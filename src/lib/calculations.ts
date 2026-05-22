@@ -349,6 +349,13 @@ export function runWeeklySimulation(
       const decay = MUSCLE_FATIGUE_DECAY[id as MuscleId] ?? 0.5;
       musclesMap[id].fatigue = musclesMap[id].fatigue * decay;
       musclesMap[id].fitness = musclesMap[id].fitness * FITNESS_RETENTION_RATE;
+
+      // Dissiper également les contributions individuelles de fatigue des exercices
+      if (musclesMap[id].contributions) {
+        Object.keys(musclesMap[id].contributions).forEach(exNom => {
+          musclesMap[id].contributions[exNom] = musclesMap[id].contributions[exNom] * decay;
+        });
+      }
     });
 
     // Dissipation très rapide du SNC (demi-vie de 24h, rétention de 0.20)
