@@ -1,9 +1,20 @@
+export type MuscleId =
+  | 'abs' | 'biceps' | 'calves' | 'chest' | 'deltoids' 
+  | 'feet' | 'forearm' | 'gluteal' | 'hamstring' | 'hands' 
+  | 'head' | 'knees' | 'lowerBack' | 'obliques' | 'quadriceps' 
+  | 'tibialis' | 'trapezius' | 'triceps' | 'upperBack' 
+  | 'rotatorCuff' | 'serratus' | 'rhomboids'
+  | 'ankles' | 'adductors' | 'neck' | 'hipFlexors' 
+  | 'upperChest' | 'lowerChest' | 'innerQuad' | 'outerQuad' 
+  | 'upperAbs' | 'lowerAbs' | 'frontDeltoid' | 'rearDeltoid' 
+  | 'upperTrapezius' | 'lowerTrapezius';
+
 export interface Exercise {
   id: string;
   nom: string;
   tier_snc: 1 | 2 | 3;
-  muscle_primaire: string;
-  muscles_secondaires: string[];
+  muscle_primaire: MuscleId;
+  muscles_secondaires: MuscleId[];
   equipment: 'poids_libre' | 'machine' | 'pdc';
 }
 
@@ -49,7 +60,7 @@ export interface MuscleStatus {
 }
 
 export interface SimulationResult {
-  muscles: { [muscleId: string]: MuscleStatus };
+  muscles: { [muscleId in MuscleId]?: MuscleStatus };
   sncScore: number;
   sncPercentage: number;
   cnsFailure: boolean;
@@ -57,96 +68,136 @@ export interface SimulationResult {
 
 // Liste de tous les exercices prédéfinis de la bibliothèque
 export const EXERCISE_LIBRARY: Exercise[] = [
-  { id: 'squat', nom: 'Squat Arrière', tier_snc: 1, muscle_primaire: 'quads', muscles_secondaires: ['glutes', 'hamstrings', 'lower_back'], equipment: 'poids_libre' },
-  { id: 'deadlift', nom: 'Soulevé de Terre', tier_snc: 1, muscle_primaire: 'lower_back', muscles_secondaires: ['glutes', 'hamstrings', 'traps', 'forearms', 'lats'], equipment: 'poids_libre' },
-  { id: 'bench_press', nom: 'Développé Couché', tier_snc: 2, muscle_primaire: 'chest_major', muscles_secondaires: ['deltoids_ant', 'triceps'], equipment: 'poids_libre' },
-  { id: 'ohp', nom: 'Overhead Press (OHP)', tier_snc: 1, muscle_primaire: 'deltoids_ant', muscles_secondaires: ['triceps', 'traps'], equipment: 'poids_libre' },
-  { id: 'pull_ups', nom: 'Tractions', tier_snc: 2, muscle_primaire: 'lats', muscles_secondaires: ['biceps', 'forearms', 'traps'], equipment: 'pdc' },
-  { id: 'barbell_row', nom: 'Rowing Barre', tier_snc: 1, muscle_primaire: 'lats', muscles_secondaires: ['traps', 'biceps', 'lower_back', 'forearms'], equipment: 'poids_libre' },
-  { id: 'dips', nom: 'Dips', tier_snc: 2, muscle_primaire: 'chest_major', muscles_secondaires: ['triceps', 'deltoids_ant'], equipment: 'pdc' },
-  { id: 'biceps_curl', nom: 'Curl Biceps (Barre/Haltères)', tier_snc: 3, muscle_primaire: 'biceps', muscles_secondaires: ['forearms'], equipment: 'poids_libre' },
+  { id: 'squat', nom: 'Squat Arrière', tier_snc: 1, muscle_primaire: 'quadriceps', muscles_secondaires: ['gluteal', 'hamstring', 'lowerBack'], equipment: 'poids_libre' },
+  { id: 'deadlift', nom: 'Soulevé de Terre', tier_snc: 1, muscle_primaire: 'lowerBack', muscles_secondaires: ['gluteal', 'hamstring', 'trapezius', 'forearm', 'upperBack'], equipment: 'poids_libre' },
+  { id: 'bench_press', nom: 'Développé Couché', tier_snc: 2, muscle_primaire: 'chest', muscles_secondaires: ['frontDeltoid', 'triceps'], equipment: 'poids_libre' },
+  { id: 'ohp', nom: 'Overhead Press (OHP)', tier_snc: 1, muscle_primaire: 'frontDeltoid', muscles_secondaires: ['triceps', 'trapezius'], equipment: 'poids_libre' },
+  { id: 'pull_ups', nom: 'Tractions', tier_snc: 2, muscle_primaire: 'upperBack', muscles_secondaires: ['biceps', 'forearm', 'trapezius'], equipment: 'pdc' },
+  { id: 'barbell_row', nom: 'Rowing Barre', tier_snc: 1, muscle_primaire: 'upperBack', muscles_secondaires: ['trapezius', 'biceps', 'lowerBack', 'forearm'], equipment: 'poids_libre' },
+  { id: 'dips', nom: 'Dips', tier_snc: 2, muscle_primaire: 'chest', muscles_secondaires: ['triceps', 'frontDeltoid'], equipment: 'pdc' },
+  { id: 'biceps_curl', nom: 'Curl Biceps (Barre/Haltères)', tier_snc: 3, muscle_primaire: 'biceps', muscles_secondaires: ['forearm'], equipment: 'poids_libre' },
   { id: 'triceps_pushdown', nom: 'Extension Triceps Poulie', tier_snc: 3, muscle_primaire: 'triceps', muscles_secondaires: [], equipment: 'machine' },
-  { id: 'incline_bench', nom: 'Développé Incliné', tier_snc: 2, muscle_primaire: 'chest_major', muscles_secondaires: ['deltoids_ant', 'triceps'], equipment: 'poids_libre' },
-  { id: 'leg_press', nom: 'Presse à Cuisses', tier_snc: 2, muscle_primaire: 'quads', muscles_secondaires: ['glutes', 'hamstrings'], equipment: 'machine' },
-  { id: 'leg_curl', nom: 'Leg Curl', tier_snc: 3, muscle_primaire: 'hamstrings', muscles_secondaires: [], equipment: 'machine' },
-  { id: 'leg_extension', nom: 'Leg Extension', tier_snc: 3, muscle_primaire: 'quads', muscles_secondaires: [], equipment: 'machine' },
-  { id: 'lateral_raise', nom: 'Élévations Latérales', tier_snc: 3, muscle_primaire: 'deltoids_ant', muscles_secondaires: [], equipment: 'poids_libre' },
-  { id: 'face_pull', nom: 'Face Pull', tier_snc: 3, muscle_primaire: 'deltoids_post', muscles_secondaires: ['traps'], equipment: 'machine' },
+  { id: 'incline_bench', nom: 'Développé Incliné', tier_snc: 2, muscle_primaire: 'chest', muscles_secondaires: ['frontDeltoid', 'triceps'], equipment: 'poids_libre' },
+  { id: 'leg_press', nom: 'Presse à Cuisses', tier_snc: 2, muscle_primaire: 'quadriceps', muscles_secondaires: ['gluteal'], equipment: 'machine' },
+  { id: 'leg_curl', nom: 'Leg Curl', tier_snc: 3, muscle_primaire: 'hamstring', muscles_secondaires: [], equipment: 'machine' },
+  { id: 'leg_extension', nom: 'Leg Extension', tier_snc: 3, muscle_primaire: 'quadriceps', muscles_secondaires: [], equipment: 'machine' },
+  { id: 'lateral_raise', nom: 'Élévations Latérales', tier_snc: 3, muscle_primaire: 'deltoids', muscles_secondaires: [], equipment: 'poids_libre' },
+  { id: 'face_pull', nom: 'Face Pull', tier_snc: 3, muscle_primaire: 'rearDeltoid', muscles_secondaires: ['trapezius'], equipment: 'machine' },
   { id: 'calf_raise', nom: 'Mollets Debout', tier_snc: 3, muscle_primaire: 'calves', muscles_secondaires: [], equipment: 'poids_libre' },
   { id: 'crunchs', nom: 'Crunchs Abdominaux', tier_snc: 3, muscle_primaire: 'abs', muscles_secondaires: [], equipment: 'pdc' },
-  { id: 'plank', nom: 'Planche Gainage', tier_snc: 3, muscle_primaire: 'abs', muscles_secondaires: ['obliques', 'lower_back'], equipment: 'pdc' },
-  { id: 'lunges', nom: 'Fentes Haltères', tier_snc: 2, muscle_primaire: 'quads', muscles_secondaires: ['glutes', 'hamstrings'], equipment: 'poids_libre' },
-  { id: 'hip_thrust', nom: 'Hip Thrust', tier_snc: 2, muscle_primaire: 'glutes', muscles_secondaires: ['hamstrings'], equipment: 'poids_libre' },
-  { id: 'pec_deck', nom: 'Pec Deck', tier_snc: 3, muscle_primaire: 'chest_major', muscles_secondaires: [], equipment: 'machine' },
-  { id: 'lat_pulldown', nom: 'Tirage Poitrine Poulie', tier_snc: 2, muscle_primaire: 'lats', muscles_secondaires: ['biceps', 'traps', 'forearms'], equipment: 'machine' }
+  { id: 'plank', nom: 'Planche Gainage', tier_snc: 3, muscle_primaire: 'abs', muscles_secondaires: ['obliques', 'lowerBack'], equipment: 'pdc' },
+  { id: 'lunges', nom: 'Fentes Haltères', tier_snc: 2, muscle_primaire: 'quadriceps', muscles_secondaires: ['gluteal', 'hamstring'], equipment: 'poids_libre' },
+  { id: 'hip_thrust', nom: 'Hip Thrust', tier_snc: 2, muscle_primaire: 'gluteal', muscles_secondaires: ['hamstring'], equipment: 'poids_libre' },
+  { id: 'pec_deck', nom: 'Pec Deck', tier_snc: 3, muscle_primaire: 'chest', muscles_secondaires: [], equipment: 'machine' },
+  { id: 'lat_pulldown', nom: 'Tirage Poitrine Poulie', tier_snc: 2, muscle_primaire: 'upperBack', muscles_secondaires: ['biceps', 'trapezius', 'forearm'], equipment: 'machine' }
 ];
 
-export const MUSCLE_DETAILS: { [id: string]: string } = {
-  chest_major: 'Grand Pectoral',
-  deltoids_ant: 'Deltoïde Antérieur',
-  deltoids_post: 'Deltoïde Postérieur',
-  biceps: 'Biceps',
-  triceps: 'Triceps',
-  forearms: 'Avant-bras',
+export const MUSCLE_DETAILS: Record<MuscleId, string> = {
   abs: 'Abdominaux',
+  biceps: 'Biceps',
+  calves: 'Mollets',
+  chest: 'Pectoraux',
+  deltoids: 'Deltoïdes Latéraux',
+  feet: 'Pieds',
+  forearm: 'Avant-bras',
+  gluteal: 'Fessiers',
+  hamstring: 'Ischio-jambiers',
+  hands: 'Mains',
+  head: 'Tête',
+  knees: 'Genoux',
+  lowerBack: 'Lombaires',
   obliques: 'Obliques',
-  traps: 'Trapèzes',
-  lats: 'Grand Dorsal',
-  lower_back: 'Lombaires (Érecteurs du rachis)',
-  glutes: 'Fessiers',
-  quads: 'Quadriceps',
-  hamstrings: 'Ischio-jambiers',
-  calves: 'Mollets'
+  quadriceps: 'Quadriceps',
+  tibialis: 'Jambier Antérieur',
+  trapezius: 'Trapèzes',
+  triceps: 'Triceps',
+  upperBack: 'Grand Dorsal / Haut du Dos',
+  rotatorCuff: 'Coiffe des Rotateurs',
+  serratus: 'Dentelé Antérieur',
+  rhomboids: 'Rhomboïdes',
+  ankles: 'Chevilles',
+  adductors: 'Adducteurs',
+  neck: 'Cou',
+  hipFlexors: 'Fléchisseurs de Hanche',
+  upperChest: 'Pectoraux Supérieurs',
+  lowerChest: 'Pectoraux Inférieurs',
+  innerQuad: 'Quadriceps Interne',
+  outerQuad: 'Quadriceps Externe',
+  upperAbs: 'Abdominaux Supérieurs',
+  lowerAbs: 'Abdominaux Inférieurs',
+  frontDeltoid: 'Deltoïde Antérieur',
+  rearDeltoid: 'Deltoïde Postérieur',
+  upperTrapezius: 'Trapèze Supérieur',
+  lowerTrapezius: 'Trapèze Inférieur'
 };
 
 // ─── 1. MATRICES DE TENSION BIOMÉCANIQUES PRÉCISES (Coefficients physiologiques) ───
-export const EXERCISE_TENSION_MATRICES: { [exId: string]: { [muscleId: string]: number } } = {
-  squat: { quads: 1.0, glutes: 0.6, hamstrings: 0.3, lower_back: 0.4 },
-  deadlift: { lower_back: 1.0, glutes: 0.8, hamstrings: 0.7, traps: 0.5, forearms: 0.4, lats: 0.3 },
-  bench_press: { chest_major: 1.0, deltoids_ant: 0.6, triceps: 0.5 },
-  ohp: { deltoids_ant: 1.0, triceps: 0.4, traps: 0.3 },
-  pull_ups: { lats: 1.0, biceps: 0.6, forearms: 0.4, traps: 0.2 },
-  barbell_row: { lats: 1.0, traps: 0.5, biceps: 0.5, lower_back: 0.6, forearms: 0.4 },
-  dips: { chest_major: 0.8, triceps: 0.8, deltoids_ant: 0.5 },
-  biceps_curl: { biceps: 1.0, forearms: 0.3 },
+export const EXERCISE_TENSION_MATRICES: Record<string, Partial<Record<MuscleId, number>>> = {
+  squat: { quadriceps: 1.0, gluteal: 0.7, lowerBack: 0.4, hamstring: 0.15 },
+  deadlift: { lowerBack: 1.0, gluteal: 0.8, hamstring: 0.85, trapezius: 0.5, forearm: 0.4, upperBack: 0.3 },
+  bench_press: { chest: 1.0, frontDeltoid: 0.6, triceps: 0.5 },
+  ohp: { frontDeltoid: 1.0, triceps: 0.5, upperChest: 0.2, trapezius: 0.3 },
+  pull_ups: { upperBack: 1.0, biceps: 0.6, forearm: 0.4, trapezius: 0.2 },
+  barbell_row: { upperBack: 1.0, trapezius: 0.6, rhomboids: 0.6, biceps: 0.5, lowerBack: 0.5, forearm: 0.4 },
+  dips: { lowerChest: 0.8, chest: 0.4, triceps: 0.8, frontDeltoid: 0.5 },
+  biceps_curl: { biceps: 1.0, forearm: 0.3 },
   triceps_pushdown: { triceps: 1.0 },
-  incline_bench: { chest_major: 0.9, deltoids_ant: 0.8, triceps: 0.4 },
-  leg_press: { quads: 1.0, glutes: 0.4, hamstrings: 0.2 },
-  leg_curl: { hamstrings: 1.0 },
-  leg_extension: { quads: 1.0 },
-  lateral_raise: { deltoids_ant: 1.0 },
-  face_pull: { deltoids_post: 1.0, traps: 0.4 },
+  incline_bench: { upperChest: 1.0, chest: 0.4, frontDeltoid: 0.7, triceps: 0.4 },
+  leg_press: { quadriceps: 1.0, gluteal: 0.4 },
+  leg_curl: { hamstring: 1.0 },
+  leg_extension: { quadriceps: 1.0 },
+  lateral_raise: { deltoids: 1.0 }, // Cible le groupe parent pour inclure le faisceau latéral
+  face_pull: { rearDeltoid: 1.0, trapezius: 0.5, rhomboids: 0.6 },
   calf_raise: { calves: 1.0 },
   crunchs: { abs: 1.0 },
-  plank: { abs: 0.8, obliques: 0.5, lower_back: 0.3 },
-  lunges: { quads: 0.8, glutes: 0.6, hamstrings: 0.4 },
-  hip_thrust: { glutes: 1.0, hamstrings: 0.4 },
-  pec_deck: { chest_major: 1.0 },
-  lat_pulldown: { lats: 1.0, biceps: 0.5, traps: 0.3, forearms: 0.2 }
+  plank: { abs: 1.0, obliques: 0.5, lowerBack: 0.3 },
+  lunges: { quadriceps: 0.8, gluteal: 0.7, hamstring: 0.2 },
+  hip_thrust: { gluteal: 1.0, hamstring: 0.3 },
+  pec_deck: { chest: 1.0 },
+  lat_pulldown: { upperBack: 1.0, biceps: 0.5, trapezius: 0.3, forearm: 0.2 }
 };
 
 // ─── 2. CINÉTIQUES DE RÉCUPÉRATION SPÉCIFIQUES AUX MUSCLES (Taux de rétention de fatigue par 24h) ───
-export const MUSCLE_FATIGUE_DECAY: { [muscleId: string]: number } = {
-  // Petits muscles (récupération rapide : retention de 0.3, cad 70% récupéré en 24h)
-  biceps: 0.3,
-  deltoids_ant: 0.3,
-  deltoids_post: 0.3,
-  calves: 0.3,
+export const MUSCLE_FATIGUE_DECAY: Record<MuscleId, number> = {
   abs: 0.3,
+  upperAbs: 0.3,
+  lowerAbs: 0.3,
+  biceps: 0.3,
+  calves: 0.3,
+  chest: 0.5,
+  upperChest: 0.5,
+  lowerChest: 0.5,
+  deltoids: 0.3,
+  frontDeltoid: 0.3,
+  rearDeltoid: 0.3,
+  forearm: 0.3,
   obliques: 0.3,
-  forearms: 0.3,
-
-  // Muscles moyens (récupération moyenne : retention de 0.5, cad 50% récupéré en 24h)
-  chest_major: 0.5,
-  lats: 0.5,
-  traps: 0.5,
+  trapezius: 0.5,
+  upperTrapezius: 0.5,
+  lowerTrapezius: 0.5,
   triceps: 0.5,
+  upperBack: 0.5,
+  rhomboids: 0.5,
+  rotatorCuff: 0.5,
+  serratus: 0.3,
+  
+  quadriceps: 0.75,
+  innerQuad: 0.75,
+  outerQuad: 0.75,
+  hamstring: 0.75,
+  gluteal: 0.75,
+  lowerBack: 0.75,
 
-  // Gros muscles et chaîne axiale (récupération lente : retention de 0.75, cad 25% récupéré en 24h)
-  quads: 0.75,
-  hamstrings: 0.75,
-  glutes: 0.75,
-  lower_back: 0.75
+  // Non-interactive decorative groups
+  feet: 0.3,
+  hands: 0.3,
+  head: 0.3,
+  knees: 0.5,
+  tibialis: 0.3,
+  ankles: 0.3,
+  adductors: 0.5,
+  neck: 0.5,
+  hipFlexors: 0.5
 };
 
 // Taux de rétention de la Fitness (l'adaptation s'estompe beaucoup plus lentement que la fatigue)
@@ -256,7 +307,7 @@ export function runWeeklySimulation(
   DAYS_OF_WEEK.forEach(day => {
     // A. Dissipation de la fatigue et de l'adaptation accumulée (au début de chaque jour)
     Object.keys(musclesMap).forEach(id => {
-      const decay = MUSCLE_FATIGUE_DECAY[id] ?? 0.5;
+      const decay = MUSCLE_FATIGUE_DECAY[id as MuscleId] ?? 0.5;
       musclesMap[id].fatigue = musclesMap[id].fatigue * decay;
       musclesMap[id].fitness = musclesMap[id].fitness * FITNESS_RETENTION_RATE;
     });
@@ -309,14 +360,58 @@ export function runWeeklySimulation(
   const targetMuscles = selectedDay ? snapshotMuscles : musclesMap;
   const targetSnc = selectedDay ? snapshotSnc : sncFatigue;
 
+  // ─── AGGREGATION DES SOUS-MUSCLES PHYSIOLOGIQUES VERS LES GROUPES VISUELS DE L'AVATAR ───
+  // Cela garantit que la tension appliquée sur un sous-muscle (ex: upperChest) se répercute visuellement
+  // sur le groupe principal de l'avatar (ex: chest) pour éviter les incohérences d'affichage.
+  const aggregateMuscle = (parentKey: MuscleId, childKeys: MuscleId[]) => {
+    const parent = targetMuscles[parentKey] || { fatigue: 0, fitness: 0, sets: 0, contributions: {} };
+    let maxFatigue = parent.fatigue;
+    let maxFitness = parent.fitness;
+    let totalSets = parent.sets;
+    const combinedContributions = { ...parent.contributions };
+
+    childKeys.forEach(childKey => {
+      const child = targetMuscles[childKey];
+      if (child) {
+        if (child.fatigue > maxFatigue) {
+          maxFatigue = child.fatigue;
+        }
+        if (child.fitness > maxFitness) {
+          maxFitness = child.fitness;
+        }
+        totalSets += child.sets;
+        Object.entries(child.contributions).forEach(([exNom, val]) => {
+          combinedContributions[exNom] = (combinedContributions[exNom] || 0) + val;
+        });
+      }
+    });
+
+    targetMuscles[parentKey] = {
+      fatigue: maxFatigue,
+      fitness: maxFitness,
+      sets: totalSets,
+      contributions: combinedContributions
+    };
+  };
+
+  // Répercuter les sous-groupes vers les parents visuels SVG
+  aggregateMuscle('chest', ['upperChest', 'lowerChest', 'serratus']);
+  aggregateMuscle('quadriceps', ['innerQuad', 'outerQuad']);
+  aggregateMuscle('abs', ['upperAbs', 'lowerAbs']);
+  aggregateMuscle('trapezius', ['upperTrapezius', 'lowerTrapezius']);
+  aggregateMuscle('upperBack', ['rhomboids', 'rotatorCuff']);
+  aggregateMuscle('frontDeltoid', ['deltoids']);
+  aggregateMuscle('rearDeltoid', ['deltoids']);
+
   // Calcul du statut du Système Nerveux Central (SNC)
   const maxSnc = profile.maxSnc || 15.0;
   const cnsFailure = targetSnc > maxSnc;
 
   // Construction des statuts musculaires finaux basés sur la Readiness
-  const finalMuscles: { [muscleId: string]: MuscleStatus } = {};
+  const finalMuscles: { [muscleId in MuscleId]?: MuscleStatus } = {};
 
   Object.entries(targetMuscles).forEach(([id, data]) => {
+    const mId = id as MuscleId;
     // Calcul de la Readiness (Forme nette)
     const readiness = data.fitness - data.fatigue;
 
@@ -348,8 +443,8 @@ export function runWeeklySimulation(
       .sort((a, b) => b.percentage - a.percentage)
       .slice(0, 2);
 
-    finalMuscles[id] = {
-      name: MUSCLE_DETAILS[id],
+    finalMuscles[mId] = {
+      name: MUSCLE_DETAILS[mId],
       inol: parseFloat(readiness.toFixed(2)), // On expose le score de Readiness comme métrique d'effort principale
       sets: Math.round(data.sets),
       color,

@@ -24,7 +24,7 @@ export default function LibraryDrawer({ onAddExercise, isOpen, onClose }: Librar
   // Filtrer la bibliothèque
   const filteredExercises = EXERCISE_LIBRARY.filter(ex => {
     const matchesSearch = ex.nom.toLowerCase().includes(search.toLowerCase());
-    const matchesMuscle = selectedMuscle === 'all' || ex.muscle_primaire === selectedMuscle || ex.muscles_secondaires.includes(selectedMuscle);
+    const matchesMuscle = selectedMuscle === 'all' || ex.muscle_primaire === selectedMuscle || (ex.muscles_secondaires as string[]).includes(selectedMuscle);
     const matchesEquipment = selectedEquipment === 'all' || ex.equipment === selectedEquipment;
     return matchesSearch && matchesMuscle && matchesEquipment;
   });

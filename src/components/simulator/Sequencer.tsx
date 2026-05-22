@@ -41,73 +41,191 @@ export default function Sequencer({
     }
   };
 
+  // Helper to calculate summary for a day
+  const getDaySummary = (day: string) => {
+    const exercises = blueprint[day] || [];
+    const isDayActive = toggledDays[day] !== false;
+    
+    if (!isDayActive) {
+      return { text: 'Désactivé', subtext: 'Jour ignoré', isRest: true };
+    }
+    
+    const activeExercises = exercises.filter(e => e.active);
+    if (activeExercises.length === 0) {
+      return { text: 'Repos ⚡', subtext: 'Récupération', isRest: true };
+    }
+    
+    const totalSets = activeExercises.reduce(
+      (sum, ex) => sum + ex.sets.reduce((sSum, s) => sSum + (s.active ? s.series : 0), 0),
+      0
+    );
+    
+    return {
+      text: `${activeExercises.length} exo${activeExercises.length > 1 ? 's' : ''}`,
+      subtext: `${totalSets} série${totalSets > 1 ? 's' : ''}`,
+      isRest: false
+    };
+  };
+
+  // Safe selected day fallback (ensure a day is always selected)
+  const currentDay = selectedDay || 'Dimanche';
+  const currentExercises = blueprint[currentDay] || [];
+  const isCurrentDayActive = toggledDays[currentDay] !== false;
+  const currentSummary = getDaySummary(currentDay);
+
   return (
-    <div className="w-full h-full overflow-x-auto scrollbar-thin select-none">
-      <div className="flex gap-3 min-w-[980px] h-full p-1 pb-2">
+    <div className="w-full h-full flex flex-col lg:flex-row gap-4 select-none min-h-0">
+      
+      {/* 1. LEFT RAIL: Day Selector (Vertical scroll on desktop, horizontal on mobile) */}
+      <div className="w-full lg:w-[220px] flex flex-row lg:flex-col gap-2 shrink-0 overflow-x-auto lg:overflow-y-auto scrollbar-thin pb-2 lg:pb-0">
         {DAYS_OF_WEEK.map((day) => {
           const exercises = blueprint[day] || [];
           const isDayActive = toggledDays[day] !== false;
-          const isSelected = selectedDay === day;
+          const isSelected = currentDay === day;
+          const summary = getDaySummary(day);
 
           return (
             <div
               key={day}
               onClick={() => onSelectDay?.(day)}
-              className={`flex-1 min-w-[150px] max-w-[200px] rounded-xl border p-2.5 flex flex-col transition-all duration-300 cursor-pointer ${
+              className={`flex-1 lg:flex-initial min-w-[120px] lg:min-w-0 rounded-xl border p-2.5 flex flex-col lg:flex-row lg:items-center justify-between transition-all duration-300 cursor-pointer ${
                 isSelected
-                  ? 'border-emerald-500 bg-zinc-950/80 ring-1 ring-emerald-500/20 shadow-[0_0_15px_rgba(16,185,129,0.15)]'
+                  ? 'border-emerald-500 bg-emerald-950/10 ring-1 ring-emerald-500/20 shadow-[0_0_15px_rgba(16,185,129,0.12)]'
                   : isDayActive
                   ? 'border-zinc-900 bg-zinc-950/40 hover:border-zinc-800'
                   : 'border-zinc-950/10 bg-zinc-950/10 opacity-40 hover:opacity-60'
               }`}
             >
-              {/* Day Header */}
-              <div className="flex items-center justify-between gap-1 pb-2 border-b border-zinc-900 shrink-0">
-                <div className="flex items-center gap-1.5" onClick={(e) => e.stopPropagation()}>
-                  <input
-                    type="checkbox"
-                    checked={isDayActive}
-                    onChange={(e) => handleToggleDay(day, e as any)}
-                    className="rounded border-zinc-800 bg-zinc-950 text-emerald-500 focus:ring-emerald-500 h-3.5 w-3.5 cursor-pointer"
-                    title={isDayActive ? "Désactiver le jour" : "Activer le jour"}
-                  />
-                  <span className="font-bold text-xs text-white tracking-wide">{day}</span>
-                </div>
+              {/* Left Side: Checkbox & Titles */}
+              <div className="flex items-center gap-2 min-w-0">
+                <input
+                  type="checkbox"
+                  checked={isDayActive}
+                  onChange={(e) => handleToggleDay(day, e as any)}
+                  className="rounded border-zinc-800 bg-zinc-950 text-emerald-500 focus:ring-emerald-500 h-3.5 w-3.5 cursor-pointer shrink-0"
+                  onClick={(e) => e.stopPropagation()} // Avoid selection when checking
+                  title={isDayActive ? "Désactiver le jour" : "Activer le jour"}
+                />
                 
-                {exercises.length > 0 && isDayActive && (
-                  <button
-                    onClick={(e) => handleClearDayConfirm(day, e)}
-                    className="text-[9px] text-zinc-500 hover:text-red-400 font-medium px-1 py-0.5 rounded hover:bg-zinc-900 transition-colors"
-                  >
-                    Vider
-                  </button>
-                )}
+                <div className="flex flex-col min-w-0">
+                  <span className="font-bold text-xs text-white tracking-wide truncate">{day}</span>
+                  <span className={`text-[9px] font-medium leading-none mt-0.5 ${
+                    summary.isRest ? 'text-zinc-500' : 'text-emerald-400'
+                  }`}>
+                    {summary.text}
+                    {!summary.isRest && <span className="text-zinc-500 ml-1">· {summary.subtext}</span>}
+                  </span>
+                </div>
               </div>
 
-              {/* Exercises Stack — scrollable internally */}
-              <div className="mt-2 flex-1 overflow-y-auto scrollbar-thin space-y-2 min-h-0">
-                {exercises.length === 0 ? (
-                  <div className="h-full flex flex-col items-center justify-center border border-dashed border-zinc-900 rounded-lg p-3 text-center">
-                    <span className="text-[10px] text-zinc-600 block">Repos</span>
-                    <span className="text-[9px] text-zinc-700 mt-1 max-w-[110px] leading-tight font-medium">
-                      Cliquez sur un exercice dans la bibliothèque
-                    </span>
-                  </div>
-                ) : (
-                  exercises.map((plannedEx, index) => (
-                    <ExerciseCard
-                      key={plannedEx.id}
-                      plannedEx={plannedEx}
-                      onChange={(updated) => onUpdateExercise(day, index, updated)}
-                      onDelete={() => onDeleteExercise(day, index)}
-                    />
-                  ))
-                )}
-              </div>
+              {/* Right Side: Clear Button */}
+              {exercises.length > 0 && isDayActive && (
+                <button
+                  onClick={(e) => handleClearDayConfirm(day, e)}
+                  className="hidden lg:block text-[9px] text-zinc-500 hover:text-red-400 font-medium px-1.5 py-0.5 rounded hover:bg-zinc-900 transition-colors cursor-pointer shrink-0"
+                  title="Vider la séance"
+                >
+                  Vider
+                </button>
+              )}
             </div>
           );
         })}
       </div>
+
+      {/* 2. RIGHT WORKSPACE: Detailed Workout Day Editor */}
+      <div className="flex-1 min-w-0 bg-zinc-900/20 border border-zinc-900 rounded-xl p-4 flex flex-col min-h-0">
+        
+        {/* Workspace Header */}
+        <div className="flex items-center justify-between pb-3 border-b border-zinc-900 shrink-0">
+          <div className="flex items-center gap-2">
+            <h4 className="font-extrabold text-base text-zinc-100 flex items-center gap-1.5 font-sans">
+              Séance du {currentDay}
+              {!isCurrentDayActive && (
+                <span className="text-[10px] bg-zinc-800 text-zinc-500 font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">
+                  Désactivée
+                </span>
+              )}
+              {isCurrentDayActive && currentSummary.isRest && (
+                <span className="text-[10px] bg-emerald-950 text-emerald-400 font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">
+                  Repos ⚡
+                </span>
+              )}
+              {isCurrentDayActive && !currentSummary.isRest && (
+                <span className="text-[10px] bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">
+                  Actif
+                </span>
+              )}
+            </h4>
+          </div>
+
+          <div className="flex items-center gap-2.5">
+            {/* Quick Toggle Active status for current day */}
+            <label className="flex items-center gap-1.5 text-xs text-zinc-400 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={isCurrentDayActive}
+                onChange={(e) => handleToggleDay(currentDay, e as any)}
+                className="rounded border-zinc-800 bg-zinc-950 text-emerald-500 focus:ring-emerald-500 h-3.5 w-3.5 cursor-pointer"
+              />
+              <span>Journée d'entraînement</span>
+            </label>
+
+            {currentExercises.length > 0 && isCurrentDayActive && (
+              <button
+                onClick={(e) => handleClearDayConfirm(currentDay, e)}
+                className="text-[10px] text-zinc-400 hover:text-red-400 font-bold px-2.5 py-1 rounded bg-zinc-900 hover:bg-zinc-850 border border-zinc-800 transition-colors cursor-pointer"
+              >
+                Vider la séance
+              </button>
+            )}
+          </div>
+        </div>
+
+        {/* Exercises Scroll Area */}
+        <div className="flex-1 overflow-y-auto scrollbar-thin mt-4 min-h-0 pr-1">
+          {!isCurrentDayActive ? (
+            <div className="h-full flex flex-col items-center justify-center border border-dashed border-zinc-900 rounded-xl p-8 text-center max-w-md mx-auto my-6">
+              <div className="bg-zinc-900/50 p-3 rounded-full mb-3">
+                <svg className="h-6 w-6 text-zinc-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
+                </svg>
+              </div>
+              <h5 className="font-bold text-sm text-zinc-400">Journée Désactivée</h5>
+              <p className="text-xs text-zinc-500 mt-2 leading-relaxed">
+                Cette journée est ignorée dans la simulation. Cochez "Journée d'entraînement" ci-dessus pour la réactiver et planifier des séances.
+              </p>
+            </div>
+          ) : currentExercises.length === 0 ? (
+            <div className="h-full flex flex-col items-center justify-center border border-dashed border-zinc-900 rounded-xl p-8 text-center max-w-md mx-auto my-6">
+              <div className="bg-emerald-950/20 p-3 rounded-full mb-3 border border-emerald-900/10">
+                <svg className="h-6 w-6 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                </svg>
+              </div>
+              <h5 className="font-bold text-sm text-zinc-300">Journée de Repos ⚡</h5>
+              <p className="text-xs text-zinc-500 mt-2 leading-relaxed">
+                Aucun exercice planifié pour le moment. Récupération complète de la fatigue nerveuse et musculaire.
+              </p>
+              <p className="text-[11px] text-emerald-400/80 mt-3 font-semibold">
+                💡 Cliquez sur un exercice dans la bibliothèque à droite pour l'ajouter !
+              </p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 pb-2">
+              {currentExercises.map((plannedEx, index) => (
+                <ExerciseCard
+                  key={plannedEx.id}
+                  plannedEx={plannedEx}
+                  onChange={(updated) => onUpdateExercise(currentDay, index, updated)}
+                  onDelete={() => onDeleteExercise(currentDay, index)}
+                />
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+
     </div>
   );
 }

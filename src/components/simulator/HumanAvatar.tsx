@@ -1,6 +1,6 @@
 'use client';
 import React, { useState } from 'react';
-import { SimulationResult, MuscleStatus } from '@/lib/calculations';
+import { SimulationResult, MuscleStatus, MuscleId } from '@/lib/calculations';
 
 interface HumanAvatarProps {
   simulation: SimulationResult;
@@ -29,8 +29,8 @@ const HOVER_COLORS: Record<ColorKey, { fill: string; stroke: string; filter: str
 // FRONT VIEW — viewBox "0 95 727 1280"
 // Each key is the muscle slug from calculations.ts
 const FRONT_PATHS: Record<string, { left: string[]; right: string[]; common?: string[] }> = {
-  // chest_major → chest slug
-  chest_major: {
+  // chest slug
+  chest: {
     left: [
       'M272.91 422.84c-18.95-17.19-22-57-12.64-78.79 5.57-12.99 26.54-24.37 39.97-25.87q20.36-2.26 37.02.75c9.74 1.76 16.13 15.64 18.41 25.04 3.99 16.48 3.23 31.38 1.67 48.06q-1.35 14.35-2.05 16.89c-6.52 23.5-38.08 29.23-58.28 24.53-9.12-2.12-17.24-4.38-24.1-10.61z',
     ],
@@ -75,8 +75,8 @@ const FRONT_PATHS: Record<string, { left: string[]; right: string[]; common?: st
     ],
   },
 
-  // deltoids_ant → deltoids slug (front)
-  deltoids_ant: {
+  // deltoids slug (front)
+  frontDeltoid: {
     left: [
       'M274.06 311.69q3.94 2.77 4.33 8.14.04.48-.38.73c-9.98 5.88-24.35 7.45-28.82 19.75-2.31 6.36-.97 17.35-1.43 23.68q-.55 7.51-5.73 14.07-10.37 13.11-13.81 16.67c-3.41 3.53-6.81 1.76-10.69-.47-15.42-8.87-24.95-25.45-22.52-43.22 2.05-14.92 12.71-25.79 24.06-35.02 16.99-13.82 35.58-17.99 54.99-4.33z',
     ],
@@ -109,8 +109,8 @@ const FRONT_PATHS: Record<string, { left: string[]; right: string[]; common?: st
     ],
   },
 
-  // quads → quadriceps slug
-  quads: {
+  // quadriceps slug
+  quadriceps: {
     left: [
       'M292.42 935.6q-.95-.52-1.57-1.4-4.1-5.79-7-13.53-7.8-20.79-13.3-42.33c-9.06-35.53-19.33-71.36-25.03-107.59-5.33-33.86 4-74.19 20.7-103.37q.35-.62.53.07c14.44 55.57 39.03 107.94 41.45 165.34 1.11 26.34.66 52.96-3.6 79.03-.63 3.83-4.73 27.81-12.18 23.78z',
       'M275.11 942.93q-2.42-2.18-3.57-5.24c-3.98-10.61-7.68-21.02-12.81-31.32-7.85-15.76-10.77-34.56-13.2-51.46-2.11-14.63-2.31-31.47-3.93-47.18-.22-2.16-1.04-12.78.46-13.79q1.36-.92 2.08.55c1.5 3.08 3.12 6.12 3.66 9.58q8.21 52.38 26.36 102.15c2.87 7.87 9.98 30.5 1.85 36.74a.71.7-42.5 01-.9-.03z',
@@ -135,8 +135,8 @@ const FRONT_PATHS: Record<string, { left: string[]; right: string[]; common?: st
     ],
   },
 
-  // traps → trapezius slug (front)
-  traps: {
+  // trapezius slug (front)
+  trapezius: {
     left: [
       'M285.01 307.01a.89.89 0 01-.11-1.64q19.44-9.61 35.65-24.8 1.68-1.57 3.31-.31.4.32.45.82 1.25 12.61-1.57 25.41c-.74 3.32-2.55 4.23-5.9 4.48q-16.02 1.24-31.83-3.96z',
     ],
@@ -145,8 +145,8 @@ const FRONT_PATHS: Record<string, { left: string[]; right: string[]; common?: st
     ],
   },
 
-  // forearms (front)
-  forearms: {
+  // forearm (front)
+  forearm: {
     left: [
       'M127.23 683.05c-4.07-2.12 1.27-27.07 2.25-31.57 4.98-23.03 9.17-46.17 13.91-69.25q1.53-7.47 2.13-15.13c.93-12.09.81-22.15 6.23-31.59 7.1-12.33 13.54-29.16 26.1-36.73a1.98 1.97 62.7 012.84.91c1.92 4.48 1.93 8.28 2.06 14.15.44 19.77-1.3 41.04-8.72 59.67-11 27.62-22.22 55.21-32.62 82.91-4.04 10.76-7.56 20.66-12.82 26.39q-.59.65-1.36.24z',
       'M201.5 527.4a.84.84 0 01.67.65c3.98 17.15-2.93 39.36-10.95 54.41-4.6 8.63-13.06 20.43-18.21 31.33q-13.21 27.92-24.58 56.64-2.51 6.35-6.61 11.02a1.43 1.43 0 01-2.5-.81q-.36-3.78.84-7.17 10.31-29.18 21.57-57.99c6.32-16.18 14.55-31.65 20.66-47.87 3.69-9.82 5.36-22.36 7.32-30.62 1.49-6.27 4.19-11.06 11.79-9.59z',
@@ -160,8 +160,8 @@ const FRONT_PATHS: Record<string, { left: string[]; right: string[]; common?: st
 
 // BACK VIEW — viewBox "718 95 727 1280"
 const BACK_PATHS: Record<string, { left: string[]; right: string[]; common?: string[] }> = {
-  // traps (back)
-  traps: {
+  // trapezius (back)
+  trapezius: {
     left: [
       'M1071.06 308.94c5.6 4.92 6.96 17.83 7.43 24.88q1.5 22.3.93 44.68-1.2 46.76-5.66 94a.57.56 3.7 01-.59.51q-.68-.03-.94-1.01-4.29-15.9-9.79-25.19c-10.24-17.31-18.8-31.84-25.59-49.4-10.19-26.38-15.6-54.28-26.46-80.58q-3.07-7.43-7.61-14.07-.3-.43.2-.6 12.47-4.28 25.48-4.85c5.54-.25 12.15.86 18.32 1.41 9.7.87 16.77 3.6 24.28 10.22z',
     ],
@@ -170,8 +170,8 @@ const BACK_PATHS: Record<string, { left: string[]; right: string[]; common?: str
     ],
   },
 
-  // deltoids_post → deltoids (back)
-  deltoids_post: {
+  // rearDeltoid (back)
+  rearDeltoid: {
     left: [
       'M980.66 319.58c.19.14.55.19.65.32a.8.8 0 01-.16 1.15c-6.78 4.75-15.26 9.77-20.03 15.58-6.41 7.78-8.76 16.96-9.44 27.04-.39 5.92-1.68 9.5-5.59 13.43-10.02 10.08-19.04 16.47-31.14 20.41q-.75.25-.75-.55.19-18.4-.09-36.3-.14-9.4 1.07-14.22c4.04-16.07 22.8-33.85 39.68-35.64 9.99-1.06 17.34 2.46 25.8 8.78z',
     ],
@@ -181,7 +181,7 @@ const BACK_PATHS: Record<string, { left: string[]; right: string[]; common?: str
   },
 
   // lats → upperBack slug (back)
-  lats: {
+  upperBack: {
     left: [
       'M987.06 381.44c-8.48-5.06-14.14-13.28-18.82-22.92q-5.3-10.92-6.46-14.04c-1.49-4.01 35.14-19.22 39.61-20.97q2.75-1.08 4.33-.72c4.33.96 6.61 9.96 7.46 13.7q5.43 23.89 14.65 55.74.78 2.7-.88 4.39c-5.37 5.5-34.69-12.08-39.89-15.18z',
       'M1017.44 583.31q-9.11-9.57-16.97-22.03-2.28-3.62-2.91-7.25c-3.28-18.82-5.77-38.04-10.52-56.55-3.53-13.73-4.74-25.19-6.61-41.43-.85-7.35-5.67-13.34-8.22-18.75q-4.93-10.47-6.44-22.88-.33-2.72 1.89-1.11c7.25 5.27 16.36 6.16 26.91 7.56 8.86 1.19 23.41-3.18 28.94-10.76 3.34-4.58 4.7-6.5 8.86-8.77a.67.66-26.4 01.92.3q10.02 21.8 19.93 43.78c2.56 5.69 12.11 15.88 10.77 21.83-3.65 16.09-9.88 31.96-16.24 47.13-9.72 23.21-18.61 46.72-27.2 70.36q-.24.67-.88.35-1.03-.52-2.23-1.78z',
@@ -204,8 +204,8 @@ const BACK_PATHS: Record<string, { left: string[]; right: string[]; common?: str
     ],
   },
 
-  // lower_back → lowerBack slug
-  lower_back: {
+  // lowerBack slug
+  lowerBack: {
     left: [
       'M986.76 627.1c-3.13-13.13-7.31-49.77 7.27-58.07 2.4-1.37 4.8-.82 6.7 1.29 6.15 6.8 16.22 18.56 18.77 28.15a1.35 1.3 52.6 01-.11.98c-2.51 4.53-9.96 8.09-15.83 11.36q-5.47 3.06-11.33 10.52c-1.23 1.56-2.6 4.3-4.5 6.06a.59.58-28.2 01-.97-.29z',
       'M1023.15 607.96a2.06 2.04-74.3 01-.94-1.69c-.17-10.98 5.04-24.58 8.79-34.9q15.61-42.83 36-83.59a1.11 1.1-62.5 011.51-.48c1.25.66 3.21 12.98 3.46 15.08q6.94 59.25 2.82 116.88-.62 8.66-3.1 19.37-.13.53-.59.24l-47.95-30.91z',
@@ -216,8 +216,8 @@ const BACK_PATHS: Record<string, { left: string[]; right: string[]; common?: str
     ],
   },
 
-  // forearms (back)
-  forearms: {
+  // forearm (back)
+  forearm: {
     left: [
       'M878.44 534.38a.15.15 0 01.18-.13c.47.12 6.68 15.77 7.07 17.22q6.66 24.73 5.52 50.29c-.4 8.9-3.45 17.35-6.64 25.55-7.94 20.38-17.41 41.88-29.59 60.09a1.04 1.02-54.2 01-1.49.25c-.34-.26.37-1.45.47-1.83q5.58-20.8 8.97-42.08 8.65-54.15 15.51-109.36z',
       'M869.06 547.19c2.16.36 1.67 6.21 1.57 7.8q-2.54 38.84-9.11 77.16c-3.04 17.71-8.47 41.3-22.09 54.09a.38.38 0 01-.62-.41c14.51-40.44 19-84.26 26.8-126.31q.9-4.88 1.48-10.82.18-1.81 1.97-1.51z',
@@ -228,8 +228,8 @@ const BACK_PATHS: Record<string, { left: string[]; right: string[]; common?: str
     ],
   },
 
-  // glutes → gluteal slug
-  glutes: {
+  // gluteal slug
+  gluteal: {
     left: [
       'M1045.06 626.19q1.42.61 4.11 4.4.27.39-.19.52c-14.47 4.12-26.13 7.4-38.13 15.77q-15.37 10.71-30.53 21.6a.55.54 74.9 01-.86-.5c1.19-13.13 10.35-35.23 20.46-45.06 9.14-8.88 34.99-1.11 45.14 3.27z',
       'M1007.94 762.81c-16.94-16.64-29.37-37.66-31.47-61-2.06-22.84 15.63-34.95 32.18-45.71 8.2-5.33 46.51-27.32 54.37-17.65 5.92 7.29 13.38 15.84 15.44 25.21q3.01 13.63 2.44 27.6-.94 22.59-6.27 44.49c-2.43 9.96-2.9 17.16-2.59 26.75.47 14.83-18.52 17.18-29.12 14.07-6.38-1.87-13.79-4.83-21.35-6.25q-7.39-1.38-13.63-7.51z',
@@ -240,8 +240,8 @@ const BACK_PATHS: Record<string, { left: string[]; right: string[]; common?: str
     ],
   },
 
-  // hamstrings → hamstring slug (back)
-  hamstrings: {
+  // hamstring slug (back)
+  hamstring: {
     left: [
       'M963.27 741.53a.71.7 31.7 011.19-.28q1.51 1.62 2.47 3.99c4.6 11.41 8.93 22.66 11.07 34.72 3.38 19.14 4.84 38.23 3.12 57.74q-1.68 19.06-2.99 38.15c-.51 7.55-.88 15.71.07 23.18q1.08 8.54 1.39 17.57a.52.52 0 01-.98.25q-1.03-2.07-1.8-4.62-5.13-16.92-7.25-34.49-5.01-41.45-6.86-83.17-1.09-24.75-.07-49.51.06-1.59.64-3.53z',
       'M998.81 761.94q14.07 14.17 20.1 33.62c.98 3.15-.78 9.61-.93 12.91q-1.3 27.63-2.3 55.27c-.55 15.31-1.54 30.27-5.12 45.26q-8.62 36.18-22.76 68.73-3.65 8.41-10.15 17.19-.45.61-.41-.14c.11-1.93.82-4.15.99-5.71q2.45-22.72 6.08-45.26c2.83-17.66 4.18-35.95 4.33-52.37.33-36.43-.75-73.34 1.47-109.68.33-5.32 1.07-16.16 4.7-20.25q.33-.36.81-.45 1.95-.37 3.19.88z',
@@ -397,7 +397,7 @@ export default function HumanAvatar({ simulation, selectedDay }: HumanAvatarProp
   };
 
   // Returns SVG path props for a given muscle ID
-  const mp = (id: string) => {
+  const mp = (id: MuscleId) => {
     const status = simulation.muscles[id];
     // Preserve muscle colors during CNS fatigue to show peripheral overreaching/status
     const color: ColorKey = status?.color ?? 'grey';
@@ -425,7 +425,7 @@ export default function HumanAvatar({ simulation, selectedDay }: HumanAvatarProp
     };
   };
 
-  const hoveredMuscle = hoveredId ? simulation.muscles[hoveredId] : null;
+  const hoveredMuscle = hoveredId ? simulation.muscles[hoveredId as MuscleId] : null;
 
   // Combined viewBox for both front and back side by side
   // Front: 0 95 727 1280 — Back: 718 95 727 1280
@@ -537,12 +537,12 @@ export default function HumanAvatar({ simulation, selectedDay }: HumanAvatarProp
 
           {/* ─── FRONT VIEW MUSCLES ──────────────────────────────────────── */}
 
-          {/* chest_major */}
-          {FRONT_PATHS.chest_major.left.map((d, i) => (
-            <path key={`chest-fl-${i}`} d={d} {...mp('chest_major')} />
+          {/* chest */}
+          {FRONT_PATHS.chest.left.map((d, i) => (
+            <path key={`chest-fl-${i}`} d={d} {...mp('chest')} />
           ))}
-          {FRONT_PATHS.chest_major.right.map((d, i) => (
-            <path key={`chest-fr-${i}`} d={d} {...mp('chest_major')} />
+          {FRONT_PATHS.chest.right.map((d, i) => (
+            <path key={`chest-fr-${i}`} d={d} {...mp('chest')} />
           ))}
 
           {/* abs */}
@@ -569,12 +569,12 @@ export default function HumanAvatar({ simulation, selectedDay }: HumanAvatarProp
             <path key={`tri-fr-${i}`} d={d} {...mp('triceps')} />
           ))}
 
-          {/* deltoids_ant */}
-          {FRONT_PATHS.deltoids_ant.left.map((d, i) => (
-            <path key={`dant-fl-${i}`} d={d} {...mp('deltoids_ant')} />
+          {/* frontDeltoid */}
+          {FRONT_PATHS.frontDeltoid.left.map((d, i) => (
+            <path key={`dant-fl-${i}`} d={d} {...mp('frontDeltoid')} />
           ))}
-          {FRONT_PATHS.deltoids_ant.right.map((d, i) => (
-            <path key={`dant-fr-${i}`} d={d} {...mp('deltoids_ant')} />
+          {FRONT_PATHS.frontDeltoid.right.map((d, i) => (
+            <path key={`dant-fr-${i}`} d={d} {...mp('frontDeltoid')} />
           ))}
 
           {/* obliques */}
@@ -585,12 +585,12 @@ export default function HumanAvatar({ simulation, selectedDay }: HumanAvatarProp
             <path key={`obl-fr-${i}`} d={d} {...mp('obliques')} />
           ))}
 
-          {/* quads */}
-          {FRONT_PATHS.quads.left.map((d, i) => (
-            <path key={`qua-fl-${i}`} d={d} {...mp('quads')} />
+          {/* quadriceps */}
+          {FRONT_PATHS.quadriceps.left.map((d, i) => (
+            <path key={`qua-fl-${i}`} d={d} {...mp('quadriceps')} />
           ))}
-          {FRONT_PATHS.quads.right.map((d, i) => (
-            <path key={`qua-fr-${i}`} d={d} {...mp('quads')} />
+          {FRONT_PATHS.quadriceps.right.map((d, i) => (
+            <path key={`qua-fr-${i}`} d={d} {...mp('quadriceps')} />
           ))}
 
           {/* calves front */}
@@ -601,46 +601,46 @@ export default function HumanAvatar({ simulation, selectedDay }: HumanAvatarProp
             <path key={`calf-fr-${i}`} d={d} {...mp('calves')} />
           ))}
 
-          {/* traps front */}
-          {FRONT_PATHS.traps.left.map((d, i) => (
-            <path key={`tr-fl-${i}`} d={d} {...mp('traps')} />
+          {/* trapezius front */}
+          {FRONT_PATHS.trapezius.left.map((d, i) => (
+            <path key={`tr-fl-${i}`} d={d} {...mp('trapezius')} />
           ))}
-          {FRONT_PATHS.traps.right.map((d, i) => (
-            <path key={`tr-fr-${i}`} d={d} {...mp('traps')} />
+          {FRONT_PATHS.trapezius.right.map((d, i) => (
+            <path key={`tr-fr-${i}`} d={d} {...mp('trapezius')} />
           ))}
 
-          {/* forearms front */}
-          {FRONT_PATHS.forearms.left.map((d, i) => (
-            <path key={`fa-fl-${i}`} d={d} {...mp('forearms')} />
+          {/* forearm front */}
+          {FRONT_PATHS.forearm.left.map((d, i) => (
+            <path key={`fa-fl-${i}`} d={d} {...mp('forearm')} />
           ))}
-          {FRONT_PATHS.forearms.right.map((d, i) => (
-            <path key={`fa-fr-${i}`} d={d} {...mp('forearms')} />
+          {FRONT_PATHS.forearm.right.map((d, i) => (
+            <path key={`fa-fr-${i}`} d={d} {...mp('forearm')} />
           ))}
 
           {/* ─── BACK VIEW MUSCLES ───────────────────────────────────────── */}
 
-          {/* traps back */}
-          {BACK_PATHS.traps.left.map((d, i) => (
-            <path key={`trb-fl-${i}`} d={d} {...mp('traps')} />
+          {/* trapezius back */}
+          {BACK_PATHS.trapezius.left.map((d, i) => (
+            <path key={`trb-fl-${i}`} d={d} {...mp('trapezius')} />
           ))}
-          {BACK_PATHS.traps.right.map((d, i) => (
-            <path key={`trb-fr-${i}`} d={d} {...mp('traps')} />
-          ))}
-
-          {/* deltoids_post */}
-          {BACK_PATHS.deltoids_post.left.map((d, i) => (
-            <path key={`dpost-fl-${i}`} d={d} {...mp('deltoids_post')} />
-          ))}
-          {BACK_PATHS.deltoids_post.right.map((d, i) => (
-            <path key={`dpost-fr-${i}`} d={d} {...mp('deltoids_post')} />
+          {BACK_PATHS.trapezius.right.map((d, i) => (
+            <path key={`trb-fr-${i}`} d={d} {...mp('trapezius')} />
           ))}
 
-          {/* lats */}
-          {BACK_PATHS.lats.left.map((d, i) => (
-            <path key={`lat-fl-${i}`} d={d} {...mp('lats')} />
+          {/* rearDeltoid */}
+          {BACK_PATHS.rearDeltoid.left.map((d, i) => (
+            <path key={`dpost-fl-${i}`} d={d} {...mp('rearDeltoid')} />
           ))}
-          {BACK_PATHS.lats.right.map((d, i) => (
-            <path key={`lat-fr-${i}`} d={d} {...mp('lats')} />
+          {BACK_PATHS.rearDeltoid.right.map((d, i) => (
+            <path key={`dpost-fr-${i}`} d={d} {...mp('rearDeltoid')} />
+          ))}
+
+          {/* upperBack */}
+          {BACK_PATHS.upperBack.left.map((d, i) => (
+            <path key={`lat-fl-${i}`} d={d} {...mp('upperBack')} />
+          ))}
+          {BACK_PATHS.upperBack.right.map((d, i) => (
+            <path key={`lat-fr-${i}`} d={d} {...mp('upperBack')} />
           ))}
 
           {/* triceps back */}
@@ -651,36 +651,36 @@ export default function HumanAvatar({ simulation, selectedDay }: HumanAvatarProp
             <path key={`trib-fr-${i}`} d={d} {...mp('triceps')} />
           ))}
 
-          {/* lower_back */}
-          {BACK_PATHS.lower_back.left.map((d, i) => (
-            <path key={`lb-fl-${i}`} d={d} {...mp('lower_back')} />
+          {/* lowerBack */}
+          {BACK_PATHS.lowerBack.left.map((d, i) => (
+            <path key={`lb-fl-${i}`} d={d} {...mp('lowerBack')} />
           ))}
-          {BACK_PATHS.lower_back.right.map((d, i) => (
-            <path key={`lb-fr-${i}`} d={d} {...mp('lower_back')} />
-          ))}
-
-          {/* forearms back */}
-          {BACK_PATHS.forearms.left.map((d, i) => (
-            <path key={`fab-fl-${i}`} d={d} {...mp('forearms')} />
-          ))}
-          {BACK_PATHS.forearms.right.map((d, i) => (
-            <path key={`fab-fr-${i}`} d={d} {...mp('forearms')} />
+          {BACK_PATHS.lowerBack.right.map((d, i) => (
+            <path key={`lb-fr-${i}`} d={d} {...mp('lowerBack')} />
           ))}
 
-          {/* glutes */}
-          {BACK_PATHS.glutes.left.map((d, i) => (
-            <path key={`gl-fl-${i}`} d={d} {...mp('glutes')} />
+          {/* forearm back */}
+          {BACK_PATHS.forearm.left.map((d, i) => (
+            <path key={`fab-fl-${i}`} d={d} {...mp('forearm')} />
           ))}
-          {BACK_PATHS.glutes.right.map((d, i) => (
-            <path key={`gl-fr-${i}`} d={d} {...mp('glutes')} />
+          {BACK_PATHS.forearm.right.map((d, i) => (
+            <path key={`fab-fr-${i}`} d={d} {...mp('forearm')} />
           ))}
 
-          {/* hamstrings */}
-          {BACK_PATHS.hamstrings.left.map((d, i) => (
-            <path key={`ham-fl-${i}`} d={d} {...mp('hamstrings')} />
+          {/* gluteal */}
+          {BACK_PATHS.gluteal.left.map((d, i) => (
+            <path key={`gl-fl-${i}`} d={d} {...mp('gluteal')} />
           ))}
-          {BACK_PATHS.hamstrings.right.map((d, i) => (
-            <path key={`ham-fr-${i}`} d={d} {...mp('hamstrings')} />
+          {BACK_PATHS.gluteal.right.map((d, i) => (
+            <path key={`gl-fr-${i}`} d={d} {...mp('gluteal')} />
+          ))}
+
+          {/* hamstring */}
+          {BACK_PATHS.hamstring.left.map((d, i) => (
+            <path key={`ham-fl-${i}`} d={d} {...mp('hamstring')} />
+          ))}
+          {BACK_PATHS.hamstring.right.map((d, i) => (
+            <path key={`ham-fr-${i}`} d={d} {...mp('hamstring')} />
           ))}
 
           {/* calves back */}
