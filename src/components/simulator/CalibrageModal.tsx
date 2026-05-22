@@ -16,6 +16,12 @@ export default function CalibrageModal({ isOpen, onClose, profile, onSave }: Cal
   const [ohp, setOhp] = useState(profile.prs.ohp);
   const [maxSnc, setMaxSnc] = useState(profile.maxSnc);
 
+  // New recovery states
+  const [age, setAge] = useState(profile.age ?? 28);
+  const [sleepHours, setSleepHours] = useState(profile.sleepHours ?? 8);
+  const [caloricStatus, setCaloricStatus] = useState(profile.caloricStatus ?? 'maintenance');
+  const [stressLevel, setStressLevel] = useState(profile.stressLevel ?? 'moderate');
+
   if (!isOpen) return null;
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -28,7 +34,11 @@ export default function CalibrageModal({ isOpen, onClose, profile, onSave }: Cal
         deadlift: Number(deadlift) || 120,
         ohp: Number(ohp) || 50
       },
-      maxSnc: Number(maxSnc) || 15.0
+      maxSnc: Number(maxSnc) || 15.0,
+      age: Number(age) || 28,
+      sleepHours: Number(sleepHours) || 8,
+      caloricStatus: caloricStatus || 'maintenance',
+      stressLevel: stressLevel || 'moderate'
     });
     onClose();
   };
@@ -142,6 +152,64 @@ export default function CalibrageModal({ isOpen, onClose, profile, onSave }: Cal
                   onChange={(e) => setOhp(Number(e.target.value))}
                   className="mt-1 block w-full rounded-lg border border-zinc-800 bg-zinc-900 px-3 py-2 text-sm text-white focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500 transition-colors"
                 />
+              </div>
+            </div>
+          </div>
+
+          {/* Facteurs de Récupération (Santé & Sommeil) */}
+          <div className="border-t border-zinc-850 pt-4">
+            <h3 className="text-sm font-semibold uppercase tracking-wider text-emerald-400">Facteurs de Récupération</h3>
+            <p className="text-xs text-zinc-500 mt-1">Ces paramètres biologiques modulent la vitesse de dissipation de votre fatigue.</p>
+            
+            <div className="mt-4 grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-xs font-medium text-zinc-400">Âge (années)</label>
+                <input
+                  type="number"
+                  required
+                  min="14"
+                  max="100"
+                  value={age}
+                  onChange={(e) => setAge(Number(e.target.value))}
+                  className="mt-1 block w-full rounded-lg border border-zinc-800 bg-zinc-900 px-3 py-2 text-sm text-white focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500 transition-colors"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-zinc-400">Sommeil (heures / nuit)</label>
+                <input
+                  type="number"
+                  required
+                  min="3"
+                  max="15"
+                  step="0.5"
+                  value={sleepHours}
+                  onChange={(e) => setSleepHours(Number(e.target.value))}
+                  className="mt-1 block w-full rounded-lg border border-zinc-800 bg-zinc-900 px-3 py-2 text-sm text-white focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500 transition-colors"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-zinc-400">Balance Calorique</label>
+                <select
+                  value={caloricStatus}
+                  onChange={(e) => setCaloricStatus(e.target.value as any)}
+                  className="mt-1 block w-full rounded-lg border border-zinc-800 bg-zinc-900 px-3 py-2 text-sm text-white focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500 transition-colors"
+                >
+                  <option value="deficit">Déficit (Sèche)</option>
+                  <option value="maintenance">Maintenance</option>
+                  <option value="surplus">Surplus (Prise de masse)</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-zinc-400">Niveau de Stress</label>
+                <select
+                  value={stressLevel}
+                  onChange={(e) => setStressLevel(e.target.value as any)}
+                  className="mt-1 block w-full rounded-lg border border-zinc-800 bg-zinc-900 px-3 py-2 text-sm text-white focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500 transition-colors"
+                >
+                  <option value="low">Faible</option>
+                  <option value="moderate">Modéré</option>
+                  <option value="high">Élevé (Cortisol)</option>
+                </select>
               </div>
             </div>
           </div>

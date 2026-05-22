@@ -16,6 +16,7 @@ export default function ExerciseCard({ plannedEx, onChange, onDelete, simulation
 
   const muscleColor = simulation?.muscles?.[exercise.muscle_primaire]?.color;
   const capacity = simulation?.muscles?.[exercise.muscle_primaire]?.remainingCapacity ?? 1.0;
+  const jointStress = simulation?.muscles?.[exercise.muscle_primaire]?.jointStress ?? 0;
 
   const handleUpdateSet = (index: number, updatedSet: Partial<PlannedSet>) => {
     const updatedSets = [...plannedEx.sets];
@@ -104,8 +105,20 @@ export default function ExerciseCard({ plannedEx, onChange, onDelete, simulation
 
       {/* Capacity Bar */}
       {plannedEx.active && (
-        <div className="mt-1.5 px-1 py-1.5 bg-zinc-950/20 rounded border border-zinc-850/30">
+        <div className="mt-1.5 px-1 py-1.5 bg-zinc-950/20 rounded border border-zinc-850/30 space-y-1">
           <CapacityBar progress={capacity} color={muscleColor} showLabel={true} />
+          {jointStress > 1.0 && (
+            <div className="flex items-center justify-between text-[8px] font-medium pt-0.5 border-t border-zinc-900/50">
+              <span className="text-zinc-500">Contrainte Articulaire :</span>
+              <span className={`font-bold px-1 rounded-full ${
+                jointStress > 2.0 
+                  ? 'text-red-400 bg-red-950/30' 
+                  : 'text-amber-400 bg-amber-950/30'
+              }`}>
+                ⚠️ {jointStress > 2.0 ? 'Élevée' : 'Modérée'} ({jointStress.toFixed(1)})
+              </span>
+            </div>
+          )}
         </div>
       )}
 

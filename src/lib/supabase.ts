@@ -25,7 +25,11 @@ const DEFAULT_PROFILE: UserProfile = {
     deadlift: 120,
     ohp: 50
   },
-  maxSnc: 15.0
+  maxSnc: 15.0,
+  age: 28,
+  sleepHours: 8,
+  caloricStatus: 'maintenance',
+  stressLevel: 'moderate'
 };
 
 // Blueprint initial vide
@@ -72,7 +76,11 @@ export async function loadUserProfile(): Promise<UserProfile> {
               deadlift: data.pr_deadlift || 120,
               ohp: data.pr_ohp || 50
             },
-            maxSnc: data.max_snc || 15.0
+            maxSnc: data.max_snc || 15.0,
+            age: 28,
+            sleepHours: 8,
+            caloricStatus: 'maintenance',
+            stressLevel: 'moderate'
           };
         }
       }

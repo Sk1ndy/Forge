@@ -28,7 +28,11 @@ export default function Home() {
   const [profile, setProfile] = useState<UserProfile>({
     pdc: 75,
     prs: { squat: 100, bench: 80, deadlift: 120, ohp: 50 },
-    maxSnc: 15.0
+    maxSnc: 15.0,
+    age: 28,
+    sleepHours: 8,
+    caloricStatus: 'maintenance',
+    stressLevel: 'moderate'
   });
 
   const [blueprint, setBlueprint] = useState<WeeklyBlueprint>({

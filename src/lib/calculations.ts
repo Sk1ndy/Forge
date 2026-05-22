@@ -29,6 +29,10 @@ export interface UserProfile {
   pdc: number; // Poids de Corps
   prs: UserPRs;
   maxSnc: number; // Capacité max SNC
+  age?: number;
+  sleepHours?: number;      // Heures de sommeil moyennes
+  caloricStatus?: 'deficit' | 'maintenance' | 'surplus';
+  stressLevel?: 'low' | 'moderate' | 'high';
 }
 
 export interface PlannedSet {
@@ -58,6 +62,7 @@ export interface MuscleStatus {
   statusLabel: string;
   contributors: { nom: string; percentage: number }[];
   remainingCapacity: number; // Valeur de 0 à 1 représentant le budget d'entraînement restant
+  jointStress: number; // Jauge de stress articulaire/tendineux
 }
 
 export interface SimulationResult {
@@ -213,6 +218,13 @@ export function estimate1RM(weight: number, reps: number, rpe: number): number {
   const effectiveReps = reps + rpeDiff;
   
   if (effectiveReps <= 1) return weight;
+  
+  // Formule de Brzycki sécurisée pour les séries longues (> 10 reps) pour éviter la surévaluation d'Epley
+  if (effectiveReps > 10) {
+    const denom = 1.0278 - (0.0278 * effectiveReps);
+    return weight / Math.max(0.1, denom);
+  }
+  
   return weight * (1 + effectiveReps / 30);
 }
 
@@ -254,13 +266,20 @@ export function calculateSetImpact(
     return { inol: 0, sncPoints: 0 };
   }
 
+  // Si l'exercice est au poids de corps (PDC), on incorpore la charge réelle déplacée par l'athlète (ex: 90% pour tractions/dips, 65% pour pompes/crunchs).
+  let effectiveWeight = set.poids;
+  if (exercise.equipment === 'pdc') {
+    const bodyweightContribution = (exercise.id === 'pull_ups' || exercise.id === 'dips') ? 0.90 : 0.65;
+    effectiveWeight = set.poids + ((profile.pdc || 75) * bodyweightContribution);
+  }
+
   // 1. Détermination du 1RM de référence
-  const pr = getApplicable1RM(exercise.id, profile.prs, set.poids, set.reps, set.rpe);
+  const pr = getApplicable1RM(exercise.id, profile.prs, effectiveWeight, set.reps, set.rpe);
   
   // 2. Calcul de l'intensité relative (%)
   let intensity = 70;
   if (pr > 0) {
-    intensity = (set.poids / pr) * 100;
+    intensity = (effectiveWeight / pr) * 100;
   }
   intensity = Math.min(99, Math.max(10, intensity));
 
@@ -276,7 +295,7 @@ export function calculateSetImpact(
 
   // 5. Calcul de l'impact SNC (Système Nerveux Central)
   const pdc = profile.pdc || 75;
-  const weightRatio = set.poids / pdc;
+  const weightRatio = effectiveWeight / pdc;
   
   // Pondération de fatigue axiale SNC : Tier 1 = 100%, Tier 2 = 50%, Tier 3 (isolation) = 5%
   let sncMultiplier = exercise.tier_snc === 1 ? 1.0 : (exercise.tier_snc === 2 ? 0.5 : 0.05);
@@ -305,19 +324,41 @@ export function runWeeklySimulation(
 ): SimulationResult {
   const DAYS_OF_WEEK = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche'];
 
+  // Modificateur individuel de récupération (Santé & Sommeil)
+  const userAge = profile.age ?? 28;
+  const userSleep = profile.sleepHours ?? 8;
+  const userCaloric = profile.caloricStatus ?? 'maintenance';
+  const userStress = profile.stressLevel ?? 'moderate';
+
+  let recoveryMultiplier = 1.0;
+  if (userAge > 40) {
+    recoveryMultiplier *= Math.max(0.70, 1 - (userAge - 40) * 0.01);
+  }
+  if (userSleep < 7.5) {
+    recoveryMultiplier *= Math.max(0.60, 0.60 + (userSleep / 7.5) * 0.40);
+  } else if (userSleep >= 9) {
+    recoveryMultiplier *= 1.05;
+  }
+  if (userCaloric === 'deficit') recoveryMultiplier *= 0.80;
+  else if (userCaloric === 'surplus') recoveryMultiplier *= 1.05;
+  
+  if (userStress === 'high') recoveryMultiplier *= 0.80;
+  else if (userStress === 'low') recoveryMultiplier *= 1.05;
+
   // Initialisation des états musculaires à T0 (Lundi matin, vierge de fatigue)
   const musclesMap: {
     [muscleId: string]: {
       fatigue: number;
       fitness: number;
       sets: number;
+      jointStress: number;
       contributions: { [exId: string]: number };
       setsContributions: { [exId: string]: number };
     };
   } = {};
   
   Object.keys(MUSCLE_DETAILS).forEach(id => {
-    musclesMap[id] = { fatigue: 0, fitness: 0, sets: 0, contributions: {}, setsContributions: {} };
+    musclesMap[id] = { fatigue: 0, fitness: 0, sets: 0, jointStress: 0, contributions: {}, setsContributions: {} };
   });
 
   // Helper de clonage profond ultra-rapide (complet, évite le JSON.parse/stringify coûteux)
@@ -329,6 +370,7 @@ export function runWeeklySimulation(
         fatigue: s.fatigue,
         fitness: s.fitness,
         sets: s.sets,
+        jointStress: s.jointStress,
         contributions: { ...s.contributions },
         setsContributions: { ...s.setsContributions }
       };
@@ -355,20 +397,26 @@ export function runWeeklySimulation(
     DAYS_OF_WEEK.forEach(day => {
       // A. Dissipation de la fatigue et de l'adaptation accumulée (au début de chaque jour)
       Object.keys(musclesMap).forEach(id => {
-        const decay = MUSCLE_FATIGUE_DECAY[id as MuscleId] ?? 0.5;
-        musclesMap[id].fatigue = musclesMap[id].fatigue * decay;
+        const baseDecay = MUSCLE_FATIGUE_DECAY[id as MuscleId] ?? 0.5;
+        // Un decay plus élevé signifie qu'on retient plus de fatigue (donc récupère moins vite)
+        const adjustedDecay = Math.max(0.05, Math.min(0.98, baseDecay + (1 - recoveryMultiplier) * (1 - baseDecay)));
+
+        musclesMap[id].fatigue = musclesMap[id].fatigue * adjustedDecay;
         musclesMap[id].fitness = musclesMap[id].fitness * FITNESS_RETENTION_RATE;
+        
+        // Dissipation très lente du stress articulaire (decay de 0.90 par 24h, soit 8-10 jours de repos pour éliminer)
+        musclesMap[id].jointStress = (musclesMap[id].jointStress || 0) * 0.90;
 
         // Dissiper également les contributions individuelles de fatigue des exercices
         if (musclesMap[id].contributions) {
           Object.keys(musclesMap[id].contributions).forEach(exNom => {
-            musclesMap[id].contributions[exNom] = musclesMap[id].contributions[exNom] * decay;
+            musclesMap[id].contributions[exNom] = musclesMap[id].contributions[exNom] * adjustedDecay;
           });
         }
       });
 
-      // Dissipation très rapide du SNC (demi-vie de 24h, rétention de 0.20)
-      sncFatigue = sncFatigue * 0.20;
+      // Dissipation plus réaliste du SNC (rétention de 0.55 par jour, soit ~45% de dissipation, demandant ~48-72h de récupération)
+      sncFatigue = sncFatigue * 0.55;
 
       // B. Application des séances d'entraînement du jour (si le jour est activé)
       if (toggledDays[day] !== false) {
@@ -390,15 +438,30 @@ export function runWeeklySimulation(
             // Accumuler la fatigue centrale (SNC)
             sncFatigue += sncPoints;
 
-            // Distribuer la fatigue périphérique (INOL) et l'adaptation (Fitness) aux muscles concernés
+            // Distribuer la fatigue périphérique (INOL), l'adaptation (Fitness) et le stress articulaire aux muscles concernés
             Object.entries(tensionMatrix).forEach(([muscleId, coeff]) => {
               if (musclesMap[muscleId]) {
                 const muscleLoad = inol * coeff;
                 musclesMap[muscleId].fatigue += muscleLoad;
-                musclesMap[muscleId].fitness += muscleLoad * 0.5; // Gain en Fitness = 50% de la fatigue induite
+                
+                // Rendements Adaptatifs Décroissants (Inverted-U) pour la Fitness sous Fatigue chronique
+                let adaptationMultiplier = 1.0;
+                const currentFatigue = musclesMap[muscleId].fatigue;
+                if (currentFatigue > 1.5) {
+                  adaptationMultiplier = Math.max(0.0, 1.0 - (currentFatigue - 1.5) * 0.6);
+                }
+                musclesMap[muscleId].fitness += muscleLoad * 0.5 * adaptationMultiplier;
+                
                 musclesMap[muscleId].sets += set.series * coeff;
                 musclesMap[muscleId].contributions[exercise.nom] = (musclesMap[muscleId].contributions[exercise.nom] || 0) + muscleLoad;
                 musclesMap[muscleId].setsContributions[exercise.nom] = (musclesMap[muscleId].setsContributions[exercise.nom] || 0) + set.series * coeff;
+
+                // Stress articulaire / tendineux passif
+                let jointStressIncrement = inol * coeff * 0.5; // Fatigue passive tendineuse de base
+                if (set.reps <= 5 && set.rpe >= 9) {
+                  jointStressIncrement += inol * coeff * 1.5; // Contrainte axiale et mécanique disproportionnée sous charge très lourde
+                }
+                musclesMap[muscleId].jointStress = (musclesMap[muscleId].jointStress || 0) + jointStressIncrement;
               }
             });
           });
@@ -421,11 +484,12 @@ export function runWeeklySimulation(
   // Agrégation consolidée par exercice : somme des exercices distincts, mais prend le maximum
   // pour le même exercice appliqué à la fois au parent et à l'enfant (évite double-comptage et sous-estimation).
   const aggregateMuscle = (parentKey: MuscleId, childKeys: MuscleId[]) => {
-    const parent = targetMuscles[parentKey] || { fatigue: 0, fitness: 0, sets: 0, contributions: {}, setsContributions: {} };
+    const parent = targetMuscles[parentKey] || { fatigue: 0, fitness: 0, sets: 0, jointStress: 0, contributions: {}, setsContributions: {} };
     
-    // Consolidation des contributions de fatigue (INOL) et de volume (séries) par exercice
+    // Consolidation des contributions de fatigue (INOL), de volume (séries) et de stress articulaire par exercice
     const combinedContributions = { ...parent.contributions };
     const combinedSetsContributions = { ...parent.setsContributions };
+    let maxJointStress = parent.jointStress || 0;
 
     childKeys.forEach(childKey => {
       const child = targetMuscles[childKey];
@@ -436,6 +500,7 @@ export function runWeeklySimulation(
         Object.entries(child.setsContributions || {}).forEach(([exNom, val]) => {
           combinedSetsContributions[exNom] = Math.max(combinedSetsContributions[exNom] || 0, val);
         });
+        maxJointStress = Math.max(maxJointStress, child.jointStress || 0);
       }
     });
 
@@ -446,6 +511,7 @@ export function runWeeklySimulation(
       fatigue: totalFatigue,
       fitness: totalFatigue * 0.5, // Ratio adaptation classique
       sets: totalSets,
+      jointStress: maxJointStress,
       contributions: combinedContributions,
       setsContributions: combinedSetsContributions
     };
@@ -506,7 +572,8 @@ export function runWeeklySimulation(
       color,
       statusLabel,
       contributors,
-      remainingCapacity: parseFloat(Math.max(0, 1 - (fatigueScore / 2.5)).toFixed(4))
+      remainingCapacity: parseFloat(Math.max(0, 1 - (fatigueScore / 2.5)).toFixed(4)),
+      jointStress: parseFloat((data.jointStress || 0).toFixed(2))
     };
   });
 

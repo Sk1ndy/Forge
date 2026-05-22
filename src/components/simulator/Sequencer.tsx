@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { WeeklyBlueprint, PlannedExercise, SimulationResult, EXERCISE_LIBRARY } from '@/lib/calculations';
+import { WeeklyBlueprint, PlannedExercise, SimulationResult, EXERCISE_LIBRARY, MuscleId } from '@/lib/calculations';
 import ExerciseCard from './ExerciseCard';
 
 interface SequencerProps {
@@ -30,6 +30,41 @@ export default function Sequencer({
   simulation
 }: SequencerProps) {
   const [isDragOver, setIsDragOver] = React.useState(false);
+
+  // Détecter s'il y a du volume de séance inadapté (plus de 10 séries pour un muscle sur le même jour)
+  const getJunkVolumeAlerts = () => {
+    if (!isCurrentDayActive) return [];
+    
+    const muscleSets: { [muscleId: string]: { name: string; sets: number } } = {};
+    
+    currentExercises.forEach(plannedEx => {
+      if (!plannedEx.active) return;
+      const exercise = EXERCISE_LIBRARY.find(e => e.id === plannedEx.exerciseId);
+      if (!exercise) return;
+      
+      const activeSetsCount = plannedEx.sets.reduce((sum, s) => sum + (s.active ? s.series : 0), 0);
+      if (activeSetsCount <= 0) return;
+      
+      const muscleId = exercise.muscle_primaire;
+      if (!muscleSets[muscleId]) {
+        muscleSets[muscleId] = {
+          name: muscleId,
+          sets: 0
+        };
+      }
+      muscleSets[muscleId].sets += activeSetsCount;
+    });
+    
+    const alerts: string[] = [];
+    Object.entries(muscleSets).forEach(([mId, data]) => {
+      if (data.sets > 10) {
+        const frenchName = simulation?.muscles?.[mId as MuscleId]?.name || mId;
+        alerts.push(`${frenchName} (${data.sets} séries)`);
+      }
+    });
+    
+    return alerts;
+  };
 
   const handleToggleDay = (day: string, e: React.MouseEvent) => {
     e.stopPropagation(); // Avoid triggering day selection if just toggling
@@ -219,6 +254,23 @@ export default function Sequencer({
             )}
           </div>
         </div>
+
+        {/* Alerte Junk Volume (Surcharge intra-séance) */}
+        {(() => {
+          const junkAlerts = getJunkVolumeAlerts();
+          if (junkAlerts.length === 0) return null;
+          return (
+            <div className="mt-3 p-3 rounded-xl border border-amber-500/20 bg-amber-500/5 text-amber-400 text-xs flex items-start gap-2.5 shrink-0 animate-pulse">
+              <span className="text-sm shrink-0">⚠️</span>
+              <div>
+                <span className="font-extrabold block">Volume de Séance Inadapté (Junk Volume)</span>
+                <span className="text-[10px] text-amber-500/80 leading-normal block mt-0.5">
+                  Faire plus de 10 séries pour un même groupe musculaire ({junkAlerts.join(', ')}) lors d'une seule séance sature les récepteurs cellulaires de l'hypertrophie. Le volume excédentaire est inutile ("volume poubelle"), ralentit la récupération et fatigue inutilement le SNC.
+                </span>
+              </div>
+            </div>
+          );
+        })()}
 
         {/* Exercises Scroll Area */}
         <div className="flex-1 overflow-y-auto scrollbar-thin mt-4 min-h-0 pr-1">
