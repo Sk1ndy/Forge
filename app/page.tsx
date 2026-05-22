@@ -158,6 +158,18 @@ export default function Home() {
     });
   };
 
+  const handleReorderExercises = (day: string, startIndex: number, endIndex: number) => {
+    setBlueprint(prev => {
+      const updatedDayExercises = [...(prev[day] || [])];
+      const [moved] = updatedDayExercises.splice(startIndex, 1);
+      updatedDayExercises.splice(endIndex, 0, moved);
+      return {
+        ...prev,
+        [day]: updatedDayExercises
+      };
+    });
+  };
+
   const handleDeleteExercise = (day: string, index: number) => {
     setBlueprint(prev => {
       const updatedDayExercises = (prev[day] || []).filter((_, i) => i !== index);
@@ -451,6 +463,7 @@ export default function Home() {
             toggledDays={toggledDays}
             onUpdateExercise={handleUpdateExercise}
             onDeleteExercise={handleDeleteExercise}
+            onReorderExercises={handleReorderExercises}
             onClearDay={handleClearDay}
             onUpdateToggledDays={setToggledDays}
             selectedDay={selectedDay}

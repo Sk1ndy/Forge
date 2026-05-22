@@ -1,12 +1,29 @@
 import React, { useState } from 'react';
 import { WeeklyBlueprint, PlannedExercise, SimulationResult, EXERCISE_LIBRARY, MuscleId } from '@/lib/calculations';
 import ExerciseCard from './ExerciseCard';
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+} from '@dnd-kit/core';
+import {
+  SortableContext,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
+  useSortable,
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 
 interface SequencerProps {
   blueprint: WeeklyBlueprint;
   toggledDays: { [day: string]: boolean };
   onUpdateExercise: (day: string, index: number, updatedEx: PlannedExercise) => void;
   onDeleteExercise: (day: string, index: number) => void;
+  onReorderExercises?: (day: string, startIndex: number, endIndex: number) => void;
   onClearDay: (day: string) => void;
   onUpdateToggledDays: (updated: { [day: string]: boolean }) => void;
   selectedDay?: string;
@@ -27,44 +44,22 @@ export default function Sequencer({
   selectedDay,
   onSelectDay,
   onAddExercise,
-  simulation
+  simulation,
+  onReorderExercises
 }: SequencerProps) {
   const [isDragOver, setIsDragOver] = React.useState(false);
 
-  // Détecter s'il y a du volume de séance inadapté (plus de 10 séries pour un muscle sur le même jour)
-  const getJunkVolumeAlerts = () => {
-    if (!isCurrentDayActive) return [];
-    
-    const muscleSets: { [muscleId: string]: { name: string; sets: number } } = {};
-    
-    currentExercises.forEach(plannedEx => {
-      if (!plannedEx.active) return;
-      const exercise = EXERCISE_LIBRARY.find(e => e.id === plannedEx.exerciseId);
-      if (!exercise) return;
-      
-      const activeSetsCount = plannedEx.sets.reduce((sum, s) => sum + (s.active ? s.series : 0), 0);
-      if (activeSetsCount <= 0) return;
-      
-      const muscleId = exercise.muscle_primaire;
-      if (!muscleSets[muscleId]) {
-        muscleSets[muscleId] = {
-          name: muscleId,
-          sets: 0
-        };
-      }
-      muscleSets[muscleId].sets += activeSetsCount;
-    });
-    
-    const alerts: string[] = [];
-    Object.entries(muscleSets).forEach(([mId, data]) => {
-      if (data.sets > 10) {
-        const frenchName = simulation?.muscles?.[mId as MuscleId]?.name || mId;
-        alerts.push(`${frenchName} (${data.sets} séries)`);
-      }
-    });
-    
-    return alerts;
-  };
+  // DND Sensors (distance 5 to allow clicks inside inputs)
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 5,
+      },
+    }),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
 
   const handleToggleDay = (day: string, e: React.MouseEvent) => {
     e.stopPropagation(); // Avoid triggering day selection if just toggling
@@ -112,6 +107,17 @@ export default function Sequencer({
   const currentExercises = blueprint[currentDay] || [];
   const isCurrentDayActive = toggledDays[currentDay] !== false;
   const currentSummary = getDaySummary(currentDay);
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+    if (over && active.id !== over.id) {
+      const oldIndex = currentExercises.findIndex((ex) => ex.id === active.id);
+      const newIndex = currentExercises.findIndex((ex) => ex.id === over.id);
+      if (oldIndex !== -1 && newIndex !== -1 && onReorderExercises) {
+        onReorderExercises(currentDay, oldIndex, newIndex);
+      }
+    }
+  };
 
   return (
     <div className="w-full h-full flex flex-col lg:flex-row gap-4 select-none min-h-0">
@@ -255,9 +261,9 @@ export default function Sequencer({
           </div>
         </div>
 
-        {/* Alerte Junk Volume (Surcharge intra-séance) */}
+        {/* Alerte Junk Volume (Surcharge intra-séance basée sur l'intensité) */}
         {(() => {
-          const junkAlerts = getJunkVolumeAlerts();
+          const junkAlerts = simulation?.junkVolumeAlerts || [];
           if (junkAlerts.length === 0) return null;
           return (
             <div className="mt-3 p-3 rounded-xl border border-amber-500/20 bg-amber-500/5 text-amber-400 text-xs flex items-start gap-2.5 shrink-0 animate-pulse">
@@ -265,7 +271,7 @@ export default function Sequencer({
               <div>
                 <span className="font-extrabold block">Volume de Séance Inadapté (Junk Volume)</span>
                 <span className="text-[10px] text-amber-500/80 leading-normal block mt-0.5">
-                  Faire plus de 10 séries pour un même groupe musculaire ({junkAlerts.join(', ')}) lors d'une seule séance sature les récepteurs cellulaires de l'hypertrophie. Le volume excédentaire est inutile ("volume poubelle"), ralentit la récupération et fatigue inutilement le SNC.
+                  La charge d'entraînement (Intensité + Volume) pour {junkAlerts.join(', ')} sature les récepteurs cellulaires de l'hypertrophie. Ce volume excédentaire est physiologiquement inefficace ("volume poubelle"), ralentit la récupération et fatigue inutilement le SNC.
                 </span>
               </div>
             </div>
@@ -287,36 +293,82 @@ export default function Sequencer({
               </p>
             </div>
           ) : currentExercises.length === 0 ? (
-            <div className="h-full flex flex-col items-center justify-center border border-dashed border-zinc-900 rounded-xl p-8 text-center max-w-md mx-auto my-6">
+            <div className="h-full flex flex-col items-center justify-center border border-dashed border-zinc-900 rounded-xl p-8 text-center max-w-md mx-auto my-6 bg-emerald-950/5">
               <div className="bg-emerald-950/20 p-3 rounded-full mb-3 border border-emerald-900/10">
                 <svg className="h-6 w-6 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
               </div>
-              <h5 className="font-bold text-sm text-zinc-300">Journée de Repos ⚡</h5>
-              <p className="text-xs text-zinc-500 mt-2 leading-relaxed">
-                Aucun exercice planifié pour le moment. Récupération complète de la fatigue nerveuse et musculaire.
+              <h5 className="font-bold text-sm text-emerald-400">Récupération Active 🌊</h5>
+              <p className="text-xs text-zinc-400 mt-2 leading-relaxed">
+                Aucun exercice planifié. Profitez-en pour dissiper la fatigue avec de la <strong className="text-zinc-300">Récupération Active</strong> (marche, vélo léger, mobilité). Cela augmente le flux sanguin intramusculaire et accélère la reconstruction des tendons.
               </p>
-              <p className="text-[11px] text-emerald-400/80 mt-3 font-semibold text-center leading-normal">
-                💡 Cliquez sur un exercice ou glissez-le directement ici pour l'ajouter !
+              <p className="text-[11px] text-zinc-500 mt-3 font-semibold text-center leading-normal">
+                💡 Cliquez sur un exercice ou glissez-le directement ici pour ajouter une séance.
               </p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 pb-2">
-              {currentExercises.map((plannedEx, index) => (
-                <ExerciseCard
-                  key={plannedEx.id}
-                  plannedEx={plannedEx}
-                  onChange={(updated) => onUpdateExercise(currentDay, index, updated)}
-                  onDelete={() => onDeleteExercise(currentDay, index)}
-                  simulation={simulation}
-                />
-              ))}
-            </div>
+            <DndContext 
+              sensors={sensors}
+              collisionDetection={closestCenter}
+              onDragEnd={handleDragEnd}
+            >
+              <SortableContext 
+                items={currentExercises.map(ex => ex.id)}
+                strategy={verticalListSortingStrategy}
+              >
+                <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 pb-2">
+                  {currentExercises.map((plannedEx, index) => (
+                    <SortableExerciseWrapper
+                      key={plannedEx.id}
+                      plannedEx={plannedEx}
+                      index={index}
+                      currentDay={currentDay}
+                      onUpdateExercise={onUpdateExercise}
+                      onDeleteExercise={onDeleteExercise}
+                      simulation={simulation}
+                    />
+                  ))}
+                </div>
+              </SortableContext>
+            </DndContext>
           )}
         </div>
       </div>
 
     </div>
+  );
+}
+
+// Wrapper for Sortable DND integration
+function SortableExerciseWrapper({ plannedEx, index, currentDay, onUpdateExercise, onDeleteExercise, simulation }: any) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: plannedEx.id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    zIndex: isDragging ? 10 : 0,
+    opacity: isDragging ? 0.9 : 1,
+    position: 'relative' as const,
+  };
+
+  return (
+    <ExerciseCard
+      setNodeRef={setNodeRef}
+      style={style}
+      dragHandleProps={attributes}
+      dragHandleListeners={listeners}
+      plannedEx={plannedEx}
+      onChange={(updated) => onUpdateExercise(currentDay, index, updated)}
+      onDelete={() => onDeleteExercise(currentDay, index)}
+      simulation={simulation}
+    />
   );
 }

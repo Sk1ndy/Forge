@@ -43,6 +43,16 @@ export interface PlannedSet {
   active: boolean;
 }
 
+import { z } from 'zod';
+
+export const PlannedSetSchema = z.object({
+  series: z.number().int().positive(),
+  reps: z.number().int().positive(),
+  poids: z.number().nonnegative(),
+  rpe: z.number().min(1).max(10),
+  active: z.boolean()
+});
+
 export interface PlannedExercise {
   id: string; // ID unique de l'instance planifiée
   exerciseId: string; // ID de l'exercice dans la bibliothèque
@@ -71,6 +81,7 @@ export interface SimulationResult {
   sncScore: number;
   sncPercentage: number;
   cnsFailure: boolean;
+  junkVolumeAlerts: string[]; // Alertes de junk volume basées sur l'INOL de la séance
 }
 
 // Liste de tous les exercices prédéfinis de la bibliothèque
@@ -252,6 +263,9 @@ export function getApplicable1RM(exerciseId: string, userPrs: UserPRs, weight: n
   return estimate1RM(weight, reps, rpe);
 }
 
+// Fonction de normalisation pour éviter la dérive des virgules flottantes (float drift)
+export const normalize = (val: number) => Math.round(val * 10000) / 10000;
+
 /**
  * Calcule l'impact d'une série unique (INOL et SNC) avec la formule exponentielle continue du RPE
  */
@@ -380,6 +394,9 @@ export function runWeeklySimulation(
   let snapshotMuscles = createLightSnapshot(musclesMap);
   let snapshotSnc = 0;
 
+  // Suivi de l'INOL intra-séance pour détecter le Junk Volume (Intensité + Volume)
+  const dailyInol: { [muscleId: string]: number } = {};
+
   // Simulation séquentielle sur 2 semaines
   for (let week = 1; week <= 2; week++) {
     // Réinitialisation des volumes de travail au début de la semaine
@@ -394,19 +411,19 @@ export function runWeeklySimulation(
         const baseDecay = MUSCLE_FATIGUE_DECAY[id as MuscleId] ?? 0.5;
         const adjustedDecay = Math.max(0.05, Math.min(0.98, baseDecay + (1 - recoveryMultiplier) * (1 - baseDecay)));
 
-        musclesMap[id].fatigue = musclesMap[id].fatigue * adjustedDecay;
-        musclesMap[id].fitness = musclesMap[id].fitness * FITNESS_RETENTION_RATE;
-        musclesMap[id].jointStress = (musclesMap[id].jointStress || 0) * 0.90;
+        musclesMap[id].fatigue = normalize(musclesMap[id].fatigue * adjustedDecay);
+        musclesMap[id].fitness = normalize(musclesMap[id].fitness * FITNESS_RETENTION_RATE);
+        musclesMap[id].jointStress = normalize((musclesMap[id].jointStress || 0) * 0.90);
 
         if (musclesMap[id].contributions) {
           Object.keys(musclesMap[id].contributions).forEach(exNom => {
-            musclesMap[id].contributions[exNom] = musclesMap[id].contributions[exNom] * adjustedDecay;
+            musclesMap[id].contributions[exNom] = normalize(musclesMap[id].contributions[exNom] * adjustedDecay);
           });
         }
       });
 
       // Dissipation réaliste du SNC
-      sncFatigue = sncFatigue * 0.55;
+      sncFatigue = normalize(sncFatigue * 0.55);
 
       // B. Application des séances du jour
       if (toggledDays[day] !== false) {
@@ -420,18 +437,21 @@ export function runWeeklySimulation(
           const tensionMatrix = EXERCISE_TENSION_MATRICES[plannedEx.exerciseId] || { [exercise.muscle_primaire]: 1.0 };
 
           plannedEx.sets.forEach(set => {
-            if (!set.active) return;
-
-            const { inol, sncPoints } = calculateSetImpact(set, exercise, profile);
+            // Validation stricte via Zod avant simulation
+            const parsedSet = PlannedSetSchema.safeParse(set);
+            if (!parsedSet.success || !parsedSet.data.active) return;
+            
+            const validSet = parsedSet.data;
+            const { inol, sncPoints } = calculateSetImpact(validSet, exercise, profile);
 
             // Accumuler la fatigue centrale
-            sncFatigue += sncPoints;
+            sncFatigue = normalize(sncFatigue + sncPoints);
 
             // Distribuer la fatigue, l'adaptation et le stress articulaire
             Object.entries(tensionMatrix).forEach(([muscleId, coeff]) => {
               if (musclesMap[muscleId]) {
                 const muscleLoad = inol * coeff;
-                musclesMap[muscleId].fatigue += muscleLoad;
+                musclesMap[muscleId].fatigue = normalize(musclesMap[muscleId].fatigue + muscleLoad);
                 
                 // Inverted-U adaptation curve
                 let adaptationMultiplier = 1.0;
@@ -439,18 +459,23 @@ export function runWeeklySimulation(
                 if (currentFatigue > 1.5) {
                   adaptationMultiplier = Math.max(0.0, 1.0 - (currentFatigue - 1.5) * 0.6);
                 }
-                musclesMap[muscleId].fitness += muscleLoad * 0.5 * adaptationMultiplier;
+                musclesMap[muscleId].fitness = normalize(musclesMap[muscleId].fitness + muscleLoad * 0.5 * adaptationMultiplier);
                 
-                musclesMap[muscleId].sets += set.series * coeff;
-                musclesMap[muscleId].contributions[exercise.nom] = (musclesMap[muscleId].contributions[exercise.nom] || 0) + muscleLoad;
-                musclesMap[muscleId].setsContributions[exercise.nom] = (musclesMap[muscleId].setsContributions[exercise.nom] || 0) + set.series * coeff;
+                musclesMap[muscleId].sets = normalize(musclesMap[muscleId].sets + validSet.series * coeff);
+                musclesMap[muscleId].contributions[exercise.nom] = normalize((musclesMap[muscleId].contributions[exercise.nom] || 0) + muscleLoad);
+                musclesMap[muscleId].setsContributions[exercise.nom] = normalize((musclesMap[muscleId].setsContributions[exercise.nom] || 0) + validSet.series * coeff);
 
-                // Contrainte mécanique articulaire
+                // Contrainte mécanique articulaire cumulative
                 let jointStressIncrement = inol * coeff * 0.5;
-                if (set.reps <= 5 && set.rpe >= 9) {
+                if (validSet.reps <= 5 && validSet.rpe >= 9) {
                   jointStressIncrement += inol * coeff * 1.5;
                 }
-                musclesMap[muscleId].jointStress = (musclesMap[muscleId].jointStress || 0) + jointStressIncrement;
+                musclesMap[muscleId].jointStress = normalize((musclesMap[muscleId].jointStress || 0) + jointStressIncrement);
+                
+                // Suivi de l'INOL intra-séance pour le jour cible
+                if (week === 2 && selectedDay && day.toLowerCase() === selectedDay.toLowerCase()) {
+                  dailyInol[muscleId] = normalize((dailyInol[muscleId] || 0) + muscleLoad);
+                }
               }
             });
           });
@@ -478,6 +503,7 @@ export function runWeeklySimulation(
     let totalFatigue = parent.fatigue;
     let totalSets = parent.sets;
     let totalJointStress = parent.jointStress;
+    let totalDailyInol = dailyInol[parentKey] || 0;
     
     const combinedContributions = { ...parent.contributions };
     const combinedSetsContributions = { ...parent.setsContributions };
@@ -487,23 +513,27 @@ export function runWeeklySimulation(
       if (child) {
         const coeff = weights[childKey] ?? 1.0;
         
-        totalFatigue += child.fatigue * coeff;
-        totalSets += child.sets * coeff;
-        totalJointStress = Math.max(totalJointStress, child.jointStress * coeff);
+        totalFatigue = normalize(totalFatigue + child.fatigue * coeff);
+        totalSets = normalize(totalSets + child.sets * coeff);
+        // CORRECTION DE L'AGRÉGATION (CRITIQUE): Sommation cumulative pondérée au lieu de Math.max
+        totalJointStress = normalize(totalJointStress + child.jointStress * coeff);
+        totalDailyInol = normalize(totalDailyInol + (dailyInol[childKey] || 0) * coeff);
 
         Object.entries(child.contributions || {}).forEach(([exNom, val]) => {
-          combinedContributions[exNom] = (combinedContributions[exNom] || 0) + val * coeff;
+          combinedContributions[exNom] = normalize((combinedContributions[exNom] || 0) + val * coeff);
         });
         
         Object.entries(child.setsContributions || {}).forEach(([exNom, val]) => {
-          combinedSetsContributions[exNom] = (combinedSetsContributions[exNom] || 0) + val * coeff;
+          combinedSetsContributions[exNom] = normalize((combinedSetsContributions[exNom] || 0) + val * coeff);
         });
       }
     });
 
+    dailyInol[parentKey] = totalDailyInol;
+
     targetMuscles[parentKey] = {
       fatigue: totalFatigue,
-      fitness: totalFatigue * 0.5,
+      fitness: normalize(totalFatigue * 0.5),
       sets: totalSets,
       jointStress: totalJointStress,
       contributions: combinedContributions,
@@ -571,12 +601,31 @@ export function runWeeklySimulation(
     };
   });
 
+  // REFACTORING DU "JUNK VOLUME"
+  // On détecte le volume poubelle en fonction de l'INOL généré dans la séance (Intensité + Volume).
+  // Un INOL > 1.5 sur un même jour pour un muscle représente une surcharge inutile.
+  const junkVolumeAlerts: string[] = [];
+  const reportedParents = new Set<string>();
+
+  // Trier par INOL décroissant pour alerter en priorité sur les gros muscles
+  Object.entries(dailyInol)
+    .sort((a, b) => b[1] - a[1])
+    .forEach(([id, inolScore]) => {
+      const isSubMuscle = !['chest', 'quadriceps', 'abs', 'trapezius', 'upperBack', 'frontDeltoid', 'rearDeltoid', 'biceps', 'triceps', 'lowerBack', 'gluteal', 'hamstring', 'calves', 'forearm'].includes(id);
+      
+      if (inolScore > 1.5 && finalMuscles[id as MuscleId] && !isSubMuscle) {
+        junkVolumeAlerts.push(`${MUSCLE_DETAILS[id as MuscleId]} (INOL: ${inolScore.toFixed(1)})`);
+        reportedParents.add(id);
+      }
+  });
+
   const sncPercentage = Math.min(100, Math.round((targetSnc / maxSnc) * 100));
 
   return {
     muscles: finalMuscles,
     sncScore: parseFloat(targetSnc.toFixed(2)),
     sncPercentage,
-    cnsFailure
+    cnsFailure,
+    junkVolumeAlerts
   };
 }

@@ -7,9 +7,22 @@ interface ExerciseCardProps {
   onChange: (updated: PlannedExercise) => void;
   onDelete: () => void;
   simulation: SimulationResult;
+  setNodeRef?: (node: HTMLElement | null) => void;
+  style?: React.CSSProperties;
+  dragHandleProps?: Record<string, any>;
+  dragHandleListeners?: Record<string, any>;
 }
 
-export default function ExerciseCard({ plannedEx, onChange, onDelete, simulation }: ExerciseCardProps) {
+export default function ExerciseCard({ 
+  plannedEx, 
+  onChange, 
+  onDelete, 
+  simulation,
+  setNodeRef,
+  style,
+  dragHandleProps,
+  dragHandleListeners
+}: ExerciseCardProps) {
   const exercise = EXERCISE_LIBRARY.find(e => e.id === plannedEx.exerciseId);
 
   if (!exercise) return null;
@@ -61,6 +74,8 @@ export default function ExerciseCard({ plannedEx, onChange, onDelete, simulation
 
   return (
     <div
+      ref={setNodeRef}
+      style={style}
       className={`border rounded-xl p-2 bg-zinc-900/60 backdrop-blur-sm transition-all ${
         plannedEx.active
           ? 'border-zinc-800 hover:border-zinc-700 shadow-md'
@@ -70,6 +85,16 @@ export default function ExerciseCard({ plannedEx, onChange, onDelete, simulation
       {/* Header */}
       <div className="flex items-center justify-between gap-1 pb-1.5 border-b border-zinc-850">
         <div className="flex items-center gap-1.5 overflow-hidden">
+          {/* Drag Handle */}
+          <div 
+            className="cursor-grab touch-none p-1 -ml-1 text-zinc-600 hover:text-zinc-400 active:cursor-grabbing"
+            {...dragHandleProps}
+            {...dragHandleListeners}
+          >
+            <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M4 8h16M4 16h16" />
+            </svg>
+          </div>
           <input
             type="checkbox"
             checked={plannedEx.active}

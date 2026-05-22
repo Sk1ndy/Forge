@@ -767,10 +767,41 @@ export default function HumanAvatar({
           <div style={{ fontSize: 11, color: getStatusColor(hoveredMuscle.color), marginBottom: 2 }}>
             {hoveredMuscle.statusLabel}
           </div>
-          <div style={{ fontSize: 11, color: '#71717a' }}>
+          <div style={{ fontSize: 11, color: '#71717a', marginBottom: 6 }}>
             INOL: <span style={{ color: '#a1a1aa' }}>{hoveredMuscle.inol.toFixed(2)}</span>
             {' · '}Séries: <span style={{ color: '#a1a1aa' }}>{hoveredMuscle.sets}</span>
           </div>
+          
+          {/* Diagnostic Clinique Prescriptif */}
+          <div style={{ fontSize: 10, marginBottom: 4, lineHeight: 1.4 }}>
+            {hoveredMuscle.color === 'red' && (
+              <span style={{ color: '#fca5a5' }}>⛔ Déficit de force majeur. Risque lésionnel élevé. Repos obligatoire.</span>
+            )}
+            {hoveredMuscle.color === 'orange' && (
+              <span style={{ color: '#fcd34d' }}>⚠️ Force temporairement réduite (~10-15%). Volume à surveiller.</span>
+            )}
+            {hoveredMuscle.color === 'green' && (
+              <span style={{ color: '#6ee7b7' }}>✅ Récupération optimale. Force maximale disponible.</span>
+            )}
+            {hoveredMuscle.color === 'grey' && (
+              <span style={{ color: '#a1a1aa' }}>Volume insuffisant pour déclencher une adaptation optimale.</span>
+            )}
+          </div>
+
+          {/* Indicateur de Stress Articulaire */}
+          {(hoveredMuscle.jointStress ?? 0) > 1.0 && (
+            <div style={{ 
+              fontSize: 10, 
+              color: (hoveredMuscle.jointStress ?? 0) > 2.0 ? '#ef4444' : '#f59e0b',
+              fontWeight: 600,
+              marginTop: 4,
+              paddingTop: 4,
+              borderTop: '1px solid rgba(255,255,255,0.06)'
+            }}>
+              {(hoveredMuscle.jointStress ?? 0) > 2.0 ? '🚨 Surcharge Articulaire/Tendineuse' : '⚠️ Contrainte Articulaire Modérée'}
+            </div>
+          )}
+
           {hoveredMuscle.contributors.length > 0 && (
             <div style={{ marginTop: 4, borderTop: '1px solid rgba(255,255,255,0.06)', paddingTop: 4 }}>
               {hoveredMuscle.contributors.map((c, i) => (
