@@ -126,11 +126,39 @@ export default function Home() {
       active: true
     };
 
-    const updatedDayExercises = [...(blueprint[day] || []), newPlannedEx];
-    setBlueprint({
-      ...blueprint,
-      [day]: updatedDayExercises
+    setBlueprint(prev => ({
+      ...prev,
+      [day]: [...(prev[day] || []), newPlannedEx]
+    }));
+  };
+
+  // Mises à jour d'état robustes (évite les stale closures de blueprint)
+  const handleUpdateExercise = (day: string, index: number, updatedEx: PlannedExercise) => {
+    setBlueprint(prev => {
+      const updatedDayExercises = [...(prev[day] || [])];
+      updatedDayExercises[index] = updatedEx;
+      return {
+        ...prev,
+        [day]: updatedDayExercises
+      };
     });
+  };
+
+  const handleDeleteExercise = (day: string, index: number) => {
+    setBlueprint(prev => {
+      const updatedDayExercises = (prev[day] || []).filter((_, i) => i !== index);
+      return {
+        ...prev,
+        [day]: updatedDayExercises
+      };
+    });
+  };
+
+  const handleClearDay = (day: string) => {
+    setBlueprint(prev => ({
+      ...prev,
+      [day]: []
+    }));
   };
 
   // 5. Sauvegarder le profil
@@ -399,7 +427,9 @@ export default function Home() {
           <Sequencer
             blueprint={blueprint}
             toggledDays={toggledDays}
-            onUpdateBlueprint={setBlueprint}
+            onUpdateExercise={handleUpdateExercise}
+            onDeleteExercise={handleDeleteExercise}
+            onClearDay={handleClearDay}
             onUpdateToggledDays={setToggledDays}
           />
         </div>

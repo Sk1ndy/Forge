@@ -5,7 +5,9 @@ import ExerciseCard from './ExerciseCard';
 interface SequencerProps {
   blueprint: WeeklyBlueprint;
   toggledDays: { [day: string]: boolean };
-  onUpdateBlueprint: (updated: WeeklyBlueprint) => void;
+  onUpdateExercise: (day: string, index: number, updatedEx: PlannedExercise) => void;
+  onDeleteExercise: (day: string, index: number) => void;
+  onClearDay: (day: string) => void;
   onUpdateToggledDays: (updated: { [day: string]: boolean }) => void;
 }
 
@@ -14,7 +16,9 @@ const DAYS_OF_WEEK = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi
 export default function Sequencer({
   blueprint,
   toggledDays,
-  onUpdateBlueprint,
+  onUpdateExercise,
+  onDeleteExercise,
+  onClearDay,
   onUpdateToggledDays
 }: SequencerProps) {
 
@@ -25,29 +29,9 @@ export default function Sequencer({
     });
   };
 
-  const handleUpdateExercise = (day: string, index: number, updatedEx: PlannedExercise) => {
-    const updatedDayExercises = [...(blueprint[day] || [])];
-    updatedDayExercises[index] = updatedEx;
-    onUpdateBlueprint({
-      ...blueprint,
-      [day]: updatedDayExercises
-    });
-  };
-
-  const handleDeleteExercise = (day: string, index: number) => {
-    const updatedDayExercises = (blueprint[day] || []).filter((_, i) => i !== index);
-    onUpdateBlueprint({
-      ...blueprint,
-      [day]: updatedDayExercises
-    });
-  };
-
-  const handleClearDay = (day: string) => {
+  const handleClearDayConfirm = (day: string) => {
     if (confirm(`Voulez-vous vider la séance de ${day} ?`)) {
-      onUpdateBlueprint({
-        ...blueprint,
-        [day]: []
-      });
+      onClearDay(day);
     }
   };
 
@@ -82,7 +66,7 @@ export default function Sequencer({
                 
                 {exercises.length > 0 && isDayActive && (
                   <button
-                    onClick={() => handleClearDay(day)}
+                    onClick={() => handleClearDayConfirm(day)}
                     className="text-[10px] text-zinc-500 hover:text-red-400 font-medium px-1.5 py-0.5 rounded hover:bg-zinc-900 transition-colors"
                   >
                     Vider
@@ -104,8 +88,8 @@ export default function Sequencer({
                     <ExerciseCard
                       key={plannedEx.id}
                       plannedEx={plannedEx}
-                      onChange={(updated) => handleUpdateExercise(day, index, updated)}
-                      onDelete={() => handleDeleteExercise(day, index)}
+                      onChange={(updated) => onUpdateExercise(day, index, updated)}
+                      onDelete={() => onDeleteExercise(day, index)}
                     />
                   ))
                 )}
