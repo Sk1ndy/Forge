@@ -4,6 +4,7 @@ import { SimulationResult, MuscleStatus } from '@/lib/calculations';
 
 interface HumanAvatarProps {
   simulation: SimulationResult;
+  selectedDay?: string;
 }
 
 // ─── Colour helpers ──────────────────────────────────────────────────────────
@@ -378,7 +379,7 @@ const BACK_HAIR = [
   "M1138.38 168.39q-.49 4.68-3.37 8.55-.31.41-.81.56c-9.91 3.11-15.97 9.67-20.28 18.94-2.21 4.75-5.25 12.39-11.48 12.3q-18.46-.25-36.94.25-5.35.14-7.43-3.53c-6.78-11.97-10.46-22.53-23.52-27.48-5.05-1.92-5.38-6.47-6.41-11.53q-6.64-26.16 4.43-48.88c8.13-16.7 34.61-21.41 51.58-21.04 4.89.11 9.69-.11 14.42.85 18.79 3.8 33.17 8.5 39.34 28.66q6.38 20.88.47 42.35z"
 ];
 
-export default function HumanAvatar({ simulation }: HumanAvatarProps) {
+export default function HumanAvatar({ simulation, selectedDay }: HumanAvatarProps) {
   const [hoveredId, setHoveredId] = useState<string | null>(null);
   const [tooltipPos, setTooltipPos] = useState({ x: 0, y: 0 });
 
@@ -398,13 +399,15 @@ export default function HumanAvatar({ simulation }: HumanAvatarProps) {
   // Returns SVG path props for a given muscle ID
   const mp = (id: string) => {
     const status = simulation.muscles[id];
-    const color: ColorKey = simulation.cnsFailure ? 'grey' : (status?.color ?? 'grey');
+    // Preserve muscle colors during CNS fatigue to show peripheral overreaching/status
+    const color: ColorKey = status?.color ?? 'grey';
     const isHovered = hoveredId === id;
 
     const base = COLORS[color];
     const hover = HOVER_COLORS[color];
 
-    const opacity = simulation.cnsFailure ? 0.4 : 1;
+    // Subtle global transparency to indicate systemic CNS fatigue without locking/graying out
+    const opacity = simulation.cnsFailure ? 0.8 : 1;
 
     return {
       fill: isHovered ? hover.fill : base.fill,
@@ -441,7 +444,7 @@ export default function HumanAvatar({ simulation }: HumanAvatarProps) {
         flexShrink: 0,
       }}>
         <span style={{ fontSize: 12, fontWeight: 800, color: '#f4f4f5', letterSpacing: '0.08em', textTransform: 'uppercase' }}>
-          CARTE ANATOMIQUE
+          CARTE ANATOMIQUE {selectedDay ? `— ${selectedDay.toUpperCase()}` : ''}
         </span>
         {simulation.cnsFailure && (
           <span style={{

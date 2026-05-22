@@ -56,6 +56,7 @@ export default function Home() {
   const [supabaseUser, setSupabaseUser] = useState<any>(null);
   const [activeBlueprintId, setActiveBlueprintId] = useState<string | null>(null);
   const [currentBlueprintName, setCurrentBlueprintName] = useState<string>('Blueprint de travail');
+  const [selectedDay, setSelectedDay] = useState<string>('Dimanche');
 
   const supabase = createClient();
 
@@ -93,8 +94,8 @@ export default function Home() {
 
   // 3. Calcul de la simulation en temps réel réactive à chaque modification
   const simulationResult = useMemo(() => {
-    return runWeeklySimulation(blueprint, profile, toggledDays);
-  }, [blueprint, profile, toggledDays]);
+    return runWeeklySimulation(blueprint, profile, toggledDays, selectedDay);
+  }, [blueprint, profile, toggledDays, selectedDay]);
 
   // 4. Ajouter un exercice au séquenceur
   const handleAddExercise = (exerciseId: string, day: string) => {
@@ -397,7 +398,7 @@ export default function Home() {
         {/* Upper Portion: SVG Anatomical Avatar — fixed height, no scroll */}
         <div className="w-full flex justify-center shrink-0 h-[280px] sm:h-[320px] md:h-[35vh] min-h-[220px]">
           <div className="w-full h-full max-w-5xl bg-zinc-950 border border-zinc-900 rounded-xl overflow-hidden flex flex-col">
-            <HumanAvatar simulation={simulationResult} />
+            <HumanAvatar simulation={simulationResult} selectedDay={selectedDay} />
           </div>
         </div>
 
@@ -431,6 +432,8 @@ export default function Home() {
             onDeleteExercise={handleDeleteExercise}
             onClearDay={handleClearDay}
             onUpdateToggledDays={setToggledDays}
+            selectedDay={selectedDay}
+            onSelectDay={setSelectedDay}
           />
         </div>
       </section>
