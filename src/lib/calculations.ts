@@ -342,66 +342,76 @@ export function runWeeklySimulation(
   let snapshotMuscles = cloneMusclesMap(musclesMap);
   let snapshotSnc = 0;
 
-  // Simulation séquentielle journalière
-  DAYS_OF_WEEK.forEach(day => {
-    // A. Dissipation de la fatigue et de l'adaptation accumulée (au début de chaque jour)
+  // Simulation séquentielle journalière sur 2 semaines pour atteindre un régime d'équilibre circulaire stable.
+  // La semaine 1 sert de "warm-up" (pré-charge) pour accumuler la fatigue résiduelle réelle.
+  // La semaine 2 est la semaine de référence capturée et retournée.
+  for (let week = 1; week <= 2; week++) {
+    // Réinitialisation des volumes de travail (séries) au début de chaque cycle hebdomadaire
     Object.keys(musclesMap).forEach(id => {
-      const decay = MUSCLE_FATIGUE_DECAY[id as MuscleId] ?? 0.5;
-      musclesMap[id].fatigue = musclesMap[id].fatigue * decay;
-      musclesMap[id].fitness = musclesMap[id].fitness * FITNESS_RETENTION_RATE;
-
-      // Dissiper également les contributions individuelles de fatigue des exercices
-      if (musclesMap[id].contributions) {
-        Object.keys(musclesMap[id].contributions).forEach(exNom => {
-          musclesMap[id].contributions[exNom] = musclesMap[id].contributions[exNom] * decay;
-        });
-      }
+      musclesMap[id].sets = 0;
+      musclesMap[id].setsContributions = {};
     });
 
-    // Dissipation très rapide du SNC (demi-vie de 24h, rétention de 0.20)
-    sncFatigue = sncFatigue * 0.20;
+    DAYS_OF_WEEK.forEach(day => {
+      // A. Dissipation de la fatigue et de l'adaptation accumulée (au début de chaque jour)
+      Object.keys(musclesMap).forEach(id => {
+        const decay = MUSCLE_FATIGUE_DECAY[id as MuscleId] ?? 0.5;
+        musclesMap[id].fatigue = musclesMap[id].fatigue * decay;
+        musclesMap[id].fitness = musclesMap[id].fitness * FITNESS_RETENTION_RATE;
 
-    // B. Application des séances d'entraînement du jour (si le jour est activé)
-    if (toggledDays[day] !== false) {
-      const plannedExercises = blueprint[day] || [];
-      plannedExercises.forEach(plannedEx => {
-        if (!plannedEx.active) return;
+        // Dissiper également les contributions individuelles de fatigue des exercices
+        if (musclesMap[id].contributions) {
+          Object.keys(musclesMap[id].contributions).forEach(exNom => {
+            musclesMap[id].contributions[exNom] = musclesMap[id].contributions[exNom] * decay;
+          });
+        }
+      });
 
-        const exercise = EXERCISE_LIBRARY.find(e => e.id === plannedEx.exerciseId);
-        if (!exercise) return;
+      // Dissipation très rapide du SNC (demi-vie de 24h, rétention de 0.20)
+      sncFatigue = sncFatigue * 0.20;
 
-        // Récupérer la matrice de distribution de tension pour l'exercice
-        const tensionMatrix = EXERCISE_TENSION_MATRICES[plannedEx.exerciseId] || { [exercise.muscle_primaire]: 1.0 };
+      // B. Application des séances d'entraînement du jour (si le jour est activé)
+      if (toggledDays[day] !== false) {
+        const plannedExercises = blueprint[day] || [];
+        plannedExercises.forEach(plannedEx => {
+          if (!plannedEx.active) return;
 
-        plannedEx.sets.forEach(set => {
-          if (!set.active) return;
+          const exercise = EXERCISE_LIBRARY.find(e => e.id === plannedEx.exerciseId);
+          if (!exercise) return;
 
-          const { inol, sncPoints } = calculateSetImpact(set, exercise, profile);
+          // Récupérer la matrice de distribution de tension pour l'exercice
+          const tensionMatrix = EXERCISE_TENSION_MATRICES[plannedEx.exerciseId] || { [exercise.muscle_primaire]: 1.0 };
 
-          // Accumuler la fatigue centrale (SNC)
-          sncFatigue += sncPoints;
+          plannedEx.sets.forEach(set => {
+            if (!set.active) return;
 
-          // Distribuer la fatigue périphérique (INOL) et l'adaptation (Fitness) aux muscles concernés
-          Object.entries(tensionMatrix).forEach(([muscleId, coeff]) => {
-            if (musclesMap[muscleId]) {
-              const muscleLoad = inol * coeff;
-              musclesMap[muscleId].fatigue += muscleLoad;
-              musclesMap[muscleId].fitness += muscleLoad * 0.5; // Gain en Fitness = 50% de la fatigue induite
-              musclesMap[muscleId].sets += set.series * coeff;
-              musclesMap[muscleId].contributions[exercise.nom] = (musclesMap[muscleId].contributions[exercise.nom] || 0) + muscleLoad;
-              musclesMap[muscleId].setsContributions[exercise.nom] = (musclesMap[muscleId].setsContributions[exercise.nom] || 0) + set.series * coeff;
-            }
+            const { inol, sncPoints } = calculateSetImpact(set, exercise, profile);
+
+            // Accumuler la fatigue centrale (SNC)
+            sncFatigue += sncPoints;
+
+            // Distribuer la fatigue périphérique (INOL) et l'adaptation (Fitness) aux muscles concernés
+            Object.entries(tensionMatrix).forEach(([muscleId, coeff]) => {
+              if (musclesMap[muscleId]) {
+                const muscleLoad = inol * coeff;
+                musclesMap[muscleId].fatigue += muscleLoad;
+                musclesMap[muscleId].fitness += muscleLoad * 0.5; // Gain en Fitness = 50% de la fatigue induite
+                musclesMap[muscleId].sets += set.series * coeff;
+                musclesMap[muscleId].contributions[exercise.nom] = (musclesMap[muscleId].contributions[exercise.nom] || 0) + muscleLoad;
+                musclesMap[muscleId].setsContributions[exercise.nom] = (musclesMap[muscleId].setsContributions[exercise.nom] || 0) + set.series * coeff;
+              }
+            });
           });
         });
-      });
-    }
+      }
 
-    // C. Capture du snapshot s'il s'agit du jour choisi par l'utilisateur (utilisant le helper performant)
-    if (selectedDay && day.toLowerCase() === selectedDay.toLowerCase()) {
-      snapshotMuscles = cloneMusclesMap(musclesMap);
-      snapshotSnc = sncFatigue;
-    }
-  });
+      // C. Capture du snapshot uniquement lors de la semaine 2 (la semaine stabilisée)
+      if (week === 2 && selectedDay && day.toLowerCase() === selectedDay.toLowerCase()) {
+        snapshotMuscles = cloneMusclesMap(musclesMap);
+        snapshotSnc = sncFatigue;
+      }
+    });
+  }
 
   // Déterminer la source finale des données (Snapshot journalier ou bilan final du dimanche)
   const targetMuscles = selectedDay ? snapshotMuscles : musclesMap;
