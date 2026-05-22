@@ -395,8 +395,8 @@ export default function Home() {
       <section className="flex-1 flex flex-col h-full overflow-hidden p-4 md:p-6 gap-4">
         
         {/* Upper Portion: SVG Anatomical Avatar — fixed height, no scroll */}
-        <div className="w-full flex justify-center shrink-0">
-          <div className="w-full max-w-5xl">
+        <div className="w-full flex justify-center shrink-0 h-[280px] sm:h-[320px] md:h-[35vh] min-h-[220px]">
+          <div className="w-full h-full max-w-5xl bg-zinc-950 border border-zinc-900 rounded-xl overflow-hidden flex flex-col">
             <HumanAvatar simulation={simulationResult} />
           </div>
         </div>
