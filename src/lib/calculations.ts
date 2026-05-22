@@ -228,25 +228,22 @@ export function getApplicable1RM(exerciseId: string, userPrs: UserPRs, weight: n
 }
 
 /**
- * Calcule le multiplicateur RPE à l'aide d'un mapping manuel physiologique
+ * Calcule l'impact d'une série unique (INOL et SNC) avec multiplicateur RPE exponentiel
  */
-export function getRpeFactor(rpe: number): number {
-  const clampedRpe = Math.min(10, Math.max(5, rpe));
-  if (clampedRpe >= 10) return 1.0;
-  if (clampedRpe >= 9.5) return 0.9;
-  if (clampedRpe >= 9) return 0.8;
-  if (clampedRpe >= 8.5) return 0.7;
-  if (clampedRpe >= 8) return 0.6;
-  if (clampedRpe >= 7.5) return 0.5;
-  if (clampedRpe >= 7) return 0.4;
-  if (clampedRpe >= 6.5) return 0.3;
-  if (clampedRpe >= 6) return 0.2;
-  return 0.1; // RPE < 6
-}
+const RPE_FATIGUE_FACTORS: Record<number, number> = {
+  10: 1.0,
+  9.5: 0.9,
+  9: 0.8,
+  8.5: 0.7,
+  8: 0.6,
+  7.5: 0.5,
+  7: 0.4,
+  6.5: 0.3,
+  6: 0.2,
+  5.5: 0.15,
+  5: 0.1
+};
 
-/**
- * Calcule l'impact d'une série unique (INOL et SNC)
- */
 export function calculateSetImpact(
   set: PlannedSet,
   exercise: Exercise,
@@ -264,14 +261,16 @@ export function calculateSetImpact(
   if (pr > 0) {
     intensity = (set.poids / pr) * 100;
   }
-  // Sécuriser la formule INOL en plafonnant l'intensité entre 30% et 95%
-  intensity = Math.min(95, Math.max(30, intensity));
+  intensity = Math.min(99, Math.max(10, intensity));
 
-  // 3. Multiplicateur RPE adouci par mapping
-  const rpeFactor = getRpeFactor(set.rpe);
+  // 3. Multiplicateur RPE Adouci (Mapping manuel physiologique réaliste)
+  const clampedRpe = Math.min(10, Math.max(5, set.rpe || 8));
+  const roundedRpe = Math.round(clampedRpe * 2) / 2;
+  const rpeFactor = RPE_FATIGUE_FACTORS[roundedRpe] ?? 0.6;
 
-  // 4. Calcul de l'INOL brut accumulé par cette série
-  const baseInol = set.reps / (100 - intensity);
+  // 4. Calcul de l'INOL brut accumulé par cette série (Intensité plafonnée à 95% pour la stabilité)
+  const inolIntensity = Math.min(95, Math.max(10, intensity));
+  const baseInol = set.reps / (100 - inolIntensity);
   const totalInol = baseInol * rpeFactor * set.series;
 
   // 5. Calcul de l'impact SNC (Système Nerveux Central)
@@ -281,7 +280,7 @@ export function calculateSetImpact(
   // Pondération de fatigue axiale SNC : Tier 1 = 100%, Tier 2 = 50%, Tier 3 (isolation) = 5%
   const sncMultiplier = exercise.tier_snc === 1 ? 1.0 : (exercise.tier_snc === 2 ? 0.5 : 0.05);
 
-  // Formule SNC : Proportionnel au ratio de poids, au multiplicateur de Tier, et au RPE exponentiel
+  // Formule SNC : Proportionnel au ratio de poids, au multiplicateur de Tier, et au RPE adouci
   const sncPoints = weightRatio * sncMultiplier * rpeFactor * set.series * 1.2;
 
   return { inol: totalInol, sncPoints };
@@ -365,7 +364,7 @@ export function runWeeklySimulation(
       });
     }
 
-    // C. Capture du snapshot s'il s'agit du jour choisi par l'utilisateur (après la séance du jour)
+    // C. Capture du snapshot s'il s'agit du jour choisi par l'utilisateur
     if (selectedDay && day.toLowerCase() === selectedDay.toLowerCase()) {
       snapshotMuscles = JSON.parse(JSON.stringify(musclesMap));
       snapshotSnc = sncFatigue;
@@ -377,7 +376,8 @@ export function runWeeklySimulation(
   const targetSnc = selectedDay ? snapshotSnc : sncFatigue;
 
   // ─── AGGREGATION DES SOUS-MUSCLES PHYSIOLOGIQUES VERS LES GROUPES VISUELS DE L'AVATAR ───
-  // Utilisation de Math.max pour éviter tout double comptage entre parents et enfants
+  // Cela garantit que la tension appliquée sur un sous-muscle (ex: upperChest) se répercute visuellement
+  // sur le groupe principal de l'avatar (ex: chest) pour éviter les incohérences d'affichage.
   const aggregateMuscle = (parentKey: MuscleId, childKeys: MuscleId[]) => {
     const parent = targetMuscles[parentKey] || { fatigue: 0, fitness: 0, sets: 0, contributions: {} };
     let maxFatigue = parent.fatigue;
@@ -424,32 +424,29 @@ export function runWeeklySimulation(
   const maxSnc = profile.maxSnc || 15.0;
   const cnsFailure = targetSnc > maxSnc;
 
-  // Construction des statuts musculaires finaux basés sur la Fatigue Aiguë
+  // Construction des statuts musculaires finaux basés sur la Fatigue Aiguë cumulée (INOL résiduel)
   const finalMuscles: { [muscleId in MuscleId]?: MuscleStatus } = {};
 
   Object.entries(targetMuscles).forEach(([id, data]) => {
     const mId = id as MuscleId;
-    
-    // Calcul de la Readiness (Forme nette) pour statistiques chiffrées uniquement
-    const readiness = data.fitness - data.fatigue;
-    const fatigue = data.fatigue;
+    const fatigueScore = data.fatigue;
 
     let color: 'grey' | 'green' | 'orange' | 'red' = 'grey';
     let statusLabel = 'Volume Insuffisant (Repos / Maintien)';
 
-    // Grille d'évaluation colorimétrique basée UNIQUEMENT sur la Fatigue Aiguë cumulée
-    if (fatigue < 0.5) {
+    // Grille d'évaluation colorimétrique calibrée sur la Fatigue Aiguë résiduelle (INOL cumulé)
+    if (fatigueScore < 0.5) {
       color = 'grey';
       statusLabel = 'Volume Insuffisant (Repos / Maintien)';
-    } else if (fatigue >= 0.5 && fatigue < 1.5) {
+    } else if (fatigueScore >= 0.5 && fatigueScore <= 1.5) {
       color = 'green';
-      statusLabel = 'Zone Optimale (Hypertrophie / Stimulus optimal)';
-    } else if (fatigue >= 1.5 && fatigue <= 2.5) {
+      statusLabel = 'Stimulus Optimal (Zone d\'Adaptation)';
+    } else if (fatigueScore > 1.5 && fatigueScore <= 2.5) {
       color = 'orange';
-      statusLabel = 'Surcharge locale / Fatigue modérée';
+      statusLabel = 'Surcharge Locale (Fatigue Élevée)';
     } else {
       color = 'red';
-      statusLabel = 'Surentraînement (Seuil de tolérance dépassé)';
+      statusLabel = 'Surentraînement (Seuil de Tolérance Dépassé / Danger)';
     }
 
     // Extraction des 2 contributeurs majeurs
@@ -464,7 +461,7 @@ export function runWeeklySimulation(
 
     finalMuscles[mId] = {
       name: MUSCLE_DETAILS[mId],
-      inol: parseFloat(readiness.toFixed(2)), // Readiness exposée pour les stats
+      inol: parseFloat(fatigueScore.toFixed(2)), // On expose directement le score de Fatigue Aiguë comme INOL résiduel principal
       sets: Math.round(data.sets),
       color,
       statusLabel,
