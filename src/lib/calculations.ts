@@ -228,7 +228,24 @@ export function getApplicable1RM(exerciseId: string, userPrs: UserPRs, weight: n
 }
 
 /**
- * Calcule l'impact d'une série unique (INOL et SNC) avec multiplicateur RPE exponentiel
+ * Calcule le multiplicateur RPE à l'aide d'un mapping manuel physiologique
+ */
+export function getRpeFactor(rpe: number): number {
+  const clampedRpe = Math.min(10, Math.max(5, rpe));
+  if (clampedRpe >= 10) return 1.0;
+  if (clampedRpe >= 9.5) return 0.9;
+  if (clampedRpe >= 9) return 0.8;
+  if (clampedRpe >= 8.5) return 0.7;
+  if (clampedRpe >= 8) return 0.6;
+  if (clampedRpe >= 7.5) return 0.5;
+  if (clampedRpe >= 7) return 0.4;
+  if (clampedRpe >= 6.5) return 0.3;
+  if (clampedRpe >= 6) return 0.2;
+  return 0.1; // RPE < 6
+}
+
+/**
+ * Calcule l'impact d'une série unique (INOL et SNC)
  */
 export function calculateSetImpact(
   set: PlannedSet,
@@ -247,12 +264,11 @@ export function calculateSetImpact(
   if (pr > 0) {
     intensity = (set.poids / pr) * 100;
   }
-  intensity = Math.min(99, Math.max(10, intensity));
+  // Sécuriser la formule INOL en plafonnant l'intensité entre 30% et 95%
+  intensity = Math.min(95, Math.max(30, intensity));
 
-  // 3. Multiplicateur RPE Exponentiel (courbe polynomiale de fatigue neurologique/physique)
-  // RPE 10 = 1.0, RPE 9 = 0.55, RPE 8 = 0.30, RPE 7 = 0.17, RPE 6 = 0.09
-  const clampedRpe = Math.min(10, Math.max(5, set.rpe || 8));
-  const rpeFactor = Math.pow(1.8, clampedRpe - 10);
+  // 3. Multiplicateur RPE adouci par mapping
+  const rpeFactor = getRpeFactor(set.rpe);
 
   // 4. Calcul de l'INOL brut accumulé par cette série
   const baseInol = set.reps / (100 - intensity);
@@ -349,7 +365,7 @@ export function runWeeklySimulation(
       });
     }
 
-    // C. Capture du snapshot s'il s'agit du jour choisi par l'utilisateur
+    // C. Capture du snapshot s'il s'agit du jour choisi par l'utilisateur (après la séance du jour)
     if (selectedDay && day.toLowerCase() === selectedDay.toLowerCase()) {
       snapshotMuscles = JSON.parse(JSON.stringify(musclesMap));
       snapshotSnc = sncFatigue;
@@ -361,13 +377,12 @@ export function runWeeklySimulation(
   const targetSnc = selectedDay ? snapshotSnc : sncFatigue;
 
   // ─── AGGREGATION DES SOUS-MUSCLES PHYSIOLOGIQUES VERS LES GROUPES VISUELS DE L'AVATAR ───
-  // Cela garantit que la tension appliquée sur un sous-muscle (ex: upperChest) se répercute visuellement
-  // sur le groupe principal de l'avatar (ex: chest) pour éviter les incohérences d'affichage.
+  // Utilisation de Math.max pour éviter tout double comptage entre parents et enfants
   const aggregateMuscle = (parentKey: MuscleId, childKeys: MuscleId[]) => {
     const parent = targetMuscles[parentKey] || { fatigue: 0, fitness: 0, sets: 0, contributions: {} };
     let maxFatigue = parent.fatigue;
     let maxFitness = parent.fitness;
-    let totalSets = parent.sets;
+    let maxSets = parent.sets;
     const combinedContributions = { ...parent.contributions };
 
     childKeys.forEach(childKey => {
@@ -379,9 +394,11 @@ export function runWeeklySimulation(
         if (child.fitness > maxFitness) {
           maxFitness = child.fitness;
         }
-        totalSets += child.sets;
+        if (child.sets > maxSets) {
+          maxSets = child.sets;
+        }
         Object.entries(child.contributions).forEach(([exNom, val]) => {
-          combinedContributions[exNom] = (combinedContributions[exNom] || 0) + val;
+          combinedContributions[exNom] = Math.max(combinedContributions[exNom] || 0, val);
         });
       }
     });
@@ -389,7 +406,7 @@ export function runWeeklySimulation(
     targetMuscles[parentKey] = {
       fatigue: maxFatigue,
       fitness: maxFitness,
-      sets: totalSets,
+      sets: maxSets,
       contributions: combinedContributions
     };
   };
@@ -407,27 +424,29 @@ export function runWeeklySimulation(
   const maxSnc = profile.maxSnc || 15.0;
   const cnsFailure = targetSnc > maxSnc;
 
-  // Construction des statuts musculaires finaux basés sur la Readiness
+  // Construction des statuts musculaires finaux basés sur la Fatigue Aiguë
   const finalMuscles: { [muscleId in MuscleId]?: MuscleStatus } = {};
 
   Object.entries(targetMuscles).forEach(([id, data]) => {
     const mId = id as MuscleId;
-    // Calcul de la Readiness (Forme nette)
+    
+    // Calcul de la Readiness (Forme nette) pour statistiques chiffrées uniquement
     const readiness = data.fitness - data.fatigue;
+    const fatigue = data.fatigue;
 
     let color: 'grey' | 'green' | 'orange' | 'red' = 'grey';
-    let statusLabel = 'Maintien / Repos';
+    let statusLabel = 'Volume Insuffisant (Repos / Maintien)';
 
-    // Grille d'évaluation colorimétrique
-    if (data.fitness < 0.05) {
+    // Grille d'évaluation colorimétrique basée UNIQUEMENT sur la Fatigue Aiguë cumulée
+    if (fatigue < 0.5) {
       color = 'grey';
       statusLabel = 'Volume Insuffisant (Repos / Maintien)';
-    } else if (readiness >= -0.20) {
+    } else if (fatigue >= 0.5 && fatigue < 1.5) {
       color = 'green';
-      statusLabel = 'Zone Optimale (Hypertrophie / Surcompensation)';
-    } else if (readiness < -0.20 && readiness >= -0.80) {
+      statusLabel = 'Zone Optimale (Hypertrophie / Stimulus optimal)';
+    } else if (fatigue >= 1.5 && fatigue <= 2.5) {
       color = 'orange';
-      statusLabel = 'Surcharge / Fatigue modérée';
+      statusLabel = 'Surcharge locale / Fatigue modérée';
     } else {
       color = 'red';
       statusLabel = 'Surentraînement (Seuil de tolérance dépassé)';
@@ -445,7 +464,7 @@ export function runWeeklySimulation(
 
     finalMuscles[mId] = {
       name: MUSCLE_DETAILS[mId],
-      inol: parseFloat(readiness.toFixed(2)), // On expose le score de Readiness comme métrique d'effort principale
+      inol: parseFloat(readiness.toFixed(2)), // Readiness exposée pour les stats
       sets: Math.round(data.sets),
       color,
       statusLabel,
