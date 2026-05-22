@@ -121,14 +121,14 @@ export default function HumanAvatar({ simulation }: HumanAvatarProps) {
             {/* Trapez (Front upper collars) */}
             <path
               d="M 92,58 L 78,82 L 84,84 L 95,72 Z"
-              className={`muscle-path ${getColorClass('traps', hoveredId === 'traps')}`}
+              className={`muscle-path ${getColorClass(muscles['traps']?.color || 'grey', hoveredId === 'traps')}`}
               onMouseEnter={(e) => handleMouseEnter('traps', e)}
               onMouseMove={handleMouseMove}
               onMouseLeave={handleMouseLeave}
             />
             <path
               d="M 108,58 L 122,82 L 116,84 L 105,72 Z"
-              className={`muscle-path ${getColorClass('traps', hoveredId === 'traps')}`}
+              className={`muscle-path ${getColorClass(muscles['traps']?.color || 'grey', hoveredId === 'traps')}`}
               onMouseEnter={(e) => handleMouseEnter('traps', e)}
               onMouseMove={handleMouseMove}
               onMouseLeave={handleMouseLeave}
@@ -137,14 +137,14 @@ export default function HumanAvatar({ simulation }: HumanAvatarProps) {
             {/* Deltoids Ant (Shoulders) */}
             <path
               d="M 65,92 Q 50,102 58,122 L 68,95 Z"
-              className={`muscle-path ${getColorClass('deltoids_ant', hoveredId === 'deltoids_ant')}`}
+              className={`muscle-path ${getColorClass(muscles['deltoids_ant']?.color || 'grey', hoveredId === 'deltoids_ant')}`}
               onMouseEnter={(e) => handleMouseEnter('deltoids_ant', e)}
               onMouseMove={handleMouseMove}
               onMouseLeave={handleMouseLeave}
             />
             <path
               d="M 135,92 Q 150,102 142,122 L 132,95 Z"
-              className={`muscle-path ${getColorClass('deltoids_ant', hoveredId === 'deltoids_ant')}`}
+              className={`muscle-path ${getColorClass(muscles['deltoids_ant']?.color || 'grey', hoveredId === 'deltoids_ant')}`}
               onMouseEnter={(e) => handleMouseEnter('deltoids_ant', e)}
               onMouseMove={handleMouseMove}
               onMouseLeave={handleMouseLeave}
@@ -153,14 +153,14 @@ export default function HumanAvatar({ simulation }: HumanAvatarProps) {
             {/* Chest (Pectorals) */}
             <path
               d="M 100,95 L 68,95 L 63,125 L 100,135 Z"
-              className={`muscle-path ${getColorClass('chest_major', hoveredId === 'chest_major')}`}
+              className={`muscle-path ${getColorClass(muscles['chest_major']?.color || 'grey', hoveredId === 'chest_major')}`}
               onMouseEnter={(e) => handleMouseEnter('chest_major', e)}
               onMouseMove={handleMouseMove}
               onMouseLeave={handleMouseLeave}
             />
             <path
               d="M 100,95 L 132,95 L 137,125 L 100,135 Z"
-              className={`muscle-path ${getColorClass('chest_major', hoveredId === 'chest_major')}`}
+              className={`muscle-path ${getColorClass(muscles['chest_major']?.color || 'grey', hoveredId === 'chest_major')}`}
               onMouseEnter={(e) => handleMouseEnter('chest_major', e)}
               onMouseMove={handleMouseMove}
               onMouseLeave={handleMouseLeave}
@@ -169,14 +169,14 @@ export default function HumanAvatar({ simulation }: HumanAvatarProps) {
             {/* Biceps */}
             <path
               d="M 56,125 L 48,154 L 57,157 L 64,127 Z"
-              className={`muscle-path ${getColorClass('biceps', hoveredId === 'biceps')}`}
+              className={`muscle-path ${getColorClass(muscles['biceps']?.color || 'grey', hoveredId === 'biceps')}`}
               onMouseEnter={(e) => handleMouseEnter('biceps', e)}
               onMouseMove={handleMouseMove}
               onMouseLeave={handleMouseLeave}
             />
             <path
               d="M 144,125 L 152,154 L 143,157 L 136,127 Z"
-              className={`muscle-path ${getColorClass('biceps', hoveredId === 'biceps')}`}
+              className={`muscle-path ${getColorClass(muscles['biceps']?.color || 'grey', hoveredId === 'biceps')}`}
               onMouseEnter={(e) => handleMouseEnter('biceps', e)}
               onMouseMove={handleMouseMove}
               onMouseLeave={handleMouseLeave}
@@ -185,14 +185,14 @@ export default function HumanAvatar({ simulation }: HumanAvatarProps) {
             {/* Forearms (Avant-bras) */}
             <path
               d="M 47,158 L 38,202 L 46,204 L 56,160 Z"
-              className={`muscle-path ${getColorClass('forearms', hoveredId === 'forearms')}`}
+              className={`muscle-path ${getColorClass(muscles['forearms']?.color || 'grey', hoveredId === 'forearms')}`}
               onMouseEnter={(e) => handleMouseEnter('forearms', e)}
               onMouseMove={handleMouseMove}
               onMouseLeave={handleMouseLeave}
             />
             <path
               d="M 153,158 L 162,202 L 154,204 L 144,160 Z"
-              className={`muscle-path ${getColorClass('forearms', hoveredId === 'forearms')}`}
+              className={`muscle-path ${getColorClass(muscles['forearms']?.color || 'grey', hoveredId === 'forearms')}`}
               onMouseEnter={(e) => handleMouseEnter('forearms', e)}
               onMouseMove={handleMouseMove}
               onMouseLeave={handleMouseLeave}
@@ -201,7 +201,7 @@ export default function HumanAvatar({ simulation }: HumanAvatarProps) {
             {/* Abs (Abdominaux) */}
             <path
               d="M 88,140 L 112,140 L 110,205 L 90,205 Z"
-              className={`muscle-path ${getColorClass('abs', hoveredId === 'abs')}`}
+              className={`muscle-path ${getColorClass(muscles['abs']?.color || 'grey', hoveredId === 'abs')}`}
               onMouseEnter={(e) => handleMouseEnter('abs', e)}
               onMouseMove={handleMouseMove}
               onMouseLeave={handleMouseLeave}
@@ -210,14 +210,14 @@ export default function HumanAvatar({ simulation }: HumanAvatarProps) {
             {/* Obliques */}
             <path
               d="M 86,140 L 72,142 L 78,205 L 88,205 Z"
-              className={`muscle-path ${getColorClass('obliques', hoveredId === 'obliques')}`}
+              className={`muscle-path ${getColorClass(muscles['obliques']?.color || 'grey', hoveredId === 'obliques')}`}
               onMouseEnter={(e) => handleMouseEnter('obliques', e)}
               onMouseMove={handleMouseMove}
               onMouseLeave={handleMouseLeave}
             />
             <path
               d="M 114,140 L 128,142 L 122,205 L 112,205 Z"
-              className={`muscle-path ${getColorClass('obliques', hoveredId === 'obliques')}`}
+              className={`muscle-path ${getColorClass(muscles['obliques']?.color || 'grey', hoveredId === 'obliques')}`}
               onMouseEnter={(e) => handleMouseEnter('obliques', e)}
               onMouseMove={handleMouseMove}
               onMouseLeave={handleMouseLeave}
@@ -226,14 +226,14 @@ export default function HumanAvatar({ simulation }: HumanAvatarProps) {
             {/* Quads (Quadriceps) */}
             <path
               d="M 62,222 L 96,222 L 91,298 L 70,298 Z"
-              className={`muscle-path ${getColorClass('quads', hoveredId === 'quads')}`}
+              className={`muscle-path ${getColorClass(muscles['quads']?.color || 'grey', hoveredId === 'quads')}`}
               onMouseEnter={(e) => handleMouseEnter('quads', e)}
               onMouseMove={handleMouseMove}
               onMouseLeave={handleMouseLeave}
             />
             <path
               d="M 138,222 L 104,222 L 109,298 L 130,298 Z"
-              className={`muscle-path ${getColorClass('quads', hoveredId === 'quads')}`}
+              className={`muscle-path ${getColorClass(muscles['quads']?.color || 'grey', hoveredId === 'quads')}`}
               onMouseEnter={(e) => handleMouseEnter('quads', e)}
               onMouseMove={handleMouseMove}
               onMouseLeave={handleMouseLeave}
@@ -264,7 +264,7 @@ export default function HumanAvatar({ simulation }: HumanAvatarProps) {
             {/* Traps (Trapèzes complets) */}
             <path
               d="M 300,68 L 275,88 L 282,118 L 300,136 L 318,118 L 325,88 Z"
-              className={`muscle-path ${getColorClass('traps', hoveredId === 'traps')}`}
+              className={`muscle-path ${getColorClass(muscles['traps']?.color || 'grey', hoveredId === 'traps')}`}
               onMouseEnter={(e) => handleMouseEnter('traps', e)}
               onMouseMove={handleMouseMove}
               onMouseLeave={handleMouseLeave}
@@ -273,14 +273,14 @@ export default function HumanAvatar({ simulation }: HumanAvatarProps) {
             {/* Rear Deltoids */}
             <path
               d="M 264,92 Q 248,102 256,122 L 272,100 Z"
-              className={`muscle-path ${getColorClass('deltoids_post', hoveredId === 'deltoids_post')}`}
+              className={`muscle-path ${getColorClass(muscles['deltoids_post']?.color || 'grey', hoveredId === 'deltoids_post')}`}
               onMouseEnter={(e) => handleMouseEnter('deltoids_post', e)}
               onMouseMove={handleMouseMove}
               onMouseLeave={handleMouseLeave}
             />
             <path
               d="M 336,92 Q 352,102 344,122 L 328,100 Z"
-              className={`muscle-path ${getColorClass('deltoids_post', hoveredId === 'deltoids_post')}`}
+              className={`muscle-path ${getColorClass(muscles['deltoids_post']?.color || 'grey', hoveredId === 'deltoids_post')}`}
               onMouseEnter={(e) => handleMouseEnter('deltoids_post', e)}
               onMouseMove={handleMouseMove}
               onMouseLeave={handleMouseLeave}
@@ -289,14 +289,14 @@ export default function HumanAvatar({ simulation }: HumanAvatarProps) {
             {/* Triceps */}
             <path
               d="M 254,122 L 246,152 L 256,155 L 262,125 Z"
-              className={`muscle-path ${getColorClass('triceps', hoveredId === 'triceps')}`}
+              className={`muscle-path ${getColorClass(muscles['triceps']?.color || 'grey', hoveredId === 'triceps')}`}
               onMouseEnter={(e) => handleMouseEnter('triceps', e)}
               onMouseMove={handleMouseMove}
               onMouseLeave={handleMouseLeave}
             />
             <path
               d="M 346,122 L 354,152 L 344,155 L 338,125 Z"
-              className={`muscle-path ${getColorClass('triceps', hoveredId === 'triceps')}`}
+              className={`muscle-path ${getColorClass(muscles['triceps']?.color || 'grey', hoveredId === 'triceps')}`}
               onMouseEnter={(e) => handleMouseEnter('triceps', e)}
               onMouseMove={handleMouseMove}
               onMouseLeave={handleMouseLeave}
@@ -305,14 +305,14 @@ export default function HumanAvatar({ simulation }: HumanAvatarProps) {
             {/* Lats (Dorsaux) */}
             <path
               d="M 280,118 L 264,148 L 282,192 L 298,188 Z"
-              className={`muscle-path ${getColorClass('lats', hoveredId === 'lats')}`}
+              className={`muscle-path ${getColorClass(muscles['lats']?.color || 'grey', hoveredId === 'lats')}`}
               onMouseEnter={(e) => handleMouseEnter('lats', e)}
               onMouseMove={handleMouseMove}
               onMouseLeave={handleMouseLeave}
             />
             <path
               d="M 320,118 L 336,148 L 318,192 L 302,188 Z"
-              className={`muscle-path ${getColorClass('lats', hoveredId === 'lats')}`}
+              className={`muscle-path ${getColorClass(muscles['lats']?.color || 'grey', hoveredId === 'lats')}`}
               onMouseEnter={(e) => handleMouseEnter('lats', e)}
               onMouseMove={handleMouseMove}
               onMouseLeave={handleMouseLeave}
@@ -321,7 +321,7 @@ export default function HumanAvatar({ simulation }: HumanAvatarProps) {
             {/* Lower Back (Lombaires) */}
             <path
               d="M 298,190 L 302,190 L 304,218 L 296,218 Z"
-              className={`muscle-path ${getColorClass('lower_back', hoveredId === 'lower_back')}`}
+              className={`muscle-path ${getColorClass(muscles['lower_back']?.color || 'grey', hoveredId === 'lower_back')}`}
               onMouseEnter={(e) => handleMouseEnter('lower_back', e)}
               onMouseMove={handleMouseMove}
               onMouseLeave={handleMouseLeave}
@@ -330,14 +330,14 @@ export default function HumanAvatar({ simulation }: HumanAvatarProps) {
             {/* Glutes (Fessiers) */}
             <path
               d="M 264,222 L 299,222 L 298,255 L 270,255 Z"
-              className={`muscle-path ${getColorClass('glutes', hoveredId === 'glutes')}`}
+              className={`muscle-path ${getColorClass(muscles['glutes']?.color || 'grey', hoveredId === 'glutes')}`}
               onMouseEnter={(e) => handleMouseEnter('glutes', e)}
               onMouseMove={handleMouseMove}
               onMouseLeave={handleMouseLeave}
             />
             <path
               d="M 336,222 L 301,222 L 302,255 L 330,255 Z"
-              className={`muscle-path ${getColorClass('glutes', hoveredId === 'glutes')}`}
+              className={`muscle-path ${getColorClass(muscles['glutes']?.color || 'grey', hoveredId === 'glutes')}`}
               onMouseEnter={(e) => handleMouseEnter('glutes', e)}
               onMouseMove={handleMouseMove}
               onMouseLeave={handleMouseLeave}
@@ -346,14 +346,14 @@ export default function HumanAvatar({ simulation }: HumanAvatarProps) {
             {/* Hamstrings (Ischios) */}
             <path
               d="M 268,258 L 298,258 L 294,320 L 274,320 Z"
-              className={`muscle-path ${getColorClass('hamstrings', hoveredId === 'hamstrings')}`}
+              className={`muscle-path ${getColorClass(muscles['hamstrings']?.color || 'grey', hoveredId === 'hamstrings')}`}
               onMouseEnter={(e) => handleMouseEnter('hamstrings', e)}
               onMouseMove={handleMouseMove}
               onMouseLeave={handleMouseLeave}
             />
             <path
               d="M 332,258 L 302,258 L 306,320 L 326,320 Z"
-              className={`muscle-path ${getColorClass('hamstrings', hoveredId === 'hamstrings')}`}
+              className={`muscle-path ${getColorClass(muscles['hamstrings']?.color || 'grey', hoveredId === 'hamstrings')}`}
               onMouseEnter={(e) => handleMouseEnter('hamstrings', e)}
               onMouseMove={handleMouseMove}
               onMouseLeave={handleMouseLeave}
@@ -362,14 +362,14 @@ export default function HumanAvatar({ simulation }: HumanAvatarProps) {
             {/* Calves (Mollets) */}
             <path
               d="M 273,324 L 292,324 L 288,370 L 276,370 Z"
-              className={`muscle-path ${getColorClass('calves', hoveredId === 'calves')}`}
+              className={`muscle-path ${getColorClass(muscles['calves']?.color || 'grey', hoveredId === 'calves')}`}
               onMouseEnter={(e) => handleMouseEnter('calves', e)}
               onMouseMove={handleMouseMove}
               onMouseLeave={handleMouseLeave}
             />
             <path
               d="M 327,324 L 308,324 L 312,370 L 324,370 Z"
-              className={`muscle-path ${getColorClass('calves', hoveredId === 'calves')}`}
+              className={`muscle-path ${getColorClass(muscles['calves']?.color || 'grey', hoveredId === 'calves')}`}
               onMouseEnter={(e) => handleMouseEnter('calves', e)}
               onMouseMove={handleMouseMove}
               onMouseLeave={handleMouseLeave}
