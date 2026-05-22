@@ -57,6 +57,7 @@ export interface MuscleStatus {
   color: 'grey' | 'green' | 'orange' | 'red';
   statusLabel: string;
   contributors: { nom: string; percentage: number }[];
+  remainingCapacity: number; // Valeur de 0 à 1 représentant le budget d'entraînement restant
 }
 
 export interface SimulationResult {
@@ -465,7 +466,8 @@ export function runWeeklySimulation(
       sets: Math.round(data.sets),
       color,
       statusLabel,
-      contributors
+      contributors,
+      remainingCapacity: parseFloat(Math.max(0, 1 - (fatigueScore / 2.5)).toFixed(4))
     };
   });
 

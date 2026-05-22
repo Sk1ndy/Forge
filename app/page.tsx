@@ -104,6 +104,13 @@ export default function Home() {
     const exercise = EXERCISE_LIBRARY.find(e => e.id === exerciseId);
     if (!exercise) return;
 
+    // Blocage de sécurité si le budget de récupération du muscle primaire est <= 25%
+    const capacity = simulationResult.muscles[exercise.muscle_primaire]?.remainingCapacity ?? 1.0;
+    if (capacity <= 0.25) {
+      alert(`⚠️ Ajout Bloqué ! Le muscle cible (${simulationResult.muscles[exercise.muscle_primaire]?.name || exercise.muscle_primaire}) est saturé. Budget de récupération insuffisant (<= 25%).`);
+      return;
+    }
+
     // Définir des valeurs de départ rationnelles selon l'équipement
     let startWeight = 60;
     if (exercise.equipment === 'pdc') {
@@ -445,6 +452,7 @@ export default function Home() {
             selectedDay={selectedDay}
             onSelectDay={setSelectedDay}
             onAddExercise={handleAddExercise}
+            simulation={simulationResult}
           />
         </div>
       </section>
@@ -457,6 +465,7 @@ export default function Home() {
           onClose={() => setLibraryOpen(false)}
           selectedMuscle={selectedMuscle}
           onSelectMuscle={setSelectedMuscle}
+          simulation={simulationResult}
         />
       </section>
 

@@ -4,8 +4,10 @@ import {
   EXERCISE_LIBRARY,
   MUSCLE_DETAILS,
   EXERCISE_TENSION_MATRICES,
-  MuscleId
+  MuscleId,
+  SimulationResult
 } from '@/lib/calculations';
+import CapacityBar from './CapacityBar';
 
 interface LibraryDrawerProps {
   onAddExercise: (exerciseId: string, day: string) => void;
@@ -13,6 +15,7 @@ interface LibraryDrawerProps {
   onClose?: () => void;
   selectedMuscle: string;
   onSelectMuscle: (muscle: string) => void;
+  simulation: SimulationResult;
 }
 
 const EQUIPMENT_LABELS: { [key: string]: string } = {
@@ -36,7 +39,8 @@ export default function LibraryDrawer({
   isOpen,
   onClose,
   selectedMuscle,
-  onSelectMuscle
+  onSelectMuscle,
+  simulation
 }: LibraryDrawerProps) {
   const [search, setSearch] = useState('');
   const [selectedEquipment, setSelectedEquipment] = useState('all');
@@ -159,87 +163,120 @@ export default function LibraryDrawer({
         {filteredExercises.length === 0 ? (
           <p className="text-xs text-zinc-500 text-center py-8">Aucun exercice trouvé.</p>
         ) : (
-          filteredExercises.map(({ ex, impact }) => (
-            <div
-              key={ex.id}
-              draggable={true}
-              onDragStart={(e) => {
-                e.dataTransfer.setData('text/plain', ex.id);
-                e.dataTransfer.effectAllowed = 'copy';
-              }}
-              className="relative p-2.5 rounded-lg border border-zinc-900 bg-zinc-900/40 hover:bg-zinc-900/80 hover:border-emerald-500/30 transition-all flex flex-col gap-1.5 cursor-grab active:cursor-grabbing group select-none"
-              title="Glissez cet exercice dans le séquenceur pour l'ajouter"
-            >
-              <div className="flex items-start justify-between gap-1.5">
-                <div className="flex items-center gap-1.5 min-w-0">
-                  <span className="text-zinc-600 group-hover:text-zinc-400 cursor-grab active:cursor-grabbing text-[11px] select-none transition-colors mr-0.5">
-                    ⋮⋮
-                  </span>
-                  <span className="text-xs font-semibold text-zinc-200 truncate">{ex.nom}</span>
-                </div>
-                <div className="flex items-center gap-1">
-                  {selectedMuscle !== 'all' && (
-                    <span className="text-[9px] bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-1.5 py-0.5 rounded-full font-bold">
-                      {Math.round(impact * 100)}%
-                    </span>
-                  )}
-                  <span
-                    className={`text-[9px] px-1.5 py-0.5 rounded-full whitespace-nowrap font-semibold ${
-                      ex.tier_snc === 1
-                        ? 'bg-red-500/10 text-red-400'
-                        : ex.tier_snc === 2
-                        ? 'bg-amber-500/10 text-amber-400'
-                        : 'bg-zinc-500/10 text-zinc-400'
-                    }`}
-                  >
-                    T{ex.tier_snc}
-                  </span>
-                </div>
-              </div>
-              
-              <div className="flex items-center justify-between text-[10px] text-zinc-400">
-                <span>{MUSCLE_DETAILS[ex.muscle_primaire]}</span>
-                <span className="text-zinc-500">{EQUIPMENT_LABELS[ex.equipment]}</span>
-              </div>
+          filteredExercises.map(({ ex, impact }) => {
+            const capacity = simulation?.muscles?.[ex.muscle_primaire]?.remainingCapacity ?? 1.0;
+            const isBlocked = capacity <= 0.25;
 
-              {/* Click to add day list */}
-              {activeAddMenu === ex.id ? (
-                <div className="mt-2 border-t border-zinc-850 pt-2 animate-fadeIn">
-                  <span className="text-[10px] text-emerald-400 block mb-1">Ajouter à quel jour ?</span>
-                  <div className="grid grid-cols-4 gap-1">
-                    {daysOfWeek.map(d => (
-                      <button
-                        key={d}
-                        onClick={() => {
-                          onAddExercise(ex.id, d);
-                          setActiveAddMenu(null);
-                        }}
-                        className="rounded bg-zinc-800 hover:bg-emerald-500 hover:text-zinc-950 px-1 py-1 text-[9px] font-bold text-center text-zinc-300 transition-all cursor-pointer"
-                      >
-                        {d.substring(0, 3)}
-                      </button>
-                    ))}
-                    <button
-                      onClick={() => setActiveAddMenu(null)}
-                      className="rounded bg-zinc-900 hover:bg-zinc-850 px-1 py-1 text-[9px] font-medium text-center text-zinc-500 col-span-4 mt-1 transition-all cursor-pointer"
+            return (
+              <div
+                key={ex.id}
+                draggable={!isBlocked}
+                onDragStart={(e) => {
+                  if (isBlocked) {
+                    e.preventDefault();
+                    return;
+                  }
+                  e.dataTransfer.setData('text/plain', ex.id);
+                  e.dataTransfer.effectAllowed = 'copy';
+                }}
+                className={`relative p-2.5 rounded-lg border transition-all flex flex-col gap-1.5 select-none ${
+                  isBlocked
+                    ? 'border-red-900/40 bg-red-950/5 hover:border-red-800/40 cursor-not-allowed opacity-80'
+                    : 'border-zinc-900 bg-zinc-900/40 hover:bg-zinc-900/80 hover:border-emerald-500/30 cursor-grab active:cursor-grabbing group'
+                }`}
+                title={
+                  isBlocked
+                    ? "Muscle saturé ! Ajout bloqué pour éviter le surentraînement."
+                    : "Glissez cet exercice dans le séquenceur pour l'ajouter"
+                }
+              >
+                <div className="flex items-start justify-between gap-1.5">
+                  <div className="flex items-center gap-1.5 min-w-0">
+                    <span className={`text-[11px] select-none transition-colors mr-0.5 ${
+                      isBlocked ? 'text-zinc-700' : 'text-zinc-600 group-hover:text-zinc-400 cursor-grab active:cursor-grabbing'
+                    }`}>
+                      ⋮⋮
+                    </span>
+                    <span className={`text-xs font-semibold truncate ${
+                      isBlocked ? 'text-zinc-400' : 'text-zinc-200'
+                    }`}>{ex.nom}</span>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    {selectedMuscle !== 'all' && (
+                      <span className="text-[9px] bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-1.5 py-0.5 rounded-full font-bold">
+                        {Math.round(impact * 100)}%
+                      </span>
+                    )}
+                    <span
+                      className={`text-[9px] px-1.5 py-0.5 rounded-full whitespace-nowrap font-semibold ${
+                        ex.tier_snc === 1
+                          ? 'bg-red-500/10 text-red-400'
+                          : ex.tier_snc === 2
+                          ? 'bg-amber-500/10 text-amber-400'
+                          : 'bg-zinc-500/10 text-zinc-400'
+                      }`}
                     >
-                      Annuler
-                    </button>
+                      T{ex.tier_snc}
+                    </span>
                   </div>
                 </div>
-              ) : (
-                <button
-                  onClick={() => setActiveAddMenu(ex.id)}
-                  className="mt-1 flex items-center justify-center gap-1 w-full rounded bg-zinc-850 hover:bg-zinc-800 text-[10px] py-1 text-zinc-300 hover:text-emerald-400 transition-all cursor-pointer border border-zinc-800"
-                >
-                  <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                  </svg>
-                  Planifier
-                </button>
-              )}
-            </div>
-          ))
+                
+                <div className="flex items-center justify-between text-[10px] text-zinc-400">
+                  <span className={isBlocked ? 'text-zinc-500' : ''}>{MUSCLE_DETAILS[ex.muscle_primaire]}</span>
+                  <span className="text-zinc-500">{EQUIPMENT_LABELS[ex.equipment]}</span>
+                </div>
+
+                {/* Work Capacity Bar */}
+                <div className="py-1">
+                  <CapacityBar progress={capacity} showLabel={true} />
+                </div>
+
+                {/* Click to add day list */}
+                {isBlocked ? (
+                  <div className="mt-1 flex items-center justify-center gap-1 w-full rounded bg-red-950/20 text-[9px] py-1.5 text-red-400 font-extrabold border border-red-500/20 cursor-not-allowed">
+                    <svg className="h-3 w-3 animate-pulse" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                    </svg>
+                    <span>Surcharge : Ajout Bloqué 🔴</span>
+                  </div>
+                ) : activeAddMenu === ex.id ? (
+                  <div className="mt-2 border-t border-zinc-850 pt-2 animate-fadeIn">
+                    <span className="text-[10px] text-emerald-400 block mb-1">Ajouter à quel jour ?</span>
+                    <div className="grid grid-cols-4 gap-1">
+                      {daysOfWeek.map(d => (
+                        <button
+                          key={d}
+                          onClick={() => {
+                            onAddExercise(ex.id, d);
+                            setActiveAddMenu(null);
+                          }}
+                          className="rounded bg-zinc-800 hover:bg-emerald-500 hover:text-zinc-950 px-1 py-1 text-[9px] font-bold text-center text-zinc-300 transition-all cursor-pointer"
+                        >
+                          {d.substring(0, 3)}
+                        </button>
+                      ))}
+                      <button
+                        onClick={() => setActiveAddMenu(null)}
+                        className="rounded bg-zinc-900 hover:bg-zinc-850 px-1 py-1 text-[9px] font-medium text-center text-zinc-500 col-span-4 mt-1 transition-all cursor-pointer"
+                      >
+                        Annuler
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <button
+                    onClick={() => setActiveAddMenu(ex.id)}
+                    className="mt-1 flex items-center justify-center gap-1 w-full rounded bg-zinc-850 hover:bg-zinc-800 text-[10px] py-1 text-zinc-300 hover:text-emerald-400 transition-all cursor-pointer border border-zinc-800"
+                  >
+                    <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                    </svg>
+                    Planifier
+                  </button>
+                )}
+              </div>
+            );
+          })
         )}
       </div>
     </div>

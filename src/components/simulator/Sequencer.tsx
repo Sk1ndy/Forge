@@ -1,5 +1,5 @@
-import React from 'react';
-import { WeeklyBlueprint, PlannedExercise } from '@/lib/calculations';
+import React, { useState } from 'react';
+import { WeeklyBlueprint, PlannedExercise, SimulationResult, EXERCISE_LIBRARY } from '@/lib/calculations';
 import ExerciseCard from './ExerciseCard';
 
 interface SequencerProps {
@@ -12,6 +12,7 @@ interface SequencerProps {
   selectedDay?: string;
   onSelectDay?: (day: string) => void;
   onAddExercise?: (exerciseId: string, day: string) => void;
+  simulation: SimulationResult;
 }
 
 const DAYS_OF_WEEK = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche'];
@@ -25,7 +26,8 @@ export default function Sequencer({
   onUpdateToggledDays,
   selectedDay,
   onSelectDay,
-  onAddExercise
+  onAddExercise,
+  simulation
 }: SequencerProps) {
   const [isDragOver, setIsDragOver] = React.useState(false);
 
@@ -151,8 +153,18 @@ export default function Sequencer({
           setIsDragOver(false);
           if (!isCurrentDayActive) return;
           const exerciseId = e.dataTransfer.getData('text/plain');
-          if (exerciseId && onAddExercise) {
-            onAddExercise(exerciseId, currentDay);
+          if (exerciseId) {
+            const exercise = EXERCISE_LIBRARY.find(ex => ex.id === exerciseId);
+            if (exercise) {
+              const capacity = simulation?.muscles?.[exercise.muscle_primaire]?.remainingCapacity ?? 1.0;
+              if (capacity <= 0.25) {
+                alert(`⚠️ Ajout Bloqué ! Le muscle cible (${simulation?.muscles?.[exercise.muscle_primaire]?.name || exercise.muscle_primaire}) est saturé. Budget de récupération insuffisant (<= 25%).`);
+                return;
+              }
+            }
+            if (onAddExercise) {
+              onAddExercise(exerciseId, currentDay);
+            }
           }
         }}
         className={`flex-1 min-w-0 border rounded-xl p-4 flex flex-col min-h-0 transition-all duration-300 ${
@@ -245,6 +257,7 @@ export default function Sequencer({
                   plannedEx={plannedEx}
                   onChange={(updated) => onUpdateExercise(currentDay, index, updated)}
                   onDelete={() => onDeleteExercise(currentDay, index)}
+                  simulation={simulation}
                 />
               ))}
             </div>

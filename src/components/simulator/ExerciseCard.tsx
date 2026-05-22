@@ -1,16 +1,20 @@
 import React from 'react';
-import { PlannedExercise, Exercise, EXERCISE_LIBRARY, PlannedSet } from '@/lib/calculations';
+import { PlannedExercise, Exercise, EXERCISE_LIBRARY, PlannedSet, SimulationResult } from '@/lib/calculations';
+import CapacityBar from './CapacityBar';
 
 interface ExerciseCardProps {
   plannedEx: PlannedExercise;
   onChange: (updated: PlannedExercise) => void;
   onDelete: () => void;
+  simulation: SimulationResult;
 }
 
-export default function ExerciseCard({ plannedEx, onChange, onDelete }: ExerciseCardProps) {
+export default function ExerciseCard({ plannedEx, onChange, onDelete, simulation }: ExerciseCardProps) {
   const exercise = EXERCISE_LIBRARY.find(e => e.id === plannedEx.exerciseId);
 
   if (!exercise) return null;
+
+  const capacity = simulation?.muscles?.[exercise.muscle_primaire]?.remainingCapacity ?? 1.0;
 
   const handleUpdateSet = (index: number, updatedSet: Partial<PlannedSet>) => {
     const updatedSets = [...plannedEx.sets];
@@ -97,8 +101,15 @@ export default function ExerciseCard({ plannedEx, onChange, onDelete }: Exercise
         </div>
       </div>
 
+      {/* Capacity Bar */}
+      {plannedEx.active && (
+        <div className="mt-1.5 px-1 py-1.5 bg-zinc-950/20 rounded border border-zinc-850/30">
+          <CapacityBar progress={capacity} showLabel={true} />
+        </div>
+      )}
+
       {/* Sets Rows */}
-      <div className="mt-1.5 space-y-1.5">
+      <div className="mt-2 space-y-1.5">
         {plannedEx.sets.map((set, idx) => (
           <div
             key={idx}
