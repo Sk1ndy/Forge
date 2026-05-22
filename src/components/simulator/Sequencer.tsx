@@ -11,6 +11,7 @@ interface SequencerProps {
   onUpdateToggledDays: (updated: { [day: string]: boolean }) => void;
   selectedDay?: string;
   onSelectDay?: (day: string) => void;
+  onAddExercise?: (exerciseId: string, day: string) => void;
 }
 
 const DAYS_OF_WEEK = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche'];
@@ -23,8 +24,10 @@ export default function Sequencer({
   onClearDay,
   onUpdateToggledDays,
   selectedDay,
-  onSelectDay
+  onSelectDay,
+  onAddExercise
 }: SequencerProps) {
+  const [isDragOver, setIsDragOver] = React.useState(false);
 
   const handleToggleDay = (day: string, e: React.MouseEvent) => {
     e.stopPropagation(); // Avoid triggering day selection if just toggling
@@ -134,7 +137,30 @@ export default function Sequencer({
       </div>
 
       {/* 2. RIGHT WORKSPACE: Detailed Workout Day Editor */}
-      <div className="flex-1 min-w-0 bg-zinc-900/20 border border-zinc-900 rounded-xl p-4 flex flex-col min-h-0">
+      <div 
+        onDragOver={(e) => {
+          e.preventDefault();
+          if (isCurrentDayActive) {
+            setIsDragOver(true);
+            e.dataTransfer.dropEffect = 'copy';
+          }
+        }}
+        onDragLeave={() => setIsDragOver(false)}
+        onDrop={(e) => {
+          e.preventDefault();
+          setIsDragOver(false);
+          if (!isCurrentDayActive) return;
+          const exerciseId = e.dataTransfer.getData('text/plain');
+          if (exerciseId && onAddExercise) {
+            onAddExercise(exerciseId, currentDay);
+          }
+        }}
+        className={`flex-1 min-w-0 border rounded-xl p-4 flex flex-col min-h-0 transition-all duration-300 ${
+          isDragOver 
+            ? 'border-emerald-500 bg-emerald-950/10 shadow-[0_0_20px_rgba(16,185,129,0.15)] ring-1 ring-emerald-500/20' 
+            : 'border-zinc-900 bg-zinc-900/20'
+        }`}
+      >
         
         {/* Workspace Header */}
         <div className="flex items-center justify-between pb-3 border-b border-zinc-900 shrink-0">
@@ -207,8 +233,8 @@ export default function Sequencer({
               <p className="text-xs text-zinc-500 mt-2 leading-relaxed">
                 Aucun exercice planifié pour le moment. Récupération complète de la fatigue nerveuse et musculaire.
               </p>
-              <p className="text-[11px] text-emerald-400/80 mt-3 font-semibold">
-                💡 Cliquez sur un exercice dans la bibliothèque à droite pour l'ajouter !
+              <p className="text-[11px] text-emerald-400/80 mt-3 font-semibold text-center leading-normal">
+                💡 Cliquez sur un exercice ou glissez-le directement ici pour l'ajouter !
               </p>
             </div>
           ) : (

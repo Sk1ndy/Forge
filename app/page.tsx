@@ -444,6 +444,7 @@ export default function Home() {
             onUpdateToggledDays={setToggledDays}
             selectedDay={selectedDay}
             onSelectDay={setSelectedDay}
+            onAddExercise={handleAddExercise}
           />
         </div>
       </section>

@@ -159,7 +159,24 @@ export default function LibraryDrawer({
         {filteredExercises.length === 0 ? (
           <p className="text-xs text-zinc-500 text-center py-8">Aucun exercice trouvé.</p>
         ) : (
-
+          filteredExercises.map(({ ex, impact }) => (
+            <div
+              key={ex.id}
+              draggable={true}
+              onDragStart={(e) => {
+                e.dataTransfer.setData('text/plain', ex.id);
+                e.dataTransfer.effectAllowed = 'copy';
+              }}
+              className="relative p-2.5 rounded-lg border border-zinc-900 bg-zinc-900/40 hover:bg-zinc-900/80 hover:border-emerald-500/30 transition-all flex flex-col gap-1.5 cursor-grab active:cursor-grabbing group select-none"
+              title="Glissez cet exercice dans le séquenceur pour l'ajouter"
+            >
+              <div className="flex items-start justify-between gap-1.5">
+                <div className="flex items-center gap-1.5 min-w-0">
+                  <span className="text-zinc-600 group-hover:text-zinc-400 cursor-grab active:cursor-grabbing text-[11px] select-none transition-colors mr-0.5">
+                    ⋮⋮
+                  </span>
+                  <span className="text-xs font-semibold text-zinc-200 truncate">{ex.nom}</span>
+                </div>
                 <div className="flex items-center gap-1">
                   {selectedMuscle !== 'all' && (
                     <span className="text-[9px] bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-1.5 py-0.5 rounded-full font-bold">
