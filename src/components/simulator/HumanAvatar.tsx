@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState } from 'react';
 import { SimulationResult, MuscleStatus } from '@/lib/calculations';
 
 interface HumanAvatarProps {
@@ -8,7 +8,6 @@ interface HumanAvatarProps {
 export default function HumanAvatar({ simulation }: HumanAvatarProps) {
   const [hoveredId, setHoveredId] = useState<string | null>(null);
   const [tooltipPos, setTooltipPos] = useState<{ x: number; y: number } | null>(null);
-  const containerRef = useRef<HTMLDivElement>(null);
 
   const handleMouseEnter = (id: string, e: React.MouseEvent) => {
     setHoveredId(id);
@@ -25,14 +24,11 @@ export default function HumanAvatar({ simulation }: HumanAvatarProps) {
   };
 
   const updateTooltipPos = (e: React.MouseEvent) => {
-    if (containerRef.current) {
-      const rect = containerRef.current.getBoundingClientRect();
-      // Positionner le tooltip au-dessus et à droite de la souris
-      setTooltipPos({
-        x: e.clientX - rect.left + 15,
-        y: e.clientY - rect.top - 15
-      });
-    }
+    // Position fixe au curseur — indépendant du conteneur
+    setTooltipPos({
+      x: e.clientX + 16,
+      y: e.clientY - 8
+    });
   };
 
   const muscles = simulation.muscles;
@@ -58,7 +54,7 @@ export default function HumanAvatar({ simulation }: HumanAvatarProps) {
   };
 
   return (
-    <div ref={containerRef} className="relative w-full border border-zinc-900 bg-zinc-950/60 backdrop-blur-md rounded-2xl p-4 md:p-6 flex flex-col items-center justify-between min-h-[480px] select-none shadow-2xl">
+    <div className="relative w-full border border-zinc-900 bg-zinc-950/60 backdrop-blur-md rounded-2xl p-3 md:p-4 flex flex-col items-center justify-between select-none shadow-2xl">
       
       {/* Title & Status */}
       <div className="w-full flex items-center justify-between pb-3 border-b border-zinc-900">
@@ -81,7 +77,7 @@ export default function HumanAvatar({ simulation }: HumanAvatarProps) {
       </div>
 
       {/* SVG Canvas with Tactical Grids */}
-      <div className="relative flex items-center justify-center w-full max-w-[440px] h-[340px] md:h-[390px] mt-4 overflow-hidden rounded-xl border border-zinc-900/40 bg-zinc-950/30 p-2">
+      <div className="relative flex items-center justify-center w-full mt-3 overflow-hidden rounded-xl border border-zinc-900/40 bg-zinc-950/30 p-1" style={{height: '280px'}}>
         
         {/* Holographic background scanner effects */}
         <div className="absolute inset-0 bg-radial-gradient from-emerald-500/5 to-transparent pointer-events-none" />
@@ -438,13 +434,15 @@ export default function HumanAvatar({ simulation }: HumanAvatarProps) {
           </g>
         </svg>
 
-        {/* Floating holographic HUD tactical tooltip */}
+        {/* Floating holographic HUD tactical tooltip — fixed position on cursor */}
         {tooltipPos && hoveredMuscle && (
           <div
             style={{
-              position: 'absolute',
+              position: 'fixed',
               left: `${tooltipPos.x}px`,
-              top: `${tooltipPos.y}px`
+              top: `${tooltipPos.y}px`,
+              zIndex: 9999,
+              pointerEvents: 'none'
             }}
             className="pointer-events-none z-50 w-[210px] rounded-xl border border-zinc-800/80 bg-zinc-950/95 backdrop-blur-md p-3.5 text-xs shadow-2xl shadow-black/90 animate-fadeIn"
           >
