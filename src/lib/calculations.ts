@@ -233,16 +233,16 @@ export function getApplicable1RM(exerciseId: string, userPrs: UserPRs, weight: n
  */
 const RPE_FATIGUE_FACTORS: Record<number, number> = {
   10: 1.0,
-  9.5: 0.9,
-  9: 0.8,
-  8.5: 0.7,
-  8: 0.6,
-  7.5: 0.5,
-  7: 0.4,
-  6.5: 0.3,
-  6: 0.2,
-  5.5: 0.15,
-  5: 0.1
+  9.5: 0.88,
+  9: 0.77,
+  8.5: 0.67,
+  8: 0.59,
+  7.5: 0.52,
+  7: 0.46,
+  6.5: 0.40,
+  6: 0.35,
+  5.5: 0.31,
+  5: 0.27
 };
 
 export function calculateSetImpact(
@@ -279,7 +279,13 @@ export function calculateSetImpact(
   const weightRatio = set.poids / pdc;
   
   // Pondération de fatigue axiale SNC : Tier 1 = 100%, Tier 2 = 50%, Tier 3 (isolation) = 5%
-  const sncMultiplier = exercise.tier_snc === 1 ? 1.0 : (exercise.tier_snc === 2 ? 0.5 : 0.05);
+  let sncMultiplier = exercise.tier_snc === 1 ? 1.0 : (exercise.tier_snc === 2 ? 0.5 : 0.05);
+
+  // Le "Deadlift Effect" : Le soulevé de terre génère une fatigue nerveuse et axiale systémique hors normes.
+  // On applique un multiplicateur supplémentaire de 1.4 pour refléter cette contrainte structurelle unique.
+  if (exercise.id === 'deadlift') {
+    sncMultiplier *= 1.4;
+  }
 
   // Formule SNC : Proportionnel au ratio de poids, au multiplicateur de Tier, et au RPE adouci
   const sncPoints = weightRatio * sncMultiplier * rpeFactor * set.series * 1.2;
@@ -306,17 +312,34 @@ export function runWeeklySimulation(
       fitness: number;
       sets: number;
       contributions: { [exId: string]: number };
+      setsContributions: { [exId: string]: number };
     };
   } = {};
   
   Object.keys(MUSCLE_DETAILS).forEach(id => {
-    musclesMap[id] = { fatigue: 0, fitness: 0, sets: 0, contributions: {} };
+    musclesMap[id] = { fatigue: 0, fitness: 0, sets: 0, contributions: {}, setsContributions: {} };
   });
+
+  // Helper de clonage profond ultra-rapide (complet, évite le JSON.parse/stringify coûteux)
+  const cloneMusclesMap = (source: typeof musclesMap): typeof musclesMap => {
+    const target: typeof musclesMap = {};
+    for (const key in source) {
+      const s = source[key];
+      target[key] = {
+        fatigue: s.fatigue,
+        fitness: s.fitness,
+        sets: s.sets,
+        contributions: { ...s.contributions },
+        setsContributions: { ...s.setsContributions }
+      };
+    }
+    return target;
+  };
 
   let sncFatigue = 0;
 
-  // Clones pour capturer l'état au jour de snapshot sélectionné
-  let snapshotMuscles: typeof musclesMap = JSON.parse(JSON.stringify(musclesMap));
+  // Clones pour capturer l'état au jour de snapshot sélectionné (utilisant le helper performant)
+  let snapshotMuscles = cloneMusclesMap(musclesMap);
   let snapshotSnc = 0;
 
   // Simulation séquentielle journalière
@@ -359,15 +382,16 @@ export function runWeeklySimulation(
               musclesMap[muscleId].fitness += muscleLoad * 0.5; // Gain en Fitness = 50% de la fatigue induite
               musclesMap[muscleId].sets += set.series * coeff;
               musclesMap[muscleId].contributions[exercise.nom] = (musclesMap[muscleId].contributions[exercise.nom] || 0) + muscleLoad;
+              musclesMap[muscleId].setsContributions[exercise.nom] = (musclesMap[muscleId].setsContributions[exercise.nom] || 0) + set.series * coeff;
             }
           });
         });
       });
     }
 
-    // C. Capture du snapshot s'il s'agit du jour choisi par l'utilisateur
+    // C. Capture du snapshot s'il s'agit du jour choisi par l'utilisateur (utilisant le helper performant)
     if (selectedDay && day.toLowerCase() === selectedDay.toLowerCase()) {
-      snapshotMuscles = JSON.parse(JSON.stringify(musclesMap));
+      snapshotMuscles = cloneMusclesMap(musclesMap);
       snapshotSnc = sncFatigue;
     }
   });
@@ -377,38 +401,36 @@ export function runWeeklySimulation(
   const targetSnc = selectedDay ? snapshotSnc : sncFatigue;
 
   // ─── AGGREGATION DES SOUS-MUSCLES PHYSIOLOGIQUES VERS LES GROUPES VISUELS DE L'AVATAR ───
-  // Cela garantit que la tension appliquée sur un sous-muscle (ex: upperChest) se répercute visuellement
-  // sur le groupe principal de l'avatar (ex: chest) pour éviter les incohérences d'affichage.
+  // Agrégation consolidée par exercice : somme des exercices distincts, mais prend le maximum
+  // pour le même exercice appliqué à la fois au parent et à l'enfant (évite double-comptage et sous-estimation).
   const aggregateMuscle = (parentKey: MuscleId, childKeys: MuscleId[]) => {
-    const parent = targetMuscles[parentKey] || { fatigue: 0, fitness: 0, sets: 0, contributions: {} };
-    let maxFatigue = parent.fatigue;
-    let maxFitness = parent.fitness;
-    let maxSets = parent.sets;
+    const parent = targetMuscles[parentKey] || { fatigue: 0, fitness: 0, sets: 0, contributions: {}, setsContributions: {} };
+    
+    // Consolidation des contributions de fatigue (INOL) et de volume (séries) par exercice
     const combinedContributions = { ...parent.contributions };
+    const combinedSetsContributions = { ...parent.setsContributions };
 
     childKeys.forEach(childKey => {
       const child = targetMuscles[childKey];
       if (child) {
-        if (child.fatigue > maxFatigue) {
-          maxFatigue = child.fatigue;
-        }
-        if (child.fitness > maxFitness) {
-          maxFitness = child.fitness;
-        }
-        if (child.sets > maxSets) {
-          maxSets = child.sets;
-        }
-        Object.entries(child.contributions).forEach(([exNom, val]) => {
+        Object.entries(child.contributions || {}).forEach(([exNom, val]) => {
           combinedContributions[exNom] = Math.max(combinedContributions[exNom] || 0, val);
+        });
+        Object.entries(child.setsContributions || {}).forEach(([exNom, val]) => {
+          combinedSetsContributions[exNom] = Math.max(combinedSetsContributions[exNom] || 0, val);
         });
       }
     });
 
+    const totalFatigue = Object.values(combinedContributions).reduce((sum, val) => sum + val, 0);
+    const totalSets = Object.values(combinedSetsContributions).reduce((sum, val) => sum + val, 0);
+
     targetMuscles[parentKey] = {
-      fatigue: maxFatigue,
-      fitness: maxFitness,
-      sets: maxSets,
-      contributions: combinedContributions
+      fatigue: totalFatigue,
+      fitness: totalFatigue * 0.5, // Ratio adaptation classique
+      sets: totalSets,
+      contributions: combinedContributions,
+      setsContributions: combinedSetsContributions
     };
   };
 
