@@ -14,6 +14,7 @@ export default function ExerciseCard({ plannedEx, onChange, onDelete, simulation
 
   if (!exercise) return null;
 
+  const muscleColor = simulation?.muscles?.[exercise.muscle_primaire]?.color;
   const capacity = simulation?.muscles?.[exercise.muscle_primaire]?.remainingCapacity ?? 1.0;
 
   const handleUpdateSet = (index: number, updatedSet: Partial<PlannedSet>) => {
@@ -104,7 +105,7 @@ export default function ExerciseCard({ plannedEx, onChange, onDelete, simulation
       {/* Capacity Bar */}
       {plannedEx.active && (
         <div className="mt-1.5 px-1 py-1.5 bg-zinc-950/20 rounded border border-zinc-850/30">
-          <CapacityBar progress={capacity} showLabel={true} />
+          <CapacityBar progress={capacity} color={muscleColor} showLabel={true} />
         </div>
       )}
 

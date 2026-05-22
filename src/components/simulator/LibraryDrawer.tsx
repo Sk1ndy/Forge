@@ -165,7 +165,8 @@ export default function LibraryDrawer({
         ) : (
           filteredExercises.map(({ ex, impact }) => {
             const capacity = simulation?.muscles?.[ex.muscle_primaire]?.remainingCapacity ?? 1.0;
-            const isBlocked = capacity <= 0.25;
+            const muscleColor = simulation?.muscles?.[ex.muscle_primaire]?.color;
+            const isBlocked = muscleColor === 'red';
 
             return (
               <div
@@ -182,11 +183,15 @@ export default function LibraryDrawer({
                 className={`relative p-2.5 rounded-lg border transition-all flex flex-col gap-1.5 select-none ${
                   isBlocked
                     ? 'border-red-900/40 bg-red-950/5 hover:border-red-800/40 cursor-not-allowed opacity-80'
+                    : muscleColor === 'orange'
+                    ? 'border-amber-900/30 bg-zinc-900/40 hover:bg-zinc-900/80 hover:border-amber-500/30 cursor-grab active:cursor-grabbing group'
                     : 'border-zinc-900 bg-zinc-900/40 hover:bg-zinc-900/80 hover:border-emerald-500/30 cursor-grab active:cursor-grabbing group'
                 }`}
                 title={
                   isBlocked
                     ? "Muscle saturé ! Ajout bloqué pour éviter le surentraînement."
+                    : muscleColor === 'orange'
+                    ? "Muscle en surcharge locale. Vous pouvez planifier avec précaution."
                     : "Glissez cet exercice dans le séquenceur pour l'ajouter"
                 }
               >
@@ -228,8 +233,18 @@ export default function LibraryDrawer({
 
                 {/* Work Capacity Bar */}
                 <div className="py-1">
-                  <CapacityBar progress={capacity} showLabel={true} />
+                  <CapacityBar progress={capacity} color={muscleColor} showLabel={true} />
                 </div>
+
+                {/* Orange warning badge if muscle is in surcharge but not blocked */}
+                {muscleColor === 'orange' && (
+                  <div className="mt-1 flex items-center justify-center gap-1 w-full rounded bg-amber-950/20 text-[9px] py-1 text-amber-400 font-bold border border-amber-500/20 select-none">
+                    <svg className="h-2.5 w-2.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                    </svg>
+                    <span>Surcharge : Fatigue Élevée ⚠️</span>
+                  </div>
+                )}
 
                 {/* Click to add day list */}
                 {isBlocked ? (
@@ -237,7 +252,7 @@ export default function LibraryDrawer({
                     <svg className="h-3 w-3 animate-pulse" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                     </svg>
-                    <span>Surcharge : Ajout Bloqué 🔴</span>
+                    <span>MRV Dépassé : Bloqué 🔴</span>
                   </div>
                 ) : activeAddMenu === ex.id ? (
                   <div className="mt-2 border-t border-zinc-850 pt-2 animate-fadeIn">

@@ -104,10 +104,10 @@ export default function Home() {
     const exercise = EXERCISE_LIBRARY.find(e => e.id === exerciseId);
     if (!exercise) return;
 
-    // Blocage de sécurité si le budget de récupération du muscle primaire est <= 25%
-    const capacity = simulationResult.muscles[exercise.muscle_primaire]?.remainingCapacity ?? 1.0;
-    if (capacity <= 0.25) {
-      alert(`⚠️ Ajout Bloqué ! Le muscle cible (${simulationResult.muscles[exercise.muscle_primaire]?.name || exercise.muscle_primaire}) est saturé. Budget de récupération insuffisant (<= 25%).`);
+    // Blocage de sécurité si le muscle cible a dépassé son Volume Récupérable Maximal (MRV / Rouge)
+    const muscleStatus = simulationResult.muscles[exercise.muscle_primaire];
+    if (muscleStatus?.color === 'red') {
+      alert(`⚠️ Ajout Bloqué ! Le muscle cible (${muscleStatus.name || exercise.muscle_primaire}) a dépassé son Volume Récupérable Maximal (MRV).`);
       return;
     }
 

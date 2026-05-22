@@ -156,9 +156,9 @@ export default function Sequencer({
           if (exerciseId) {
             const exercise = EXERCISE_LIBRARY.find(ex => ex.id === exerciseId);
             if (exercise) {
-              const capacity = simulation?.muscles?.[exercise.muscle_primaire]?.remainingCapacity ?? 1.0;
-              if (capacity <= 0.25) {
-                alert(`⚠️ Ajout Bloqué ! Le muscle cible (${simulation?.muscles?.[exercise.muscle_primaire]?.name || exercise.muscle_primaire}) est saturé. Budget de récupération insuffisant (<= 25%).`);
+              const muscleStatus = simulation?.muscles?.[exercise.muscle_primaire];
+              if (muscleStatus?.color === 'red') {
+                alert(`⚠️ Ajout Bloqué ! Le muscle cible (${muscleStatus.name || exercise.muscle_primaire}) a dépassé son Volume Récupérable Maximal (MRV).`);
                 return;
               }
             }

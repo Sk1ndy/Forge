@@ -5,9 +5,10 @@ import React from 'react';
 interface CapacityBarProps {
   progress: number; // Value between 0 and 1
   showLabel?: boolean;
+  color?: 'grey' | 'green' | 'orange' | 'red';
 }
 
-export default function CapacityBar({ progress, showLabel = true }: CapacityBarProps) {
+export default function CapacityBar({ progress, showLabel = true, color }: CapacityBarProps) {
   const percentage = Math.min(100, Math.max(0, Math.round(progress * 100)));
   
   // Visual threshold rules
@@ -16,16 +17,37 @@ export default function CapacityBar({ progress, showLabel = true }: CapacityBarP
   let shadowClass = '';
   let labelText = '';
 
-  if (progress > 0.6) {
+  // Determine actual color category
+  let displayColor: 'green' | 'orange' | 'red' = 'green';
+  if (color) {
+    if (color === 'grey' || color === 'green') {
+      displayColor = 'green';
+    } else if (color === 'orange') {
+      displayColor = 'orange';
+    } else {
+      displayColor = 'red';
+    }
+  } else {
+    // Fallback using progress thresholds harmonized with calculations.ts
+    if (progress >= 0.4) {
+      displayColor = 'green';
+    } else if (progress > 0.0) {
+      displayColor = 'orange';
+    } else {
+      displayColor = 'red';
+    }
+  }
+
+  if (displayColor === 'green') {
     barColorClass = 'bg-gradient-to-r from-emerald-500 to-teal-400';
     textColorClass = 'text-emerald-400';
     shadowClass = 'shadow-[0_0_8px_rgba(16,185,129,0.3)]';
     labelText = 'Approuvé';
-  } else if (progress > 0.25) {
+  } else if (displayColor === 'orange') {
     barColorClass = 'bg-gradient-to-r from-amber-500 to-orange-400';
     textColorClass = 'text-amber-400';
     shadowClass = 'shadow-[0_0_8px_rgba(245,158,11,0.3)]';
-    labelText = 'Attention';
+    labelText = 'Surcharge';
   } else {
     barColorClass = 'bg-gradient-to-r from-red-600 to-red-400 animate-pulse';
     textColorClass = 'text-red-400 font-extrabold';
@@ -40,9 +62,9 @@ export default function CapacityBar({ progress, showLabel = true }: CapacityBarP
           <span className="text-zinc-400 font-medium tracking-wide">Capacité de Travail</span>
           <span className={`font-bold flex items-center gap-1 ${textColorClass}`}>
             {percentage}% <span className={`text-[8px] bg-zinc-900 border px-1 py-0.5 rounded uppercase tracking-wider font-semibold ${
-              progress > 0.6 
+              displayColor === 'green' 
                 ? 'border-emerald-500/20 text-emerald-400' 
-                : progress > 0.25 
+                : displayColor === 'orange' 
                 ? 'border-amber-500/20 text-amber-400' 
                 : 'border-red-500/30 text-red-400 animate-pulse'
             }`}>{labelText}</span>
