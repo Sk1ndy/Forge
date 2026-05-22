@@ -1,3 +1,4 @@
+'use client';
 import React, { useState } from 'react';
 import { SimulationResult, MuscleStatus } from '@/lib/calculations';
 
@@ -13,525 +14,379 @@ export default function HumanAvatar({ simulation }: HumanAvatarProps) {
     setHoveredId(id);
     updateTooltipPos(e);
   };
-
-  const handleMouseMove = (e: React.MouseEvent) => {
-    updateTooltipPos(e);
-  };
-
-  const handleMouseLeave = () => {
-    setHoveredId(null);
-    setTooltipPos(null);
-  };
+  const handleMouseMove = (e: React.MouseEvent) => updateTooltipPos(e);
+  const handleMouseLeave = () => { setHoveredId(null); setTooltipPos(null); };
 
   const updateTooltipPos = (e: React.MouseEvent) => {
-    // Position fixe au curseur — indépendant du conteneur
-    setTooltipPos({
-      x: e.clientX + 16,
-      y: e.clientY - 8
-    });
+    // Tooltip suit le curseur exactement — position fixe fenêtre
+    setTooltipPos({ x: e.clientX + 14, y: e.clientY + 14 });
   };
 
   const muscles = simulation.muscles;
   const hoveredMuscle = hoveredId ? muscles[hoveredId] : null;
 
-  // Remplissage SVG par couleur (Gradients cyberpunk premiums)
-  const getColorClass = (color: MuscleStatus['color'], isHovered: boolean) => {
-    if (simulation.cnsFailure) {
-      return 'muscle-grey opacity-40 transition-all duration-300';
-    }
-    
-    switch (color) {
-      case 'green':
-        return isHovered ? 'muscle-green-hover cursor-help' : 'muscle-green cursor-help';
-      case 'orange':
-        return isHovered ? 'muscle-orange-hover cursor-help' : 'muscle-orange cursor-help';
-      case 'red':
-        return isHovered ? 'muscle-red-hover cursor-help animate-pulse' : 'muscle-red cursor-help animate-pulse';
-      case 'grey':
-      default:
-        return isHovered ? 'muscle-grey-hover cursor-help' : 'muscle-grey cursor-help';
-    }
+  const getColor = (id: string): string => {
+    if (simulation.cnsFailure) return '#27272a';
+    const c = muscles[id]?.color || 'grey';
+    const hov = hoveredId === id;
+    if (c === 'green')  return hov ? '#2dd4bf' : '#0d9488';
+    if (c === 'orange') return hov ? '#fbbf24' : '#d97706';
+    if (c === 'red')    return hov ? '#f87171' : '#dc2626';
+    return hov ? '#3f3f46' : '#1c1c22';
   };
 
+  const getStroke = (id: string): string => {
+    if (simulation.cnsFailure) return '#3f3f46';
+    const c = muscles[id]?.color || 'grey';
+    const hov = hoveredId === id;
+    if (c === 'green')  return hov ? '#99f6e4' : '#14b8a6';
+    if (c === 'orange') return hov ? '#fde68a' : '#f59e0b';
+    if (c === 'red')    return hov ? '#fecaca' : '#ef4444';
+    return hov ? '#52525b' : '#27272a';
+  };
+
+  const getFilter = (id: string): string => {
+    if (simulation.cnsFailure) return 'none';
+    const c = muscles[id]?.color || 'grey';
+    const hov = hoveredId === id;
+    if (!hov) return 'none';
+    if (c === 'green')  return 'drop-shadow(0 0 6px rgba(20,184,166,0.8))';
+    if (c === 'orange') return 'drop-shadow(0 0 6px rgba(245,158,11,0.8))';
+    if (c === 'red')    return 'drop-shadow(0 0 8px rgba(239,68,68,0.9))';
+    return 'drop-shadow(0 0 4px rgba(113,113,122,0.5))';
+  };
+
+  const mp = (id: string) => ({
+    fill: getColor(id),
+    stroke: getStroke(id),
+    strokeWidth: 0.8,
+    style: { filter: getFilter(id), transition: 'all 0.2s ease', cursor: 'help' },
+    onMouseEnter: (e: React.MouseEvent) => handleMouseEnter(id, e),
+    onMouseMove: handleMouseMove,
+    onMouseLeave: handleMouseLeave,
+  });
+
   return (
-    <div className="relative w-full border border-zinc-900 bg-zinc-950/60 backdrop-blur-md rounded-2xl p-3 md:p-4 flex flex-col items-center justify-between select-none shadow-2xl">
-      
+    <div className="relative w-full border border-zinc-900 bg-zinc-950/60 backdrop-blur-md rounded-2xl p-3 flex flex-col select-none shadow-2xl">
+
       {/* Title & Status */}
-      <div className="w-full flex items-center justify-between pb-3 border-b border-zinc-900">
+      <div className="w-full flex items-center justify-between pb-2 border-b border-zinc-900 mb-2">
         <div className="flex items-center gap-2">
           <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_8px_#10b981]" />
-          <h3 className="text-sm font-bold tracking-wider uppercase text-zinc-400">
-            Scanner Anatomique Électronique
-          </h3>
+          <h3 className="text-xs font-bold tracking-wider uppercase text-zinc-400">Scanner Anatomique</h3>
         </div>
-        
         {simulation.cnsFailure ? (
-          <div className="animate-bounce bg-red-500/10 border border-red-500/30 text-red-400 text-[10px] font-black tracking-widest uppercase px-2.5 py-1 rounded-md">
-            ⚠️ ALERTE : SURCHARGE SYSTÉMIQUE (SNC)
+          <div className="animate-bounce bg-red-500/10 border border-red-500/30 text-red-400 text-[10px] font-black tracking-widest uppercase px-2 py-0.5 rounded-md">
+            ⚠️ SURCHARGE SNC
           </div>
         ) : (
           <div className="text-[9px] bg-emerald-500/5 text-emerald-400 border border-emerald-500/10 font-bold px-2 py-0.5 rounded uppercase tracking-wider">
-            Système Nominal
+            Nominal
           </div>
         )}
       </div>
 
-      {/* SVG Canvas with Tactical Grids */}
-      <div className="relative flex items-center justify-center w-full mt-3 overflow-hidden rounded-xl border border-zinc-900/40 bg-zinc-950/30 p-1" style={{height: '280px'}}>
-        
-        {/* Holographic background scanner effects */}
-        <div className="absolute inset-0 bg-radial-gradient from-emerald-500/5 to-transparent pointer-events-none" />
-
+      {/* SVG — face + dos côte à côte */}
+      <div className="w-full flex-1 overflow-hidden rounded-xl border border-zinc-900/40 bg-zinc-950/20">
         <svg
-          viewBox="0 0 400 380"
-          className="w-full h-full z-10"
+          viewBox="0 0 440 340"
+          className="w-full h-full"
           xmlns="http://www.w3.org/2000/svg"
+          style={{ minHeight: 220 }}
         >
-          {/* DEFINITIONS OF GRADIENTS & CUSTOM CYBER STYLES */}
           <defs>
-            <linearGradient id="grad-grey" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stopColor="#1e1e24" />
-              <stop offset="100%" stopColor="#0e0e11" />
-            </linearGradient>
-            <linearGradient id="grad-green" x1="0%" y1="0%" x2="0%" y2="100%">
-              <stop offset="0%" stopColor="#0d9488" />
-              <stop offset="100%" stopColor="#115e59" />
-            </linearGradient>
-            <linearGradient id="grad-orange" x1="0%" y1="0%" x2="0%" y2="100%">
-              <stop offset="0%" stopColor="#d97706" />
-              <stop offset="100%" stopColor="#92400e" />
-            </linearGradient>
-            <linearGradient id="grad-red" x1="0%" y1="0%" x2="0%" y2="100%">
-              <stop offset="0%" stopColor="#dc2626" />
-              <stop offset="100%" stopColor="#991b1b" />
-            </linearGradient>
-
-            <style>{`
-              .silhouette { fill: #070709; stroke: #1b1b22; stroke-width: 1.2; }
-              .muscle-path { stroke-width: 0.9; stroke-linejoin: round; transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1); }
-              .muscle-grey { fill: url(#grad-grey); stroke: #232329; }
-              .muscle-grey-hover { fill: #373740; stroke: #4b4b55; filter: drop-shadow(0 0 3px rgba(113,113,122,0.4)); }
-              .muscle-green { fill: url(#grad-green); stroke: #14b8a6; }
-              .muscle-green-hover { fill: #2dd4bf; stroke: #ccfbf1; filter: drop-shadow(0 0 5px rgba(20,184,166,0.7)); }
-              .muscle-orange { fill: url(#grad-orange); stroke: #f59e0b; }
-              .muscle-orange-hover { fill: #fbbf24; stroke: #fef9c3; filter: drop-shadow(0 0 5px rgba(245,158,11,0.7)); }
-              .muscle-red { fill: url(#grad-red); stroke: #ef4444; }
-              .muscle-red-hover { fill: #f87171; stroke: #fee2e2; filter: drop-shadow(0 0 8px rgba(239,68,68,0.9)); }
-            `}</style>
+            {/* Grid scan lines */}
+            <pattern id="scan-grid" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse">
+              <path d="M 20 0 L 0 0 0 20" fill="none" stroke="#10b981" strokeWidth="0.2" opacity="0.15" />
+            </pattern>
           </defs>
 
-          {/* ==================== TECH HUD DETAILS (GRID & RETICULES) ==================== */}
-          <g opacity="0.12" pointerEvents="none">
-            {/* Horizontal scan lines */}
-            <line x1="0" y1="50" x2="400" y2="50" stroke="#10b981" strokeWidth="0.5" strokeDasharray="3,6" />
-            <line x1="0" y1="120" x2="400" y2="120" stroke="#10b981" strokeWidth="0.5" strokeDasharray="3,6" />
-            <line x1="0" y1="210" x2="400" y2="210" stroke="#10b981" strokeWidth="0.5" strokeDasharray="3,6" />
-            <line x1="0" y1="300" x2="400" y2="300" stroke="#10b981" strokeWidth="0.5" strokeDasharray="3,6" />
-            
-            {/* Axis align coordinates */}
-            <line x1="100" y1="0" x2="100" y2="380" stroke="#10b981" strokeWidth="0.5" strokeDasharray="3,6" />
-            <line x1="300" y1="0" x2="300" y2="380" stroke="#10b981" strokeWidth="0.5" strokeDasharray="3,6" />
-            <line x1="200" y1="0" x2="200" y2="380" stroke="#10b981" strokeWidth="0.5" />
+          {/* Background grid */}
+          <rect width="440" height="340" fill="url(#scan-grid)" />
+
+          {/* ── HUD decorations ── */}
+          <g opacity="0.25" pointerEvents="none">
+            {/* Centre divider */}
+            <line x1="220" y1="10" x2="220" y2="330" stroke="#10b981" strokeWidth="0.5" strokeDasharray="4,8" />
+            {/* Labels */}
+            <text x="110" y="16" fill="#10b981" fontSize="8" fontWeight="bold" letterSpacing="0.15em" textAnchor="middle" opacity="0.8">ANTERIOR</text>
+            <text x="330" y="16" fill="#10b981" fontSize="8" fontWeight="bold" letterSpacing="0.15em" textAnchor="middle" opacity="0.8">POSTERIOR</text>
+            {/* Corner reticles front */}
+            <path d="M 20,20 L 20,30 M 20,20 L 30,20" stroke="#10b981" strokeWidth="0.8" />
+            <path d="M 200,20 L 200,30 M 200,20 L 190,20" stroke="#10b981" strokeWidth="0.8" />
+            <path d="M 20,320 L 20,310 M 20,320 L 30,320" stroke="#10b981" strokeWidth="0.8" />
+            <path d="M 200,320 L 200,310 M 200,320 L 190,320" stroke="#10b981" strokeWidth="0.8" />
+            {/* Corner reticles back */}
+            <path d="M 240,20 L 240,30 M 240,20 L 250,20" stroke="#10b981" strokeWidth="0.8" />
+            <path d="M 420,20 L 420,30 M 420,20 L 410,20" stroke="#10b981" strokeWidth="0.8" />
+            <path d="M 240,320 L 240,310 M 240,320 L 250,320" stroke="#10b981" strokeWidth="0.8" />
+            <path d="M 420,320 L 420,310 M 420,320 L 410,320" stroke="#10b981" strokeWidth="0.8" />
           </g>
 
-          <g opacity="0.15" pointerEvents="none">
-            {/* Target circular HUD overlays */}
-            <circle cx="100" cy="130" r="48" fill="none" stroke="#10b981" strokeWidth="0.5" strokeDasharray="2,8" />
-            <circle cx="300" cy="130" r="48" fill="none" stroke="#10b981" strokeWidth="0.5" strokeDasharray="2,8" />
-            
-            {/* Precision crosshairs */}
-            <path d="M 85,130 L 115,130 M 100,115 L 100,145" stroke="#10b981" strokeWidth="0.5" />
-            <path d="M 285,130 L 315,130 M 300,115 L 300,145" stroke="#10b981" strokeWidth="0.5" />
+          {/* ═══════════════════════════════════════════════════
+              VUE FACE  (viewbox 0→215, centré à x=110)
+          ═══════════════════════════════════════════════════ */}
+          <g id="front">
+
+            {/* ─── Silhouette de base ─── */}
+            {/* Tête */}
+            <ellipse cx="110" cy="34" rx="15" ry="19" fill="#070709" stroke="#1b1b22" strokeWidth="1" />
+            {/* Cou */}
+            <rect x="103" y="51" width="14" height="14" rx="4" fill="#070709" stroke="#1b1b22" strokeWidth="0.8" />
+            {/* Torse */}
+            <path d="M 77,65 C 68,70 64,100 66,130 C 68,155 74,168 82,175 L 82,210 L 138,210 L 138,175 C 146,168 152,155 154,130 C 156,100 152,70 143,65 Z"
+              fill="#070709" stroke="#1b1b22" strokeWidth="1" />
+            {/* Bassin */}
+            <path d="M 82,210 C 78,215 76,220 79,228 L 141,228 C 144,220 142,215 138,210 Z"
+              fill="#070709" stroke="#1b1b22" strokeWidth="0.8" />
+            {/* Bras gauche */}
+            <path d="M 77,65 C 64,68 54,80 52,105 C 50,125 54,148 50,165 L 62,165 C 64,148 64,126 66,106 C 68,88 76,72 81,68 Z"
+              fill="#070709" stroke="#1b1b22" strokeWidth="0.8" />
+            {/* Avant-bras gauche */}
+            <path d="M 50,165 C 46,175 44,195 46,215 L 58,215 C 58,195 60,175 62,165 Z"
+              fill="#070709" stroke="#1b1b22" strokeWidth="0.8" />
+            {/* Bras droit */}
+            <path d="M 143,65 C 156,68 166,80 168,105 C 170,125 166,148 170,165 L 158,165 C 156,148 156,126 154,106 C 152,88 144,72 139,68 Z"
+              fill="#070709" stroke="#1b1b22" strokeWidth="0.8" />
+            {/* Avant-bras droit */}
+            <path d="M 170,165 C 174,175 176,195 174,215 L 162,215 C 162,195 160,175 158,165 Z"
+              fill="#070709" stroke="#1b1b22" strokeWidth="0.8" />
+            {/* Cuisse gauche */}
+            <path d="M 82,228 C 76,235 72,260 74,285 C 76,300 80,310 84,318 L 100,318 C 102,308 104,295 104,280 C 104,260 106,238 110,228 Z"
+              fill="#070709" stroke="#1b1b22" strokeWidth="0.8" />
+            {/* Mollet gauche */}
+            <path d="M 84,318 C 82,325 82,332 84,340 L 100,340 C 100,332 100,325 100,318 Z"
+              fill="#070709" stroke="#1b1b22" strokeWidth="0.8" />
+            {/* Cuisse droite */}
+            <path d="M 138,228 C 144,235 148,260 146,285 C 144,300 140,310 136,318 L 120,318 C 118,308 116,295 116,280 C 116,260 114,238 110,228 Z"
+              fill="#070709" stroke="#1b1b22" strokeWidth="0.8" />
+            {/* Mollet droit */}
+            <path d="M 120,318 C 120,325 120,332 120,340 L 136,340 C 138,332 138,325 136,318 Z"
+              fill="#070709" stroke="#1b1b22" strokeWidth="0.8" />
+
+            {/* ─── Muscles interactifs FACE ─── */}
+
+            {/* TRAPÈZES (visible de face) */}
+            <path d="M 103,52 C 92,56 83,60 79,65 L 88,70 C 92,65 98,60 105,56 Z" {...mp('traps')} />
+            <path d="M 117,52 C 128,56 137,60 141,65 L 132,70 C 128,65 122,60 115,56 Z" {...mp('traps')} />
+
+            {/* DELTOÏDES ANTÉRIEURS */}
+            <path d="M 79,65 C 68,70 58,80 60,98 C 63,94 66,84 70,75 C 73,70 76,67 79,65 Z" {...mp('deltoids_ant')} />
+            <path d="M 141,65 C 152,70 162,80 160,98 C 157,94 154,84 150,75 C 147,70 144,67 141,65 Z" {...mp('deltoids_ant')} />
+
+            {/* PECTORAUX */}
+            <path d="M 88,70 C 82,73 76,80 77,100 C 79,112 88,118 110,119 Z" {...mp('chest')} />
+            <path d="M 132,70 C 138,73 144,80 143,100 C 141,112 132,118 110,119 Z" {...mp('chest')} />
+
+            {/* BICEPS */}
+            <path d="M 60,98 C 56,110 54,130 54,148 C 56,144 60,134 62,122 C 64,112 63,103 60,98 Z" {...mp('biceps')} />
+            <path d="M 160,98 C 164,110 166,130 166,148 C 164,144 160,134 158,122 C 156,112 157,103 160,98 Z" {...mp('biceps')} />
+
+            {/* TRICEPS (visible de face côté) */}
+            <path d="M 66,100 C 66,120 66,140 66,155 L 62,155 C 62,140 60,120 60,100 Z" {...mp('triceps')} />
+            <path d="M 154,100 C 154,120 154,140 154,155 L 158,155 C 158,140 160,120 160,100 Z" {...mp('triceps')} />
+
+            {/* AVANT-BRAS */}
+            <path d="M 54,148 C 50,160 48,180 48,200 C 50,198 54,185 56,170 C 58,160 57,152 54,148 Z" {...mp('forearms')} />
+            <path d="M 166,148 C 170,160 172,180 172,200 C 170,198 166,185 164,170 C 162,160 163,152 166,148 Z" {...mp('forearms')} />
+
+            {/* ABDOMINAUX (grands droits — 6 pavés) */}
+            {[0,1,2].map(row => (
+              <React.Fragment key={row}>
+                <rect x="99" y={122 + row * 19} width="9" height="16" rx="3" {...mp('abs')} />
+                <rect x="112" y={122 + row * 19} width="9" height="16" rx="3" {...mp('abs')} />
+              </React.Fragment>
+            ))}
+
+            {/* OBLIQUES */}
+            <path d="M 82,120 C 78,130 77,148 79,170 C 82,164 85,148 85,132 C 85,126 84,122 82,120 Z" {...mp('obliques')} />
+            <path d="M 138,120 C 142,130 143,148 141,170 C 138,164 135,148 135,132 C 135,126 136,122 138,120 Z" {...mp('obliques')} />
+
+            {/* QUADRICEPS */}
+            {/* Vaste médial G */}
+            <path d="M 95,235 C 90,248 86,268 86,290 C 88,300 92,308 96,316 L 100,316 C 99,302 97,278 96,258 C 95,248 95,240 95,235 Z" {...mp('quads')} />
+            {/* Droit fémoral G */}
+            <path d="M 100,228 C 99,240 99,258 100,278 C 101,295 102,308 102,318 L 108,318 C 108,308 107,292 106,275 C 104,255 103,238 100,228 Z" {...mp('quads')} />
+            {/* Vaste latéral G */}
+            <path d="M 108,230 C 106,242 106,260 108,280 C 110,296 112,308 112,318 L 116,318 C 115,308 113,295 112,278 C 111,260 110,244 108,230 Z" {...mp('quads')} />
+            {/* Vaste médial D */}
+            <path d="M 125,235 C 130,248 134,268 134,290 C 132,300 128,308 124,316 L 120,316 C 121,302 123,278 124,258 C 125,248 125,240 125,235 Z" {...mp('quads')} />
+            {/* Droit fémoral D */}
+            <path d="M 120,228 C 121,240 121,258 120,278 C 119,295 118,308 118,318 L 112,318 C 112,308 113,292 114,275 C 116,255 117,238 120,228 Z" {...mp('quads')} />
+            {/* Vaste latéral D */}
+            <path d="M 112,230 C 114,242 114,260 112,280 C 110,296 108,308 108,318 L 104,318 Z" {...mp('quads')} />
+
+            {/* MOLLETS FACE (tibial antérieur) */}
+            <path d="M 86,318 C 85,324 84,330 84,338 C 86,337 88,333 89,326 C 90,322 88,319 86,318 Z" {...mp('calves')} />
+            <path d="M 134,318 C 135,324 136,330 136,338 C 134,337 132,333 131,326 C 130,322 132,319 134,318 Z" {...mp('calves')} />
+
           </g>
 
-          {/* ==================== VUE FACE (CENTRE x = 100) ==================== */}
-          <g id="front-view">
-            {/* Background beautiful curved athletic outlines */}
-            <ellipse cx="100" cy="38" rx="14" ry="18" className="silhouette" />
-            <path d="M 91,54 Q 100,62 109,54 L 105,74 Q 100,75 95,74 Z" className="silhouette" />
-            
-            {/* Torso & Limbs curved backgrounds to match overlaying muscles */}
-            <path d="M 72,88 C 55,100 55,140 70,165 C 74,185 78,212 94,212 C 100,214 100,214 106,212 C 122,212 126,185 130,165 C 145,140 145,100 128,88 Z" className="silhouette" />
-            <path d="M 64,222 C 58,245 62,280 72,300 C 64,316 66,335 72,362 L 80,362 C 86,320 96,275 96,222 Z" className="silhouette" />
-            <path d="M 136,222 C 142,245 138,280 128,300 C 136,316 134,335 128,362 L 120,362 C 114,320 104,275 104,222 Z" className="silhouette" />
-            
-            <path d="M 72,88 C 58,95 48,115 56,160 C 48,174 38,194 40,210 L 46,210 C 58,185 64,155 72,96 Z" className="silhouette" />
-            <path d="M 128,88 C 142,95 152,115 144,160 C 152,174 162,194 160,210 L 154,210 C 142,185 136,155 128,96 Z" className="silhouette" />
+          {/* ═══════════════════════════════════════════════════
+              VUE DOS  (viewbox 225→440, centré à x=330)
+          ═══════════════════════════════════════════════════ */}
+          <g id="back">
 
-            {/* INTERACTIVE MUSCLES - FRONT */}
-            {/* Front Traps */}
-            <path
-              d="M 94,62 C 86,72 78,80 72,88 L 82,92 C 86,84 92,72 96,62 Z"
-              className={`muscle-path ${getColorClass(muscles['traps']?.color || 'grey', hoveredId === 'traps')}`}
-              onMouseEnter={(e) => handleMouseEnter('traps', e)}
-              onMouseMove={handleMouseMove}
-              onMouseLeave={handleMouseLeave}
-            />
-            <path
-              d="M 106,62 C 114,72 122,80 128,88 L 118,92 C 114,84 108,72 104,62 Z"
-              className={`muscle-path ${getColorClass(muscles['traps']?.color || 'grey', hoveredId === 'traps')}`}
-              onMouseEnter={(e) => handleMouseEnter('traps', e)}
-              onMouseMove={handleMouseMove}
-              onMouseLeave={handleMouseLeave}
-            />
+            {/* ─── Silhouette de base dos ─── */}
+            <ellipse cx="330" cy="34" rx="15" ry="19" fill="#070709" stroke="#1b1b22" strokeWidth="1" />
+            <rect x="323" y="51" width="14" height="14" rx="4" fill="#070709" stroke="#1b1b22" strokeWidth="0.8" />
+            <path d="M 297,65 C 288,70 284,100 286,130 C 288,155 294,168 302,175 L 302,210 L 358,210 L 358,175 C 366,168 372,155 374,130 C 376,100 372,70 363,65 Z"
+              fill="#070709" stroke="#1b1b22" strokeWidth="1" />
+            <path d="M 302,210 C 298,215 296,220 299,228 L 361,228 C 364,220 362,215 358,210 Z"
+              fill="#070709" stroke="#1b1b22" strokeWidth="0.8" />
+            {/* Bras gauche dos */}
+            <path d="M 297,65 C 284,68 274,80 272,105 C 270,125 274,148 270,165 L 282,165 C 284,148 284,126 286,106 C 288,88 296,72 301,68 Z"
+              fill="#070709" stroke="#1b1b22" strokeWidth="0.8" />
+            <path d="M 270,165 C 266,175 264,195 266,215 L 278,215 C 278,195 280,175 282,165 Z"
+              fill="#070709" stroke="#1b1b22" strokeWidth="0.8" />
+            {/* Bras droit dos */}
+            <path d="M 363,65 C 376,68 386,80 388,105 C 390,125 386,148 390,165 L 378,165 C 376,148 376,126 374,106 C 372,88 364,72 359,68 Z"
+              fill="#070709" stroke="#1b1b22" strokeWidth="0.8" />
+            <path d="M 390,165 C 394,175 396,195 394,215 L 382,215 C 382,195 380,175 378,165 Z"
+              fill="#070709" stroke="#1b1b22" strokeWidth="0.8" />
+            {/* Cuisses dos */}
+            <path d="M 302,228 C 296,235 292,260 294,285 C 296,300 300,310 304,318 L 320,318 C 322,308 324,295 324,280 C 324,260 326,238 330,228 Z"
+              fill="#070709" stroke="#1b1b22" strokeWidth="0.8" />
+            <path d="M 304,318 C 302,325 302,332 304,340 L 320,340 C 320,332 320,325 320,318 Z"
+              fill="#070709" stroke="#1b1b22" strokeWidth="0.8" />
+            <path d="M 358,228 C 364,235 368,260 366,285 C 364,300 360,310 356,318 L 340,318 C 338,308 336,295 336,280 C 336,260 334,238 330,228 Z"
+              fill="#070709" stroke="#1b1b22" strokeWidth="0.8" />
+            <path d="M 340,318 C 340,325 340,332 340,340 L 356,340 C 358,332 358,325 356,318 Z"
+              fill="#070709" stroke="#1b1b22" strokeWidth="0.8" />
 
-            {/* Deltoids Ant (épaule face) */}
-            <path
-              d="M 72,88 C 58,95 52,112 60,126 C 63,122 66,108 72,96 Z"
-              className={`muscle-path ${getColorClass(muscles['deltoids_ant']?.color || 'grey', hoveredId === 'deltoids_ant')}`}
-              onMouseEnter={(e) => handleMouseEnter('deltoids_ant', e)}
-              onMouseMove={handleMouseMove}
-              onMouseLeave={handleMouseLeave}
-            />
-            <path
-              d="M 128,88 C 142,95 148,112 140,126 C 137,122 134,108 128,96 Z"
-              className={`muscle-path ${getColorClass(muscles['deltoids_ant']?.color || 'grey', hoveredId === 'deltoids_ant')}`}
-              onMouseEnter={(e) => handleMouseEnter('deltoids_ant', e)}
-              onMouseMove={handleMouseMove}
-              onMouseLeave={handleMouseLeave}
-            />
+            {/* ─── Muscles interactifs DOS ─── */}
 
-            {/* Chest (Grand Pectoral) */}
-            <path
-              d="M 100,94 C 85,94 72,96 70,118 C 72,132 94,136 100,136 Z"
-              className={`muscle-path ${getColorClass(muscles['chest_major']?.color || 'grey', hoveredId === 'chest_major')}`}
-              onMouseEnter={(e) => handleMouseEnter('chest_major', e)}
-              onMouseMove={handleMouseMove}
-              onMouseLeave={handleMouseLeave}
-            />
-            <path
-              d="M 100,94 C 115,94 128,96 130,118 C 128,132 106,136 100,136 Z"
-              className={`muscle-path ${getColorClass(muscles['chest_major']?.color || 'grey', hoveredId === 'chest_major')}`}
-              onMouseEnter={(e) => handleMouseEnter('chest_major', e)}
-              onMouseMove={handleMouseMove}
-              onMouseLeave={handleMouseLeave}
-            />
+            {/* TRAPÈZES (grand trapèze dos) */}
+            <path d="M 323,52 C 313,55 302,60 299,65 L 308,74 C 314,67 320,60 326,56 Z" {...mp('traps')} />
+            <path d="M 337,52 C 347,55 358,60 361,65 L 352,74 C 346,67 340,60 334,56 Z" {...mp('traps')} />
+            {/* Centre trapèze losange */}
+            <path d="M 326,56 L 330,90 L 334,56 L 330,52 Z" {...mp('traps')} />
 
-            {/* Biceps */}
-            <path
-              d="M 59,127 C 50,135 48,152 56,160 C 60,154 62,142 67,128 Z"
-              className={`muscle-path ${getColorClass(muscles['biceps']?.color || 'grey', hoveredId === 'biceps')}`}
-              onMouseEnter={(e) => handleMouseEnter('biceps', e)}
-              onMouseMove={handleMouseMove}
-              onMouseLeave={handleMouseLeave}
-            />
-            <path
-              d="M 141,127 C 150,135 152,152 144,160 C 140,154 138,142 133,128 Z"
-              className={`muscle-path ${getColorClass(muscles['biceps']?.color || 'grey', hoveredId === 'biceps')}`}
-              onMouseEnter={(e) => handleMouseEnter('biceps', e)}
-              onMouseMove={handleMouseMove}
-              onMouseLeave={handleMouseLeave}
-            />
+            {/* DELTOÏDES POSTÉRIEURS */}
+            <path d="M 299,65 C 288,70 278,82 280,98 C 283,92 287,82 291,74 C 294,70 297,67 299,65 Z" {...mp('deltoids_post')} />
+            <path d="M 361,65 C 372,70 382,82 380,98 C 377,92 373,82 369,74 C 366,70 363,67 361,65 Z" {...mp('deltoids_post')} />
 
-            {/* Forearms (Avant-bras) */}
-            <path
-              d="M 56,161 C 48,174 38,194 40,210 C 44,210 49,198 59,173 Z"
-              className={`muscle-path ${getColorClass(muscles['forearms']?.color || 'grey', hoveredId === 'forearms')}`}
-              onMouseEnter={(e) => handleMouseEnter('forearms', e)}
-              onMouseMove={handleMouseMove}
-              onMouseLeave={handleMouseLeave}
-            />
-            <path
-              d="M 144,161 C 152,174 162,194 160,210 C 156,210 151,198 141,173 Z"
-              className={`muscle-path ${getColorClass(muscles['forearms']?.color || 'grey', hoveredId === 'forearms')}`}
-              onMouseEnter={(e) => handleMouseEnter('forearms', e)}
-              onMouseMove={handleMouseMove}
-              onMouseLeave={handleMouseLeave}
-            />
+            {/* DELTOÏDES LATÉRAUX */}
+            <path d="M 291,74 C 283,82 278,95 280,110 C 282,106 284,96 286,88 C 288,82 289,78 291,74 Z" {...mp('deltoids_lat')} />
+            <path d="M 369,74 C 377,82 382,95 380,110 C 378,106 376,96 374,88 C 372,82 371,78 369,74 Z" {...mp('deltoids_lat')} />
 
-            {/* Abdominaux (Abs - Tablettes) */}
-            <path
-              d="M 88,138 C 94,137 106,137 112,138 C 110,160 108,185 106,212 C 100,214 100,214 94,212 C 92,185 90,160 88,138 Z"
-              className={`muscle-path ${getColorClass(muscles['abs']?.color || 'grey', hoveredId === 'abs')}`}
-              onMouseEnter={(e) => handleMouseEnter('abs', e)}
-              onMouseMove={handleMouseMove}
-              onMouseLeave={handleMouseLeave}
-            />
+            {/* GRAND DORSAL */}
+            <path d="M 308,74 C 302,82 296,100 296,125 C 298,140 302,155 308,168 C 312,155 314,140 312,125 C 310,108 310,90 308,74 Z" {...mp('lats')} />
+            <path d="M 352,74 C 358,82 364,100 364,125 C 362,140 358,155 352,168 C 348,155 346,140 348,125 C 350,108 350,90 352,74 Z" {...mp('lats')} />
 
-            {/* Obliques */}
-            <path
-              d="M 87,138 C 76,145 74,180 78,212 C 84,213 88,212 93,212 C 90,185 88,160 87,138 Z"
-              className={`muscle-path ${getColorClass(muscles['obliques']?.color || 'grey', hoveredId === 'obliques')}`}
-              onMouseEnter={(e) => handleMouseEnter('obliques', e)}
-              onMouseMove={handleMouseMove}
-              onMouseLeave={handleMouseLeave}
-            />
-            <path
-              d="M 113,138 C 124,145 126,180 122,212 C 116,213 112,212 107,212 C 110,185 112,160 113,138 Z"
-              className={`muscle-path ${getColorClass(muscles['obliques']?.color || 'grey', hoveredId === 'obliques')}`}
-              onMouseEnter={(e) => handleMouseEnter('obliques', e)}
-              onMouseMove={handleMouseMove}
-              onMouseLeave={handleMouseLeave}
-            />
+            {/* RHOMBOÏDES */}
+            <path d="M 313,78 C 313,95 312,110 313,128 L 330,118 L 347,128 C 348,110 347,95 347,78 L 330,90 Z" {...mp('lats')} />
 
-            {/* Quadriceps (Athletic sweep curves) */}
-            <path
-              d="M 64,222 C 58,245 62,280 72,300 C 80,300 86,290 92,298 C 96,275 98,245 96,222 Z"
-              className={`muscle-path ${getColorClass(muscles['quads']?.color || 'grey', hoveredId === 'quads')}`}
-              onMouseEnter={(e) => handleMouseEnter('quads', e)}
-              onMouseMove={handleMouseMove}
-              onMouseLeave={handleMouseLeave}
-            />
-            <path
-              d="M 136,222 C 142,245 138,280 128,300 C 120,300 114,290 108,298 C 104,275 102,245 104,222 Z"
-              className={`muscle-path ${getColorClass(muscles['quads']?.color || 'grey', hoveredId === 'quads')}`}
-              onMouseEnter={(e) => handleMouseEnter('quads', e)}
-              onMouseMove={handleMouseMove}
-              onMouseLeave={handleMouseLeave}
-            />
+            {/* ÉRECTEURS (colonne vertébrale) */}
+            <path d="M 324,95 C 322,115 322,140 324,165 C 326,175 328,182 330,185 C 332,182 334,175 336,165 C 338,140 338,115 336,95 C 334,90 332,90 330,90 C 328,90 326,90 324,95 Z" {...mp('lower_back')} />
 
-            {/* Calves (Mollets face) */}
-            <path
-              d="M 70,304 C 64,316 66,335 72,362 L 78,362 C 82,342 85,322 86,304 Z"
-              className={`muscle-path ${getColorClass(muscles['calves']?.color || 'grey', hoveredId === 'calves')}`}
-              onMouseEnter={(e) => handleMouseEnter('calves', e)}
-              onMouseMove={handleMouseMove}
-              onMouseLeave={handleMouseLeave}
-            />
-            <path
-              d="M 130,304 C 136,316 134,335 128,362 L 122,362 C 118,342 115,322 114,304 Z"
-              className={`muscle-path ${getColorClass(muscles['calves']?.color || 'grey', hoveredId === 'calves')}`}
-              onMouseEnter={(e) => handleMouseEnter('calves', e)}
-              onMouseMove={handleMouseMove}
-              onMouseLeave={handleMouseLeave}
-            />
+            {/* TRICEPS DOS */}
+            <path d="M 280,98 C 276,112 274,130 274,148 C 276,144 278,132 280,120 C 282,110 281,103 280,98 Z" {...mp('triceps')} />
+            <path d="M 380,98 C 384,112 386,130 386,148 C 384,144 382,132 380,120 C 378,110 379,103 380,98 Z" {...mp('triceps')} />
 
-            {/* Grid coordinate Front */}
-            <text x="100" y="375" fill="#52525b" fontSize="10" fontWeight="extrabold" letterSpacing="0.1em" textAnchor="middle" opacity="0.6">ANTERIOR</text>
+            {/* AVANT-BRAS DOS */}
+            <path d="M 274,148 C 270,160 268,180 270,200 C 272,198 275,186 277,170 C 278,160 277,153 274,148 Z" {...mp('forearms')} />
+            <path d="M 386,148 C 390,160 392,180 390,200 C 388,198 385,186 383,170 C 382,160 383,153 386,148 Z" {...mp('forearms')} />
+
+            {/* FESSIERS */}
+            <path d="M 302,210 C 296,215 294,222 297,232 C 300,240 308,246 318,246 C 324,246 328,244 330,242 C 332,244 336,246 342,246 C 352,246 360,240 363,232 C 366,222 364,215 358,210 Z" {...mp('glutes')} />
+
+            {/* ISCHIO-JAMBIERS */}
+            {/* G */}
+            <path d="M 302,232 C 298,244 296,264 298,285 C 300,300 304,310 306,318 L 318,318 C 318,308 316,292 314,272 C 312,254 308,240 302,232 Z" {...mp('hamstrings')} />
+            {/* D */}
+            <path d="M 358,232 C 362,244 364,264 362,285 C 360,300 356,310 354,318 L 342,318 C 342,308 344,292 346,272 C 348,254 352,240 358,232 Z" {...mp('hamstrings')} />
+
+            {/* MOLLETS DOS (gastrocnémiens) */}
+            <path d="M 306,318 C 304,325 304,334 306,342 C 308,338 311,330 313,322 L 313,318 Z" {...mp('calves')} />
+            <path d="M 316,318 C 316,328 315,336 316,342 C 318,338 319,330 318,322 L 318,318 Z" {...mp('calves')} />
+            <path d="M 344,318 C 344,328 345,336 344,342 C 342,338 341,330 342,322 L 342,318 Z" {...mp('calves')} />
+            <path d="M 354,318 C 356,325 356,334 354,342 C 352,338 349,330 347,322 L 347,318 Z" {...mp('calves')} />
+
           </g>
 
-          {/* ==================== VUE DOS (CENTRE x = 300) ==================== */}
-          <g id="back-view">
-            {/* Background beautiful curved athletic outlines */}
-            <ellipse cx="300" cy="38" rx="14" ry="18" className="silhouette" />
-            <path d="M 291,54 Q 300,62 309,54 L 305,74 Q 300,75 295,74 Z" className="silhouette" />
-            
-            {/* Torso & Limbs curved backgrounds */}
-            <path d="M 272,88 C 255,100 255,140 270,165 C 274,185 278,212 294,212 C 300,214 300,214 306,212 C 322,212 326,185 330,165 C 345,140 345,100 328,88 Z" className="silhouette" />
-            <path d="M 264,222 C 258,245 262,280 272,300 C 264,316 265,335 272,362 L 280,362 C 286,320 296,275 296,222 Z" className="silhouette" />
-            <path d="M 336,222 C 342,245 338,280 328,300 C 336,316 334,335 328,362 L 320,362 C 314,320 304,275 304,222 Z" className="silhouette" />
-            
-            <path d="M 272,88 C 258,95 48,115 256,160 C 248,174 238,194 240,210 L 246,210 C 258,185 264,155 272,96 Z" className="silhouette" />
-            <path d="M 328,88 C 342,95 352,115 344,160 C 352,174 362,194 360,210 L 354,210 C 342,185 336,155 328,96 Z" className="silhouette" />
-
-            {/* INTERACTIVE MUSCLES - BACK */}
-            {/* Traps complete (Trapèzes en V) */}
-            <path
-              d="M 300,74 C 290,74 278,82 272,92 C 280,105 290,118 300,138 C 310,118 320,105 328,92 C 322,82 310,74 300,74 Z"
-              className={`muscle-path ${getColorClass(muscles['traps']?.color || 'grey', hoveredId === 'traps')}`}
-              onMouseEnter={(e) => handleMouseEnter('traps', e)}
-              onMouseMove={handleMouseMove}
-              onMouseLeave={handleMouseLeave}
-            />
-
-            {/* Rear Deltoids (épaule arrière) */}
-            <path
-              d="M 272,92 C 258,97 252,112 258,124 C 263,120 268,110 274,96 Z"
-              className={`muscle-path ${getColorClass(muscles['deltoids_post']?.color || 'grey', hoveredId === 'deltoids_post')}`}
-              onMouseEnter={(e) => handleMouseEnter('deltoids_post', e)}
-              onMouseMove={handleMouseMove}
-              onMouseLeave={handleMouseLeave}
-            />
-            <path
-              d="M 328,92 C 342,97 348,112 342,124 C 337,120 332,110 326,96 Z"
-              className={`muscle-path ${getColorClass(muscles['deltoids_post']?.color || 'grey', hoveredId === 'deltoids_post')}`}
-              onMouseEnter={(e) => handleMouseEnter('deltoids_post', e)}
-              onMouseMove={handleMouseMove}
-              onMouseLeave={handleMouseLeave}
-            />
-
-            {/* Triceps (arrière bras) */}
-            <path
-              d="M 257,125 C 248,135 244,152 253,160 C 257,154 259,142 263,127 Z"
-              className={`muscle-path ${getColorClass(muscles['triceps']?.color || 'grey', hoveredId === 'triceps')}`}
-              onMouseEnter={(e) => handleMouseEnter('triceps', e)}
-              onMouseMove={handleMouseMove}
-              onMouseLeave={handleMouseLeave}
-            />
-            <path
-              d="M 343,125 C 352,135 356,152 347,160 C 343,154 341,142 337,127 Z"
-              className={`muscle-path ${getColorClass(muscles['triceps']?.color || 'grey', hoveredId === 'triceps')}`}
-              onMouseEnter={(e) => handleMouseEnter('triceps', e)}
-              onMouseMove={handleMouseMove}
-              onMouseLeave={handleMouseLeave}
-            />
-
-            {/* Lats (Grand Dorsal) */}
-            <path
-              d="M 273,98 C 262,115 258,140 270,165 C 280,185 290,192 296,192 C 290,165 282,135 273,98 Z"
-              className={`muscle-path ${getColorClass(muscles['lats']?.color || 'grey', hoveredId === 'lats')}`}
-              onMouseEnter={(e) => handleMouseEnter('lats', e)}
-              onMouseMove={handleMouseMove}
-              onMouseLeave={handleMouseLeave}
-            />
-            <path
-              d="M 327,98 C 338,115 342,140 330,165 C 320,185 310,192 304,192 C 310,165 318,135 327,98 Z"
-              className={`muscle-path ${getColorClass(muscles['lats']?.color || 'grey', hoveredId === 'lats')}`}
-              onMouseEnter={(e) => handleMouseEnter('lats', e)}
-              onMouseMove={handleMouseMove}
-              onMouseLeave={handleMouseLeave}
-            />
-
-            {/* Lombaires (Lower Back) */}
-            <path
-              d="M 297,192 C 292,192 292,205 294,218 C 300,220 300,220 306,218 C 308,205 308,192 303,192 Z"
-              className={`muscle-path ${getColorClass(muscles['lower_back']?.color || 'grey', hoveredId === 'lower_back')}`}
-              onMouseEnter={(e) => handleMouseEnter('lower_back', e)}
-              onMouseMove={handleMouseMove}
-              onMouseLeave={handleMouseLeave}
-            />
-
-            {/* Glutes (Fessiers galbés) */}
-            <path
-              d="M 264,222 C 258,235 264,256 280,256 C 294,256 298,245 298,222 Z"
-              className={`muscle-path ${getColorClass(muscles['glutes']?.color || 'grey', hoveredId === 'glutes')}`}
-              onMouseEnter={(e) => handleMouseEnter('glutes', e)}
-              onMouseMove={handleMouseMove}
-              onMouseLeave={handleMouseLeave}
-            />
-            <path
-              d="M 336,222 C 342,235 336,256 320,256 C 306,256 302,245 302,222 Z"
-              className={`muscle-path ${getColorClass(muscles['glutes']?.color || 'grey', hoveredId === 'glutes')}`}
-              onMouseEnter={(e) => handleMouseEnter('glutes', e)}
-              onMouseMove={handleMouseMove}
-              onMouseLeave={handleMouseLeave}
-            />
-
-            {/* Hamstrings (Ischios) */}
-            <path
-              d="M 268,258 C 262,275 266,305 274,320 C 284,320 290,305 294,258 Z"
-              className={`muscle-path ${getColorClass(muscles['hamstrings']?.color || 'grey', hoveredId === 'hamstrings')}`}
-              onMouseEnter={(e) => handleMouseEnter('hamstrings', e)}
-              onMouseMove={handleMouseMove}
-              onMouseLeave={handleMouseLeave}
-            />
-            <path
-              d="M 332,258 C 338,275 334,305 326,320 C 316,320 310,305 306,258 Z"
-              className={`muscle-path ${getColorClass(muscles['hamstrings']?.color || 'grey', hoveredId === 'hamstrings')}`}
-              onMouseEnter={(e) => handleMouseEnter('hamstrings', e)}
-              onMouseMove={handleMouseMove}
-              onMouseLeave={handleMouseLeave}
-            />
-
-            {/* Calves (Mollets arrière) */}
-            <path
-              d="M 273,322 C 263,332 265,348 274,370 C 279,370 282,360 286,322 Z"
-              className={`muscle-path ${getColorClass(muscles['calves']?.color || 'grey', hoveredId === 'calves')}`}
-              onMouseEnter={(e) => handleMouseEnter('calves', e)}
-              onMouseMove={handleMouseMove}
-              onMouseLeave={handleMouseLeave}
-            />
-            <path
-              d="M 327,322 C 337,332 335,348 326,370 C 321,370 318,360 314,322 Z"
-              className={`muscle-path ${getColorClass(muscles['calves']?.color || 'grey', hoveredId === 'calves')}`}
-              onMouseEnter={(e) => handleMouseEnter('calves', e)}
-              onMouseMove={handleMouseMove}
-              onMouseLeave={handleMouseLeave}
-            />
-
-            {/* Grid coordinate Back */}
-            <text x="300" y="375" fill="#52525b" fontSize="10" fontWeight="extrabold" letterSpacing="0.1em" textAnchor="middle" opacity="0.6">POSTERIOR</text>
-          </g>
         </svg>
-
-        {/* Floating holographic HUD tactical tooltip — fixed position on cursor */}
-        {tooltipPos && hoveredMuscle && (
-          <div
-            style={{
-              position: 'fixed',
-              left: `${tooltipPos.x}px`,
-              top: `${tooltipPos.y}px`,
-              zIndex: 9999,
-              pointerEvents: 'none'
-            }}
-            className="pointer-events-none z-50 w-[210px] rounded-xl border border-zinc-800/80 bg-zinc-950/95 backdrop-blur-md p-3.5 text-xs shadow-2xl shadow-black/90 animate-fadeIn"
-          >
-            {/* Tooltip Header */}
-            <div className="flex items-center justify-between pb-2 border-b border-zinc-850">
-              <span className="font-bold text-white tracking-wide truncate">{hoveredMuscle.name}</span>
-              <span
-                className={`h-2 w-2 rounded-full ${
-                  hoveredMuscle.color === 'green'
-                    ? 'bg-emerald-400 shadow-[0_0_6px_#10b981]'
-                    : hoveredMuscle.color === 'orange'
-                    ? 'bg-amber-400 shadow-[0_0_6px_#f59e0b]'
-                    : hoveredMuscle.color === 'red'
-                    ? 'bg-red-400 shadow-[0_0_6px_#ef4444] animate-ping'
-                    : 'bg-zinc-600'
-                }`}
-              />
-            </div>
-            
-            {/* Tooltip Stats */}
-            <div className="mt-2.5 space-y-1.5 text-zinc-400 font-medium">
-              <div className="flex justify-between items-center">
-                <span>Physiologie :</span>
-                <span
-                  className={`font-bold uppercase text-[10px] tracking-wider ${
-                    hoveredMuscle.color === 'green'
-                      ? 'text-emerald-400'
-                      : hoveredMuscle.color === 'orange'
-                      ? 'text-amber-400'
-                      : hoveredMuscle.color === 'red'
-                      ? 'text-red-400 font-black'
-                      : 'text-zinc-500'
-                  }`}
-                >
-                  {hoveredMuscle.color === 'green' && 'OPTIMAL'}
-                  {hoveredMuscle.color === 'orange' && 'FATIGUE +'}
-                  {hoveredMuscle.color === 'red' && 'SURCHARGE'}
-                  {hoveredMuscle.color === 'grey' && 'MAINTIEN'}
-                </span>
-              </div>
-              <div className="flex justify-between">
-                <span>Fatigue INOL :</span>
-                <span className="font-bold text-white tracking-wide">{hoveredMuscle.inol} / 1.20</span>
-              </div>
-              <div className="flex justify-between">
-                <span>Séries Cumulées :</span>
-                <span className="font-bold text-zinc-300">{hoveredMuscle.sets} séries</span>
-              </div>
-            </div>
-
-            {/* Contributors Section */}
-            {hoveredMuscle.contributors.length > 0 && (
-              <div className="mt-3 pt-2.5 border-t border-zinc-850">
-                <span className="text-[9px] text-zinc-500 block mb-1.5 font-bold uppercase tracking-widest">
-                  Facteurs de Tension :
-                </span>
-                <div className="space-y-1.5">
-                  {hoveredMuscle.contributors.map((c, i) => (
-                    <div key={i} className="flex justify-between text-[10px] items-center">
-                      <span className="text-zinc-400 truncate max-w-[130px] font-semibold">{c.nom}</span>
-                      <span className="font-bold text-emerald-400 bg-emerald-950/20 px-1.5 py-0.5 rounded border border-emerald-500/10 text-[9px]">{c.percentage}%</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-          </div>
-        )}
       </div>
 
-      {/* Premium HUD Calibration Colors Legend */}
-      <div className="w-full mt-4 flex items-center justify-around border-t border-zinc-900 pt-3.5 text-[9px] text-zinc-500 font-bold uppercase tracking-wider">
-        <div className="flex items-center gap-2">
-          <span className="h-2.5 w-2.5 rounded-full border border-zinc-700 bg-zinc-800" />
-          <span>Repos / Maintien</span>
+      {/* Légende */}
+      <div className="w-full mt-2 flex items-center justify-around border-t border-zinc-900 pt-2 text-[9px] text-zinc-500 font-bold uppercase tracking-wider">
+        <div className="flex items-center gap-1.5">
+          <span className="h-2 w-2 rounded-full border border-zinc-700 bg-zinc-800" />
+          <span>Repos</span>
         </div>
-        <div className="flex items-center gap-2">
-          <span className="h-2.5 w-2.5 rounded-full border border-teal-500/30 bg-teal-600/80 shadow-[0_0_6px_rgba(20,184,166,0.3)]" />
+        <div className="flex items-center gap-1.5">
+          <span className="h-2 w-2 rounded-full bg-teal-600 shadow-[0_0_5px_rgba(20,184,166,0.4)]" />
           <span className="text-teal-400">Optimum</span>
         </div>
-        <div className="flex items-center gap-2">
-          <span className="h-2.5 w-2.5 rounded-full border border-amber-500/30 bg-amber-600/80 shadow-[0_0_6px_rgba(245,158,11,0.3)]" />
+        <div className="flex items-center gap-1.5">
+          <span className="h-2 w-2 rounded-full bg-amber-600 shadow-[0_0_5px_rgba(245,158,11,0.4)]" />
           <span className="text-amber-400">Fatigue</span>
         </div>
-        <div className="flex items-center gap-2">
-          <span className="h-2.5 w-2.5 rounded-full border border-red-500/30 bg-red-600/80 shadow-[0_0_8px_rgba(239,68,68,0.5)] animate-pulse" />
+        <div className="flex items-center gap-1.5">
+          <span className="h-2 w-2 rounded-full bg-red-600 shadow-[0_0_6px_rgba(239,68,68,0.5)] animate-pulse" />
           <span className="text-red-400">Surcharge</span>
         </div>
       </div>
+
+      {/* Tooltip fixe au curseur */}
+      {tooltipPos && hoveredMuscle && (
+        <div
+          style={{
+            position: 'fixed',
+            left: `${tooltipPos.x}px`,
+            top: `${tooltipPos.y}px`,
+            zIndex: 9999,
+            pointerEvents: 'none',
+          }}
+          className="w-[200px] rounded-xl border border-zinc-800/80 bg-zinc-950/95 backdrop-blur-md p-3 text-xs shadow-2xl shadow-black/90"
+        >
+          <div className="flex items-center justify-between pb-1.5 border-b border-zinc-800">
+            <span className="font-bold text-white tracking-wide truncate">{hoveredMuscle.name}</span>
+            <span className={`h-2 w-2 rounded-full shrink-0 ml-1 ${
+              hoveredMuscle.color === 'green'  ? 'bg-emerald-400 shadow-[0_0_6px_#10b981]'
+            : hoveredMuscle.color === 'orange' ? 'bg-amber-400 shadow-[0_0_6px_#f59e0b]'
+            : hoveredMuscle.color === 'red'    ? 'bg-red-400 shadow-[0_0_6px_#ef4444] animate-ping'
+            : 'bg-zinc-600'}`}
+            />
+          </div>
+          <div className="mt-2 space-y-1 text-zinc-400">
+            <div className="flex justify-between items-center">
+              <span>Statut :</span>
+              <span className={`font-bold text-[10px] uppercase tracking-wider ${
+                hoveredMuscle.color === 'green'  ? 'text-emerald-400'
+              : hoveredMuscle.color === 'orange' ? 'text-amber-400'
+              : hoveredMuscle.color === 'red'    ? 'text-red-400'
+              : 'text-zinc-500'}`}>
+                {hoveredMuscle.color === 'green' && 'OPTIMAL'}
+                {hoveredMuscle.color === 'orange' && 'FATIGUE'}
+                {hoveredMuscle.color === 'red' && 'SURCHARGE'}
+                {hoveredMuscle.color === 'grey' && 'REPOS'}
+              </span>
+            </div>
+            <div className="flex justify-between">
+              <span>INOL :</span>
+              <span className="font-bold text-white">{hoveredMuscle.inol} / 1.20</span>
+            </div>
+            <div className="flex justify-between">
+              <span>Séries :</span>
+              <span className="font-bold text-zinc-300">{hoveredMuscle.sets}</span>
+            </div>
+          </div>
+          {hoveredMuscle.contributors.length > 0 && (
+            <div className="mt-2 pt-1.5 border-t border-zinc-800">
+              <span className="text-[9px] text-zinc-600 block mb-1 font-bold uppercase tracking-widest">Exercices :</span>
+              <div className="space-y-1">
+                {hoveredMuscle.contributors.map((c, i) => (
+                  <div key={i} className="flex justify-between text-[10px]">
+                    <span className="text-zinc-400 truncate max-w-[120px]">{c.nom}</span>
+                    <span className="font-bold text-emerald-400 text-[9px]">{c.percentage}%</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }
