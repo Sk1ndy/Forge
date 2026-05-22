@@ -1,10 +1,18 @@
 import React, { useState } from 'react';
-import { Exercise, EXERCISE_LIBRARY, MUSCLE_DETAILS } from '@/lib/calculations';
+import {
+  Exercise,
+  EXERCISE_LIBRARY,
+  MUSCLE_DETAILS,
+  EXERCISE_TENSION_MATRICES,
+  MuscleId
+} from '@/lib/calculations';
 
 interface LibraryDrawerProps {
   onAddExercise: (exerciseId: string, day: string) => void;
   isOpen: boolean;
   onClose?: () => void;
+  selectedMuscle: string;
+  onSelectMuscle: (muscle: string) => void;
 }
 
 const EQUIPMENT_LABELS: { [key: string]: string } = {
@@ -13,21 +21,74 @@ const EQUIPMENT_LABELS: { [key: string]: string } = {
   pdc: 'Poids du Corps'
 };
 
-export default function LibraryDrawer({ onAddExercise, isOpen, onClose }: LibraryDrawerProps) {
+const MUSCLE_SUBGROUPS: Record<string, string[]> = {
+  chest: ['chest', 'upperChest', 'lowerChest', 'serratus'],
+  quadriceps: ['quadriceps', 'innerQuad', 'outerQuad'],
+  abs: ['abs', 'upperAbs', 'lowerAbs'],
+  trapezius: ['trapezius', 'upperTrapezius', 'lowerTrapezius'],
+  upperBack: ['upperBack', 'rhomboids', 'rotatorCuff'],
+  frontDeltoid: ['frontDeltoid', 'deltoids'],
+  rearDeltoid: ['rearDeltoid', 'deltoids']
+};
+
+export default function LibraryDrawer({
+  onAddExercise,
+  isOpen,
+  onClose,
+  selectedMuscle,
+  onSelectMuscle
+}: LibraryDrawerProps) {
   const [search, setSearch] = useState('');
-  const [selectedMuscle, setSelectedMuscle] = useState('all');
   const [selectedEquipment, setSelectedEquipment] = useState('all');
   const [activeAddMenu, setActiveAddMenu] = useState<string | null>(null);
 
   if (!isOpen) return null;
 
-  // Filtrer la bibliothèque
-  const filteredExercises = EXERCISE_LIBRARY.filter(ex => {
+  // Déterminer la liste des muscles cibles (gère les sous-groupes physiologiques)
+  const targetMuscles = selectedMuscle === 'all'
+    ? []
+    : (MUSCLE_SUBGROUPS[selectedMuscle] || [selectedMuscle]);
+
+  // Filtrer la bibliothèque avec calcul d'impact
+  const mappedExercises = EXERCISE_LIBRARY.map(ex => {
+    let maxImpact = 0;
+    if (selectedMuscle !== 'all') {
+      targetMuscles.forEach(mId => {
+        let impact = 0;
+        const matrix = EXERCISE_TENSION_MATRICES[ex.id];
+        if (matrix && matrix[mId as MuscleId] !== undefined) {
+          impact = matrix[mId as MuscleId]!;
+        } else if (ex.muscle_primaire === mId) {
+          impact = 1.0;
+        } else if (ex.muscles_secondaires.includes(mId as MuscleId)) {
+          impact = 0.35;
+        }
+        if (impact > maxImpact) {
+          maxImpact = impact;
+        }
+      });
+    } else {
+      maxImpact = 1.0; // Par défaut quand aucun filtre actif
+    }
+    return { ex, impact: maxImpact };
+  });
+
+  const filteredExercises = mappedExercises.filter(({ ex, impact }) => {
     const matchesSearch = ex.nom.toLowerCase().includes(search.toLowerCase());
-    const matchesMuscle = selectedMuscle === 'all' || ex.muscle_primaire === selectedMuscle || (ex.muscles_secondaires as string[]).includes(selectedMuscle);
+    const matchesMuscle = selectedMuscle === 'all' || impact > 0;
     const matchesEquipment = selectedEquipment === 'all' || ex.equipment === selectedEquipment;
     return matchesSearch && matchesMuscle && matchesEquipment;
   });
+
+  // Si un muscle spécifique est sélectionné, trier par impact décroissant, puis par tier_snc décroissant (exercices lourds d'abord)
+  if (selectedMuscle !== 'all') {
+    filteredExercises.sort((a, b) => {
+      if (b.impact !== a.impact) {
+        return b.impact - a.impact;
+      }
+      return b.ex.tier_snc - a.ex.tier_snc;
+    });
+  }
 
   const daysOfWeek = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche'];
 
@@ -67,8 +128,8 @@ export default function LibraryDrawer({ onAddExercise, isOpen, onClose }: Librar
           <label className="block text-[10px] font-medium text-zinc-400 mb-1">Muscle</label>
           <select
             value={selectedMuscle}
-            onChange={(e) => setSelectedMuscle(e.target.value)}
-            className="w-full rounded border border-zinc-850 bg-zinc-900 px-1 py-1.5 text-[11px] text-white focus:outline-none"
+            onChange={(e) => onSelectMuscle(e.target.value)}
+            className="w-full rounded border border-zinc-850 bg-zinc-900 px-1 py-1.5 text-[11px] text-white focus:outline-none cursor-pointer"
           >
             <option value="all">Tous les muscles</option>
             {Object.entries(MUSCLE_DETAILS).map(([id, name]) => (
@@ -83,7 +144,7 @@ export default function LibraryDrawer({ onAddExercise, isOpen, onClose }: Librar
           <select
             value={selectedEquipment}
             onChange={(e) => setSelectedEquipment(e.target.value)}
-            className="w-full rounded border border-zinc-850 bg-zinc-900 px-1 py-1.5 text-[11px] text-white focus:outline-none"
+            className="w-full rounded border border-zinc-850 bg-zinc-900 px-1 py-1.5 text-[11px] text-white focus:outline-none cursor-pointer"
           >
             <option value="all">Tous les types</option>
             {Object.entries(EQUIPMENT_LABELS).map(([id, label]) => (
@@ -98,24 +159,31 @@ export default function LibraryDrawer({ onAddExercise, isOpen, onClose }: Librar
         {filteredExercises.length === 0 ? (
           <p className="text-xs text-zinc-500 text-center py-8">Aucun exercice trouvé.</p>
         ) : (
-          filteredExercises.map(ex => (
+          filteredExercises.map(({ ex, impact }) => (
             <div
               key={ex.id}
               className="relative p-2.5 rounded-lg border border-zinc-900 bg-zinc-900/40 hover:bg-zinc-900/80 transition-all flex flex-col gap-1.5"
             >
               <div className="flex items-start justify-between gap-1.5">
                 <span className="text-xs font-semibold text-zinc-200">{ex.nom}</span>
-                <span
-                  className={`text-[9px] px-1.5 py-0.5 rounded-full whitespace-nowrap ${
-                    ex.tier_snc === 1
-                      ? 'bg-red-500/10 text-red-400'
-                      : ex.tier_snc === 2
-                      ? 'bg-amber-500/10 text-amber-400'
-                      : 'bg-zinc-500/10 text-zinc-400'
-                  }`}
-                >
-                  Tier {ex.tier_snc}
-                </span>
+                <div className="flex items-center gap-1">
+                  {selectedMuscle !== 'all' && (
+                    <span className="text-[9px] bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-1.5 py-0.5 rounded-full font-bold">
+                      {Math.round(impact * 100)}%
+                    </span>
+                  )}
+                  <span
+                    className={`text-[9px] px-1.5 py-0.5 rounded-full whitespace-nowrap font-semibold ${
+                      ex.tier_snc === 1
+                        ? 'bg-red-500/10 text-red-400'
+                        : ex.tier_snc === 2
+                        ? 'bg-amber-500/10 text-amber-400'
+                        : 'bg-zinc-500/10 text-zinc-400'
+                    }`}
+                  >
+                    T{ex.tier_snc}
+                  </span>
+                </div>
               </div>
               
               <div className="flex items-center justify-between text-[10px] text-zinc-400">

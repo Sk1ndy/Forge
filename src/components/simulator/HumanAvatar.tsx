@@ -5,6 +5,8 @@ import { SimulationResult, MuscleStatus, MuscleId } from '@/lib/calculations';
 interface HumanAvatarProps {
   simulation: SimulationResult;
   selectedDay?: string;
+  selectedMuscle?: string;
+  onMuscleClick?: (muscleId: MuscleId) => void;
 }
 
 // ─── Colour helpers ──────────────────────────────────────────────────────────
@@ -379,7 +381,12 @@ const BACK_HAIR = [
   "M1138.38 168.39q-.49 4.68-3.37 8.55-.31.41-.81.56c-9.91 3.11-15.97 9.67-20.28 18.94-2.21 4.75-5.25 12.39-11.48 12.3q-18.46-.25-36.94.25-5.35.14-7.43-3.53c-6.78-11.97-10.46-22.53-23.52-27.48-5.05-1.92-5.38-6.47-6.41-11.53q-6.64-26.16 4.43-48.88c8.13-16.7 34.61-21.41 51.58-21.04 4.89.11 9.69-.11 14.42.85 18.79 3.8 33.17 8.5 39.34 28.66q6.38 20.88.47 42.35z"
 ];
 
-export default function HumanAvatar({ simulation, selectedDay }: HumanAvatarProps) {
+export default function HumanAvatar({
+  simulation,
+  selectedDay,
+  selectedMuscle = 'all',
+  onMuscleClick
+}: HumanAvatarProps) {
   const [hoveredId, setHoveredId] = useState<string | null>(null);
   const [tooltipPos, setTooltipPos] = useState({ x: 0, y: 0 });
 
@@ -402,6 +409,7 @@ export default function HumanAvatar({ simulation, selectedDay }: HumanAvatarProp
     // Preserve muscle colors during CNS fatigue to show peripheral overreaching/status
     const color: ColorKey = status?.color ?? 'grey';
     const isHovered = hoveredId === id;
+    const isSelected = selectedMuscle === id;
 
     const base = COLORS[color];
     const hover = HOVER_COLORS[color];
@@ -409,19 +417,33 @@ export default function HumanAvatar({ simulation, selectedDay }: HumanAvatarProp
     // Subtle global transparency to indicate systemic CNS fatigue without locking/graying out
     const opacity = simulation.cnsFailure ? 0.8 : 1;
 
+    let fill = isHovered ? hover.fill : base.fill;
+    let stroke = isHovered ? hover.stroke : base.stroke;
+    let strokeWidth = isHovered ? 1.5 : 0.8;
+    let filter = isHovered ? hover.filter : undefined;
+
+    if (isSelected) {
+      stroke = isHovered ? '#34d399' : '#10b981';
+      strokeWidth = isHovered ? 2.5 : 2.0;
+      filter = isHovered 
+        ? 'drop-shadow(0 0 8px rgba(52,211,153,0.85))' 
+        : 'drop-shadow(0 0 5px rgba(16,185,129,0.65))';
+    }
+
     return {
-      fill: isHovered ? hover.fill : base.fill,
-      stroke: isHovered ? hover.stroke : base.stroke,
-      strokeWidth: isHovered ? 1.5 : 0.8,
+      fill,
+      stroke,
+      strokeWidth,
       opacity,
       style: {
-        filter: isHovered ? hover.filter : undefined,
+        filter,
         transition: 'fill 0.2s ease, stroke 0.2s ease, filter 0.2s ease, opacity 0.2s ease',
         cursor: 'pointer',
       } as React.CSSProperties,
       onMouseEnter: (e: React.MouseEvent) => handleMouseEnter(id, e),
       onMouseMove: handleMouseMove,
       onMouseLeave: handleMouseLeave,
+      onClick: () => onMuscleClick?.(id)
     };
   };
 

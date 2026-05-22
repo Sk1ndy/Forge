@@ -7,7 +7,8 @@ import {
   WeeklyBlueprint,
   runWeeklySimulation,
   PlannedExercise,
-  EXERCISE_LIBRARY
+  EXERCISE_LIBRARY,
+  MuscleId
 } from '@/lib/calculations';
 import {
   loadUserProfile,
@@ -57,6 +58,7 @@ export default function Home() {
   const [activeBlueprintId, setActiveBlueprintId] = useState<string | null>(null);
   const [currentBlueprintName, setCurrentBlueprintName] = useState<string>('Blueprint de travail');
   const [selectedDay, setSelectedDay] = useState<string>('Dimanche');
+  const [selectedMuscle, setSelectedMuscle] = useState<string>('all');
 
   const supabase = createClient();
 
@@ -398,7 +400,15 @@ export default function Home() {
         {/* Upper Portion: SVG Anatomical Avatar — fixed height, no scroll */}
         <div className="w-full flex justify-center shrink-0 h-[340px] sm:h-[380px] md:h-[45vh] min-h-[280px]">
           <div className="w-full h-full max-w-5xl bg-zinc-950 border border-zinc-900 rounded-xl overflow-hidden flex flex-col">
-            <HumanAvatar simulation={simulationResult} selectedDay={selectedDay} />
+            <HumanAvatar 
+              simulation={simulationResult} 
+              selectedDay={selectedDay} 
+              selectedMuscle={selectedMuscle}
+              onMuscleClick={(muscleId) => {
+                setSelectedMuscle(prev => prev === muscleId ? 'all' : muscleId);
+                setLibraryOpen(true);
+              }}
+            />
           </div>
         </div>
 
@@ -444,6 +454,8 @@ export default function Home() {
           onAddExercise={handleAddExercise}
           isOpen={true}
           onClose={() => setLibraryOpen(false)}
+          selectedMuscle={selectedMuscle}
+          onSelectMuscle={setSelectedMuscle}
         />
       </section>
 
