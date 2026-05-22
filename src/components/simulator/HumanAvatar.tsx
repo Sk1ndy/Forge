@@ -301,7 +301,7 @@ export default function HumanAvatar({ simulation }: HumanAvatarProps) {
             />
 
             {/* Grid coordinate Front */}
-            <text x="100" y="375" fill="#52525b" fontSize="10" fontWeight="extrabold" tracking="wider" textAnchor="middle" opacity="0.6">ANTERIOR</text>
+            <text x="100" y="375" fill="#52525b" fontSize="10" fontWeight="extrabold" letterSpacing="0.1em" textAnchor="middle" opacity="0.6">ANTERIOR</text>
           </g>
 
           {/* ==================== VUE DOS (CENTRE x = 300) ==================== */}
@@ -434,7 +434,7 @@ export default function HumanAvatar({ simulation }: HumanAvatarProps) {
             />
 
             {/* Grid coordinate Back */}
-            <text x="300" y="375" fill="#52525b" fontSize="10" fontWeight="extrabold" tracking="wider" textAnchor="middle" opacity="0.6">POSTERIOR</text>
+            <text x="300" y="375" fill="#52525b" fontSize="10" fontWeight="extrabold" letterSpacing="0.1em" textAnchor="middle" opacity="0.6">POSTERIOR</text>
           </g>
         </svg>
 
