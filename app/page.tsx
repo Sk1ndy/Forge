@@ -591,6 +591,7 @@ export default function Home() {
                 setLibraryOpen(true);
               }}
               highlightedMuscles={highlightedMuscles}
+              viewMode={viewMode}
             />
           </div>
         </div>

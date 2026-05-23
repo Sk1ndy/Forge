@@ -42,6 +42,7 @@ interface HumanAvatarProps {
   selectedMuscle?: string;
   onMuscleClick?: (muscleId: MuscleId) => void;
   highlightedMuscles?: string[];
+  viewMode?: 'day' | 'week';
 }
 
 // ─── Colour helpers ──────────────────────────────────────────────────────────
@@ -421,7 +422,8 @@ export default function HumanAvatar({
   selectedDay,
   selectedMuscle = 'all',
   onMuscleClick,
-  highlightedMuscles = []
+  highlightedMuscles = [],
+  viewMode = 'day'
 }: HumanAvatarProps) {
   const [hoveredId, setHoveredId] = useState<string | null>(null);
   const [tooltipPos, setTooltipPos] = useState({ x: 0, y: 0 });
@@ -442,8 +444,22 @@ export default function HumanAvatar({
   // Returns SVG path props for a given muscle ID
   const mp = (id: MuscleId) => {
     const status = simulation.muscles[id];
-    // Preserve muscle colors during CNS fatigue to show peripheral overreaching/status
-    const color: ColorKey = status?.color ?? 'grey';
+    
+    // Determine color based on viewMode (weekly volume vs daily fatigue)
+    let color: ColorKey = status?.color ?? 'grey';
+    if (viewMode === 'week' && status) {
+      const sets = status.sets ?? 0;
+      if (sets < 10) {
+        color = 'grey'; // Gris/Bleu (Maintien / Sous-stimulé)
+      } else if (sets >= 10 && sets <= 20) {
+        color = 'green'; // Vert (Croissance Optimale)
+      } else if (sets > 20 && sets <= 22) {
+        color = 'orange'; // Transition / Élevé
+      } else {
+        color = 'red'; // Rouge (Volume Excessif / Risque de stagnation)
+      }
+    }
+
     const isHovered = hoveredId === id;
     const isSelected = selectedMuscle === id;
     const isHighlighted = highlightedMuscles.includes(id);
@@ -897,17 +913,39 @@ export default function HumanAvatar({
           
           {/* Diagnostic Clinique Prescriptif */}
           <div style={{ fontSize: 10, marginBottom: 4, lineHeight: 1.4 }}>
-            {hoveredMuscle.color === 'red' && (
-              <span style={{ color: '#fca5a5' }}>⛔ Déficit de force majeur. Risque lésionnel élevé. Repos obligatoire.</span>
-            )}
-            {hoveredMuscle.color === 'orange' && (
-              <span style={{ color: '#fcd34d' }}>⚠️ Force temporairement réduite (~10-15%). Volume à surveiller.</span>
-            )}
-            {hoveredMuscle.color === 'green' && (
-              <span style={{ color: '#6ee7b7' }}>✅ Récupération optimale. Force maximale disponible.</span>
-            )}
-            {hoveredMuscle.color === 'grey' && (
-              <span style={{ color: '#a1a1aa' }}>Volume insuffisant pour déclencher une adaptation optimale.</span>
+            {viewMode === 'week' ? (
+              <>
+                {hoveredMuscle.sets < 4 && (
+                  <span style={{ color: '#a1a1aa' }}>💤 Volume de maintien / Sous-stimulé ({hoveredMuscle.sets} séries).</span>
+                )}
+                {hoveredMuscle.sets >= 4 && hoveredMuscle.sets < 10 && (
+                  <span style={{ color: '#a1a1aa' }}>⚡ Stimulation légère ({hoveredMuscle.sets} séries). Ajoutez du volume pour croître.</span>
+                )}
+                {hoveredMuscle.sets >= 10 && hoveredMuscle.sets <= 20 && (
+                  <span style={{ color: '#6ee7b7' }}>✅ Croissance Optimale ({hoveredMuscle.sets} séries). Volume parfait.</span>
+                )}
+                {hoveredMuscle.sets > 20 && hoveredMuscle.sets <= 22 && (
+                  <span style={{ color: '#fcd34d' }}>⚠️ Volume Élevé ({hoveredMuscle.sets} séries). Proche du volume limite.</span>
+                )}
+                {hoveredMuscle.sets > 22 && (
+                  <span style={{ color: '#fca5a5' }}>🚨 Volume Excessif ({hoveredMuscle.sets} séries). Risque élevé de surentraînement.</span>
+                )}
+              </>
+            ) : (
+              <>
+                {hoveredMuscle.color === 'red' && (
+                  <span style={{ color: '#fca5a5' }}>⛔ Déficit de force majeur. Risque lésionnel élevé. Repos obligatoire.</span>
+                )}
+                {hoveredMuscle.color === 'orange' && (
+                  <span style={{ color: '#fcd34d' }}>⚠️ Force temporairement réduite (~10-15%). Volume à surveiller.</span>
+                )}
+                {hoveredMuscle.color === 'green' && (
+                  <span style={{ color: '#6ee7b7' }}>✅ Récupération optimale. Force maximale disponible.</span>
+                )}
+                {hoveredMuscle.color === 'grey' && (
+                  <span style={{ color: '#a1a1aa' }}>Volume insuffisant pour déclencher une adaptation optimale.</span>
+                )}
+              </>
             )}
           </div>
 

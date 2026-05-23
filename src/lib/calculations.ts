@@ -661,17 +661,88 @@ export function runWeeklySimulation(
   const globalFatigueScore = (sncPercentage + avgMuscleFatiguePct) / 2;
   const globalWorkCapacity = Math.max(0, parseFloat((100 - globalFatigueScore).toFixed(1)));
 
-  const topSurcharged = Object.values(finalMuscles)
-    .filter((m): m is MuscleStatus => m !== undefined && (m.color === 'red' || m.color === 'orange'))
-    .sort((a, b) => b.inol - a.inol)
-    .slice(0, 3);
+  const MAJOR_GROUPS: MuscleId[] = [
+    'chest', 'upperChest', 'lowerChest',
+    'upperBack', 'lowerBack', 'rhomboids', 'trapezius', 'upperTrapezius', 'lowerTrapezius',
+    'deltoids', 'frontDeltoid', 'rearDeltoid',
+    'biceps', 'triceps', 'quadriceps', 'innerQuad', 'outerQuad',
+    'hamstring', 'gluteal'
+  ];
 
-  const ignoredMuscles = ['knees', 'feet', 'hands', 'head', 'ankles', 'neck'];
-  const topNeglected = Object.entries(finalMuscles)
-    .filter((entry): entry is [string, MuscleStatus] => entry[1] !== undefined && entry[1].color === 'grey' && !ignoredMuscles.includes(entry[0]))
-    .map(entry => entry[1])
-    .sort((a, b) => a.inol - b.inol)
-    .slice(0, 3);
+  const getCleanGroupName = (id: MuscleId): string => {
+    switch (id) {
+      case 'chest':
+      case 'upperChest':
+      case 'lowerChest':
+        return 'Pectoraux';
+      case 'upperBack':
+      case 'lowerBack':
+      case 'rhomboids':
+      case 'trapezius':
+      case 'upperTrapezius':
+      case 'lowerTrapezius':
+        return 'Dos';
+      case 'deltoids':
+      case 'frontDeltoid':
+      case 'rearDeltoid':
+        return 'Épaules';
+      case 'biceps':
+        return 'Biceps';
+      case 'triceps':
+        return 'Triceps';
+      case 'quadriceps':
+      case 'innerQuad':
+      case 'outerQuad':
+        return 'Quadriceps';
+      case 'hamstring':
+      case 'gluteal':
+        return 'Ischios/Fessiers';
+      default:
+        return MUSCLE_DETAILS[id] || id;
+    }
+  };
+
+  const rawSurcharged = Object.entries(finalMuscles)
+    .filter((entry): entry is [string, MuscleStatus] => {
+      const [id, m] = entry;
+      return m !== undefined && MAJOR_GROUPS.includes(id as MuscleId) && (m.color === 'red' || m.color === 'orange');
+    })
+    .map(([id, m]) => ({
+      ...m,
+      name: getCleanGroupName(id as MuscleId)
+    }))
+    .sort((a, b) => b.inol - a.inol);
+
+  const uniqueSurcharged: MuscleStatus[] = [];
+  const seenSurcharged = new Set<string>();
+  for (const item of rawSurcharged) {
+    if (!seenSurcharged.has(item.name)) {
+      seenSurcharged.add(item.name);
+      uniqueSurcharged.push(item);
+    }
+  }
+  const topSurcharged = uniqueSurcharged.slice(0, 3);
+
+  const rawNeglected = Object.entries(finalMuscles)
+    .filter((entry): entry is [string, MuscleStatus] => {
+      const [id, m] = entry;
+      return m !== undefined && MAJOR_GROUPS.includes(id as MuscleId) && m.color === 'grey';
+    })
+    .map(([id, m]) => ({
+      ...m,
+      name: getCleanGroupName(id as MuscleId)
+    }))
+    .sort((a, b) => a.inol - b.inol);
+
+  const uniqueNeglected: MuscleStatus[] = [];
+  const seenNeglected = new Set<string>();
+  for (const item of rawNeglected) {
+    if (!seenNeglected.has(item.name)) {
+      seenNeglected.add(item.name);
+      uniqueNeglected.push(item);
+    }
+  }
+  const topNeglected = uniqueNeglected.slice(0, 3);
 
   const getPplCategory = (muscle: MuscleId): 'push' | 'pull' | 'legs' => {
     const pushMuscles: MuscleId[] = ['chest', 'frontDeltoid', 'triceps', 'deltoids', 'upperChest', 'lowerChest'];
