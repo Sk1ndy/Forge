@@ -134,7 +134,7 @@ export default function Sequencer({
   }, [currentExercises, currentDay, onReorderExercises]);
 
   return (
-    <div className="w-full h-full select-none min-h-0">
+    <div className="w-full h-full select-none min-h-0 flex flex-col">
       
       {/* 2. RIGHT WORKSPACE: Detailed Workout Day Editor */}
       <div 
@@ -218,7 +218,7 @@ export default function Sequencer({
           </div>
         </div>
 
-        {/* Recovery Capacity Bar - Placé en haut pour une visibilité immédiate et une meilleure clarté */}
+        {/* Recovery Capacity Bar */}
         <div className="mt-3 bg-zinc-950/40 rounded-xl p-3 border border-zinc-900/50 shrink-0 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-[inset_0_1px_0_rgba(255,255,255,0.03)]">
           <div className="flex flex-col min-w-0">
             <span className="text-[9px] font-extrabold tracking-wider uppercase text-zinc-500 font-sans">
@@ -264,7 +264,7 @@ export default function Sequencer({
           </div>
         </div>
 
-        {/* Alerte Junk Volume (Surcharge intra-séance basée sur l'intensité) */}
+        {/* Alerte Junk Volume */}
         {(() => {
           const junkAlerts = simulation?.junkVolumeAlerts || [];
           if (junkAlerts.length === 0) return null;
@@ -281,73 +281,73 @@ export default function Sequencer({
           );
         })()}
 
-        {/* Exercises Scroll Area */}
-        <div className="flex-1 overflow-y-auto scrollbar-thin mt-4 min-h-0 pr-1">
-          {isBlueprintEmpty ? (
-            <div className="flex flex-col items-center justify-center h-full p-8 text-center space-y-6 overflow-y-auto">
-              <div className="w-16 h-16 rounded-full bg-zinc-900 border border-zinc-800 flex items-center justify-center shadow-[0_0_30px_rgba(255,255,255,0.03)]">
-                <svg className="h-8 w-8 text-zinc-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 002-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
-                </svg>
-              </div>
-              <div>
-                <h2 className="text-xl font-bold text-zinc-200">Commencez votre programme</h2>
-                <p className="text-sm text-zinc-500 mt-2 max-w-md mx-auto">
-                  Votre Séquenceur Hebdomadaire est vide. Ajoutez des exercices manuellement depuis la bibliothèque, ou chargez l&apos;un de nos templates pour démarrer immédiatement.
-                </p>
-              </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full max-w-lg mt-4">
-                <button
-                  onClick={() => onLoadTemplate?.(PPL_TEMPLATE)}
-                  className="group relative overflow-hidden rounded-xl border border-zinc-800 bg-zinc-900/50 hover:bg-zinc-800 p-5 text-left transition-all hover:border-emerald-500/50"
-                >
-                  <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                  <h3 className="font-bold text-zinc-200 flex items-center gap-2">
-                    <span>🏃</span> PPL Débutant
-                  </h3>
-                  <p className="text-xs text-zinc-400 mt-2">Push, Pull, Legs sur 6 jours. Idéal pour maximiser l&apos;hypertrophie.</p>
-                </button>
-                
-                <button
-                  onClick={() => onLoadTemplate?.(FULL_BODY_TEMPLATE)}
-                  className="group relative overflow-hidden rounded-xl border border-zinc-800 bg-zinc-900/50 hover:bg-zinc-800 p-5 text-left transition-all hover:border-blue-500/50"
-                >
-                  <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                  <h3 className="font-bold text-zinc-200 flex items-center gap-2">
-                    <span>🏋️</span> Full Body Force
-                  </h3>
-                  <p className="text-xs text-zinc-400 mt-2">Squat, Bench, Deadlift sur 3 jours. Axé sur la progression en force.</p>
-                </button>
-              </div>
+        {/* Exercises Scroll Area or Centered States */}
+        {isBlueprintEmpty ? (
+          <div className="flex-1 flex flex-col items-center justify-center p-4 sm:p-6 text-center space-y-4 sm:space-y-5 min-h-0 overflow-y-auto mt-2">
+            <div className="w-14 h-14 rounded-full bg-zinc-900 border border-zinc-800 flex items-center justify-center shadow-[0_0_30px_rgba(255,255,255,0.03)] shrink-0">
+              <svg className="h-6.5 w-6.5 text-zinc-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 002-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+              </svg>
             </div>
-          ) : !isCurrentDayActive ? (
-            <div className="h-full flex flex-col items-center justify-center border border-dashed border-zinc-900 rounded-xl p-8 text-center max-w-md mx-auto my-6">
-              <div className="bg-zinc-900/50 p-3 rounded-full mb-3">
-                <svg className="h-6 w-6 text-zinc-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
-                </svg>
-              </div>
-              <h5 className="font-bold text-sm text-zinc-400">Journée Désactivée</h5>
-              <p className="text-xs text-zinc-500 mt-2 leading-relaxed">
-                Cette journée est ignorée dans la simulation. Cochez &quot;Journée d&apos;entraînement&quot; ci-dessus pour la réactiver et planifier des séances.
+            <div className="shrink-0">
+              <h2 className="text-lg font-bold text-zinc-200">Commencez votre programme</h2>
+              <p className="text-xs text-zinc-500 mt-1.5 max-w-md mx-auto leading-relaxed">
+                Votre Séquenceur Hebdomadaire est vide. Ajoutez des exercices depuis la bibliothèque, ou chargez l&apos;un de nos templates pour démarrer immédiatement.
               </p>
             </div>
-          ) : currentExercises.length === 0 ? (
-            <div className="h-full flex flex-col items-center justify-center border border-dashed border-zinc-900 rounded-xl p-8 text-center max-w-md mx-auto my-6 bg-emerald-950/5">
-              <div className="bg-emerald-950/20 p-3 rounded-full mb-3 border border-emerald-900/10">
-                <svg className="h-6 w-6 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-              </div>
-              <h5 className="font-bold text-sm text-emerald-400">Récupération Active 🌊</h5>
-              <p className="text-xs text-zinc-400 mt-2 leading-relaxed">
-                Aucun exercice planifié. Profitez-en pour dissiper la fatigue avec de la <strong className="text-zinc-300">Récupération Active</strong> (marche, vélo léger, mobilité). Cela augmente le flux sanguin intramusculaire et accélère la reconstruction des tendons.
-              </p>
-              <p className="text-[11px] text-zinc-500 mt-3 font-semibold text-center leading-normal">
-                💡 Cliquez sur un exercice ou glissez-le directement ici pour ajouter une séance.
-              </p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 w-full max-w-lg mt-2 shrink-0">
+              <button
+                onClick={() => onLoadTemplate?.(PPL_TEMPLATE)}
+                className="group relative overflow-hidden rounded-xl border border-zinc-850 bg-zinc-900/40 hover:bg-zinc-850 p-4.5 text-left transition-all hover:border-emerald-500/50"
+              >
+                <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                <h3 className="font-bold text-sm text-zinc-200 flex items-center gap-2">
+                  <span>🏃</span> PPL Débutant
+                </h3>
+                <p className="text-[11px] text-zinc-450 mt-1 leading-normal">Push, Pull, Legs sur 6 jours. Idéal pour maximiser l&apos;hypertrophie.</p>
+              </button>
+              
+              <button
+                onClick={() => onLoadTemplate?.(FULL_BODY_TEMPLATE)}
+                className="group relative overflow-hidden rounded-xl border border-zinc-850 bg-zinc-900/40 hover:bg-zinc-850 p-4.5 text-left transition-all hover:border-blue-500/50"
+              >
+                <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                <h3 className="font-bold text-sm text-zinc-200 flex items-center gap-2">
+                  <span>🏋️</span> Full Body Force
+                </h3>
+                <p className="text-[11px] text-zinc-450 mt-1 leading-normal">Squat, Bench, Deadlift sur 3 jours. Axé sur la progression en force.</p>
+              </button>
             </div>
-          ) : (
+          </div>
+        ) : !isCurrentDayActive ? (
+          <div className="flex-1 flex flex-col items-center justify-center p-6 text-center max-w-md mx-auto mt-2 min-h-0 overflow-y-auto">
+            <div className="bg-zinc-900/50 p-3.5 rounded-full mb-3.5 border border-zinc-850 shrink-0">
+              <svg className="h-6.5 w-6.5 text-zinc-550" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
+              </svg>
+            </div>
+            <h5 className="font-bold text-sm text-zinc-350 shrink-0">Journée Désactivée</h5>
+            <p className="text-xs text-zinc-500 mt-2 leading-relaxed">
+              Cette journée est ignorée dans la simulation. Cochez &quot;Journée d&apos;entraînement&quot; ci-dessus pour la réactiver et planifier des séances.
+            </p>
+          </div>
+        ) : currentExercises.length === 0 ? (
+          <div className="flex-1 flex flex-col items-center justify-center p-6 text-center max-w-md mx-auto mt-2 bg-emerald-950/5 border border-dashed border-emerald-900/10 rounded-xl min-h-0 overflow-y-auto">
+            <div className="bg-emerald-950/20 p-3.5 rounded-full mb-3 border border-emerald-900/20 shrink-0">
+              <svg className="h-6.5 w-6.5 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+            <h5 className="font-bold text-sm text-emerald-450 shrink-0">Récupération Active 🌊</h5>
+            <p className="text-xs text-zinc-400 mt-2 leading-relaxed">
+              Aucun exercice planifié. Profitez-en pour dissiper la fatigue avec de la <strong className="text-zinc-300">Récupération Active</strong> (marche, vélo léger, mobilité). Cela augmente le flux sanguin intramusculaire et accélère la reconstruction des tendons.
+            </p>
+            <p className="text-[11px] text-zinc-500 mt-3 font-semibold text-center leading-normal shrink-0">
+              💡 Cliquez sur un exercice ou glissez-le directement ici pour ajouter une séance.
+            </p>
+          </div>
+        ) : (
+          <div className="flex-1 overflow-y-auto scrollbar-thin mt-4 min-h-0 pr-1">
             <DndContext 
               sensors={sensors}
               collisionDetection={closestCenter}
@@ -386,10 +386,9 @@ export default function Sequencer({
                 </div>
               </SortableContext>
             </DndContext>
-          )}
-        </div>
+          </div>
+        )}
       </div>
-
     </div>
   );
 }

@@ -400,7 +400,7 @@ export default function Home() {
             <span className="text-xs font-bold text-zinc-300 uppercase tracking-wider block">
               Planning Hebdomadaire
             </span>
-            <div className="space-y-1.5 max-h-[220px] overflow-y-auto pr-1">
+            <div className="space-y-1.5 pr-1">
               {['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche'].map((day) => {
                 const dayExercises = blueprint[day] || [];
                 const isDayActive = toggledDays[day] !== false;
