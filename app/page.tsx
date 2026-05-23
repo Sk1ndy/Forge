@@ -373,8 +373,8 @@ export default function Home() {
 
           {/* Blueprints History / Presets */}
           <div className="space-y-3">
-            <div className="flex items-center justify-between">
               <span className="text-xs font-bold text-zinc-400 uppercase tracking-wider">Mes Blueprints</span>
+            <div className="flex items-center justify-between">
               <div className="flex gap-1.5">
                 <button
                   onClick={handleNewBlueprint}
