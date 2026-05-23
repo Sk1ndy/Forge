@@ -417,7 +417,7 @@ export default function HumanAvatar({
     // Subtle global transparency to indicate systemic CNS fatigue without locking/graying out
     const opacity = simulation.cnsFailure ? 0.8 : 1;
 
-    let fill = isHovered ? hover.fill : base.fill;
+    const fill = isHovered ? hover.fill : base.fill;
     let stroke = isHovered ? hover.stroke : base.stroke;
     let strokeWidth = isHovered ? 1.5 : 0.8;
     let filter = isHovered ? hover.filter : undefined;

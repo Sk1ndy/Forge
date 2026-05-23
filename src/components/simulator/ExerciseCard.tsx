@@ -9,8 +9,10 @@ interface ExerciseCardProps {
   simulation: SimulationResult;
   setNodeRef?: (node: HTMLElement | null) => void;
   style?: React.CSSProperties;
-  dragHandleProps?: Record<string, any>;
-  dragHandleListeners?: Record<string, any>;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  dragHandleProps?: any;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  dragHandleListeners?: any;
 }
 
 export default function ExerciseCard({ 

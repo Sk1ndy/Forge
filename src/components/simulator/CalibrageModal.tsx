@@ -191,7 +191,7 @@ export default function CalibrageModal({ isOpen, onClose, profile, onSave }: Cal
                 <label className="block text-xs font-medium text-zinc-400">Balance Calorique</label>
                 <select
                   value={caloricStatus}
-                  onChange={(e) => setCaloricStatus(e.target.value as any)}
+                  onChange={(e) => setCaloricStatus(e.target.value as "deficit" | "maintenance" | "surplus")}
                   className="mt-1 block w-full rounded-lg border border-zinc-800 bg-zinc-900 px-3 py-2 text-sm text-white focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500 transition-colors"
                 >
                   <option value="deficit">Déficit (Sèche)</option>
@@ -203,7 +203,7 @@ export default function CalibrageModal({ isOpen, onClose, profile, onSave }: Cal
                 <label className="block text-xs font-medium text-zinc-400">Niveau de Stress</label>
                 <select
                   value={stressLevel}
-                  onChange={(e) => setStressLevel(e.target.value as any)}
+                  onChange={(e) => setStressLevel(e.target.value as "low" | "moderate" | "high")}
                   className="mt-1 block w-full rounded-lg border border-zinc-800 bg-zinc-900 px-3 py-2 text-sm text-white focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500 transition-colors"
                 >
                   <option value="low">Faible</option>

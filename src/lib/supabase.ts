@@ -1,8 +1,9 @@
 import { createClient } from './supabase/client';
 import { UserProfile, WeeklyBlueprint } from './calculations';
+import { SupabaseClient } from '@supabase/supabase-js';
 
 // Initialisation sûre du client Supabase
-let supabaseClient: any = null;
+let supabaseClient: SupabaseClient | null = null;
 try {
   supabaseClient = createClient();
 } catch (e) {
@@ -154,7 +155,7 @@ export async function loadSavedBlueprints(): Promise<{ id: string; name: string;
           .order('updated_at', { ascending: false });
 
         if (!error && data) {
-          return data.map((d: any) => ({
+          return data.map((d: { id: string; nom: string; state: unknown }) => ({
             id: d.id,
             name: d.nom,
             blueprint: d.state as WeeklyBlueprint

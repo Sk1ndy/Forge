@@ -58,7 +58,7 @@ export default function Home() {
   const [savedBlueprints, setSavedBlueprints] = useState<{ id: string; name: string; blueprint: WeeklyBlueprint }[]>([]);
   const [isCalibrageOpen, setIsCalibrageOpen] = useState(false);
   const [libraryOpen, setLibraryOpen] = useState(true);
-  const [supabaseUser, setSupabaseUser] = useState<any>(null);
+  const [supabaseUser, setSupabaseUser] = useState<unknown>(null);
   const [activeBlueprintId, setActiveBlueprintId] = useState<string | null>(null);
   const [currentBlueprintName, setCurrentBlueprintName] = useState<string>('Blueprint de travail');
   const [selectedDay, setSelectedDay] = useState<string>('Dimanche');
@@ -201,6 +201,19 @@ export default function Home() {
     const id = await saveBlueprint(name, blueprint, activeBlueprintId || undefined);
     setCurrentBlueprintName(name);
     setActiveBlueprintId(id);
+
+    // Recharger l'historique
+    const history = await loadSavedBlueprints();
+    setSavedBlueprints(history);
+  };
+
+  const handleRenameBlueprint = async () => {
+    if (!activeBlueprintId) return;
+    const name = prompt("Entrez un nouveau nom pour ce Blueprint :", currentBlueprintName);
+    if (!name || name === currentBlueprintName) return;
+
+    await saveBlueprint(name, blueprint, activeBlueprintId);
+    setCurrentBlueprintName(name);
 
     // Recharger l'historique
     const history = await loadSavedBlueprints();
@@ -375,6 +388,14 @@ export default function Home() {
                 >
                   Sauvegarder
                 </button>
+                {activeBlueprintId && (
+                  <button
+                    onClick={handleRenameBlueprint}
+                    className="text-[10px] bg-amber-500/10 border border-amber-500/20 text-amber-400 hover:bg-amber-500/20 hover:text-amber-300 font-bold px-2 py-1 rounded cursor-pointer transition-colors"
+                  >
+                    Renommer
+                  </button>
+                )}
               </div>
             </div>
 

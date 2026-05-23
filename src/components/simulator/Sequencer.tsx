@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { WeeklyBlueprint, PlannedExercise, SimulationResult, EXERCISE_LIBRARY, MuscleId } from '@/lib/calculations';
+import React from 'react';
+import { WeeklyBlueprint, PlannedExercise, SimulationResult, EXERCISE_LIBRARY } from '@/lib/calculations';
 import ExerciseCard from './ExerciseCard';
 import {
   DndContext,
@@ -147,7 +147,7 @@ export default function Sequencer({
                 <input
                   type="checkbox"
                   checked={isDayActive}
-                  onChange={(e) => handleToggleDay(day, e as any)}
+                  onChange={(e) => handleToggleDay(day, e as unknown as React.MouseEvent)}
                   className="rounded border-zinc-800 bg-zinc-950 text-emerald-500 focus:ring-emerald-500 h-3.5 w-3.5 cursor-pointer shrink-0"
                   onClick={(e) => e.stopPropagation()} // Avoid selection when checking
                   title={isDayActive ? "Désactiver le jour" : "Activer le jour"}
@@ -244,10 +244,10 @@ export default function Sequencer({
               <input
                 type="checkbox"
                 checked={isCurrentDayActive}
-                onChange={(e) => handleToggleDay(currentDay, e as any)}
+                onChange={(e) => handleToggleDay(currentDay, e as unknown as React.MouseEvent)}
                 className="rounded border-zinc-800 bg-zinc-950 text-emerald-500 focus:ring-emerald-500 h-3.5 w-3.5 cursor-pointer"
               />
-              <span>Journée d'entraînement</span>
+              <span>Journée d&apos;entraînement</span>
             </label>
 
             {currentExercises.length > 0 && isCurrentDayActive && (
@@ -271,7 +271,7 @@ export default function Sequencer({
               <div>
                 <span className="font-extrabold block">Volume de Séance Inadapté (Junk Volume)</span>
                 <span className="text-[10px] text-amber-500/80 leading-normal block mt-0.5">
-                  La charge d'entraînement (Intensité + Volume) pour {junkAlerts.join(', ')} sature les récepteurs cellulaires de l'hypertrophie. Ce volume excédentaire est physiologiquement inefficace ("volume poubelle"), ralentit la récupération et fatigue inutilement le SNC.
+                  La charge d&apos;entraînement (Intensité + Volume) pour {junkAlerts.join(', ')} sature les récepteurs cellulaires de l&apos;hypertrophie. Ce volume excédentaire est physiologiquement inefficace (&quot;volume poubelle&quot;), ralentit la récupération et fatigue inutilement le SNC.
                 </span>
               </div>
             </div>
@@ -289,7 +289,7 @@ export default function Sequencer({
               </div>
               <h5 className="font-bold text-sm text-zinc-400">Journée Désactivée</h5>
               <p className="text-xs text-zinc-500 mt-2 leading-relaxed">
-                Cette journée est ignorée dans la simulation. Cochez "Journée d'entraînement" ci-dessus pour la réactiver et planifier des séances.
+                Cette journée est ignorée dans la simulation. Cochez &quot;Journée d&apos;entraînement&quot; ci-dessus pour la réactiver et planifier des séances.
               </p>
             </div>
           ) : currentExercises.length === 0 ? (
@@ -341,7 +341,7 @@ export default function Sequencer({
 }
 
 // Wrapper for Sortable DND integration
-function SortableExerciseWrapper({ plannedEx, index, currentDay, onUpdateExercise, onDeleteExercise, simulation }: any) {
+function SortableExerciseWrapper({ plannedEx, index, currentDay, onUpdateExercise, onDeleteExercise, simulation }: { plannedEx: PlannedExercise, index: number, currentDay: string, onUpdateExercise: (day: string, idx: number, updated: PlannedExercise) => void, onDeleteExercise: (day: string, idx: number) => void, simulation: SimulationResult }) {
   const {
     attributes,
     listeners,

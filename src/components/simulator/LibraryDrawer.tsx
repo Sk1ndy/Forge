@@ -103,7 +103,7 @@ export default function LibraryDrawer({
           <svg className="h-4 w-4 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
           </svg>
-          Bibliothèque d'Exercices
+          Bibliothèque d&apos;Exercices
         </h3>
         {onClose && (
           <button onClick={onClose} className="md:hidden text-zinc-400 hover:text-white p-1">
@@ -136,7 +136,13 @@ export default function LibraryDrawer({
             className="w-full rounded border border-zinc-850 bg-zinc-900 px-1 py-1.5 text-[11px] text-white focus:outline-none cursor-pointer"
           >
             <option value="all">Tous les muscles</option>
-            {Object.entries(MUSCLE_DETAILS).map(([id, name]) => (
+            {Object.entries(MUSCLE_DETAILS)
+              .filter(([id]) => [
+                'chest', 'abs', 'biceps', 'triceps', 'deltoids', 'frontDeltoid', 'rearDeltoid', 
+                'obliques', 'quadriceps', 'calves', 'trapezius', 'forearm', 'upperBack', 
+                'lowerBack', 'gluteal', 'hamstring'
+              ].includes(id))
+              .map(([id, name]) => (
               <option key={id} value={id}>{name}</option>
             ))}
           </select>
