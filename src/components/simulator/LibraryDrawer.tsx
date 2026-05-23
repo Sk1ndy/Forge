@@ -6,7 +6,6 @@ import {
   MuscleId,
   SimulationResult
 } from '@/lib/calculations';
-import CapacityBar from './CapacityBar';
 
 interface LibraryDrawerProps {
   onAddExercise: (exerciseId: string, day: string) => void;
@@ -171,7 +170,6 @@ export default function LibraryDrawer({
           <p className="text-xs text-zinc-500 text-center py-8">Aucun exercice trouvé.</p>
         ) : (
           filteredExercises.map(({ ex, impact }) => {
-            const capacity = simulation?.muscles?.[ex.muscle_primaire]?.remainingCapacity ?? 1.0;
             const muscleColor = simulation?.muscles?.[ex.muscle_primaire]?.color;
             const isBlocked = muscleColor === 'red';
 
@@ -238,10 +236,7 @@ export default function LibraryDrawer({
                   <span className="text-zinc-500">{EQUIPMENT_LABELS[ex.equipment]}</span>
                 </div>
 
-                {/* Work Capacity Bar */}
-                <div className="py-1">
-                  <CapacityBar progress={capacity} color={muscleColor} showLabel={true} />
-                </div>
+
 
                 {/* Orange warning badge if muscle is in surcharge but not blocked */}
                 {muscleColor === 'orange' && (

@@ -33,6 +33,7 @@ interface SequencerProps {
   simulation: SimulationResult;
   exercises: Exercise[];
   onLoadTemplate?: (template: WeeklyBlueprint) => void;
+  onHoverExerciseChange?: (exercise: Exercise | null) => void;
 }
 
 const DAYS_OF_WEEK = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche'];
@@ -50,7 +51,8 @@ export default function Sequencer({
   simulation,
   onReorderExercises,
   exercises,
-  onLoadTemplate
+  onLoadTemplate,
+  onHoverExerciseChange
 }: SequencerProps) {
   const [isDragOver, setIsDragOver] = React.useState(false);
 
@@ -116,6 +118,8 @@ export default function Sequencer({
   const isBlueprintEmpty = useMemo(() => {
     return Object.values(blueprint).every(dayExercises => dayExercises.length === 0);
   }, [blueprint]);
+
+  const globalCapacity = simulation?.globalWorkCapacity ?? 100;
 
   const handleDragEnd = useCallback((event: DragEndEvent) => {
     const { active, over } = event;
@@ -376,6 +380,8 @@ export default function Sequencer({
                         onUpdateExercise={onUpdateExercise}
                         onDeleteExercise={onDeleteExercise}
                         simulation={simulation}
+                        onHoverEnter={() => onHoverExerciseChange?.(exerciseDef || null)}
+                        onHoverLeave={() => onHoverExerciseChange?.(null)}
                       />
                     );
                   })}
@@ -384,6 +390,52 @@ export default function Sequencer({
             </DndContext>
           )}
         </div>
+
+        {/* Sticky Footer - Jauge de Récupération Globale */}
+        <div className="mt-4 pt-3 border-t border-zinc-900 bg-zinc-950/40 rounded-xl p-3.5 shrink-0 flex flex-col sm:flex-row sm:items-center justify-between gap-3 border border-zinc-800/20">
+          <div className="flex flex-col min-w-0">
+            <span className="text-[10px] font-extrabold tracking-wider uppercase text-zinc-500 font-sans">
+              Capacité de Récupération Hebdomadaire
+            </span>
+            <span className={`text-xs font-bold mt-0.5 ${
+              globalCapacity > 40
+                ? 'text-emerald-400'
+                : globalCapacity >= 15
+                ? 'text-amber-400'
+                : 'text-red-400 animate-pulse'
+            }`}>
+              {globalCapacity > 40
+                ? 'Volume Optimal - Capacité disponible'
+                : globalCapacity >= 15
+                ? 'Surcharge Musculaire - Planification prudente'
+                : 'Seuil Critique - Risque de surentraînement ⚠️'}
+            </span>
+          </div>
+          
+          <div className="flex items-center gap-3 flex-1 sm:max-w-md w-full">
+            <div className="h-2 rounded-full bg-zinc-900 border border-zinc-850 w-full overflow-hidden relative">
+              <div 
+                className={`h-full rounded-full transition-all duration-500 ease-out ${
+                  globalCapacity > 40
+                    ? 'bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.3)]'
+                    : globalCapacity >= 15
+                    ? 'bg-amber-500 shadow-[0_0_10px_rgba(245,158,11,0.3)]'
+                    : 'bg-red-500 animate-pulse shadow-[0_0_15px_rgba(239,68,68,0.6)]'
+                }`}
+                style={{ width: `${globalCapacity}%` }}
+              />
+            </div>
+            <span className={`font-mono text-xs font-extrabold w-12 text-right ${
+              globalCapacity > 40
+                ? 'text-emerald-400'
+                : globalCapacity >= 15
+                ? 'text-amber-400'
+                : 'text-red-400 animate-pulse'
+            }`}>
+              {globalCapacity.toFixed(1)}%
+            </span>
+          </div>
+        </div>
       </div>
 
     </div>
@@ -391,7 +443,27 @@ export default function Sequencer({
 }
 
 // Wrapper for Sortable DND integration
-const SortableExerciseWrapper = React.memo(function SortableExerciseWrapper({ plannedEx, exerciseDef, index, currentDay, onUpdateExercise, onDeleteExercise, simulation }: { plannedEx: PlannedExercise, exerciseDef?: Exercise, index: number, currentDay: string, onUpdateExercise: (day: string, idx: number, updated: PlannedExercise) => void, onDeleteExercise: (day: string, idx: number) => void, simulation: SimulationResult }) {
+const SortableExerciseWrapper = React.memo(function SortableExerciseWrapper({ 
+  plannedEx, 
+  exerciseDef, 
+  index, 
+  currentDay, 
+  onUpdateExercise, 
+  onDeleteExercise, 
+  simulation,
+  onHoverEnter,
+  onHoverLeave
+}: { 
+  plannedEx: PlannedExercise, 
+  exerciseDef?: Exercise, 
+  index: number, 
+  currentDay: string, 
+  onUpdateExercise: (day: string, idx: number, updated: PlannedExercise) => void, 
+  onDeleteExercise: (day: string, idx: number) => void, 
+  simulation: SimulationResult,
+  onHoverEnter?: () => void,
+  onHoverLeave?: () => void
+}) {
   const {
     attributes,
     listeners,
@@ -420,6 +492,8 @@ const SortableExerciseWrapper = React.memo(function SortableExerciseWrapper({ pl
       onChange={(updated) => onUpdateExercise(currentDay, index, updated)}
       onDelete={() => onDeleteExercise(currentDay, index)}
       simulation={simulation}
+      onMouseEnter={onHoverEnter}
+      onMouseLeave={onHoverLeave}
     />
   );
 });

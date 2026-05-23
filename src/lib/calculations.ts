@@ -84,6 +84,7 @@ export interface SimulationResult {
   sncPercentage: number;
   cnsFailure: boolean;
   junkVolumeAlerts: string[]; // Alertes de junk volume basées sur l'INOL de la séance
+  globalWorkCapacity: number; // Capacité de travail systémique restante (0-100)
 }
 
 // Liste de fallback pour les exercices
@@ -643,11 +644,26 @@ export function runWeeklySimulation(
 
   const sncPercentage = Math.min(100, Math.round((targetSnc / maxSnc) * 100));
 
+  // Calcul de la capacité de récupération globale (globalWorkCapacity)
+  const fiveBigMuscles: MuscleId[] = ['quadriceps', 'chest', 'upperBack', 'lowerBack', 'gluteal'];
+  let totalMuscleFatiguePct = 0;
+  fiveBigMuscles.forEach(id => {
+    const muscle = targetMuscles[id];
+    const fatigue = muscle ? muscle.fatigue : 0;
+    // Fatigue max acceptable avant danger absolu est de 2.5
+    const pct = Math.min(100, Math.max(0, (fatigue / 2.5) * 100));
+    totalMuscleFatiguePct += pct;
+  });
+  const avgMuscleFatiguePct = totalMuscleFatiguePct / 5;
+  const globalFatigueScore = (sncPercentage + avgMuscleFatiguePct) / 2;
+  const globalWorkCapacity = Math.max(0, parseFloat((100 - globalFatigueScore).toFixed(1)));
+
   return {
     muscles: finalMuscles,
     sncScore: parseFloat(targetSnc.toFixed(2)),
     sncPercentage,
     cnsFailure,
-    junkVolumeAlerts
+    junkVolumeAlerts,
+    globalWorkCapacity
   };
 }

@@ -1,5 +1,5 @@
 'use client';
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { SimulationResult, MuscleStatus, MuscleId } from '@/lib/calculations';
 
 const Sparkline = ({ data }: { data?: number[] }) => {
@@ -41,6 +41,7 @@ interface HumanAvatarProps {
   selectedDay?: string;
   selectedMuscle?: string;
   onMuscleClick?: (muscleId: MuscleId) => void;
+  highlightedMuscles?: string[];
 }
 
 // ─── Colour helpers ──────────────────────────────────────────────────────────
@@ -419,7 +420,8 @@ export default function HumanAvatar({
   simulation,
   selectedDay,
   selectedMuscle = 'all',
-  onMuscleClick
+  onMuscleClick,
+  highlightedMuscles = []
 }: HumanAvatarProps) {
   const [hoveredId, setHoveredId] = useState<string | null>(null);
   const [tooltipPos, setTooltipPos] = useState({ x: 0, y: 0 });
@@ -444,6 +446,7 @@ export default function HumanAvatar({
     const color: ColorKey = status?.color ?? 'grey';
     const isHovered = hoveredId === id;
     const isSelected = selectedMuscle === id;
+    const isHighlighted = highlightedMuscles.includes(id);
 
     const base = COLORS[color];
     const hover = HOVER_COLORS[color];
@@ -455,6 +458,24 @@ export default function HumanAvatar({
     let stroke = isHovered ? hover.stroke : base.stroke;
     let strokeWidth = isHovered ? 1.5 : 0.8;
     let filter = isHovered ? hover.filter : undefined;
+    let className = '';
+
+    if (isHighlighted) {
+      strokeWidth = isHovered ? 2.5 : 2.0;
+      if (color === 'red') {
+        stroke = '#ef4444';
+        filter = 'drop-shadow(0 0 8px rgba(239,68,68,0.95))';
+        className = 'animate-glow-red';
+      } else if (color === 'orange') {
+        stroke = '#f59e0b';
+        filter = 'drop-shadow(0 0 8px rgba(245,158,11,0.95))';
+        className = 'animate-glow-orange';
+      } else {
+        stroke = '#38bdf8';
+        filter = 'drop-shadow(0 0 8px rgba(56,189,248,0.95))';
+        className = 'animate-glow-highlight';
+      }
+    }
 
     if (isSelected) {
       stroke = isHovered ? '#34d399' : '#10b981';
@@ -469,6 +490,7 @@ export default function HumanAvatar({
       stroke,
       strokeWidth,
       opacity,
+      className,
       style: {
         filter,
         transition: 'fill 0.2s ease, stroke 0.2s ease, filter 0.2s ease, opacity 0.2s ease',
@@ -483,12 +505,78 @@ export default function HumanAvatar({
 
   const hoveredMuscle = hoveredId ? simulation.muscles[hoveredId as MuscleId] : null;
 
-  // Combined viewBox for both front and back side by side
-  // Front: 0 95 727 1280 — Back: 718 95 727 1280
+  const saturatedHighlightedMuscles = useMemo(() => {
+    return highlightedMuscles
+      .map(id => ({ id, status: simulation.muscles[id as MuscleId] }))
+      .filter(item => item.status && (item.status.color === 'orange' || item.status.color === 'red'));
+  }, [highlightedMuscles, simulation]);
+
   const combinedViewBox = '0 95 1450 1280';
 
   return (
-    <div className="human-avatar-wrapper" style={{ display: 'flex', flexDirection: 'column', height: '100%', gap: 0, background: '#09090b' }}>
+    <div className="human-avatar-wrapper" style={{ display: 'flex', flexDirection: 'column', height: '100%', gap: 0, background: '#09090b', position: 'relative' }}>
+      <style>{`
+        @keyframes muscle-glow-green {
+          0%, 100% { stroke: #14b8a6; filter: drop-shadow(0 0 2px rgba(20,184,166,0.4)); }
+          50% { stroke: #2dd4bf; filter: drop-shadow(0 0 8px rgba(45,212,191,0.85)); }
+        }
+        @keyframes muscle-glow-orange {
+          0%, 100% { stroke: #d97706; filter: drop-shadow(0 0 2px rgba(217,119,6,0.4)); }
+          50% { stroke: #fbbf24; filter: drop-shadow(0 0 10px rgba(251,191,36,0.9)); }
+        }
+        @keyframes muscle-glow-red {
+          0%, 100% { stroke: #dc2626; filter: drop-shadow(0 0 3px rgba(220,38,38,0.5)); }
+          50% { stroke: #f87171; filter: drop-shadow(0 0 12px rgba(248,113,113,0.95)); }
+        }
+        @keyframes muscle-glow-highlight {
+          0%, 100% { stroke: #38bdf8; filter: drop-shadow(0 0 2px rgba(56,189,248,0.4)); }
+          50% { stroke: #7dd3fc; filter: drop-shadow(0 0 10px rgba(125,211,252,0.9)); }
+        }
+        
+        .animate-glow-green { animation: muscle-glow-green 1.5s infinite ease-in-out; }
+        .animate-glow-orange { animation: muscle-glow-orange 1.5s infinite ease-in-out; }
+        .animate-glow-red { animation: muscle-glow-red 1.5s infinite ease-in-out; }
+        .animate-glow-highlight { animation: muscle-glow-highlight 1.5s infinite ease-in-out; }
+        
+        @keyframes bounce-subtle {
+          0%, 100% { transform: translateY(0); }
+          50% { transform: translateY(-3px); }
+        }
+        .animate-bounce-subtle { animation: bounce-subtle 2s infinite ease-in-out; }
+      `}</style>
+
+      {saturatedHighlightedMuscles.length > 0 && (
+        <div 
+          className="animate-bounce-subtle"
+          style={{
+            position: 'absolute',
+            top: 48,
+            left: 12,
+            right: 12,
+            backgroundColor: 'rgba(28, 25, 23, 0.95)',
+            backdropFilter: 'blur(8px)',
+            border: '1px solid rgba(239, 68, 68, 0.3)',
+            borderRadius: 8,
+            padding: '10px 12px',
+            display: 'flex',
+            alignItems: 'start',
+            gap: 10,
+            boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.5), 0 8px 10px -6px rgba(0, 0, 0, 0.5)',
+            zIndex: 40,
+          }}
+        >
+          <span style={{ fontSize: 14, flexShrink: 0 }}>⚠️</span>
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <span style={{ fontSize: 10, fontWeight: 800, color: '#f87171', textTransform: 'uppercase', letterSpacing: '0.05em', display: 'block', fontFamily: 'sans-serif' }}>
+              Surcharge Musculaire Détectée
+            </span>
+            <span style={{ fontSize: 10, color: 'rgba(254, 226, 226, 0.9)', fontWeight: 500, lineHeight: 1.4, display: 'block', marginTop: 2 }}>
+              Cet exercice sollicite <strong style={{ color: '#fff' }}>{saturatedHighlightedMuscles.map(m => m.status?.name).join(', ')}</strong>, qui présente une fatigue élevée ou critique. Adaptez votre volume ou remplacez l&apos;exercice par de l&apos;isolation ou des machines.
+            </span>
+          </div>
+        </div>
+      )}
+
       {/* Header */}
       <div className="avatar-header" style={{
         display: 'flex',

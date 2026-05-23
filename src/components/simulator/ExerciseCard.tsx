@@ -1,6 +1,5 @@
 import React from 'react';
 import { PlannedExercise, Exercise, PlannedSet, SimulationResult } from '@/lib/calculations';
-import CapacityBar from './CapacityBar';
 
 interface ExerciseCardProps {
   plannedEx: PlannedExercise;
@@ -14,6 +13,8 @@ interface ExerciseCardProps {
   dragHandleProps?: any;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   dragHandleListeners?: any;
+  onMouseEnter?: () => void;
+  onMouseLeave?: () => void;
 }
 
 export default React.memo(function ExerciseCard({ 
@@ -25,14 +26,14 @@ export default React.memo(function ExerciseCard({
   setNodeRef,
   style,
   dragHandleProps,
-  dragHandleListeners
+  dragHandleListeners,
+  onMouseEnter,
+  onMouseLeave
 }: ExerciseCardProps) {
   const exercise = exerciseDef;
 
   if (!exercise) return null;
 
-  const muscleColor = simulation?.muscles?.[exercise.muscle_primaire]?.color;
-  const capacity = simulation?.muscles?.[exercise.muscle_primaire]?.remainingCapacity ?? 1.0;
   const jointStress = simulation?.muscles?.[exercise.muscle_primaire]?.jointStress ?? 0;
 
   const handleUpdateSet = (index: number, updatedSet: Partial<PlannedSet>) => {
@@ -80,6 +81,8 @@ export default React.memo(function ExerciseCard({
     <div
       ref={setNodeRef}
       style={style}
+      onMouseEnter={onMouseEnter}
+      onMouseLeave={onMouseLeave}
       className={`border rounded-xl p-2 bg-zinc-900/60 backdrop-blur-sm transition-all ${
         plannedEx.active
           ? 'border-zinc-800 hover:border-zinc-700 shadow-md'
@@ -132,22 +135,17 @@ export default React.memo(function ExerciseCard({
         </div>
       </div>
 
-      {/* Capacity Bar */}
-      {plannedEx.active && (
-        <div className="mt-1.5 px-1 py-1.5 bg-zinc-950/20 rounded border border-zinc-850/30 space-y-1">
-          <CapacityBar progress={capacity} color={muscleColor} showLabel={true} />
-          {jointStress > 1.0 && (
-            <div className="flex items-center justify-between text-[8px] font-medium pt-0.5 border-t border-zinc-900/50">
-              <span className="text-zinc-500">Contrainte Articulaire :</span>
-              <span className={`font-bold px-1 rounded-full ${
-                jointStress > 2.0 
-                  ? 'text-red-400 bg-red-950/30' 
-                  : 'text-amber-400 bg-amber-950/30'
-              }`}>
-                ⚠️ {jointStress > 2.0 ? 'Élevée' : 'Modérée'} ({jointStress.toFixed(1)})
-              </span>
-            </div>
-          )}
+      {/* Joint Stress Alert */}
+      {plannedEx.active && jointStress > 1.0 && (
+        <div className="mt-1.5 px-2 py-1 bg-zinc-950/20 rounded border border-zinc-850/30 flex items-center justify-between text-[8px] font-medium">
+          <span className="text-zinc-500">Contrainte Articulaire :</span>
+          <span className={`font-bold px-1 rounded-full ${
+            jointStress > 2.0 
+              ? 'text-red-400 bg-red-950/30' 
+              : 'text-amber-400 bg-amber-950/30'
+          }`}>
+            ⚠️ {jointStress > 2.0 ? 'Élevée' : 'Modérée'} ({jointStress.toFixed(1)})
+          </span>
         </div>
       )}
 
