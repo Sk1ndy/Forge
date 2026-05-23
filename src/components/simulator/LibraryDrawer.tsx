@@ -15,6 +15,7 @@ interface LibraryDrawerProps {
   onSelectMuscle: (muscle: string) => void;
   simulation: SimulationResult;
   exercises: Exercise[];
+  onHoverExerciseChange?: (exercise: Exercise | null) => void;
 }
 
 const EQUIPMENT_LABELS: { [key: string]: string } = {
@@ -40,7 +41,8 @@ export default function LibraryDrawer({
   selectedMuscle,
   onSelectMuscle,
   simulation,
-  exercises
+  exercises,
+  onHoverExerciseChange
 }: LibraryDrawerProps) {
   const [search, setSearch] = useState('');
   const [selectedEquipment, setSelectedEquipment] = useState('all');
@@ -185,6 +187,8 @@ export default function LibraryDrawer({
                   e.dataTransfer.setData('text/plain', ex.id);
                   e.dataTransfer.effectAllowed = 'copy';
                 }}
+                onMouseEnter={() => onHoverExerciseChange?.(ex)}
+                onMouseLeave={() => onHoverExerciseChange?.(null)}
                 className={`relative p-2.5 rounded-lg border transition-all flex flex-col gap-1.5 select-none ${
                   isBlocked
                     ? 'border-red-900/40 bg-red-950/5 hover:border-red-800/40 cursor-not-allowed opacity-80'

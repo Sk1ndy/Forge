@@ -65,11 +65,13 @@ export default function Home() {
   const [selectedMuscle, setSelectedMuscle] = useState<string>('all');
   const [exercises, setExercises] = useState<Exercise[]>([]);
   const [hoveredExercise, setHoveredExercise] = useState<Exercise | null>(null);
+  const [selectedExercise, setSelectedExercise] = useState<Exercise | null>(null);
 
   const highlightedMuscles = useMemo(() => {
-    if (!hoveredExercise) return [];
-    return [hoveredExercise.muscle_primaire, ...hoveredExercise.muscles_secondaires];
-  }, [hoveredExercise]);
+    const activeEx = hoveredExercise || selectedExercise;
+    if (!activeEx) return [];
+    return [activeEx.muscle_primaire, ...activeEx.muscles_secondaires];
+  }, [hoveredExercise, selectedExercise]);
 
   const supabase = createClient();
 
@@ -511,6 +513,8 @@ export default function Home() {
             exercises={exercises}
             onLoadTemplate={handleLoadTemplate}
             onHoverExerciseChange={setHoveredExercise}
+            selectedExercise={selectedExercise}
+            onSelectExercise={setSelectedExercise}
           />
         </div>
       </section>
@@ -525,6 +529,7 @@ export default function Home() {
           onSelectMuscle={setSelectedMuscle}
           simulation={simulationResult}
           exercises={exercises}
+          onHoverExerciseChange={setHoveredExercise}
         />
       </section>
 

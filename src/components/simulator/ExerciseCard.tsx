@@ -15,6 +15,8 @@ interface ExerciseCardProps {
   dragHandleListeners?: any;
   onMouseEnter?: () => void;
   onMouseLeave?: () => void;
+  isSelected?: boolean;
+  onSelect?: () => void;
 }
 
 export default React.memo(function ExerciseCard({ 
@@ -28,7 +30,9 @@ export default React.memo(function ExerciseCard({
   dragHandleProps,
   dragHandleListeners,
   onMouseEnter,
-  onMouseLeave
+  onMouseLeave,
+  isSelected,
+  onSelect
 }: ExerciseCardProps) {
   const exercise = exerciseDef;
 
@@ -83,10 +87,17 @@ export default React.memo(function ExerciseCard({
       style={style}
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
-      className={`border rounded-xl p-2 bg-zinc-900/60 backdrop-blur-sm transition-all ${
-        plannedEx.active
-          ? 'border-zinc-800 hover:border-zinc-700 shadow-md'
-          : 'border-zinc-900/20 opacity-50 bg-zinc-950/20'
+      onClick={(e) => {
+        const target = e.target as HTMLElement;
+        if (target.closest('input') || target.closest('select') || target.closest('button')) return;
+        onSelect?.();
+      }}
+      className={`border rounded-xl p-3.5 bg-zinc-900/40 backdrop-blur-sm transition-all select-none cursor-pointer duration-300 ${
+        !plannedEx.active
+          ? 'border-zinc-950/10 opacity-40 bg-zinc-950/10'
+          : isSelected
+          ? 'border-emerald-500 bg-emerald-950/5 ring-1 ring-emerald-500/20 shadow-[0_0_15px_rgba(16,185,129,0.12)]'
+          : 'border-zinc-900 hover:border-zinc-800 hover:bg-zinc-900/60 shadow-sm'
       }`}
     >
       {/* Header */}
@@ -149,13 +160,25 @@ export default React.memo(function ExerciseCard({
         </div>
       )}
 
+      {/* Header des colonnes (uniquement s'il y a des séries et actif) */}
+      {plannedEx.active && plannedEx.sets.length > 0 && (
+        <div className="flex items-center gap-2 px-1 text-[8px] font-extrabold tracking-wider uppercase text-zinc-500 font-sans border-b border-zinc-900/50 pb-1.5 mb-2 mt-3 select-none">
+          <div className="w-3.5 shrink-0"></div> {/* Checkbox spacer */}
+          <div className="w-[42px] text-center">Séries</div>
+          <div className="w-[42px] text-center">Reps</div>
+          <div className="w-[58px] text-center">Poids</div>
+          <div className="w-[64px] text-center">Intensité</div>
+          <div className="flex-1"></div> {/* Spacer for delete button alignment */}
+        </div>
+      )}
+
       {/* Sets Rows */}
-      <div className="mt-2 space-y-1.5">
+      <div className="space-y-2">
         {plannedEx.sets.map((set, idx) => (
           <div
             key={idx}
-            className={`flex items-center gap-1 text-[10px] ${
-              !set.active ? 'opacity-40' : ''
+            className={`flex items-center gap-2 text-[10px] ${
+              !set.active ? 'opacity-35' : ''
             }`}
           >
             {/* Active set toggle */}
@@ -163,7 +186,7 @@ export default React.memo(function ExerciseCard({
               type="checkbox"
               checked={set.active}
               onChange={(e) => handleUpdateSet(idx, { active: e.target.checked })}
-              className="rounded-full border-zinc-800 bg-zinc-950 text-emerald-500 focus:ring-emerald-500 h-3 w-3 cursor-pointer shrink-0"
+              className="rounded-full border-zinc-800 bg-zinc-950 text-emerald-500 focus:ring-emerald-500 h-3.5 w-3.5 cursor-pointer shrink-0"
             />
 
             {/* Series */}
@@ -173,10 +196,9 @@ export default React.memo(function ExerciseCard({
               max="20"
               value={set.series}
               onChange={(e) => handleUpdateSet(idx, { series: Math.max(1, Number(e.target.value)) })}
-              className="w-[30px] text-center rounded border border-zinc-800 bg-zinc-950 px-0.5 py-0.5 text-white focus:border-emerald-500 focus:outline-none"
+              className="w-[42px] text-center rounded border border-zinc-850 bg-zinc-950 px-1 py-1 text-white text-[10px] focus:border-emerald-500/50 focus:outline-none"
               title="Séries"
             />
-            <span className="text-zinc-600 text-[9px]">x</span>
 
             {/* Reps */}
             <input
@@ -185,28 +207,30 @@ export default React.memo(function ExerciseCard({
               max="100"
               value={set.reps}
               onChange={(e) => handleUpdateSet(idx, { reps: Math.max(1, Number(e.target.value)) })}
-              className="w-[30px] text-center rounded border border-zinc-800 bg-zinc-950 px-0.5 py-0.5 text-white focus:border-emerald-500 focus:outline-none"
+              className="w-[42px] text-center rounded border border-zinc-850 bg-zinc-950 px-1 py-1 text-white text-[10px] focus:border-emerald-500/50 focus:outline-none"
               title="Répétitions"
             />
             
             {/* Weight */}
-            <input
-              type="number"
-              min="0"
-              max="1000"
-              value={set.poids}
-              onChange={(e) => handleUpdateSet(idx, { poids: Math.max(0, Number(e.target.value)) })}
-              className="w-[34px] text-center rounded border border-zinc-800 bg-zinc-950 px-0.5 py-0.5 text-emerald-400 font-semibold focus:border-emerald-500 focus:outline-none"
-              title="Poids (kg)"
-            />
-            <span className="text-zinc-600 text-[9px]">k</span>
+            <div className="flex items-center rounded border border-zinc-850 bg-zinc-950 px-1 py-0.5 focus-within:border-emerald-500/50 w-[58px] justify-between">
+              <input
+                type="number"
+                min="0"
+                max="1000"
+                value={set.poids}
+                onChange={(e) => handleUpdateSet(idx, { poids: Math.max(0, Number(e.target.value)) })}
+                className="w-[32px] text-center bg-transparent text-emerald-400 font-semibold text-[10px] focus:outline-none"
+                title="Poids"
+              />
+              <span className="text-zinc-600 text-[8px] font-bold select-none pr-0.5">kg</span>
+            </div>
 
             {/* RPE */}
             <select
               value={set.rpe}
               onChange={(e) => handleUpdateSet(idx, { rpe: Number(e.target.value) })}
-              className="flex-1 min-w-0 rounded border border-zinc-800 bg-zinc-950 px-0 py-0.5 text-center text-white focus:border-emerald-500 focus:outline-none text-[9px]"
-              title="RPE"
+              className="w-[64px] rounded border border-zinc-850 bg-zinc-950 px-1 py-1 text-center text-white focus:border-emerald-500/50 focus:outline-none text-[10px]"
+              title="Intensité (RPE)"
             >
               {[10, 9.5, 9, 8.5, 8, 7.5, 7, 6.5, 6, 5.5, 5].map(v => (
                 <option key={v} value={v}>@{v}</option>
@@ -214,16 +238,18 @@ export default React.memo(function ExerciseCard({
             </select>
 
             {/* Remove Row */}
-            {plannedEx.sets.length > 1 && (
-              <button
-                onClick={() => handleRemoveSetRow(idx)}
-                className="text-zinc-600 hover:text-red-400 p-0.5 shrink-0"
-              >
-                <svg className="h-2.5 w-2.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-            )}
+            <div className="flex-1 flex justify-end">
+              {plannedEx.sets.length > 1 && (
+                <button
+                  onClick={() => handleRemoveSetRow(idx)}
+                  className="text-zinc-500 hover:text-red-400 p-1 shrink-0 transition-colors"
+                >
+                  <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              )}
+            </div>
           </div>
         ))}
       </div>

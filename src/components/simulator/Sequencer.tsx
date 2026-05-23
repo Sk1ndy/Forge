@@ -34,6 +34,8 @@ interface SequencerProps {
   exercises: Exercise[];
   onLoadTemplate?: (template: WeeklyBlueprint) => void;
   onHoverExerciseChange?: (exercise: Exercise | null) => void;
+  selectedExercise?: Exercise | null;
+  onSelectExercise?: (exercise: Exercise | null) => void;
 }
 
 const DAYS_OF_WEEK = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche'];
@@ -52,7 +54,9 @@ export default function Sequencer({
   onReorderExercises,
   exercises,
   onLoadTemplate,
-  onHoverExerciseChange
+  onHoverExerciseChange,
+  selectedExercise,
+  onSelectExercise
 }: SequencerProps) {
   const [isDragOver, setIsDragOver] = React.useState(false);
 
@@ -274,6 +278,52 @@ export default function Sequencer({
           </div>
         </div>
 
+        {/* Recovery Capacity Bar - Placé en haut pour une visibilité immédiate et une meilleure clarté */}
+        <div className="mt-3 bg-zinc-950/40 rounded-xl p-3 border border-zinc-900/50 shrink-0 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-[inset_0_1px_0_rgba(255,255,255,0.03)]">
+          <div className="flex flex-col min-w-0">
+            <span className="text-[9px] font-extrabold tracking-wider uppercase text-zinc-500 font-sans">
+              Capacité de Récupération Hebdomadaire
+            </span>
+            <span className={`text-xs font-extrabold mt-0.5 ${
+              globalCapacity > 40
+                ? 'text-emerald-400'
+                : globalCapacity >= 15
+                ? 'text-amber-400'
+                : 'text-red-400 animate-pulse'
+            }`}>
+              {globalCapacity > 40
+                ? 'Volume Optimal - Capacité disponible'
+                : globalCapacity >= 15
+                ? 'Surcharge Musculaire - Planification prudente'
+                : 'Seuil Critique - Risque de surentraînement ⚠️'}
+            </span>
+          </div>
+          
+          <div className="flex items-center gap-3 flex-1 sm:max-w-md w-full">
+            <div className="h-2 rounded-full bg-zinc-900 border border-zinc-850 w-full overflow-hidden relative">
+              <div 
+                className={`h-full rounded-full transition-all duration-500 ease-out ${
+                  globalCapacity > 40
+                    ? 'bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.3)]'
+                    : globalCapacity >= 15
+                    ? 'bg-amber-500 shadow-[0_0_10px_rgba(245,158,11,0.3)]'
+                    : 'bg-red-500 animate-pulse shadow-[0_0_15px_rgba(239,68,68,0.6)]'
+                }`}
+                style={{ width: `${globalCapacity}%` }}
+              />
+            </div>
+            <span className={`font-mono text-xs font-extrabold w-12 text-right ${
+              globalCapacity > 40
+                ? 'text-emerald-400'
+                : globalCapacity >= 15
+                ? 'text-amber-400'
+                : 'text-red-400 animate-pulse'
+            }`}>
+              {globalCapacity.toFixed(1)}%
+            </span>
+          </div>
+        </div>
+
         {/* Alerte Junk Volume (Surcharge intra-séance basée sur l'intensité) */}
         {(() => {
           const junkAlerts = simulation?.junkVolumeAlerts || [];
@@ -382,6 +432,14 @@ export default function Sequencer({
                         simulation={simulation}
                         onHoverEnter={() => onHoverExerciseChange?.(exerciseDef || null)}
                         onHoverLeave={() => onHoverExerciseChange?.(null)}
+                        isSelected={selectedExercise?.id === exerciseDef?.id}
+                        onSelect={() => {
+                          if (selectedExercise?.id === exerciseDef?.id) {
+                            onSelectExercise?.(null);
+                          } else {
+                            onSelectExercise?.(exerciseDef || null);
+                          }
+                        }}
                       />
                     );
                   })}
@@ -389,52 +447,6 @@ export default function Sequencer({
               </SortableContext>
             </DndContext>
           )}
-        </div>
-
-        {/* Sticky Footer - Jauge de Récupération Globale */}
-        <div className="mt-4 pt-3 border-t border-zinc-900 bg-zinc-950/40 rounded-xl p-3.5 shrink-0 flex flex-col sm:flex-row sm:items-center justify-between gap-3 border border-zinc-800/20">
-          <div className="flex flex-col min-w-0">
-            <span className="text-[10px] font-extrabold tracking-wider uppercase text-zinc-500 font-sans">
-              Capacité de Récupération Hebdomadaire
-            </span>
-            <span className={`text-xs font-bold mt-0.5 ${
-              globalCapacity > 40
-                ? 'text-emerald-400'
-                : globalCapacity >= 15
-                ? 'text-amber-400'
-                : 'text-red-400 animate-pulse'
-            }`}>
-              {globalCapacity > 40
-                ? 'Volume Optimal - Capacité disponible'
-                : globalCapacity >= 15
-                ? 'Surcharge Musculaire - Planification prudente'
-                : 'Seuil Critique - Risque de surentraînement ⚠️'}
-            </span>
-          </div>
-          
-          <div className="flex items-center gap-3 flex-1 sm:max-w-md w-full">
-            <div className="h-2 rounded-full bg-zinc-900 border border-zinc-850 w-full overflow-hidden relative">
-              <div 
-                className={`h-full rounded-full transition-all duration-500 ease-out ${
-                  globalCapacity > 40
-                    ? 'bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.3)]'
-                    : globalCapacity >= 15
-                    ? 'bg-amber-500 shadow-[0_0_10px_rgba(245,158,11,0.3)]'
-                    : 'bg-red-500 animate-pulse shadow-[0_0_15px_rgba(239,68,68,0.6)]'
-                }`}
-                style={{ width: `${globalCapacity}%` }}
-              />
-            </div>
-            <span className={`font-mono text-xs font-extrabold w-12 text-right ${
-              globalCapacity > 40
-                ? 'text-emerald-400'
-                : globalCapacity >= 15
-                ? 'text-amber-400'
-                : 'text-red-400 animate-pulse'
-            }`}>
-              {globalCapacity.toFixed(1)}%
-            </span>
-          </div>
         </div>
       </div>
 
@@ -452,7 +464,9 @@ const SortableExerciseWrapper = React.memo(function SortableExerciseWrapper({
   onDeleteExercise, 
   simulation,
   onHoverEnter,
-  onHoverLeave
+  onHoverLeave,
+  isSelected,
+  onSelect
 }: { 
   plannedEx: PlannedExercise, 
   exerciseDef?: Exercise, 
@@ -462,7 +476,9 @@ const SortableExerciseWrapper = React.memo(function SortableExerciseWrapper({
   onDeleteExercise: (day: string, idx: number) => void, 
   simulation: SimulationResult,
   onHoverEnter?: () => void,
-  onHoverLeave?: () => void
+  onHoverLeave?: () => void,
+  isSelected?: boolean,
+  onSelect?: () => void
 }) {
   const {
     attributes,
@@ -494,6 +510,8 @@ const SortableExerciseWrapper = React.memo(function SortableExerciseWrapper({
       simulation={simulation}
       onMouseEnter={onHoverEnter}
       onMouseLeave={onHoverLeave}
+      isSelected={isSelected}
+      onSelect={onSelect}
     />
   );
 });
