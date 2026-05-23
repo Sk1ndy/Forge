@@ -23,6 +23,7 @@ import HumanAvatar from '@/components/simulator/HumanAvatar';
 import Sequencer from '@/components/simulator/Sequencer';
 import LibraryDrawer from '@/components/simulator/LibraryDrawer';
 import CalibrageModal from '@/components/simulator/CalibrageModal';
+import BlueprintsModal from '@/components/simulator/BlueprintsModal';
 
 export default function Home() {
   const [profile, setProfile] = useState<UserProfile>({
@@ -57,6 +58,7 @@ export default function Home() {
 
   const [savedBlueprints, setSavedBlueprints] = useState<{ id: string; name: string; blueprint: WeeklyBlueprint }[]>([]);
   const [isCalibrageOpen, setIsCalibrageOpen] = useState(false);
+  const [isBlueprintsModalOpen, setIsBlueprintsModalOpen] = useState(false);
   const [libraryOpen, setLibraryOpen] = useState(true);
   const [supabaseUser, setSupabaseUser] = useState<unknown>(null);
   const [activeBlueprintId, setActiveBlueprintId] = useState<string | null>(null);
@@ -225,18 +227,6 @@ export default function Home() {
     setSavedBlueprints(history);
   };
 
-  const handleRenameBlueprint = async () => {
-    if (!activeBlueprintId) return;
-    const name = prompt("Entrez un nouveau nom pour ce Blueprint :", currentBlueprintName);
-    if (!name || name === currentBlueprintName) return;
-
-    await saveBlueprint(name, blueprint, activeBlueprintId);
-    setCurrentBlueprintName(name);
-
-    // Recharger l'historique
-    const history = await loadSavedBlueprints();
-    setSavedBlueprints(history);
-  };
 
   // 7. Charger un Blueprint existant
   const handleLoadBlueprint = (id: string) => {
@@ -266,9 +256,25 @@ export default function Home() {
     }
   };
 
-  // 9. Supprimer un Blueprint
-  const handleDeleteBlueprint = async (id: string, e: React.MouseEvent) => {
-    e.stopPropagation();
+
+  const handleRenameBlueprintById = async (id: string, oldName: string) => {
+    const name = prompt("Entrez un nouveau nom pour ce Blueprint :", oldName);
+    if (!name || name === oldName) return;
+
+    const bp = savedBlueprints.find(s => s.id === id);
+    if (!bp) return;
+
+    await saveBlueprint(name, bp.blueprint, id);
+    if (activeBlueprintId === id) {
+      setCurrentBlueprintName(name);
+    }
+
+    // Recharger l'historique
+    const history = await loadSavedBlueprints();
+    setSavedBlueprints(history);
+  };
+
+  const handleDeleteBlueprintById = async (id: string) => {
     if (confirm("Êtes-vous sûr de vouloir supprimer ce Blueprint ?")) {
       await deleteBlueprint(id);
       if (activeBlueprintId === id) {
@@ -389,61 +395,139 @@ export default function Home() {
             </div>
           </div>
 
-          {/* Blueprints History / Presets */}
-          <div className="space-y-3">
-              <span className="text-xs font-bold text-zinc-400 uppercase tracking-wider">Mes Blueprints</span>
-            <div className="flex items-center justify-between">
-              <div className="flex gap-1.5">
-                <button
-                  onClick={handleNewBlueprint}
-                  className="text-[10px] bg-zinc-900 hover:bg-zinc-800 hover:text-white text-zinc-400 font-bold px-2 py-1 rounded cursor-pointer transition-colors border border-zinc-800"
-                >
-                  Nouveau
-                </button>
-                <button
-                  onClick={handleSaveBlueprint}
-                  className="text-[10px] bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 hover:bg-emerald-500/20 hover:text-emerald-300 font-bold px-2 py-1 rounded cursor-pointer transition-colors"
-                >
-                  Sauvegarder
-                </button>
-                {activeBlueprintId && (
-                  <button
-                    onClick={handleRenameBlueprint}
-                    className="text-[10px] bg-amber-500/10 border border-amber-500/20 text-amber-400 hover:bg-amber-500/20 hover:text-amber-300 font-bold px-2 py-1 rounded cursor-pointer transition-colors"
+          {/* 1. Planning Hebdomadaire (Day Selector moved from middle rail) */}
+          <div className="space-y-3 p-3.5 border border-zinc-900 bg-zinc-950/60 rounded-xl">
+            <span className="text-xs font-bold text-zinc-300 uppercase tracking-wider block">
+              Planning Hebdomadaire
+            </span>
+            <div className="space-y-1.5 max-h-[220px] overflow-y-auto pr-1">
+              {['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche'].map((day) => {
+                const dayExercises = blueprint[day] || [];
+                const isDayActive = toggledDays[day] !== false;
+                const isSelected = selectedDay === day;
+                
+                // Day summary logic
+                let summaryText = 'Repos ⚡';
+                let isRest = true;
+                if (!isDayActive) {
+                  summaryText = 'Désactivé';
+                } else if (dayExercises.length > 0) {
+                  const activeExs = dayExercises.filter(e => e.active);
+                  if (activeExs.length > 0) {
+                    const totalSets = activeExs.reduce(
+                      (sum, ex) => sum + ex.sets.reduce((sSum, s) => sSum + (s.active ? s.series : 0), 0),
+                      0
+                    );
+                    summaryText = `${activeExs.length} exo${activeExs.length > 1 ? 's' : ''} · ${totalSets} sér.`;
+                    isRest = false;
+                  }
+                }
+
+                return (
+                  <div
+                    key={day}
+                    onClick={() => setSelectedDay(day)}
+                    className={`group flex items-center justify-between p-2 rounded-lg border text-xs cursor-pointer transition-all duration-200 ${
+                      isSelected
+                        ? 'border-emerald-500 bg-emerald-950/15 ring-1 ring-emerald-500/20 shadow-[0_0_10px_rgba(16,185,129,0.08)] text-white font-bold'
+                        : isDayActive
+                        ? 'border-zinc-900 bg-zinc-900/10 text-zinc-400 hover:bg-zinc-900/40 hover:text-white'
+                        : 'border-zinc-950 bg-zinc-950/10 opacity-40 hover:opacity-60 text-zinc-500'
+                    }`}
                   >
-                    Renommer
-                  </button>
-                )}
-              </div>
+                    <div className="flex items-center gap-2 min-w-0">
+                      <input
+                        type="checkbox"
+                        checked={isDayActive}
+                        onChange={(e) => {
+                          e.stopPropagation();
+                          setToggledDays(prev => ({
+                            ...prev,
+                            [day]: !prev[day]
+                          }));
+                        }}
+                        className="rounded border-zinc-800 bg-zinc-950 text-emerald-500 focus:ring-emerald-500 h-3.5 w-3.5 cursor-pointer shrink-0"
+                        onClick={(e) => e.stopPropagation()}
+                      />
+                      <div className="flex flex-col min-w-0">
+                        <span className="font-bold text-[11px] truncate">{day}</span>
+                        <span className={`text-[9px] font-semibold mt-0.5 leading-none ${isRest ? 'text-zinc-600' : 'text-emerald-500'}`}>
+                          {summaryText}
+                        </span>
+                      </div>
+                    </div>
+                    {dayExercises.length > 0 && isDayActive && (
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          if (confirm(`Voulez-vous vider la séance de ${day} ?`)) {
+                            handleClearDay(day);
+                          }
+                        }}
+                        className="opacity-0 group-hover:opacity-100 text-[9px] text-zinc-550 hover:text-red-400 font-bold px-1.5 py-0.5 rounded hover:bg-zinc-900 transition-all cursor-pointer shrink-0"
+                      >
+                        Vider
+                      </button>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* 2. Blueprints Section (Compact: 2 last used, plus Gérer button) */}
+          <div className="space-y-3 p-3.5 border border-zinc-900 bg-zinc-950/60 rounded-xl">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-bold text-zinc-300 uppercase tracking-wider">Mes Blueprints</span>
+              <button
+                onClick={() => setIsBlueprintsModalOpen(true)}
+                className="text-[9px] text-emerald-400 hover:text-emerald-300 font-bold border border-emerald-950 bg-emerald-950/30 px-2 py-0.5 rounded hover:bg-emerald-950/50 transition-all cursor-pointer shrink-0"
+              >
+                Gérer ({savedBlueprints.length})
+              </button>
             </div>
 
-            <div className="space-y-1.5 max-h-[220px] overflow-y-auto pr-1">
-              {savedBlueprints.length === 0 ? (
-                <p className="text-[10px] text-zinc-500 text-center py-6 border border-dashed border-zinc-900 rounded-lg">
-                  Aucun programme enregistré.
-                </p>
-              ) : (
-                savedBlueprints.map(sb => (
+            {/* Quick Actions */}
+            <div className="flex gap-1.5">
+              <button
+                onClick={handleNewBlueprint}
+                className="flex-1 text-[9px] bg-zinc-900 hover:bg-zinc-850 hover:text-white text-zinc-400 font-bold py-1.5 rounded cursor-pointer transition-colors border border-zinc-800"
+              >
+                Nouveau
+              </button>
+              <button
+                onClick={handleSaveBlueprint}
+                className="flex-1 text-[9px] bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 hover:bg-emerald-500/20 hover:text-emerald-300 font-bold py-1.5 rounded cursor-pointer transition-all"
+              >
+                Sauvegarder
+              </button>
+            </div>
+
+            {/* Render 2 last used blueprints */}
+            <div className="space-y-1.5 pt-0.5">
+              {savedBlueprints.slice(0, 2).map(sb => {
+                const isActive = activeBlueprintId === sb.id;
+                return (
                   <div
                     key={sb.id}
                     onClick={() => handleLoadBlueprint(sb.id)}
-                    className={`flex items-center justify-between p-2.5 rounded-lg border text-xs cursor-pointer transition-all ${
-                      activeBlueprintId === sb.id
+                    className={`flex items-center justify-between p-2 rounded-lg border text-xs cursor-pointer transition-all ${
+                      isActive
                         ? 'border-emerald-500 bg-emerald-950/10 text-white font-bold'
-                        : 'border-zinc-900 bg-zinc-900/10 text-zinc-400 hover:bg-zinc-900/40 hover:text-white'
+                        : 'border-zinc-900 bg-zinc-900/10 text-zinc-450 hover:bg-zinc-900/40 hover:text-white'
                     }`}
                   >
-                    <span className="truncate max-w-[170px]">{sb.name}</span>
-                    <button
-                      onClick={(e) => handleDeleteBlueprint(sb.id, e)}
-                      className="text-zinc-600 hover:text-red-400 p-0.5 rounded transition-colors"
-                    >
-                      <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                      </svg>
-                    </button>
+                    <span className="truncate max-w-[190px]">{sb.name}</span>
+                    {isActive && (
+                      <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 shrink-0" />
+                    )}
                   </div>
-                ))
+                );
+              })}
+              {savedBlueprints.length === 0 && (
+                <p className="text-[10px] text-zinc-500 text-center py-4 border border-dashed border-zinc-900 rounded-lg">
+                  Aucun blueprint sauvegardé.
+                </p>
               )}
             </div>
           </div>
@@ -539,6 +623,16 @@ export default function Home() {
         onClose={() => setIsCalibrageOpen(false)}
         profile={profile}
         onSave={handleSaveProfile}
+      />
+
+      <BlueprintsModal
+        isOpen={isBlueprintsModalOpen}
+        onClose={() => setIsBlueprintsModalOpen(false)}
+        savedBlueprints={savedBlueprints}
+        onLoadBlueprint={handleLoadBlueprint}
+        onRenameBlueprint={handleRenameBlueprintById}
+        onDeleteBlueprint={handleDeleteBlueprintById}
+        activeBlueprintId={activeBlueprintId}
       />
     </main>
   );

@@ -38,7 +38,10 @@ export default React.memo(function ExerciseCard({
 
   if (!exercise) return null;
 
-  const jointStress = simulation?.muscles?.[exercise.muscle_primaire]?.jointStress ?? 0;
+  const targetMuscle = exercise.muscle_primaire;
+  const muscleStatus = simulation?.muscles?.[targetMuscle];
+  const inolScore = muscleStatus?.inol ?? 0;
+  const muscleColor = muscleStatus?.color ?? 'grey';
 
   const handleUpdateSet = (index: number, updatedSet: Partial<PlannedSet>) => {
     const updatedSets = [...plannedEx.sets];
@@ -46,7 +49,8 @@ export default React.memo(function ExerciseCard({
     onChange({ ...plannedEx, sets: updatedSets });
   };
 
-  const handleAddSetRow = () => {
+  const handleAddSetRow = (e: React.MouseEvent) => {
+    e.stopPropagation();
     const defaultSet: PlannedSet = {
       series: 3,
       reps: 8,
@@ -54,7 +58,6 @@ export default React.memo(function ExerciseCard({
       rpe: 8,
       active: true
     };
-    // Copier les paramètres de la dernière ligne s'il y en a une
     if (plannedEx.sets.length > 0) {
       const last = plannedEx.sets[plannedEx.sets.length - 1];
       defaultSet.series = last.series;
@@ -68,7 +71,8 @@ export default React.memo(function ExerciseCard({
     });
   };
 
-  const handleRemoveSetRow = (index: number) => {
+  const handleRemoveSetRow = (index: number, e: React.MouseEvent) => {
+    e.stopPropagation();
     const updatedSets = plannedEx.sets.filter((_, i) => i !== index);
     if (updatedSets.length === 0) {
       onDelete();
@@ -77,8 +81,8 @@ export default React.memo(function ExerciseCard({
     }
   };
 
-  const toggleExerciseActive = () => {
-    onChange({ ...plannedEx, active: !plannedEx.active });
+  const toggleExerciseActive = (e: React.ChangeEvent<HTMLInputElement>) => {
+    onChange({ ...plannedEx, active: e.target.checked });
   };
 
   return (
@@ -92,157 +96,156 @@ export default React.memo(function ExerciseCard({
         if (target.closest('input') || target.closest('select') || target.closest('button')) return;
         onSelect?.();
       }}
-      className={`border rounded-xl p-3.5 bg-zinc-900/40 backdrop-blur-sm transition-all select-none cursor-pointer duration-300 ${
+      className={`border rounded-xl p-3 bg-zinc-900/40 backdrop-blur-sm transition-all select-none cursor-pointer duration-300 flex flex-col sm:flex-row sm:items-center justify-between gap-3 w-full ${
         !plannedEx.active
-          ? 'border-zinc-950/10 opacity-40 bg-zinc-950/10'
+          ? 'border-zinc-950/10 opacity-30 bg-zinc-950/10'
           : isSelected
           ? 'border-emerald-500 bg-emerald-950/5 ring-1 ring-emerald-500/20 shadow-[0_0_15px_rgba(16,185,129,0.12)]'
           : 'border-zinc-900 hover:border-zinc-800 hover:bg-zinc-900/60 shadow-sm'
       }`}
     >
-      {/* Header */}
-      <div className="flex items-center justify-between gap-1 pb-1.5 border-b border-zinc-850">
-        <div className="flex items-center gap-1.5 overflow-hidden">
-          {/* Drag Handle */}
-          <div 
-            className="cursor-grab touch-none p-1 -ml-1 text-zinc-600 hover:text-zinc-400 active:cursor-grabbing"
-            {...dragHandleProps}
-            {...dragHandleListeners}
-          >
-            <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M4 8h16M4 16h16" />
-            </svg>
-          </div>
-          <input
-            type="checkbox"
-            checked={plannedEx.active}
-            onChange={toggleExerciseActive}
-            className="rounded border-zinc-800 bg-zinc-950 text-emerald-500 focus:ring-emerald-500 h-3.5 w-3.5 cursor-pointer shrink-0"
-          />
-          <h4 className="font-semibold text-[11px] text-zinc-100 truncate" title={exercise.nom}>
-            {exercise.nom}
-          </h4>
+      {/* 1. LEFT METADATA SECTION */}
+      <div className="flex items-center gap-2 min-w-0">
+        {/* Drag Handle */}
+        <div 
+          className="cursor-grab touch-none p-1 text-zinc-650 hover:text-zinc-400 active:cursor-grabbing shrink-0"
+          {...dragHandleProps}
+          {...dragHandleListeners}
+        >
+          <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M4 8h16M4 16h16" />
+          </svg>
         </div>
-        <div className="flex items-center gap-1 shrink-0">
+
+        {/* Active Checkbox */}
+        <input
+          type="checkbox"
+          checked={plannedEx.active}
+          onChange={toggleExerciseActive}
+          className="rounded border-zinc-850 bg-zinc-950 text-emerald-500 focus:ring-emerald-500 h-4 w-4 cursor-pointer shrink-0"
+        />
+
+        {/* Name, Tier & Fatigue Badge */}
+        <div className="flex items-center gap-2 min-w-0">
+          <span className="font-bold text-xs sm:text-sm text-zinc-200 truncate max-w-[130px] sm:max-w-[180px]" title={exercise.nom}>
+            {exercise.nom}
+          </span>
+          
           <span
-            className={`text-[9px] font-bold px-1.5 py-0.5 rounded-full ${
+            className={`text-[9px] font-extrabold px-1.5 py-0.5 rounded-full shrink-0 leading-none ${
               exercise.tier_snc === 1
                 ? 'bg-red-500/10 text-red-400 border border-red-500/20'
                 : exercise.tier_snc === 2
-                ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20'
+                ? 'bg-sky-500/10 text-sky-400 border border-sky-500/20'
                 : 'bg-zinc-500/10 text-zinc-400 border border-zinc-500/20'
             }`}
           >
             T{exercise.tier_snc}
           </span>
-          <button
-            onClick={onDelete}
-            className="text-zinc-500 hover:text-red-400 p-0.5 rounded hover:bg-zinc-850 transition-colors"
-          >
-            <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-            </svg>
-          </button>
+
+          {plannedEx.active && (
+            <span
+              className={`text-[10px] font-black px-1.5 py-0.5 rounded border shrink-0 leading-none font-mono ${
+                muscleColor === 'red'
+                  ? 'bg-red-500/15 text-red-400 border-red-500/30'
+                  : muscleColor === 'orange'
+                  ? 'bg-amber-500/15 text-amber-400 border-amber-500/30'
+                  : muscleColor === 'green'
+                  ? 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30'
+                  : 'bg-zinc-500/15 text-zinc-400 border-zinc-500/30'
+              }`}
+              title={`Fatigue INOL accumulée sur le muscle cible (${muscleStatus?.name || targetMuscle}) : ${inolScore.toFixed(2)}`}
+            >
+              {inolScore.toFixed(1)}
+            </span>
+          )}
         </div>
       </div>
 
-      {/* Joint Stress Alert */}
-      {plannedEx.active && jointStress > 1.0 && (
-        <div className="mt-1.5 px-2 py-1 bg-zinc-950/20 rounded border border-zinc-850/30 flex items-center justify-between text-[8px] font-medium">
-          <span className="text-zinc-500">Contrainte Articulaire :</span>
-          <span className={`font-bold px-1 rounded-full ${
-            jointStress > 2.0 
-              ? 'text-red-400 bg-red-950/30' 
-              : 'text-amber-400 bg-amber-950/30'
-          }`}>
-            ⚠️ {jointStress > 2.0 ? 'Élevée' : 'Modérée'} ({jointStress.toFixed(1)})
-          </span>
-        </div>
-      )}
-
-      {/* Header des colonnes (uniquement s'il y a des séries et actif) */}
-      {plannedEx.active && plannedEx.sets.length > 0 && (
-        <div className="flex items-center gap-2 px-1 text-[8px] font-extrabold tracking-wider uppercase text-zinc-500 font-sans border-b border-zinc-900/50 pb-1.5 mb-2 mt-3 select-none">
-          <div className="w-3.5 shrink-0"></div> {/* Checkbox spacer */}
-          <div className="w-[42px] text-center">Séries</div>
-          <div className="w-[42px] text-center">Reps</div>
-          <div className="w-[58px] text-center">Poids</div>
-          <div className="w-[64px] text-center">Intensité</div>
-          <div className="flex-1"></div> {/* Spacer for delete button alignment */}
-        </div>
-      )}
-
-      {/* Sets Rows */}
-      <div className="space-y-2">
+      {/* 2. RIGHT SETS LIST SECTION */}
+      <div className="flex flex-col gap-1.5 sm:items-end w-full sm:w-auto shrink-0">
         {plannedEx.sets.map((set, idx) => (
           <div
             key={idx}
-            className={`flex items-center gap-2 text-[10px] ${
+            className={`flex items-center gap-1.5 text-xs w-full justify-between sm:justify-start ${
               !set.active ? 'opacity-35' : ''
             }`}
           >
-            {/* Active set toggle */}
-            <input
-              type="checkbox"
-              checked={set.active}
-              onChange={(e) => handleUpdateSet(idx, { active: e.target.checked })}
-              className="rounded-full border-zinc-800 bg-zinc-950 text-emerald-500 focus:ring-emerald-500 h-3.5 w-3.5 cursor-pointer shrink-0"
-            />
+            <div className="flex items-center gap-1.5">
+              {/* Toggle set active */}
+              <input
+                type="checkbox"
+                checked={set.active}
+                onChange={(e) => handleUpdateSet(idx, { active: e.target.checked })}
+                className="rounded-full border-zinc-850 bg-zinc-950 text-emerald-500 focus:ring-emerald-500 h-4 w-4 cursor-pointer shrink-0"
+              />
 
-            {/* Series */}
-            <input
-              type="number"
-              min="1"
-              max="20"
-              value={set.series}
-              onChange={(e) => handleUpdateSet(idx, { series: Math.max(1, Number(e.target.value)) })}
-              className="w-[42px] text-center rounded border border-zinc-850 bg-zinc-950 px-1 py-1 text-white text-[10px] focus:border-emerald-500/50 focus:outline-none"
-              title="Séries"
-            />
-
-            {/* Reps */}
-            <input
-              type="number"
-              min="1"
-              max="100"
-              value={set.reps}
-              onChange={(e) => handleUpdateSet(idx, { reps: Math.max(1, Number(e.target.value)) })}
-              className="w-[42px] text-center rounded border border-zinc-850 bg-zinc-950 px-1 py-1 text-white text-[10px] focus:border-emerald-500/50 focus:outline-none"
-              title="Répétitions"
-            />
-            
-            {/* Weight */}
-            <div className="flex items-center rounded border border-zinc-850 bg-zinc-950 px-1 py-0.5 focus-within:border-emerald-500/50 w-[58px] justify-between">
+              {/* Series Input */}
               <input
                 type="number"
-                min="0"
-                max="1000"
-                value={set.poids}
-                onChange={(e) => handleUpdateSet(idx, { poids: Math.max(0, Number(e.target.value)) })}
-                className="w-[32px] text-center bg-transparent text-emerald-400 font-semibold text-[10px] focus:outline-none"
-                title="Poids"
+                min="1"
+                max="20"
+                value={set.series}
+                onChange={(e) => handleUpdateSet(idx, { series: Math.max(1, Number(e.target.value)) })}
+                className="w-[32px] text-center rounded border border-zinc-800 bg-zinc-950/60 px-1 py-0.5 text-white font-mono text-[11px] focus:border-emerald-500/50 focus:outline-none"
+                title="Séries"
               />
-              <span className="text-zinc-600 text-[8px] font-bold select-none pr-0.5">kg</span>
-            </div>
 
-            {/* RPE */}
-            <select
-              value={set.rpe}
-              onChange={(e) => handleUpdateSet(idx, { rpe: Number(e.target.value) })}
-              className="w-[64px] rounded border border-zinc-850 bg-zinc-950 px-1 py-1 text-center text-white focus:border-emerald-500/50 focus:outline-none text-[10px]"
-              title="Intensité (RPE)"
-            >
-              {[10, 9.5, 9, 8.5, 8, 7.5, 7, 6.5, 6, 5.5, 5].map(v => (
-                <option key={v} value={v}>@{v}</option>
-              ))}
-            </select>
+              <span className="text-zinc-650 font-bold font-mono text-[10px]">×</span>
 
-            {/* Remove Row */}
-            <div className="flex-1 flex justify-end">
-              {plannedEx.sets.length > 1 && (
+              {/* Reps Input */}
+              <input
+                type="number"
+                min="1"
+                max="100"
+                value={set.reps}
+                onChange={(e) => handleUpdateSet(idx, { reps: Math.max(1, Number(e.target.value)) })}
+                className="w-[32px] text-center rounded border border-zinc-800 bg-zinc-950/60 px-1 py-0.5 text-white font-mono text-[11px] focus:border-emerald-500/50 focus:outline-none"
+                title="Répétitions"
+              />
+
+              {/* Weight Input */}
+              <div className="flex items-center rounded border border-zinc-800 bg-zinc-950/60 px-1 py-0.5 focus-within:border-emerald-500/50 w-[58px] justify-between">
+                <input
+                  type="number"
+                  min="0"
+                  max="1000"
+                  value={set.poids}
+                  onChange={(e) => handleUpdateSet(idx, { poids: Math.max(0, Number(e.target.value)) })}
+                  className="w-[34px] text-center bg-transparent text-emerald-400 font-semibold font-mono text-[11px] focus:outline-none"
+                  title="Poids"
+                />
+                <span className="text-zinc-600 text-[8px] font-bold select-none pr-0.5">kg</span>
+              </div>
+
+              {/* RPE Selector */}
+              <select
+                value={set.rpe}
+                onChange={(e) => handleUpdateSet(idx, { rpe: Number(e.target.value) })}
+                className="w-[56px] rounded border border-zinc-800 bg-zinc-950/60 px-1 py-0.5 text-center text-emerald-500 font-extrabold focus:border-emerald-500/50 focus:outline-none text-[11px] cursor-pointer"
+                title="Intensité (RPE)"
+              >
+                {[10, 9.5, 9, 8.5, 8, 7.5, 7, 6.5, 6, 5.5, 5].map(v => (
+                  <option key={v} value={v}>@{v}</option>
+                ))}
+              </select>
+
+              {/* Inline plus button or delete set row */}
+              {idx === plannedEx.sets.length - 1 ? (
                 <button
-                  onClick={() => handleRemoveSetRow(idx)}
-                  className="text-zinc-500 hover:text-red-400 p-1 shrink-0 transition-colors"
+                  onClick={(e) => handleAddSetRow(e)}
+                  className="w-5.5 h-5.5 rounded border border-dashed border-zinc-800 hover:border-emerald-500/40 bg-zinc-950/40 text-zinc-500 hover:text-emerald-400 flex items-center justify-center transition-colors cursor-pointer shrink-0"
+                  title="Ajouter une série"
+                >
+                  <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" />
+                  </svg>
+                </button>
+              ) : (
+                <button
+                  onClick={(e) => handleRemoveSetRow(idx, e)}
+                  className="w-5.5 h-5.5 rounded border border-zinc-800 hover:border-red-500/40 bg-zinc-950/40 text-zinc-500 hover:text-red-400 flex items-center justify-center transition-colors cursor-pointer shrink-0"
+                  title="Supprimer cette série"
                 >
                   <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.2} d="M6 18L18 6M6 6l12 12" />
@@ -250,22 +253,22 @@ export default React.memo(function ExerciseCard({
                 </button>
               )}
             </div>
+
+            {/* Delete entire exercise button - displayed on the rightmost edge */}
+            {idx === 0 && (
+              <button
+                onClick={(e) => { e.stopPropagation(); onDelete(); }}
+                className="text-zinc-600 hover:text-red-400 p-1 rounded hover:bg-zinc-800/40 transition-colors ml-2 cursor-pointer shrink-0"
+                title="Supprimer l'exercice"
+              >
+                <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                </svg>
+              </button>
+            )}
           </div>
         ))}
       </div>
-
-      {/* Add Row Button */}
-      {plannedEx.active && (
-        <button
-          onClick={handleAddSetRow}
-          className="mt-2 flex items-center justify-center gap-1 w-full rounded border border-dashed border-zinc-850 hover:border-zinc-700 py-1 text-[9px] text-zinc-400 hover:text-emerald-400 transition-all cursor-pointer"
-        >
-          <svg className="h-2.5 w-2.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" />
-          </svg>
-          + Séries
-        </button>
-      )}
     </div>
   );
 });

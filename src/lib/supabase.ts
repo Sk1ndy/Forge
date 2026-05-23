@@ -64,7 +64,7 @@ export async function loadUserProfile(): Promise<UserProfile> {
       if (user) {
         const { data, error } = await supabaseClient
           .from('users')
-          .select('pdc, pr_squat, pr_bench, pr_deadlift, pr_ohp, max_snc')
+          .select('pdc, pr_squat, pr_bench, pr_deadlift, pr_ohp, max_snc, age, sleep_hours, caloric_status, stress_level')
           .eq('id', user.id)
           .single();
 
@@ -78,10 +78,10 @@ export async function loadUserProfile(): Promise<UserProfile> {
               ohp: data.pr_ohp || 50
             },
             maxSnc: data.max_snc || 15.0,
-            age: 28,
-            sleepHours: 8,
-            caloricStatus: 'maintenance',
-            stressLevel: 'moderate'
+            age: data.age !== null && data.age !== undefined ? data.age : 28,
+            sleepHours: data.sleep_hours !== null && data.sleep_hours !== undefined ? Number(data.sleep_hours) : 8,
+            caloricStatus: data.caloric_status || 'maintenance',
+            stressLevel: data.stress_level || 'moderate'
           };
         }
       }
@@ -127,6 +127,10 @@ export async function saveUserProfile(profile: UserProfile): Promise<boolean> {
             pr_deadlift: profile.prs.deadlift,
             pr_ohp: profile.prs.ohp,
             max_snc: profile.maxSnc,
+            age: profile.age,
+            sleep_hours: profile.sleepHours,
+            caloric_status: profile.caloricStatus,
+            stress_level: profile.stressLevel,
             updated_at: new Date().toISOString()
           });
 

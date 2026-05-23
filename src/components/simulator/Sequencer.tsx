@@ -38,8 +38,6 @@ interface SequencerProps {
   onSelectExercise?: (exercise: Exercise | null) => void;
 }
 
-const DAYS_OF_WEEK = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche'];
-
 export default function Sequencer({
   blueprint,
   toggledDays,
@@ -48,7 +46,6 @@ export default function Sequencer({
   onClearDay,
   onUpdateToggledDays,
   selectedDay,
-  onSelectDay,
   onAddExercise,
   simulation,
   onReorderExercises,
@@ -137,65 +134,8 @@ export default function Sequencer({
   }, [currentExercises, currentDay, onReorderExercises]);
 
   return (
-    <div className="w-full h-full flex flex-col lg:flex-row gap-4 select-none min-h-0">
+    <div className="w-full h-full select-none min-h-0">
       
-      {/* 1. LEFT RAIL: Day Selector (Vertical scroll on desktop, horizontal on mobile) */}
-      <div className="w-full lg:w-[220px] flex flex-row lg:flex-col gap-2 shrink-0 overflow-x-auto lg:overflow-y-auto scrollbar-thin pb-2 lg:pb-0">
-        {DAYS_OF_WEEK.map((day) => {
-          const exercises = blueprint[day] || [];
-          const isDayActive = toggledDays[day] !== false;
-          const isSelected = currentDay === day;
-          const summary = getDaySummary(day);
-
-          return (
-            <div
-              key={day}
-              onClick={() => onSelectDay?.(day)}
-              className={`flex-1 lg:flex-initial min-w-[120px] lg:min-w-0 rounded-xl border p-2.5 flex flex-col lg:flex-row lg:items-center justify-between transition-all duration-300 cursor-pointer ${
-                isSelected
-                  ? 'border-emerald-500 bg-emerald-950/10 ring-1 ring-emerald-500/20 shadow-[0_0_15px_rgba(16,185,129,0.12)]'
-                  : isDayActive
-                  ? 'border-zinc-900 bg-zinc-950/40 hover:border-zinc-800'
-                  : 'border-zinc-950/10 bg-zinc-950/10 opacity-40 hover:opacity-60'
-              }`}
-            >
-              {/* Left Side: Checkbox & Titles */}
-              <div className="flex items-center gap-2 min-w-0">
-                <input
-                  type="checkbox"
-                  checked={isDayActive}
-                  onChange={(e) => handleToggleDay(day, e as unknown as React.MouseEvent)}
-                  className="rounded border-zinc-800 bg-zinc-950 text-emerald-500 focus:ring-emerald-500 h-3.5 w-3.5 cursor-pointer shrink-0"
-                  onClick={(e) => e.stopPropagation()} // Avoid selection when checking
-                  title={isDayActive ? "Désactiver le jour" : "Activer le jour"}
-                />
-                
-                <div className="flex flex-col min-w-0">
-                  <span className="font-bold text-xs text-white tracking-wide truncate">{day}</span>
-                  <span className={`text-[9px] font-medium leading-none mt-0.5 ${
-                    summary.isRest ? 'text-zinc-500' : 'text-emerald-400'
-                  }`}>
-                    {summary.text}
-                    {!summary.isRest && <span className="text-zinc-500 ml-1">· {summary.subtext}</span>}
-                  </span>
-                </div>
-              </div>
-
-              {/* Right Side: Clear Button */}
-              {exercises.length > 0 && isDayActive && (
-                <button
-                  onClick={(e) => handleClearDayConfirm(day, e)}
-                  className="hidden lg:block text-[9px] text-zinc-500 hover:text-red-400 font-medium px-1.5 py-0.5 rounded hover:bg-zinc-900 transition-colors cursor-pointer shrink-0"
-                  title="Vider la séance"
-                >
-                  Vider
-                </button>
-              )}
-            </div>
-          );
-        })}
-      </div>
-
       {/* 2. RIGHT WORKSPACE: Detailed Workout Day Editor */}
       <div 
         onDragOver={(e) => {
@@ -417,7 +357,7 @@ export default function Sequencer({
                 items={currentExercises.map(ex => ex.id)}
                 strategy={verticalListSortingStrategy}
               >
-                <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 pb-2">
+                <div className="flex flex-col gap-2.5 pb-2">
                   {currentExercises.map((plannedEx, index) => {
                     const exerciseDef = exercises.find(ex => ex.id === plannedEx.exerciseId);
                     return (
