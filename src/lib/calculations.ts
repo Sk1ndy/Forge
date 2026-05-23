@@ -16,6 +16,7 @@ export interface Exercise {
   muscle_primaire: MuscleId;
   muscles_secondaires: MuscleId[];
   equipment: 'poids_libre' | 'machine' | 'pdc';
+  tension_matrix?: Record<string, number>;
 }
 
 export interface UserPRs {
@@ -84,8 +85,8 @@ export interface SimulationResult {
   junkVolumeAlerts: string[]; // Alertes de junk volume basées sur l'INOL de la séance
 }
 
-// Liste de tous les exercices prédéfinis de la bibliothèque
-export const EXERCISE_LIBRARY: Exercise[] = [
+// Liste de fallback pour les exercices
+export const DEFAULT_EXERCISE_LIBRARY: Exercise[] = [
   { id: 'squat', nom: 'Squat Arrière', tier_snc: 1, muscle_primaire: 'quadriceps', muscles_secondaires: ['gluteal', 'hamstring', 'lowerBack'], equipment: 'poids_libre' },
   { id: 'deadlift', nom: 'Soulevé de Terre', tier_snc: 1, muscle_primaire: 'lowerBack', muscles_secondaires: ['gluteal', 'hamstring', 'trapezius', 'forearm', 'upperBack'], equipment: 'poids_libre' },
   { id: 'bench_press', nom: 'Développé Couché', tier_snc: 2, muscle_primaire: 'chest', muscles_secondaires: ['frontDeltoid', 'triceps'], equipment: 'poids_libre' },
@@ -150,7 +151,7 @@ export const MUSCLE_DETAILS: Record<MuscleId, string> = {
 };
 
 // ─── 1. MATRICES DE TENSION BIOMÉCANIQUES PRÉCISES (Coefficients physiologiques) ───
-export const EXERCISE_TENSION_MATRICES: Record<string, Partial<Record<MuscleId, number>>> = {
+export const DEFAULT_EXERCISE_TENSION_MATRICES: Record<string, Partial<Record<MuscleId, number>>> = {
   squat: { quadriceps: 1.0, gluteal: 0.7, lowerBack: 0.4, hamstring: 0.15 },
   deadlift: { lowerBack: 1.0, gluteal: 0.8, hamstring: 0.85, trapezius: 0.5, forearm: 0.4, upperBack: 0.3 },
   bench_press: { chest: 1.0, frontDeltoid: 0.6, triceps: 0.5 },
@@ -330,7 +331,8 @@ export function runWeeklySimulation(
   blueprint: WeeklyBlueprint,
   profile: UserProfile,
   toggledDays: { [day: string]: boolean } = {},
-  selectedDay?: string
+  selectedDay?: string,
+  exerciseLibrary: Exercise[] = DEFAULT_EXERCISE_LIBRARY
 ): SimulationResult {
   const DAYS_OF_WEEK = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche'];
 
@@ -431,10 +433,10 @@ export function runWeeklySimulation(
         plannedExercises.forEach(plannedEx => {
           if (!plannedEx.active) return;
 
-          const exercise = EXERCISE_LIBRARY.find(e => e.id === plannedEx.exerciseId);
+          const exercise = exerciseLibrary.find(e => e.id === plannedEx.exerciseId);
           if (!exercise) return;
 
-          const tensionMatrix = EXERCISE_TENSION_MATRICES[plannedEx.exerciseId] || { [exercise.muscle_primaire]: 1.0 };
+          const tensionMatrix = exercise.tension_matrix || DEFAULT_EXERCISE_TENSION_MATRICES[plannedEx.exerciseId] || { [exercise.muscle_primaire]: 1.0 };
 
           plannedEx.sets.forEach(set => {
             // Validation stricte via Zod avant simulation

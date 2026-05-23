@@ -1,5 +1,5 @@
 import { createClient } from './supabase/client';
-import { UserProfile, WeeklyBlueprint } from './calculations';
+import { UserProfile, WeeklyBlueprint, Exercise, DEFAULT_EXERCISE_LIBRARY } from './calculations';
 import { SupabaseClient } from '@supabase/supabase-js';
 
 // Initialisation sûre du client Supabase
@@ -286,4 +286,24 @@ export function saveCurrentWorkPlan(blueprint: WeeklyBlueprint, toggledDays: { [
     localStorage.setItem(STORAGE_KEYS.CURRENT_BLUEPRINT, JSON.stringify(blueprint));
     localStorage.setItem(STORAGE_KEYS.TOGGLED_DAYS, JSON.stringify(toggledDays));
   }
+}
+
+/**
+ * Charge la bibliothèque d'exercices dynamique
+ */
+export async function loadExercises(): Promise<Exercise[]> {
+  if (supabaseClient) {
+    try {
+      const { data, error } = await supabaseClient
+        .from('exercises')
+        .select('*');
+
+      if (!error && data && data.length > 0) {
+        return data as Exercise[];
+      }
+    } catch (e) {
+      console.warn("Supabase loadExercises error. Falling back to default library.", e);
+    }
+  }
+  return DEFAULT_EXERCISE_LIBRARY;
 }

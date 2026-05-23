@@ -1,14 +1,13 @@
 'use client';
 
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import {
   UserProfile,
   WeeklyBlueprint,
   runWeeklySimulation,
   PlannedExercise,
-  EXERCISE_LIBRARY,
-  MuscleId
+  Exercise
 } from '@/lib/calculations';
 import {
   loadUserProfile,
@@ -17,7 +16,8 @@ import {
   saveBlueprint,
   deleteBlueprint,
   loadCurrentWorkPlan,
-  saveCurrentWorkPlan
+  saveCurrentWorkPlan,
+  loadExercises
 } from '@/lib/supabase';
 import HumanAvatar from '@/components/simulator/HumanAvatar';
 import Sequencer from '@/components/simulator/Sequencer';
@@ -63,6 +63,7 @@ export default function Home() {
   const [currentBlueprintName, setCurrentBlueprintName] = useState<string>('Blueprint de travail');
   const [selectedDay, setSelectedDay] = useState<string>('Dimanche');
   const [selectedMuscle, setSelectedMuscle] = useState<string>('all');
+  const [exercises, setExercises] = useState<Exercise[]>([]);
 
   const supabase = createClient();
 
@@ -73,8 +74,8 @@ export default function Home() {
       try {
         const { data: { user } } = await supabase.auth.getUser();
         setSupabaseUser(user);
-      } catch (e) {
-        console.warn("Supabase auth check failed, operating in local mode.");
+      } catch (err) {
+        console.warn("Supabase auth check failed, operating in local mode.", err);
       }
 
       // Charger le profil
@@ -89,8 +90,13 @@ export default function Home() {
       // Charger l'historique des blueprints
       const history = await loadSavedBlueprints();
       setSavedBlueprints(history);
+
+      // Charger les exercices dynamiques
+      const loadedExercises = await loadExercises();
+      setExercises(loadedExercises);
     }
     initData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // 2. Sauvegarde automatique de la session de travail actuelle
@@ -100,12 +106,12 @@ export default function Home() {
 
   // 3. Calcul de la simulation en temps réel réactive à chaque modification
   const simulationResult = useMemo(() => {
-    return runWeeklySimulation(blueprint, profile, toggledDays, selectedDay);
-  }, [blueprint, profile, toggledDays, selectedDay]);
+    return runWeeklySimulation(blueprint, profile, toggledDays, selectedDay, exercises);
+  }, [blueprint, profile, toggledDays, selectedDay, exercises]);
 
   // 4. Ajouter un exercice au séquenceur
-  const handleAddExercise = (exerciseId: string, day: string) => {
-    const exercise = EXERCISE_LIBRARY.find(e => e.id === exerciseId);
+  const handleAddExercise = useCallback((exerciseId: string, day: string) => {
+    const exercise = exercises.find(e => e.id === exerciseId);
     if (!exercise) return;
 
     // Blocage de sécurité si le muscle cible a dépassé son Volume Récupérable Maximal (MRV / Rouge)
@@ -144,10 +150,10 @@ export default function Home() {
       ...prev,
       [day]: [...(prev[day] || []), newPlannedEx]
     }));
-  };
+  }, [exercises, simulationResult]);
 
   // Mises à jour d'état robustes (évite les stale closures de blueprint)
-  const handleUpdateExercise = (day: string, index: number, updatedEx: PlannedExercise) => {
+  const handleUpdateExercise = useCallback((day: string, index: number, updatedEx: PlannedExercise) => {
     setBlueprint(prev => {
       const updatedDayExercises = [...(prev[day] || [])];
       updatedDayExercises[index] = updatedEx;
@@ -156,9 +162,9 @@ export default function Home() {
         [day]: updatedDayExercises
       };
     });
-  };
+  }, []);
 
-  const handleReorderExercises = (day: string, startIndex: number, endIndex: number) => {
+  const handleReorderExercises = useCallback((day: string, startIndex: number, endIndex: number) => {
     setBlueprint(prev => {
       const updatedDayExercises = [...(prev[day] || [])];
       const [moved] = updatedDayExercises.splice(startIndex, 1);
@@ -168,9 +174,9 @@ export default function Home() {
         [day]: updatedDayExercises
       };
     });
-  };
+  }, []);
 
-  const handleDeleteExercise = (day: string, index: number) => {
+  const handleDeleteExercise = useCallback((day: string, index: number) => {
     setBlueprint(prev => {
       const updatedDayExercises = (prev[day] || []).filter((_, i) => i !== index);
       return {
@@ -178,14 +184,14 @@ export default function Home() {
         [day]: updatedDayExercises
       };
     });
-  };
+  }, []);
 
-  const handleClearDay = (day: string) => {
+  const handleClearDay = useCallback((day: string) => {
     setBlueprint(prev => ({
       ...prev,
       [day]: []
     }));
-  };
+  }, []);
 
   // 5. Sauvegarder le profil
   const handleSaveProfile = async (newProfile: UserProfile) => {
@@ -491,6 +497,7 @@ export default function Home() {
             onSelectDay={setSelectedDay}
             onAddExercise={handleAddExercise}
             simulation={simulationResult}
+            exercises={exercises}
           />
         </div>
       </section>
@@ -504,6 +511,7 @@ export default function Home() {
           selectedMuscle={selectedMuscle}
           onSelectMuscle={setSelectedMuscle}
           simulation={simulationResult}
+          exercises={exercises}
         />
       </section>
 

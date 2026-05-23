@@ -1,9 +1,8 @@
 import React, { useState } from 'react';
 import {
   Exercise,
-  EXERCISE_LIBRARY,
+  DEFAULT_EXERCISE_TENSION_MATRICES,
   MUSCLE_DETAILS,
-  EXERCISE_TENSION_MATRICES,
   MuscleId,
   SimulationResult
 } from '@/lib/calculations';
@@ -16,6 +15,7 @@ interface LibraryDrawerProps {
   selectedMuscle: string;
   onSelectMuscle: (muscle: string) => void;
   simulation: SimulationResult;
+  exercises: Exercise[];
 }
 
 const EQUIPMENT_LABELS: { [key: string]: string } = {
@@ -40,7 +40,8 @@ export default function LibraryDrawer({
   onClose,
   selectedMuscle,
   onSelectMuscle,
-  simulation
+  simulation,
+  exercises
 }: LibraryDrawerProps) {
   const [search, setSearch] = useState('');
   const [selectedEquipment, setSelectedEquipment] = useState('all');
@@ -54,12 +55,12 @@ export default function LibraryDrawer({
     : (MUSCLE_SUBGROUPS[selectedMuscle] || [selectedMuscle]);
 
   // Filtrer la bibliothèque avec calcul d'impact
-  const mappedExercises = EXERCISE_LIBRARY.map(ex => {
+  const mappedExercises = exercises.map(ex => {
     let maxImpact = 0;
     if (selectedMuscle !== 'all') {
       targetMuscles.forEach(mId => {
         let impact = 0;
-        const matrix = EXERCISE_TENSION_MATRICES[ex.id];
+        const matrix = ex.tension_matrix || DEFAULT_EXERCISE_TENSION_MATRICES[ex.id];
         if (matrix && matrix[mId as MuscleId] !== undefined) {
           impact = matrix[mId as MuscleId]!;
         } else if (ex.muscle_primaire === mId) {

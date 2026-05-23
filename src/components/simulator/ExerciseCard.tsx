@@ -1,9 +1,10 @@
 import React from 'react';
-import { PlannedExercise, Exercise, EXERCISE_LIBRARY, PlannedSet, SimulationResult } from '@/lib/calculations';
+import { PlannedExercise, Exercise, PlannedSet, SimulationResult } from '@/lib/calculations';
 import CapacityBar from './CapacityBar';
 
 interface ExerciseCardProps {
   plannedEx: PlannedExercise;
+  exerciseDef?: Exercise;
   onChange: (updated: PlannedExercise) => void;
   onDelete: () => void;
   simulation: SimulationResult;
@@ -15,8 +16,9 @@ interface ExerciseCardProps {
   dragHandleListeners?: any;
 }
 
-export default function ExerciseCard({ 
+export default React.memo(function ExerciseCard({ 
   plannedEx, 
+  exerciseDef,
   onChange, 
   onDelete, 
   simulation,
@@ -25,7 +27,7 @@ export default function ExerciseCard({
   dragHandleProps,
   dragHandleListeners
 }: ExerciseCardProps) {
-  const exercise = EXERCISE_LIBRARY.find(e => e.id === plannedEx.exerciseId);
+  const exercise = exerciseDef;
 
   if (!exercise) return null;
 
@@ -242,4 +244,4 @@ export default function ExerciseCard({
       )}
     </div>
   );
-}
+});

@@ -1,5 +1,5 @@
-import React from 'react';
-import { WeeklyBlueprint, PlannedExercise, SimulationResult, EXERCISE_LIBRARY } from '@/lib/calculations';
+import React, { useMemo, useCallback } from 'react';
+import { WeeklyBlueprint, PlannedExercise, SimulationResult, Exercise } from '@/lib/calculations';
 import ExerciseCard from './ExerciseCard';
 import {
   DndContext,
@@ -30,6 +30,7 @@ interface SequencerProps {
   onSelectDay?: (day: string) => void;
   onAddExercise?: (exerciseId: string, day: string) => void;
   simulation: SimulationResult;
+  exercises: Exercise[];
 }
 
 const DAYS_OF_WEEK = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche'];
@@ -45,7 +46,8 @@ export default function Sequencer({
   onSelectDay,
   onAddExercise,
   simulation,
-  onReorderExercises
+  onReorderExercises,
+  exercises
 }: SequencerProps) {
   const [isDragOver, setIsDragOver] = React.useState(false);
 
@@ -61,23 +63,23 @@ export default function Sequencer({
     })
   );
 
-  const handleToggleDay = (day: string, e: React.MouseEvent) => {
+  const handleToggleDay = useCallback((day: string, e: React.MouseEvent) => {
     e.stopPropagation(); // Avoid triggering day selection if just toggling
     onUpdateToggledDays({
       ...toggledDays,
       [day]: !toggledDays[day]
     });
-  };
+  }, [toggledDays, onUpdateToggledDays]);
 
-  const handleClearDayConfirm = (day: string, e: React.MouseEvent) => {
+  const handleClearDayConfirm = useCallback((day: string, e: React.MouseEvent) => {
     e.stopPropagation(); // Avoid triggering day selection if just clearing
     if (confirm(`Voulez-vous vider la séance de ${day} ?`)) {
       onClearDay(day);
     }
-  };
+  }, [onClearDay]);
 
   // Helper to calculate summary for a day
-  const getDaySummary = (day: string) => {
+  const getDaySummary = useCallback((day: string) => {
     const exercises = blueprint[day] || [];
     const isDayActive = toggledDays[day] !== false;
     
@@ -100,15 +102,15 @@ export default function Sequencer({
       subtext: `${totalSets} série${totalSets > 1 ? 's' : ''}`,
       isRest: false
     };
-  };
+  }, [blueprint, toggledDays]);
 
   // Safe selected day fallback (ensure a day is always selected)
   const currentDay = selectedDay || 'Dimanche';
-  const currentExercises = blueprint[currentDay] || [];
+  const currentExercises = useMemo(() => blueprint[currentDay] || [], [blueprint, currentDay]);
   const isCurrentDayActive = toggledDays[currentDay] !== false;
-  const currentSummary = getDaySummary(currentDay);
+  const currentSummary = useMemo(() => getDaySummary(currentDay), [getDaySummary, currentDay]);
 
-  const handleDragEnd = (event: DragEndEvent) => {
+  const handleDragEnd = useCallback((event: DragEndEvent) => {
     const { active, over } = event;
     if (over && active.id !== over.id) {
       const oldIndex = currentExercises.findIndex((ex) => ex.id === active.id);
@@ -117,7 +119,7 @@ export default function Sequencer({
         onReorderExercises(currentDay, oldIndex, newIndex);
       }
     }
-  };
+  }, [currentExercises, currentDay, onReorderExercises]);
 
   return (
     <div className="w-full h-full flex flex-col lg:flex-row gap-4 select-none min-h-0">
@@ -195,7 +197,7 @@ export default function Sequencer({
           if (!isCurrentDayActive) return;
           const exerciseId = e.dataTransfer.getData('text/plain');
           if (exerciseId) {
-            const exercise = EXERCISE_LIBRARY.find(ex => ex.id === exerciseId);
+            const exercise = exercises.find(ex => ex.id === exerciseId);
             if (exercise) {
               const muscleStatus = simulation?.muscles?.[exercise.muscle_primaire];
               if (muscleStatus?.color === 'red') {
@@ -318,17 +320,21 @@ export default function Sequencer({
                 strategy={verticalListSortingStrategy}
               >
                 <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 pb-2">
-                  {currentExercises.map((plannedEx, index) => (
-                    <SortableExerciseWrapper
-                      key={plannedEx.id}
-                      plannedEx={plannedEx}
-                      index={index}
-                      currentDay={currentDay}
-                      onUpdateExercise={onUpdateExercise}
-                      onDeleteExercise={onDeleteExercise}
-                      simulation={simulation}
-                    />
-                  ))}
+                  {currentExercises.map((plannedEx, index) => {
+                    const exerciseDef = exercises.find(ex => ex.id === plannedEx.exerciseId);
+                    return (
+                      <SortableExerciseWrapper
+                        key={plannedEx.id}
+                        plannedEx={plannedEx}
+                        exerciseDef={exerciseDef}
+                        index={index}
+                        currentDay={currentDay}
+                        onUpdateExercise={onUpdateExercise}
+                        onDeleteExercise={onDeleteExercise}
+                        simulation={simulation}
+                      />
+                    );
+                  })}
                 </div>
               </SortableContext>
             </DndContext>
@@ -341,7 +347,7 @@ export default function Sequencer({
 }
 
 // Wrapper for Sortable DND integration
-function SortableExerciseWrapper({ plannedEx, index, currentDay, onUpdateExercise, onDeleteExercise, simulation }: { plannedEx: PlannedExercise, index: number, currentDay: string, onUpdateExercise: (day: string, idx: number, updated: PlannedExercise) => void, onDeleteExercise: (day: string, idx: number) => void, simulation: SimulationResult }) {
+const SortableExerciseWrapper = React.memo(function SortableExerciseWrapper({ plannedEx, exerciseDef, index, currentDay, onUpdateExercise, onDeleteExercise, simulation }: { plannedEx: PlannedExercise, exerciseDef?: Exercise, index: number, currentDay: string, onUpdateExercise: (day: string, idx: number, updated: PlannedExercise) => void, onDeleteExercise: (day: string, idx: number) => void, simulation: SimulationResult }) {
   const {
     attributes,
     listeners,
@@ -366,9 +372,10 @@ function SortableExerciseWrapper({ plannedEx, index, currentDay, onUpdateExercis
       dragHandleProps={attributes}
       dragHandleListeners={listeners}
       plannedEx={plannedEx}
+      exerciseDef={exerciseDef}
       onChange={(updated) => onUpdateExercise(currentDay, index, updated)}
       onDelete={() => onDeleteExercise(currentDay, index)}
       simulation={simulation}
     />
   );
-}
+});
