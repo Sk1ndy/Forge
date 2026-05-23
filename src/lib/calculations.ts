@@ -85,6 +85,9 @@ export interface SimulationResult {
   cnsFailure: boolean;
   junkVolumeAlerts: string[]; // Alertes de junk volume basées sur l'INOL de la séance
   globalWorkCapacity: number; // Capacité de travail systémique restante (0-100)
+  topSurcharged: MuscleStatus[];
+  topNeglected: MuscleStatus[];
+  pushPullLegsRatio: { push: number; pull: number; legs: number };
 }
 
 // Liste de fallback pour les exercices
@@ -658,12 +661,68 @@ export function runWeeklySimulation(
   const globalFatigueScore = (sncPercentage + avgMuscleFatiguePct) / 2;
   const globalWorkCapacity = Math.max(0, parseFloat((100 - globalFatigueScore).toFixed(1)));
 
+  const topSurcharged = Object.values(finalMuscles)
+    .filter((m): m is MuscleStatus => m !== undefined && (m.color === 'red' || m.color === 'orange'))
+    .sort((a, b) => b.inol - a.inol)
+    .slice(0, 3);
+
+  const ignoredMuscles = ['knees', 'feet', 'hands', 'head', 'ankles', 'neck'];
+  const topNeglected = Object.entries(finalMuscles)
+    .filter((entry): entry is [string, MuscleStatus] => entry[1] !== undefined && entry[1].color === 'grey' && !ignoredMuscles.includes(entry[0]))
+    .map(entry => entry[1])
+    .sort((a, b) => a.inol - b.inol)
+    .slice(0, 3);
+
+  const getPplCategory = (muscle: MuscleId): 'push' | 'pull' | 'legs' => {
+    const pushMuscles: MuscleId[] = ['chest', 'frontDeltoid', 'triceps', 'deltoids', 'upperChest', 'lowerChest'];
+    const pullMuscles: MuscleId[] = ['upperBack', 'lowerBack', 'biceps', 'trapezius', 'forearm', 'rearDeltoid', 'rhomboids', 'upperTrapezius', 'lowerTrapezius', 'abs', 'obliques', 'upperAbs', 'lowerAbs'];
+    const legsMuscles: MuscleId[] = ['quadriceps', 'hamstring', 'gluteal', 'calves', 'adductors', 'hipFlexors', 'innerQuad', 'outerQuad', 'tibialis'];
+    
+    if (pushMuscles.includes(muscle)) return 'push';
+    if (pullMuscles.includes(muscle)) return 'pull';
+    if (legsMuscles.includes(muscle)) return 'legs';
+    return 'push';
+  };
+
+  let pushSets = 0;
+  let pullSets = 0;
+  let legsSets = 0;
+
+  Object.values(blueprint).forEach(dayExercises => {
+    dayExercises.forEach(plannedEx => {
+      if (!plannedEx.active) return;
+      const exDef = exerciseLibrary.find(e => e.id === plannedEx.exerciseId);
+      if (!exDef) return;
+      
+      const cat = getPplCategory(exDef.muscle_primaire);
+      
+      plannedEx.sets.forEach(set => {
+        if (!set.active) return;
+        if (cat === 'push') pushSets += set.series;
+        else if (cat === 'pull') pullSets += set.series;
+        else if (cat === 'legs') legsSets += set.series;
+      });
+    });
+  });
+
+  const totalPplSets = pushSets + pullSets + legsSets;
+  const pushPct = totalPplSets > 0 ? Math.round((pushSets / totalPplSets) * 100) : 0;
+  const pullPct = totalPplSets > 0 ? Math.round((pullSets / totalPplSets) * 100) : 0;
+  const legsPct = totalPplSets > 0 ? 100 - pushPct - pullPct : 0;
+
   return {
     muscles: finalMuscles,
     sncScore: parseFloat(targetSnc.toFixed(2)),
     sncPercentage,
     cnsFailure,
     junkVolumeAlerts,
-    globalWorkCapacity
+    globalWorkCapacity,
+    topSurcharged,
+    topNeglected,
+    pushPullLegsRatio: {
+      push: pushPct,
+      pull: pullPct,
+      legs: legsPct > 0 ? legsPct : 0
+    }
   };
 }

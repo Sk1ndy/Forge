@@ -60,6 +60,7 @@ export default function Home() {
   const [isCalibrageOpen, setIsCalibrageOpen] = useState(false);
   const [isBlueprintsModalOpen, setIsBlueprintsModalOpen] = useState(false);
   const [libraryOpen, setLibraryOpen] = useState(true);
+  const [viewMode, setViewMode] = useState<'day' | 'week'>('day');
   const [supabaseUser, setSupabaseUser] = useState<unknown>(null);
   const [activeBlueprintId, setActiveBlueprintId] = useState<string | null>(null);
   const [currentBlueprintName, setCurrentBlueprintName] = useState<string>('Blueprint de travail');
@@ -114,10 +115,16 @@ export default function Home() {
     saveCurrentWorkPlan(blueprint, toggledDays);
   }, [blueprint, toggledDays]);
 
-  // 3. Calcul de la simulation en temps réel réactive à chaque modification
-  const simulationResult = useMemo(() => {
+  // 3. Calculs des simulations mémoïsées (Bascule instantanée Jour vs Semaine Cumulée)
+  const weeklySimulationResult = useMemo(() => {
+    return runWeeklySimulation(blueprint, profile, toggledDays, undefined, exercises);
+  }, [blueprint, profile, toggledDays, exercises]);
+
+  const dailySimulationResult = useMemo(() => {
     return runWeeklySimulation(blueprint, profile, toggledDays, selectedDay, exercises);
   }, [blueprint, profile, toggledDays, selectedDay, exercises]);
+
+  const simulationResult = viewMode === 'week' ? weeklySimulationResult : dailySimulationResult;
 
   // 4. Ajouter un exercice au séquenceur
   const handleAddExercise = useCallback((exerciseId: string, day: string) => {
@@ -543,6 +550,35 @@ export default function Home() {
       {/* 2. CENTRAL WORKSPACE - Heatmap & Sequencer */}
       <section className="flex-1 flex flex-col h-full overflow-hidden p-4 md:p-6 gap-4">
         
+        {/* View Mode Toggle Switch */}
+        <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-2 shrink-0">
+          <div className="flex bg-zinc-900/80 p-1 border border-zinc-850 rounded-xl max-w-max">
+            <button
+              onClick={() => setViewMode('day')}
+              className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                viewMode === 'day'
+                  ? 'bg-emerald-500 text-zinc-950 shadow-md'
+                  : 'text-zinc-400 hover:text-white'
+              }`}
+            >
+              Vue Journée
+            </button>
+            <button
+              onClick={() => setViewMode('week')}
+              className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                viewMode === 'week'
+                  ? 'bg-emerald-500 text-zinc-950 shadow-md'
+                  : 'text-zinc-400 hover:text-white'
+              }`}
+            >
+              Vue Semaine Globale
+            </button>
+          </div>
+          <span className="text-[10px] text-zinc-500 uppercase tracking-wider font-extrabold font-mono">
+            {viewMode === 'day' ? `Aperçu quotidien : ${selectedDay}` : 'Bilan cumulé hebdomadaire'}
+          </span>
+        </div>
+
         {/* Upper Portion: SVG Anatomical Avatar — fixed height, no scroll */}
         <div className="w-full flex justify-center shrink-0 h-[340px] sm:h-[380px] md:h-[45vh] min-h-[280px]">
           <div className="w-full h-full max-w-5xl bg-zinc-950 border border-zinc-900 rounded-xl overflow-hidden flex flex-col">
@@ -569,17 +605,19 @@ export default function Home() {
               Séquenceur Hebdomadaire
             </h3>
             
-            <div className="flex items-center gap-2">
-              <button
-                onClick={() => setLibraryOpen(!libraryOpen)}
-                className="rounded-lg bg-zinc-900 border border-zinc-800 hover:bg-zinc-800 text-zinc-300 font-bold px-3 py-1.5 text-xs transition-colors flex items-center gap-1.5 cursor-pointer"
-              >
-                <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.2} d="M4 6h16M4 12h16M4 18h16" />
-                </svg>
-                {libraryOpen ? 'Masquer Bibliothèque' : 'Afficher Bibliothèque'}
-              </button>
-            </div>
+            {viewMode !== 'week' && (
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => setLibraryOpen(!libraryOpen)}
+                  className="rounded-lg bg-zinc-900 border border-zinc-800 hover:bg-zinc-800 text-zinc-300 font-bold px-3 py-1.5 text-xs transition-colors flex items-center gap-1.5 cursor-pointer"
+                >
+                  <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.2} d="M4 6h16M4 12h16M4 18h16" />
+                  </svg>
+                  {libraryOpen ? 'Masquer Bibliothèque' : 'Afficher Bibliothèque'}
+                </button>
+              </div>
+            )}
           </div>
 
           <Sequencer
@@ -599,12 +637,13 @@ export default function Home() {
             onHoverExerciseChange={setHoveredExercise}
             selectedExercise={selectedExercise}
             onSelectExercise={setSelectedExercise}
+            viewMode={viewMode}
           />
         </div>
       </section>
 
       {/* 3. RIGHT PANEL (Library Drawer) */}
-      <section className={`${libraryOpen ? 'block' : 'hidden'} border-t md:border-t-0 md:border-l border-zinc-900 shrink-0`}>
+      <section className={`${libraryOpen && viewMode !== 'week' ? 'block' : 'hidden'} border-t md:border-t-0 md:border-l border-zinc-900 shrink-0`}>
         <LibraryDrawer
           onAddExercise={handleAddExercise}
           isOpen={true}

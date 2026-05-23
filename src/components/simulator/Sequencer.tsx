@@ -36,6 +36,7 @@ interface SequencerProps {
   onHoverExerciseChange?: (exercise: Exercise | null) => void;
   selectedExercise?: Exercise | null;
   onSelectExercise?: (exercise: Exercise | null) => void;
+  viewMode?: 'day' | 'week';
 }
 
 export default function Sequencer({
@@ -53,7 +54,8 @@ export default function Sequencer({
   onLoadTemplate,
   onHoverExerciseChange,
   selectedExercise,
-  onSelectExercise
+  onSelectExercise,
+  viewMode = 'day'
 }: SequencerProps) {
   const [isDragOver, setIsDragOver] = React.useState(false);
 
@@ -135,16 +137,149 @@ export default function Sequencer({
 
   return (
     <div className="w-full h-full select-none min-h-0 flex flex-col">
-      
-      {/* 2. RIGHT WORKSPACE: Detailed Workout Day Editor */}
-      <div 
-        onDragOver={(e) => {
-          e.preventDefault();
-          if (isCurrentDayActive) {
-            setIsDragOver(true);
-            e.dataTransfer.dropEffect = 'copy';
-          }
-        }}
+      {viewMode === 'week' ? (
+        <div className="flex-1 border rounded-xl p-4 flex flex-col min-h-0 border-zinc-900 bg-zinc-900/20">
+          {/* Workspace Header */}
+          <div className="flex items-center justify-between pb-3 border-b border-zinc-900 shrink-0">
+            <h4 className="font-extrabold text-base text-zinc-100 flex items-center gap-1.5 font-sans">
+              Rapport Hebdomadaire Analytique
+              <span className="text-[10px] bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">
+                Cumulé Semaine
+              </span>
+            </h4>
+          </div>
+
+          {/* 3 columns macro analysis dashboard */}
+          <div className="flex-1 grid grid-cols-1 md:grid-cols-3 gap-6 mt-4 min-h-0 overflow-y-auto pr-1">
+            
+            {/* Column 1: Surcharge (Left) */}
+            <div className="bg-zinc-900/10 border border-zinc-900 rounded-xl p-4.5 flex flex-col justify-between h-full">
+              <div>
+                <h5 className="text-xs font-bold text-red-400 uppercase tracking-wider flex items-center gap-2 mb-3">
+                  <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
+                  Muscles en Surcharge (Alertes)
+                </h5>
+                <p className="text-[11px] text-zinc-500 mb-4 leading-normal">
+                  Surcharges locales cumulées (INOL &gt; 1.5). Risque de surentraînement ou dérive articulaire si prolongé.
+                </p>
+                
+                <div className="space-y-2.5">
+                  {(simulation.topSurcharged || []).length === 0 ? (
+                    <div className="text-center py-8 border border-dashed border-zinc-900 rounded-lg text-[11px] text-zinc-550">
+                      ✅ Aucun muscle en surcharge.
+                    </div>
+                  ) : (
+                    (simulation.topSurcharged || []).map((m) => (
+                      <div key={m.name} className="flex items-center justify-between p-2.5 bg-red-950/5 border border-red-950/20 rounded-lg text-xs">
+                        <span className="font-bold text-zinc-250">{m.name}</span>
+                        <span className="font-mono font-black text-red-400 bg-red-950/40 px-2 py-0.5 rounded border border-red-500/20">{m.inol.toFixed(1)}</span>
+                      </div>
+                    ))
+                  )}
+                </div>
+              </div>
+              
+              {(simulation.topSurcharged || []).length > 0 && (
+                <div className="text-[10px] text-red-400/80 bg-red-500/5 p-2 rounded-lg border border-red-500/10 mt-4 leading-relaxed shrink-0">
+                  💡 **Conseil** : Réduisez le nombre de séries actives ou allégez l&apos;intensité de ces groupes.
+                </div>
+              )}
+            </div>
+
+            {/* Column 2: Balance Anatomique (Centre) */}
+            <div className="bg-zinc-900/10 border border-zinc-900 rounded-xl p-4.5 flex flex-col justify-between h-full">
+              <div>
+                <h5 className="text-xs font-bold text-emerald-400 uppercase tracking-wider flex items-center gap-2 mb-3">
+                  ⚖️ Balance Anatomique
+                </h5>
+                <p className="text-[11px] text-zinc-500 mb-4 leading-normal">
+                  Répartition anatomique du volume de travail par patron de mouvement (Push / Pull / Legs).
+                </p>
+
+                <div className="space-y-4 pt-1">
+                  {/* Push */}
+                  <div className="space-y-1.5">
+                    <div className="flex justify-between text-xs font-bold">
+                      <span className="text-zinc-350">Poussée (Push)</span>
+                      <span className="text-sky-400">{(simulation.pushPullLegsRatio || { push: 0 }).push}%</span>
+                    </div>
+                    <div className="h-2 w-full bg-zinc-950 border border-zinc-900 rounded-full overflow-hidden p-0.5">
+                      <div className="h-full bg-sky-500 rounded-full" style={{ width: `${(simulation.pushPullLegsRatio || { push: 0 }).push}%` }} />
+                    </div>
+                  </div>
+
+                  {/* Pull */}
+                  <div className="space-y-1.5">
+                    <div className="flex justify-between text-xs font-bold">
+                      <span className="text-zinc-350">Tirage (Pull)</span>
+                      <span className="text-amber-400">{(simulation.pushPullLegsRatio || { pull: 0 }).pull}%</span>
+                    </div>
+                    <div className="h-2 w-full bg-zinc-950 border border-zinc-900 rounded-full overflow-hidden p-0.5">
+                      <div className="h-full bg-amber-500 rounded-full" style={{ width: `${(simulation.pushPullLegsRatio || { pull: 0 }).pull}%` }} />
+                    </div>
+                  </div>
+
+                  {/* Legs */}
+                  <div className="space-y-1.5">
+                    <div className="flex justify-between text-xs font-bold">
+                      <span className="text-zinc-350">Jambes (Legs)</span>
+                      <span className="text-emerald-400">{(simulation.pushPullLegsRatio || { legs: 0 }).legs}%</span>
+                    </div>
+                    <div className="h-2 w-full bg-zinc-950 border border-zinc-900 rounded-full overflow-hidden p-0.5">
+                      <div className="h-full bg-emerald-500 rounded-full" style={{ width: `${(simulation.pushPullLegsRatio || { legs: 0 }).legs}%` }} />
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="text-[10px] text-zinc-500 bg-zinc-900/30 p-2 rounded-lg border border-zinc-850 mt-4 leading-relaxed shrink-0">
+                🎯 **Cible Pro** : ~30-40% par catégorie pour une harmonie structurelle athlétique complète.
+              </div>
+            </div>
+
+            {/* Column 3: Muscles Oubliés (Right) */}
+            <div className="bg-zinc-900/10 border border-zinc-900 rounded-xl p-4.5 flex flex-col justify-between h-full">
+              <div>
+                <h5 className="text-xs font-bold text-zinc-400 uppercase tracking-wider flex items-center gap-2 mb-3">
+                  💤 Muscles Négligés (Objectifs)
+                </h5>
+                <p className="text-[11px] text-zinc-500 mb-4 leading-normal">
+                  Muscles sous-stimulés (INOL proche de 0). Envisagez de les solliciter lors des prochaines séances.
+                </p>
+
+                <div className="space-y-2.5">
+                  {(simulation.topNeglected || []).length === 0 ? (
+                    <div className="text-center py-8 border border-dashed border-zinc-900 rounded-lg text-[11px] text-zinc-550">
+                      Tous vos muscles reçoivent un stimulus optimal !
+                    </div>
+                  ) : (
+                    (simulation.topNeglected || []).map((m) => (
+                      <div key={m.name} className="flex items-center justify-between p-2.5 bg-zinc-950/20 border border-zinc-850 rounded-lg text-xs">
+                        <span className="font-bold text-zinc-300">{m.name}</span>
+                        <span className="text-[10px] text-zinc-500 uppercase tracking-wider font-semibold">Inactif</span>
+                      </div>
+                    ))
+                  )}
+                </div>
+              </div>
+
+              {(simulation.topNeglected || []).length > 0 && (
+                <div className="text-[10px] text-emerald-450 bg-emerald-500/5 p-2 rounded-lg border border-emerald-500/10 mt-4 leading-relaxed shrink-0">
+                  💡 **Conseil** : Intégrez des exercices ciblant ces zones pour équilibrer le physique.
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      ) : (
+        <div 
+          onDragOver={(e) => {
+            e.preventDefault();
+            if (isCurrentDayActive) {
+              setIsDragOver(true);
+              e.dataTransfer.dropEffect = 'copy';
+            }
+          }}
         onDragLeave={() => setIsDragOver(false)}
         onDrop={(e) => {
           e.preventDefault();
@@ -389,6 +524,7 @@ export default function Sequencer({
           </div>
         )}
       </div>
+      )}
     </div>
   );
 }
