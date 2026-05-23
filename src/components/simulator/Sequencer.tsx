@@ -1,5 +1,6 @@
 import React, { useMemo, useCallback } from 'react';
 import { WeeklyBlueprint, PlannedExercise, SimulationResult, Exercise } from '@/lib/calculations';
+import { PPL_TEMPLATE, FULL_BODY_TEMPLATE } from '@/lib/templates';
 import ExerciseCard from './ExerciseCard';
 import {
   DndContext,
@@ -31,6 +32,7 @@ interface SequencerProps {
   onAddExercise?: (exerciseId: string, day: string) => void;
   simulation: SimulationResult;
   exercises: Exercise[];
+  onLoadTemplate?: (template: WeeklyBlueprint) => void;
 }
 
 const DAYS_OF_WEEK = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche'];
@@ -47,7 +49,8 @@ export default function Sequencer({
   onAddExercise,
   simulation,
   onReorderExercises,
-  exercises
+  exercises,
+  onLoadTemplate
 }: SequencerProps) {
   const [isDragOver, setIsDragOver] = React.useState(false);
 
@@ -109,6 +112,10 @@ export default function Sequencer({
   const currentExercises = useMemo(() => blueprint[currentDay] || [], [blueprint, currentDay]);
   const isCurrentDayActive = toggledDays[currentDay] !== false;
   const currentSummary = useMemo(() => getDaySummary(currentDay), [getDaySummary, currentDay]);
+
+  const isBlueprintEmpty = useMemo(() => {
+    return Object.values(blueprint).every(dayExercises => dayExercises.length === 0);
+  }, [blueprint]);
 
   const handleDragEnd = useCallback((event: DragEndEvent) => {
     const { active, over } = event;
@@ -282,7 +289,44 @@ export default function Sequencer({
 
         {/* Exercises Scroll Area */}
         <div className="flex-1 overflow-y-auto scrollbar-thin mt-4 min-h-0 pr-1">
-          {!isCurrentDayActive ? (
+          {isBlueprintEmpty ? (
+            <div className="flex flex-col items-center justify-center h-full p-8 text-center space-y-6 overflow-y-auto">
+              <div className="w-16 h-16 rounded-full bg-zinc-900 border border-zinc-800 flex items-center justify-center shadow-[0_0_30px_rgba(255,255,255,0.03)]">
+                <svg className="h-8 w-8 text-zinc-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 002-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                </svg>
+              </div>
+              <div>
+                <h2 className="text-xl font-bold text-zinc-200">Commencez votre programme</h2>
+                <p className="text-sm text-zinc-500 mt-2 max-w-md mx-auto">
+                  Votre Séquenceur Hebdomadaire est vide. Ajoutez des exercices manuellement depuis la bibliothèque, ou chargez l&apos;un de nos templates pour démarrer immédiatement.
+                </p>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full max-w-lg mt-4">
+                <button
+                  onClick={() => onLoadTemplate?.(PPL_TEMPLATE)}
+                  className="group relative overflow-hidden rounded-xl border border-zinc-800 bg-zinc-900/50 hover:bg-zinc-800 p-5 text-left transition-all hover:border-emerald-500/50"
+                >
+                  <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                  <h3 className="font-bold text-zinc-200 flex items-center gap-2">
+                    <span>🏃</span> PPL Débutant
+                  </h3>
+                  <p className="text-xs text-zinc-400 mt-2">Push, Pull, Legs sur 6 jours. Idéal pour maximiser l&apos;hypertrophie.</p>
+                </button>
+                
+                <button
+                  onClick={() => onLoadTemplate?.(FULL_BODY_TEMPLATE)}
+                  className="group relative overflow-hidden rounded-xl border border-zinc-800 bg-zinc-900/50 hover:bg-zinc-800 p-5 text-left transition-all hover:border-blue-500/50"
+                >
+                  <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                  <h3 className="font-bold text-zinc-200 flex items-center gap-2">
+                    <span>🏋️</span> Full Body Force
+                  </h3>
+                  <p className="text-xs text-zinc-400 mt-2">Squat, Bench, Deadlift sur 3 jours. Axé sur la progression en force.</p>
+                </button>
+              </div>
+            </div>
+          ) : !isCurrentDayActive ? (
             <div className="h-full flex flex-col items-center justify-center border border-dashed border-zinc-900 rounded-xl p-8 text-center max-w-md mx-auto my-6">
               <div className="bg-zinc-900/50 p-3 rounded-full mb-3">
                 <svg className="h-6 w-6 text-zinc-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">

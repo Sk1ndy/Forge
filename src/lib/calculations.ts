@@ -75,6 +75,7 @@ export interface MuscleStatus {
   remainingCapacity: number; // Valeur de 0 à 1 représentant le budget d'entraînement restant
   jointStress: number; // Jauge de stress articulaire/tendineux
   readiness: number; // État de forme net (fitness - fatigue)
+  fatigueHistory?: number[]; // Historique de fatigue sur les 7 derniers jours
 }
 
 export interface SimulationResult {
@@ -366,11 +367,12 @@ export function runWeeklySimulation(
       jointStress: number;
       contributions: { [exId: string]: number };
       setsContributions: { [exId: string]: number };
+      fatigueHistory: number[];
     };
   } = {};
   
   Object.keys(MUSCLE_DETAILS).forEach(id => {
-    musclesMap[id] = { fatigue: 0, fitness: 0, sets: 0, jointStress: 0, contributions: {}, setsContributions: {} };
+    musclesMap[id] = { fatigue: 0, fitness: 0, sets: 0, jointStress: 0, contributions: {}, setsContributions: {}, fatigueHistory: [] };
   });
 
   // Copie légère, ciblée et performante de l'état musculaire pour le snapshot
@@ -384,7 +386,8 @@ export function runWeeklySimulation(
         sets: s.sets,
         jointStress: s.jointStress,
         contributions: { ...s.contributions },
-        setsContributions: { ...s.setsContributions }
+        setsContributions: { ...s.setsContributions },
+        fatigueHistory: [...s.fatigueHistory]
       };
     }
     return snapshot;
@@ -484,6 +487,13 @@ export function runWeeklySimulation(
         });
       }
 
+      // Fin de la journée : enregistrement de l'historique sur la semaine 2
+      if (week === 2) {
+        Object.keys(musclesMap).forEach(id => {
+          musclesMap[id].fatigueHistory.push(musclesMap[id].fatigue);
+        });
+      }
+
       // C. Capture légère du snapshot uniquement lors de la semaine 2 stabilisée
       if (week === 2 && selectedDay && day.toLowerCase() === selectedDay.toLowerCase()) {
         snapshotMuscles = createLightSnapshot(musclesMap);
@@ -507,6 +517,8 @@ export function runWeeklySimulation(
     let totalJointStress = parent.jointStress;
     let totalDailyInol = dailyInol[parentKey] || 0;
     
+    let totalFatigueHistory = parent.fatigueHistory ? [...parent.fatigueHistory] : Array(7).fill(0);
+    
     const combinedContributions = { ...parent.contributions };
     const combinedSetsContributions = { ...parent.setsContributions };
 
@@ -520,6 +532,12 @@ export function runWeeklySimulation(
         // CORRECTION DE L'AGRÉGATION (CRITIQUE): Sommation cumulative pondérée au lieu de Math.max
         totalJointStress = normalize(totalJointStress + child.jointStress * coeff);
         totalDailyInol = normalize(totalDailyInol + (dailyInol[childKey] || 0) * coeff);
+
+        if (child.fatigueHistory) {
+          totalFatigueHistory = totalFatigueHistory.map((val, idx) => 
+            normalize(val + (child.fatigueHistory[idx] || 0) * coeff)
+          );
+        }
 
         Object.entries(child.contributions || {}).forEach(([exNom, val]) => {
           combinedContributions[exNom] = normalize((combinedContributions[exNom] || 0) + val * coeff);
@@ -539,7 +557,8 @@ export function runWeeklySimulation(
       sets: totalSets,
       jointStress: totalJointStress,
       contributions: combinedContributions,
-      setsContributions: combinedSetsContributions
+      setsContributions: combinedSetsContributions,
+      fatigueHistory: totalFatigueHistory
     };
   };
 
@@ -599,7 +618,8 @@ export function runWeeklySimulation(
       contributors,
       remainingCapacity: parseFloat(Math.max(0, 1 - (fatigueScore / 2.5)).toFixed(4)),
       jointStress: parseFloat((data.jointStress || 0).toFixed(2)),
-      readiness: parseFloat((data.fitness - fatigueScore).toFixed(2)) // Readiness conservée et calculée proprement pour l'affichage
+      readiness: parseFloat((data.fitness - fatigueScore).toFixed(2)), // Readiness conservée et calculée proprement pour l'affichage
+      fatigueHistory: data.fatigueHistory.map(v => parseFloat(v.toFixed(2)))
     };
   });
 

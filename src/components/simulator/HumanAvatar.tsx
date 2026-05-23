@@ -2,6 +2,40 @@
 import React, { useState } from 'react';
 import { SimulationResult, MuscleStatus, MuscleId } from '@/lib/calculations';
 
+const Sparkline = ({ data }: { data?: number[] }) => {
+  if (!data || data.length < 2) return null;
+  const max = Math.max(...data, 1);
+  const min = Math.min(...data, 0);
+  const range = max - min || 1;
+  const width = 140;
+  const height = 24;
+  
+  const points = data.map((val, i) => {
+    const x = (i / (data.length - 1)) * width;
+    const y = height - ((val - min) / range) * height;
+    return `${x},${y}`;
+  }).join(' ');
+
+  return (
+    <div style={{ marginTop: 8, borderTop: '1px solid rgba(255,255,255,0.06)', paddingTop: 8 }}>
+      <div style={{ fontSize: 10, color: '#71717a', textTransform: 'uppercase', fontWeight: 700, letterSpacing: '0.05em', marginBottom: 4, display: 'flex', justifyContent: 'space-between' }}>
+        <span>Tendance fatigue</span>
+        <span>7J</span>
+      </div>
+      <svg viewBox={`0 0 ${width} ${height}`} style={{ width: '100%', height: 24, overflow: 'visible' }}>
+        <polyline
+          fill="none"
+          stroke="#10b981"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          points={points}
+        />
+      </svg>
+    </div>
+  );
+};
+
 interface HumanAvatarProps {
   simulation: SimulationResult;
   selectedDay?: string;
@@ -812,6 +846,9 @@ export default function HumanAvatar({
               ))}
             </div>
           )}
+
+          {/* Graphique Sparkline d'historique de fatigue */}
+          <Sparkline data={hoveredMuscle.fatigueHistory} />
         </div>
       )}
     </div>

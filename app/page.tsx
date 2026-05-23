@@ -193,6 +193,10 @@ export default function Home() {
     }));
   }, []);
 
+  const handleLoadTemplate = useCallback((template: WeeklyBlueprint) => {
+    setBlueprint(template);
+  }, []);
+
   // 5. Sauvegarder le profil
   const handleSaveProfile = async (newProfile: UserProfile) => {
     setProfile(newProfile);
@@ -498,6 +502,7 @@ export default function Home() {
             onAddExercise={handleAddExercise}
             simulation={simulationResult}
             exercises={exercises}
+            onLoadTemplate={handleLoadTemplate}
           />
         </div>
       </section>
