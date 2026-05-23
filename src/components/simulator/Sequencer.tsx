@@ -399,23 +399,6 @@ export default function Sequencer({
           </div>
         </div>
 
-        {/* Alerte Junk Volume */}
-        {(() => {
-          const junkAlerts = simulation?.junkVolumeAlerts || [];
-          if (junkAlerts.length === 0) return null;
-          return (
-            <div className="mt-3 p-3 rounded-xl border border-amber-500/20 bg-amber-500/5 text-amber-400 text-xs flex items-start gap-2.5 shrink-0 animate-pulse">
-              <span className="text-sm shrink-0">⚠️</span>
-              <div>
-                <span className="font-extrabold block">Volume de Séance Inadapté (Junk Volume)</span>
-                <span className="text-[10px] text-amber-500/80 leading-normal block mt-0.5">
-                  La charge d&apos;entraînement (Intensité + Volume) pour {junkAlerts.join(', ')} sature les récepteurs cellulaires de l&apos;hypertrophie. Ce volume excédentaire est physiologiquement inefficace (&quot;volume poubelle&quot;), ralentit la récupération et fatigue inutilement le SNC.
-                </span>
-              </div>
-            </div>
-          );
-        })()}
-
         {/* Exercises Scroll Area or Centered States */}
         {isBlueprintEmpty ? (
           <div className="flex-1 flex flex-col items-center justify-center p-4 sm:p-6 text-center space-y-4 sm:space-y-5 min-h-0 overflow-y-auto mt-2">

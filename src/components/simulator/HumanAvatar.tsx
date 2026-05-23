@@ -462,19 +462,9 @@ export default function HumanAvatar({
 
     if (isHighlighted) {
       strokeWidth = isHovered ? 2.5 : 2.0;
-      if (color === 'red') {
-        stroke = '#ef4444';
-        filter = 'drop-shadow(0 0 8px rgba(239,68,68,0.95))';
-        className = 'animate-glow-red';
-      } else if (color === 'orange') {
-        stroke = '#f59e0b';
-        filter = 'drop-shadow(0 0 8px rgba(245,158,11,0.95))';
-        className = 'animate-glow-orange';
-      } else {
-        stroke = '#38bdf8';
-        filter = 'drop-shadow(0 0 8px rgba(56,189,248,0.95))';
-        className = 'animate-glow-highlight';
-      }
+      stroke = '#c084fc';
+      filter = 'drop-shadow(0 0 8px rgba(192,132,252,0.95))';
+      className = 'animate-glow-highlight';
     }
 
     if (isSelected) {
@@ -529,8 +519,8 @@ export default function HumanAvatar({
           50% { stroke: #f87171; filter: drop-shadow(0 0 12px rgba(248,113,113,0.95)); }
         }
         @keyframes muscle-glow-highlight {
-          0%, 100% { stroke: #38bdf8; filter: drop-shadow(0 0 2px rgba(56,189,248,0.4)); }
-          50% { stroke: #7dd3fc; filter: drop-shadow(0 0 10px rgba(125,211,252,0.9)); }
+          0%, 100% { stroke: #c084fc; filter: drop-shadow(0 0 2px rgba(192,132,252,0.4)); }
+          50% { stroke: #d8b4fe; filter: drop-shadow(0 0 10px rgba(216,180,254,0.9)); }
         }
         
         .animate-glow-green { animation: muscle-glow-green 1.5s infinite ease-in-out; }
@@ -625,6 +615,17 @@ export default function HumanAvatar({
 
       {/* SVG Body */}
       <div style={{ flex: 1, minHeight: 0, position: 'relative', padding: '8px' }}>
+        {simulation.junkVolumeAlerts && simulation.junkVolumeAlerts.length > 0 && (
+          <div className="absolute top-3 left-3 z-30 group">
+            <div className="flex items-center justify-center w-8 h-8 rounded-full border border-amber-500/40 bg-amber-950/40 text-amber-400 font-black hover:bg-amber-900/50 hover:border-amber-400 hover:text-white transition-all cursor-help shadow-lg select-none animate-pulse text-sm">
+              ?
+            </div>
+            <div className="absolute left-10 top-0 w-80 p-3.5 bg-zinc-900/95 border border-zinc-800 text-zinc-300 rounded-xl shadow-2xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 backdrop-blur-md z-50 text-[11px] leading-relaxed">
+              <span className="font-extrabold text-amber-400 text-xs block mb-1">⚠️ Volume Inadapté (Junk Volume)</span>
+              La charge d&apos;entraînement (Intensité + Volume) pour <strong className="text-white">{simulation.junkVolumeAlerts.join(', ')}</strong> sature les récepteurs cellulaires de l&apos;hypertrophie. Ce volume excédentaire est physiologiquement inefficace (&quot;volume poubelle&quot;), ralentit la récupération et fatigue inutilement le SNC.
+            </div>
+          </div>
+        )}
         <svg
           viewBox={combinedViewBox}
           xmlns="http://www.w3.org/2000/svg"

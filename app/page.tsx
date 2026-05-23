@@ -548,7 +548,7 @@ export default function Home() {
       </section>
 
       {/* 2. CENTRAL WORKSPACE - Heatmap & Sequencer */}
-      <section className="flex-1 flex flex-col h-full overflow-hidden p-4 md:p-6 gap-4">
+      <section className="flex-1 flex flex-col h-full overflow-hidden p-4 md:p-6 gap-4 relative">
         
         {/* View Mode Toggle Switch */}
         <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-2 shrink-0">
@@ -604,20 +604,6 @@ export default function Home() {
               </svg>
               Séquenceur Hebdomadaire
             </h3>
-            
-            {viewMode !== 'week' && (
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={() => setLibraryOpen(!libraryOpen)}
-                  className="rounded-lg bg-zinc-900 border border-zinc-800 hover:bg-zinc-800 text-zinc-300 font-bold px-3 py-1.5 text-xs transition-colors flex items-center gap-1.5 cursor-pointer"
-                >
-                  <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.2} d="M4 6h16M4 12h16M4 18h16" />
-                  </svg>
-                  {libraryOpen ? 'Masquer Bibliothèque' : 'Afficher Bibliothèque'}
-                </button>
-              </div>
-            )}
           </div>
 
           <Sequencer
@@ -640,6 +626,25 @@ export default function Home() {
             viewMode={viewMode}
           />
         </div>
+        {viewMode !== 'week' && (
+          <button
+            onClick={() => setLibraryOpen(!libraryOpen)}
+            className={`absolute top-1/2 -translate-y-1/2 z-40 w-7 h-7 bg-zinc-900 border border-zinc-800 text-zinc-400 hover:text-white rounded-full hover:bg-zinc-800 transition-all flex items-center justify-center cursor-pointer shadow-md ${
+              libraryOpen ? 'right-0 translate-x-1/2' : 'right-3'
+            }`}
+            title={libraryOpen ? "Masquer la bibliothèque" : "Afficher la bibliothèque"}
+          >
+            {libraryOpen ? (
+              <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
+              </svg>
+            ) : (
+              <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 19l-7-7 7-7" />
+              </svg>
+            )}
+          </button>
+        )}
       </section>
 
       {/* 3. RIGHT PANEL (Library Drawer) */}
