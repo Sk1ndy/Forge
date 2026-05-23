@@ -183,11 +183,11 @@ export default React.memo(function ExerciseCard({
               {/* Series Input */}
               <input
                 type="number"
-                min="1"
+                min="0"
                 max="20"
-                value={set.series}
-                onChange={(e) => handleUpdateSet(idx, { series: Math.max(1, Number(e.target.value)) })}
-                className="w-[32px] text-center rounded border border-zinc-800 bg-zinc-950/60 px-1 py-0.5 text-white font-mono text-[11px] focus:border-emerald-500/50 focus:outline-none"
+                value={set.series === 0 ? '' : set.series}
+                onChange={(e) => handleUpdateSet(idx, { series: e.target.value === '' ? 0 : Math.max(0, Number(e.target.value)) })}
+                className="w-[42px] text-center rounded border border-zinc-800 bg-zinc-950/60 px-1 py-0.5 text-white font-mono text-[11px] focus:border-emerald-500/50 focus:outline-none"
                 title="Séries"
               />
 
@@ -196,37 +196,49 @@ export default React.memo(function ExerciseCard({
               {/* Reps Input */}
               <input
                 type="number"
-                min="1"
+                min="0"
                 max="100"
-                value={set.reps}
-                onChange={(e) => handleUpdateSet(idx, { reps: Math.max(1, Number(e.target.value)) })}
-                className="w-[32px] text-center rounded border border-zinc-800 bg-zinc-950/60 px-1 py-0.5 text-white font-mono text-[11px] focus:border-emerald-500/50 focus:outline-none"
+                value={set.reps === 0 ? '' : set.reps}
+                onChange={(e) => handleUpdateSet(idx, { reps: e.target.value === '' ? 0 : Math.max(0, Number(e.target.value)) })}
+                className="w-[42px] text-center rounded border border-zinc-800 bg-zinc-950/60 px-1 py-0.5 text-white font-mono text-[11px] focus:border-emerald-500/50 focus:outline-none"
                 title="Répétitions"
               />
 
               {/* Weight Input */}
-              <div className="flex items-center rounded border border-zinc-800 bg-zinc-950/60 px-1 py-0.5 focus-within:border-emerald-500/50 w-[58px] justify-between">
+              <div className="flex items-center rounded border border-zinc-800 bg-zinc-950/60 px-1 py-0.5 focus-within:border-emerald-500/50 w-[72px] justify-between">
                 <input
                   type="number"
                   min="0"
                   max="1000"
-                  value={set.poids}
-                  onChange={(e) => handleUpdateSet(idx, { poids: Math.max(0, Number(e.target.value)) })}
-                  className="w-[34px] text-center bg-transparent text-emerald-400 font-semibold font-mono text-[11px] focus:outline-none"
+                  value={set.poids === 0 ? '' : set.poids}
+                  onChange={(e) => handleUpdateSet(idx, { poids: e.target.value === '' ? 0 : Math.max(0, Number(e.target.value)) })}
+                  className="w-[44px] text-center bg-transparent text-emerald-400 font-semibold font-mono text-[11px] focus:outline-none"
                   title="Poids"
                 />
                 <span className="text-zinc-600 text-[8px] font-bold select-none pr-0.5">kg</span>
               </div>
 
-              {/* RPE Selector */}
+              {/* RPE Selector with Reps In Reserve (RIR) explanations */}
               <select
                 value={set.rpe}
                 onChange={(e) => handleUpdateSet(idx, { rpe: Number(e.target.value) })}
-                className="w-[56px] rounded border border-zinc-800 bg-zinc-950/60 px-1 py-0.5 text-center text-emerald-500 font-extrabold focus:border-emerald-500/50 focus:outline-none text-[11px] cursor-pointer"
-                title="Intensité (RPE)"
+                className="w-[145px] rounded border border-zinc-800 bg-zinc-950/60 px-1.5 py-0.5 text-left text-emerald-500 font-extrabold focus:border-emerald-500/50 focus:outline-none text-[11px] cursor-pointer"
+                title="Nombre de Répétitions en Réserve (RIR) / Intensité"
               >
-                {[10, 9.5, 9, 8.5, 8, 7.5, 7, 6.5, 6, 5.5, 5].map(v => (
-                  <option key={v} value={v}>@{v}</option>
+                {[
+                  { v: 10, label: '0 RIR (Effort Max)' },
+                  { v: 9.5, label: '0-1 RIR (Quasi-Max)' },
+                  { v: 9, label: '1 RIR (1 en réserve)' },
+                  { v: 8.5, label: '1-2 RIR' },
+                  { v: 8, label: '2 RIR (2 en réserve)' },
+                  { v: 7.5, label: '2-3 RIR' },
+                  { v: 7, label: '3 RIR (3 en réserve)' },
+                  { v: 6.5, label: '3-4 RIR' },
+                  { v: 6, label: '4 RIR (4 en réserve)' },
+                  { v: 5.5, label: '4-5 RIR' },
+                  { v: 5, label: '5+ RIR (Effort Léger)' }
+                ].map(item => (
+                  <option key={item.v} value={item.v}>{item.label}</option>
                 ))}
               </select>
 
