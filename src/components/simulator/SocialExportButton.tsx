@@ -7,7 +7,7 @@ export default function SocialExportButton() {
   const handleExport = async () => {
     setIsExporting(true);
     try {
-      const node = document.getElementById('forge-social-export');
+      const node = document.getElementById('forge-social-poster');
       if (!node) {
         alert("Impossible de trouver le conteneur à exporter.");
         return;

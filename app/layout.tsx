@@ -7,6 +7,8 @@ export const metadata: Metadata = {
     "Forge un programme que ton corps peut réellement encaisser.",
 };
 
+import Navbar from "@/components/Navbar";
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -14,7 +16,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="fr">
-      <body className="min-h-screen antialiased">{children}</body>
+      <body className="min-h-screen antialiased bg-black">
+        <Navbar />
+        {children}
+      </body>
     </html>
   );
 }
