@@ -388,17 +388,33 @@ export default function WeekDashboard({ simulation, blueprint, toggledDays }: We
         <div className={cardBase}>
           <h5 className="text-[10px] font-bold text-red-400 uppercase tracking-wider mb-3">🧠 SNC & Traumatismes Aigus</h5>
           <div className="space-y-2.5 mb-3">
-            <div className="flex justify-between items-center text-xs group relative" title="La Charge Axiale représente le stress imposé sur ta colonne vertébrale par les exercices lourds (ex: Squat, Soulevé de Terre). Trop de charge axiale fatigue ton système nerveux et augmente le risque de blessure au dos.">
-              <span className="text-zinc-400 font-semibold cursor-help">Charge Axiale (Tier 1) ❓</span>
+            <div className="flex justify-between items-center text-xs relative group w-full">
+              <div className="flex items-center gap-1.5 cursor-help">
+                <span className="text-zinc-400 font-semibold">Charge Axiale (Tier 1)</span>
+                <span className="text-zinc-500 flex items-center justify-center w-3.5 h-3.5 rounded-full border border-zinc-700 text-[9px] hover:bg-zinc-800 hover:text-zinc-300 transition-colors">?</span>
+              </div>
               <span className="font-black font-mono" style={{ color: axialColor }}>{axial}%</span>
+              
+              {/* Custom Tooltip */}
+              <div className="absolute bottom-full left-0 mb-2 w-56 p-2.5 bg-[#09090b]/95 border border-white/10 rounded-xl text-[10px] text-zinc-300 shadow-[0_12px_32px_rgba(0,0,0,0.8)] backdrop-blur-md opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity duration-200 z-[9999]">
+                La Charge Axiale représente le stress imposé sur ta colonne vertébrale par les exercices lourds (ex: Squat, Soulevé de Terre). Trop de charge axiale fatigue ton système nerveux et augmente le risque de blessure au dos.
+              </div>
             </div>
             <div className="h-2.5 w-full bg-zinc-950 border border-zinc-900 rounded-full overflow-hidden p-0.5">
               <div className={`h-full rounded-full transition-all duration-700 ${axial > 80 ? 'animate-pulse' : ''}`}
                 style={{ width: `${axial}%`, backgroundColor: axialColor, boxShadow: axial > 80 ? `0 0 8px ${axialColor}80` : 'none' }} />
             </div>
-            <div className="flex justify-between items-center text-xs group relative" title="Le Système Nerveux Central (SNC) est la 'batterie' qui envoie le signal à tes muscles. S'il est saturé (au-delà de 80%), tu perdras de la force globale même si tes muscles sont reposés.">
-              <span className="text-zinc-400 font-semibold cursor-help">Saturation SNC ❓</span>
+            <div className="flex justify-between items-center text-xs relative group w-full">
+              <div className="flex items-center gap-1.5 cursor-help">
+                <span className="text-zinc-400 font-semibold">Saturation SNC</span>
+                <span className="text-zinc-500 flex items-center justify-center w-3.5 h-3.5 rounded-full border border-zinc-700 text-[9px] hover:bg-zinc-800 hover:text-zinc-300 transition-colors">?</span>
+              </div>
               <span className={`font-black font-mono ${simulation.cnsFailure ? 'text-red-400 animate-pulse' : 'text-zinc-300'}`}>{sncPct}%</span>
+              
+              {/* Custom Tooltip */}
+              <div className="absolute bottom-full left-0 mb-2 w-56 p-2.5 bg-[#09090b]/95 border border-white/10 rounded-xl text-[10px] text-zinc-300 shadow-[0_12px_32px_rgba(0,0,0,0.8)] backdrop-blur-md opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity duration-200 z-[9999]">
+                Le Système Nerveux Central (SNC) est la 'batterie' qui envoie le signal à tes muscles. S'il est saturé (au-delà de 80%), tu perdras de la force globale même si tes muscles sont reposés.
+              </div>
             </div>
             <div className="h-2 w-full bg-zinc-950 border border-zinc-900 rounded-full overflow-hidden">
               <div className={`h-full rounded-full transition-all duration-700 ${sncPct > 100 ? 'animate-pulse' : ''}`}
