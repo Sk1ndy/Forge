@@ -4,160 +4,104 @@ import React from 'react';
 import { Document, Page, Text, View, StyleSheet, Image } from '@react-pdf/renderer';
 import { SimulationResult, WeeklyBlueprint, DEFAULT_EXERCISE_LIBRARY } from '@/lib/calculations';
 
-// ─── Design Tokens (Premium SaaS) ─────────────────────────────────────────────
+// ─── Design Tokens (Objective Data) ───────────────────────────────────────────
 const C = {
-  textTitle:   '#111827',
+  textTitle:   '#000000',
   textBody:    '#374151',
-  textMuted:   '#6B7280',
+  textMuted:   '#9CA3AF',
   
   bgPage:      '#FFFFFF',
-  bgCard:      '#F9FAFB',
-  bgHeaderRow: '#F3F4F6',
-  bgCoachRow:  '#EFF6FF',
-  bgExoBlock:  '#FFFFFF',
+  bgAltRow:    '#F9FAFB',
 
-  borderUltraLight: '#F3F4F6',
-  borderLight: '#E5E7EB',
-  borderDark:  '#D1D5DB',
-  
-  accent:      '#2563EB', // SaaS Blue
-  accentLight: '#DBEAFE',
-  success:     '#10B981',
+  borderLine:  '#E5E7EB',
+  borderDark:  '#000000',
 };
 
 // ─── StyleSheet ───────────────────────────────────────────────────────────────
 const s = StyleSheet.create({
   page: {
     backgroundColor: C.bgPage,
-    fontFamily: 'Helvetica',
     padding: 40,
+    fontFamily: 'Helvetica',
     color: C.textBody,
   },
   
-  section: {
-    marginTop: 25,
+  // ─── Headers ───
+  headerBox: {
+    borderBottomWidth: 2,
+    borderBottomColor: C.borderDark,
+    paddingBottom: 10,
+    marginBottom: 30,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-end',
   },
-  sectionTitleWrap: {
-    borderBottomWidth: 1,
-    borderBottomColor: C.borderLight,
-    paddingBottom: 8,
-    marginBottom: 16,
-  },
-  sectionTitle: { fontSize: 16, fontWeight: 'bold', color: C.textTitle, textTransform: 'uppercase', letterSpacing: 1 },
+  headerTitle: { fontSize: 20, fontWeight: 'bold', color: C.textTitle, textTransform: 'uppercase' },
+  headerDate: { fontSize: 10, color: C.textMuted, textTransform: 'uppercase' },
 
-  // Header Page 1
-  headerWrap: {
+  sectionTitle: { fontSize: 12, fontWeight: 'bold', color: C.textTitle, textTransform: 'uppercase', marginBottom: 15 },
+
+  // ─── Avatar & Annotations ───
+  avatarContainer: {
+    position: 'relative',
+    height: 350,
+    width: '100%',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 40,
+  },
+  avatarImg: { width: 180, height: 350, objectFit: 'contain' },
+
+  // Annotation Base
+  annoRowLeft: { position: 'absolute', left: 0, flexDirection: 'row', alignItems: 'center', width: '40%', justifyContent: 'flex-end' },
+  annoRowRight: { position: 'absolute', right: 0, flexDirection: 'row', alignItems: 'center', width: '40%', justifyContent: 'flex-start' },
+  annoTextLeft: { fontSize: 9, color: C.textTitle, fontWeight: 'bold', textAlign: 'right' },
+  annoTextRight: { fontSize: 9, color: C.textTitle, fontWeight: 'bold', textAlign: 'left' },
+  annoLine: { height: 1, backgroundColor: C.borderDark },
+
+  // ─── Dashboard ───
+  dashGrid: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'flex-start',
-    marginBottom: 20,
   },
-  titleMain: { fontSize: 28, fontWeight: 'bold', color: C.textTitle, letterSpacing: -0.5 },
-  titleSub: { fontSize: 10, color: C.textMuted, marginTop: 4, textTransform: 'uppercase', letterSpacing: 1 },
-  headerRight: { alignItems: 'flex-end' },
-  badge: { backgroundColor: C.accentLight, color: C.accent, paddingHorizontal: 8, paddingVertical: 4, borderRadius: 4, fontSize: 9, fontWeight: 'bold', textTransform: 'uppercase' },
-
-  // KPIs 3 columns
-  kpiRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginTop: 25,
-  },
-  kpiCard: {
-    flex: 1,
-    backgroundColor: C.bgCard,
-    padding: 16,
-    borderRadius: 8,
+  tonnageBox: {
+    width: '35%',
     borderWidth: 1,
-    borderColor: C.borderLight,
-    marginHorizontal: 5,
-    alignItems: 'center',
-  },
-  kpiLabel: { fontSize: 9, color: C.textMuted, textTransform: 'uppercase', fontWeight: 'bold', marginBottom: 8, letterSpacing: 0.5 },
-  kpiValue: { fontSize: 24, fontWeight: 'bold', color: C.accent },
-  kpiSub: { fontSize: 9, color: C.success, marginTop: 4, fontWeight: 'bold' },
-
-  // Avatar Section
-  avatarWrap: {
-    marginTop: 35,
-    alignItems: 'center',
-    backgroundColor: C.bgCard,
-    borderRadius: 12,
+    borderColor: C.borderLine,
     padding: 20,
-    borderWidth: 1,
-    borderColor: C.borderLight,
-  },
-  avatarImg: { width: 220, height: 350, objectFit: 'contain' },
-  avatarBadgeTop: { position: 'absolute', top: 20, backgroundColor: '#FFFFFF', padding: 8, borderRadius: 6, borderWidth: 1, borderColor: C.borderLight, shadowColor: '#000', shadowOpacity: 0.05, shadowRadius: 4 },
-  avatarBadgeBottom: { position: 'absolute', bottom: 20, right: 20, backgroundColor: '#FFFFFF', padding: 8, borderRadius: 6, borderWidth: 1, borderColor: C.borderLight, shadowColor: '#000', shadowOpacity: 0.05, shadowRadius: 4 },
-  avatarBadgeText: { fontSize: 9, fontWeight: 'bold', color: C.textTitle },
-
-  // ─── Tables Page 2 ───
-  dayTitle: { fontSize: 14, fontWeight: 'bold', color: C.textTitle, textTransform: 'uppercase' },
-  dayCount: { fontSize: 10, color: C.textMuted, marginTop: 2 },
-
-  table: { width: '100%', marginTop: 12 },
-  
-  // Header Row
-  thRow: { 
-    flexDirection: 'row', 
-    backgroundColor: C.bgHeaderRow, 
-    paddingVertical: 8, 
-    paddingHorizontal: 12, 
-    borderRadius: 6,
-    marginBottom: 8 
-  },
-  thColExo: { flex: 3, textAlign: 'left' },
-  thColNum: { flex: 1, textAlign: 'right' },
-  thText: { fontSize: 9, fontWeight: 'bold', color: C.textBody, textTransform: 'uppercase', letterSpacing: 0.5 },
-
-  // Exercise Block
-  exoBlock: {
-    marginBottom: 12,
-    borderWidth: 1,
-    borderColor: C.borderLight,
-    borderRadius: 8,
-    overflow: 'hidden',
-  },
-  trSet: {
-    flexDirection: 'row',
-    paddingVertical: 10,
-    paddingHorizontal: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: C.borderUltraLight,
-    backgroundColor: C.bgExoBlock,
     alignItems: 'center',
+    justifyContent: 'center',
   },
-  tdTextMain: { fontSize: 11, fontWeight: 'bold', color: C.textTitle },
-  tdTextSub: { fontSize: 9, color: C.textMuted, marginTop: 2 },
-  tdNum: { fontSize: 11, fontWeight: 'bold', color: C.textTitle },
-  
-  colExo: { flex: 3, textAlign: 'left', paddingRight: 8 },
-  colNum: { flex: 1, textAlign: 'right' },
+  tonnageValue: { fontSize: 24, fontWeight: 'bold', color: C.textTitle },
+  tonnageLabel: { fontSize: 10, color: C.textMuted, textTransform: 'uppercase', marginTop: 4 },
 
-  // Coach Advice Row
-  coachRow: {
-    backgroundColor: C.bgCoachRow,
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-    flexDirection: 'row',
-    alignItems: 'center',
+  muscleTable: {
+    width: '60%',
+    borderWidth: 1,
+    borderColor: C.borderLine,
   },
-  coachIcon: { fontSize: 10, marginRight: 6 },
-  coachText: { fontSize: 9, color: C.accent, fontWeight: 'bold' },
+  mRow: { flexDirection: 'row', paddingVertical: 6, paddingHorizontal: 12, borderBottomWidth: 1, borderBottomColor: C.borderLine },
+  mRowAlt: { flexDirection: 'row', paddingVertical: 6, paddingHorizontal: 12, borderBottomWidth: 1, borderBottomColor: C.borderLine, backgroundColor: C.bgAltRow },
+  mColName: { flex: 2, fontSize: 9, color: C.textTitle, fontWeight: 'bold' },
+  mColVal: { flex: 1, fontSize: 9, color: C.textTitle, textAlign: 'right' },
 
-  // Footer
-  footer: {
-    position: 'absolute',
-    bottom: 20,
-    left: 40,
-    right: 40,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    borderTopWidth: 1,
-    borderTopColor: C.borderLight,
-    paddingTop: 10,
-  },
+  // ─── Carnet (Page 2) ───
+  dayBlock: { marginBottom: 35, breakInside: 'avoid' },
+  dayTitle: { fontSize: 12, fontWeight: 'bold', color: C.textTitle, textTransform: 'uppercase', marginBottom: 10, borderBottomWidth: 1, borderBottomColor: C.borderLine, paddingBottom: 4 },
+
+  table: { width: '100%' },
+  thRow: { flexDirection: 'row', paddingBottom: 6, marginBottom: 4, borderBottomWidth: 1, borderBottomColor: C.borderDark },
+  thTextMain: { flex: 3, fontSize: 9, fontWeight: 'bold', color: C.textTitle, textTransform: 'uppercase' },
+  thTextNum: { flex: 1, fontSize: 9, fontWeight: 'bold', color: C.textTitle, textTransform: 'uppercase', textAlign: 'right' },
+
+  trRow: { flexDirection: 'row', paddingVertical: 8, paddingHorizontal: 4 },
+  trRowAlt: { flexDirection: 'row', paddingVertical: 8, paddingHorizontal: 4, backgroundColor: C.bgAltRow },
+  tdTextMain: { flex: 3, fontSize: 10, color: C.textTitle },
+  tdTextNum: { flex: 1, fontSize: 10, color: C.textBody, textAlign: 'right' },
+
+  // ─── Footer ───
+  footer: { position: 'absolute', bottom: 30, left: 40, right: 40, flexDirection: 'row', justifyContent: 'space-between', borderTopWidth: 1, borderTopColor: C.borderLine, paddingTop: 10 },
   footerText: { fontSize: 8, color: C.textMuted, textTransform: 'uppercase' },
 });
 
@@ -171,28 +115,12 @@ interface PDFReportProps {
 
 const DAYS_ORDER = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche'];
 
-const getRandomPositiveAdvice = (muscle: string) => {
-  const advices = [
-    `Cible principale : ${muscle || 'muscles sollicités'}. Focus sur la qualité du mouvement.`,
-    "Exécution stricte requise. Ne sacrifiez pas la forme pour la charge.",
-    "Progression linéaire conseillée sur ce mouvement polyarticulaire.",
-    "Tension maximale sur la phase de contraction.",
-    "Excellent mouvement pour le volume. Maintenez le RPE cible."
-  ];
-  return advices[Math.floor(Math.random() * advices.length)];
-};
-
 // ─── Component ────────────────────────────────────────────────────────────────
 const PDFReport = ({ simulation, blueprint, avatarImageStr, toggledDays }: PDFReportProps) => {
   const dateStr = new Date().toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' });
-  const macro = simulation.weeklyMacro;
 
-  const totalSets = Object.values(macro?.weeklyEffectiveSets ?? {}).reduce((sum, v) => sum + (v as number), 0);
-  
+  // ─── Data Extraction ───
   let weeklyTonnage = 0;
-  let totalRpe = 0;
-  let setsCount = 0;
-
   Object.entries(blueprint).forEach(([day, dayExercises]) => {
     if (toggledDays && toggledDays[day] === false) return;
     dayExercises.forEach(ex => {
@@ -200,81 +128,104 @@ const PDFReport = ({ simulation, blueprint, avatarImageStr, toggledDays }: PDFRe
       ex.sets.forEach(set => {
         if (!set.active) return;
         weeklyTonnage += set.series * set.reps * set.poids;
-        totalRpe += set.rpe * set.series;
-        setsCount += set.series;
       });
     });
   });
 
-  const tonnageVal = weeklyTonnage >= 1000 ? (weeklyTonnage / 1000).toFixed(1) : weeklyTonnage.toString();
-  const tonnageUnit = weeklyTonnage >= 1000 ? 'Tonnes' : 'Kg';
-  const avgRpe = setsCount > 0 ? (totalRpe / setsCount).toFixed(1) : '0';
+  const sets = simulation.weeklyMacro?.weeklyEffectiveSets ?? {};
+  
+  const muscleGroups = [
+    { label: 'Pectoraux', val: (sets['chest'] || 0) + (sets['upperChest'] || 0) },
+    { label: 'Dos', val: (sets['lats'] || 0) + (sets['traps'] || 0) + (sets['lowerBack'] || 0) + (sets['rhomboids'] || 0) },
+    { label: 'Épaules', val: (sets['frontDelts'] || 0) + (sets['sideDelts'] || 0) + (sets['rearDelts'] || 0) },
+    { label: 'Biceps', val: sets['biceps'] || 0 },
+    { label: 'Triceps', val: sets['triceps'] || 0 },
+    { label: 'Quadriceps', val: sets['quads'] || 0 },
+    { label: 'Ischios & Fessiers', val: (sets['hamstrings'] || 0) + (sets['glutes'] || 0) },
+  ];
 
   return (
     <Document>
 
-      {/* ━━━━━━━━━━━━━━━━━━━ PAGE 1 : BILAN PERFORMANCE ━━━━━━━━━━━━━━━━━━━ */}
+      {/* ━━━━━━━━━━━━━━━━━━━ PAGE 1 : ANALYSE ANATOMIQUE ━━━━━━━━━━━━━━━━━━━ */}
       <Page size="A4" style={s.page}>
         
-        <View style={s.headerWrap}>
-          <View>
-            <Text style={s.titleMain}>BILAN PERFORMANCE</Text>
-            <Text style={s.titleSub}>RAPPORT ANALYTIQUE DE LA SEMAINE</Text>
+        <View style={s.headerBox} fixed>
+          <Text style={s.headerTitle}>Rapport de Performance</Text>
+          <Text style={s.headerDate}>{dateStr}</Text>
+        </View>
+
+        <Text style={s.sectionTitle}>Analyse du Volume</Text>
+        
+        <View style={s.avatarContainer}>
+          {/* eslint-disable-next-line jsx-a11y/alt-text */}
+          {avatarImageStr && <Image source={avatarImageStr} style={s.avatarImg} />}
+          
+          {/* Annotations (Lignes pointant vers l'avatar) */}
+          <View style={[s.annoRowLeft, { top: '15%' }]}>
+            <Text style={s.annoTextLeft}>Épaules : {muscleGroups.find(m => m.label === 'Épaules')?.val} s</Text>
+            <View style={[s.annoLine, { width: 40, marginLeft: 8 }]} />
           </View>
-          <View style={s.headerRight}>
-            <Text style={s.badge}>FORGE ATHLETE</Text>
-            <Text style={s.titleSub}>{dateStr}</Text>
+          
+          <View style={[s.annoRowRight, { top: '25%' }]}>
+            <View style={[s.annoLine, { width: 40, marginRight: 8 }]} />
+            <Text style={s.annoTextRight}>Pectoraux : {muscleGroups.find(m => m.label === 'Pectoraux')?.val} s</Text>
+          </View>
+
+          <View style={[s.annoRowLeft, { top: '35%' }]}>
+            <Text style={s.annoTextLeft}>Biceps : {muscleGroups.find(m => m.label === 'Biceps')?.val} s</Text>
+            <View style={[s.annoLine, { width: 25, marginLeft: 8 }]} />
+          </View>
+
+          <View style={[s.annoRowRight, { top: '40%' }]}>
+            <View style={[s.annoLine, { width: 25, marginRight: 8 }]} />
+            <Text style={s.annoTextRight}>Dos : {muscleGroups.find(m => m.label === 'Dos')?.val} s</Text>
+          </View>
+
+          <View style={[s.annoRowLeft, { top: '48%' }]}>
+            <Text style={s.annoTextLeft}>Triceps : {muscleGroups.find(m => m.label === 'Triceps')?.val} s</Text>
+            <View style={[s.annoLine, { width: 35, marginLeft: 8 }]} />
+          </View>
+
+          <View style={[s.annoRowRight, { top: '65%' }]}>
+            <View style={[s.annoLine, { width: 30, marginRight: 8 }]} />
+            <Text style={s.annoTextRight}>Quadriceps : {muscleGroups.find(m => m.label === 'Quadriceps')?.val} s</Text>
+          </View>
+
+          <View style={[s.annoRowLeft, { top: '80%' }]}>
+            <Text style={s.annoTextLeft}>Ischios & Fessiers : {muscleGroups.find(m => m.label === 'Ischios & Fessiers')?.val} s</Text>
+            <View style={[s.annoLine, { width: 20, marginLeft: 8 }]} />
           </View>
         </View>
 
-        <View style={s.section}>
-          <View style={s.sectionTitleWrap}>
-            <Text style={s.sectionTitle}>Indicateurs de Progrès</Text>
+        <View style={s.dashGrid}>
+          <View style={s.tonnageBox}>
+            <Text style={s.tonnageValue}>{weeklyTonnage} KG</Text>
+            <Text style={s.tonnageLabel}>Tonnage Total</Text>
           </View>
-          <View style={s.kpiRow}>
-            <View style={[s.kpiCard, { marginLeft: 0 }]}>
-              <Text style={s.kpiLabel}>Tonnage Hebdo</Text>
-              <Text style={s.kpiValue}>{tonnageVal} {tonnageUnit}</Text>
-              <Text style={s.kpiSub}>↗ Volume Stimulant</Text>
-            </View>
-            <View style={s.kpiCard}>
-              <Text style={s.kpiLabel}>Séries Effectives</Text>
-              <Text style={s.kpiValue}>{totalSets}</Text>
-              <Text style={s.kpiSub}>🎯 Répartition Optimale</Text>
-            </View>
-            <View style={[s.kpiCard, { marginRight: 0 }]}>
-              <Text style={s.kpiLabel}>Intensité Moyenne</Text>
-              <Text style={s.kpiValue}>RPE {avgRpe}</Text>
-              <Text style={s.kpiSub}>🔥 Haute Intensité</Text>
-            </View>
+
+          <View style={s.muscleTable}>
+            {muscleGroups.map((m, i) => (
+              <View key={m.label} style={i % 2 === 0 ? s.mRowAlt : s.mRow}>
+                <Text style={s.mColName}>{m.label}</Text>
+                <Text style={s.mColVal}>{m.val} séries</Text>
+              </View>
+            ))}
           </View>
         </View>
 
-        {avatarImageStr && (
-          <View style={s.section}>
-            <View style={s.sectionTitleWrap}>
-              <Text style={s.sectionTitle}>Cartographie Musculaire</Text>
-            </View>
-            <View style={s.avatarWrap}>
-              <View style={s.avatarBadgeTop}>
-                <Text style={s.avatarBadgeText}>↗ Focus Hypertrophie Actif</Text>
-              </View>
-              {/* eslint-disable-next-line jsx-a11y/alt-text */}
-              <Image source={avatarImageStr} style={s.avatarImg} />
-              <View style={s.avatarBadgeBottom}>
-                <Text style={s.avatarBadgeText}>Distribution Parfaite ✅</Text>
-              </View>
-            </View>
-          </View>
-        )}
-
+        <View style={s.footer} fixed>
+          <Text style={s.footerText}>Forge Simulator</Text>
+          <Text style={s.footerText}>Données Brutes</Text>
+        </View>
       </Page>
 
-      {/* ━━━━━━━━━━━━━━━━━━━ PAGE 2+ : CARNET DE SÉANCES ━━━━━━━━━━━━━━━━━━━ */}
+      {/* ━━━━━━━━━━━━━━━━━━━ PAGE 2+ : CARNET DE SÉANCE ━━━━━━━━━━━━━━━━━━━ */}
       <Page size="A4" style={s.page}>
         
-        <View style={s.sectionTitleWrap}>
-          <Text style={s.sectionTitle}>Programme de la Semaine</Text>
+        <View style={s.headerBox} fixed>
+          <Text style={s.headerTitle}>Carnet de Séances</Text>
+          <Text style={s.headerDate}>Volume & Intensité</Text>
         </View>
 
         {DAYS_ORDER.map((day) => {
@@ -282,31 +233,27 @@ const PDFReport = ({ simulation, blueprint, avatarImageStr, toggledDays }: PDFRe
           const dayExercises = blueprint[day] || [];
           const activeExercises = dayExercises.filter(ex => ex.active);
           
-          if (!isToggledOn || activeExercises.length === 0) {
-            return null;
-          }
+          if (!isToggledOn || activeExercises.length === 0) return null;
 
           return (
-            <View key={day} style={s.section}>
+            <View key={day} style={s.dayBlock} wrap={false}>
               
               <Text style={s.dayTitle}>{day}</Text>
-              <Text style={s.dayCount}>{activeExercises.length} Exercice{activeExercises.length > 1 ? 's' : ''}</Text>
 
               <View style={s.table}>
-                {/* Header Row */}
-                <View style={s.thRow} wrap={false}>
-                  <Text style={[s.thText, s.thColExo]}>Exercice</Text>
-                  <Text style={[s.thText, s.thColNum]}>Séries</Text>
-                  <Text style={[s.thText, s.thColNum]}>Reps</Text>
-                  <Text style={[s.thText, s.thColNum]}>Poids</Text>
-                  <Text style={[s.thText, s.thColNum]}>RPE</Text>
+                {/* Table Header */}
+                <View style={s.thRow}>
+                  <Text style={s.thTextMain}>Exercice</Text>
+                  <Text style={s.thTextNum}>Séries</Text>
+                  <Text style={s.thTextNum}>Reps</Text>
+                  <Text style={s.thTextNum}>Poids</Text>
+                  <Text style={s.thTextNum}>RPE</Text>
                 </View>
 
-                {/* Exercises Blocks */}
-                {activeExercises.map((ex) => {
+                {/* Exercises Rows */}
+                {activeExercises.map((ex, exIndex) => {
                   const template = DEFAULT_EXERCISE_LIBRARY.find(e => e.id === ex.exerciseId);
                   const templateName = template?.nom || ex.exerciseId;
-                  const targetMuscle = template?.muscle_primaire || '';
                   
                   const groupedSets: { reps: number; poids: number; rpe: number; seriesCount: number }[] = [];
                   ex.sets.filter(s => s.active).forEach(s => {
@@ -318,40 +265,27 @@ const PDFReport = ({ simulation, blueprint, avatarImageStr, toggledDays }: PDFRe
                     }
                   });
 
-                  return (
-                    <View key={ex.id} style={s.exoBlock} wrap={false}>
-                      {groupedSets.map((grp, i) => (
-                        <View key={`${ex.id}-set-${i}`} style={s.trSet}>
-                          <View style={s.colExo}>
-                            <Text style={s.tdTextMain}>{i === 0 ? templateName : '  "  '}</Text>
-                            {i === 0 && targetMuscle && (
-                              <Text style={s.tdTextSub}>Cible: {targetMuscle}</Text>
-                            )}
-                          </View>
-                          <Text style={[s.tdNum, s.colNum]}>{grp.seriesCount}</Text>
-                          <Text style={[s.tdNum, s.colNum]}>{grp.reps}</Text>
-                          <Text style={[s.tdNum, s.colNum]}>{grp.poids > 0 ? `${grp.poids} kg` : '-'}</Text>
-                          <Text style={[s.tdNum, s.colNum]}>{grp.rpe}</Text>
-                        </View>
-                      ))}
-                      
-                      {/* Coach Advice */}
-                      <View style={s.coachRow}>
-                        <Text style={s.coachIcon}>💡</Text>
-                        <Text style={s.coachText}>Conseil Coach : {getRandomPositiveAdvice(targetMuscle)}</Text>
+                  return groupedSets.map((grp, i) => {
+                    const isAlt = (exIndex + i) % 2 !== 0;
+                    return (
+                      <View key={`${ex.id}-set-${i}`} style={isAlt ? s.trRowAlt : s.trRow}>
+                        <Text style={s.tdTextMain}>{i === 0 ? templateName : '  "  '}</Text>
+                        <Text style={s.tdTextNum}>{grp.seriesCount}</Text>
+                        <Text style={s.tdTextNum}>{grp.reps}</Text>
+                        <Text style={s.tdTextNum}>{grp.poids > 0 ? `${grp.poids} kg` : '-'}</Text>
+                        <Text style={s.tdTextNum}>{grp.rpe}</Text>
                       </View>
-                    </View>
-                  );
+                    );
+                  });
                 })}
               </View>
-
             </View>
           );
         })}
 
         <View style={s.footer} fixed>
-          <Text style={s.footerText}>Bilan Performance généré par Forge</Text>
-          <Text style={s.footerText}>PAGE 2 / CARNET</Text>
+          <Text style={s.footerText}>Forge Simulator</Text>
+          <Text style={s.footerText}>Carnet d&apos;Entraînement</Text>
         </View>
 
       </Page>
