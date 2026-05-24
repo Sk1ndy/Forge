@@ -9,6 +9,10 @@ import {
 } from './constants';
 import { calculateSetImpact, normalize } from './biomechanics';
 
+// Cache LRU simpliste pour éviter les recalculs coûteux (memoization)
+const simulationCache = new Map<string, SimulationResult>();
+const MAX_CACHE_SIZE = 50;
+
 /**
  * Exécute la simulation chronologique complète (Modèle Fitness-Fatigue Banister)
  * Retourne le snapshot de l'avatar pour le jour sélectionné (ou Dimanche par défaut)
@@ -21,6 +25,14 @@ export function runWeeklySimulation(
   exerciseLibrary: Exercise[] = DEFAULT_EXERCISE_LIBRARY,
   week2Blueprint?: WeeklyBlueprint
 ): SimulationResult {
+  // ─── MÉCANISME DE CACHE (MEMOIZATION) ───
+  // Génération d'une empreinte unique basée sur les paramètres d'entrée stricts
+  const cacheKey = JSON.stringify({ blueprint, profile, toggledDays, selectedDay, week2Blueprint });
+
+  if (simulationCache.has(cacheKey)) {
+    return simulationCache.get(cacheKey)!;
+  }
+
   const DAYS_OF_WEEK = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche'];
 
   // Récupération et modulation des facteurs biologiques individuels
@@ -605,7 +617,7 @@ export function runWeeklySimulation(
   // Sort by severity descending
   weeklyTraumas.sort((a, b) => b.peakInol - a.peakInol);
 
-  return {
+  const result: SimulationResult = {
     muscles: finalMuscles,
     sncScore: parseFloat(targetSnc.toFixed(2)),
     sncPercentage,
@@ -622,4 +634,13 @@ export function runWeeklySimulation(
     weeklyMacro,
     weeklyTraumas,
   };
+
+  // Sauvegarde dans le cache
+  if (simulationCache.size >= MAX_CACHE_SIZE) {
+    const firstKey = simulationCache.keys().next().value;
+    if (firstKey) simulationCache.delete(firstKey);
+  }
+  simulationCache.set(cacheKey, result);
+
+  return result;
 }
