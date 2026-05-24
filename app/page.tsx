@@ -75,17 +75,16 @@ export default function Home() {
   const [hoveredExercise, setHoveredExercise] = useState<Exercise | null>(null);
   const [selectedExercise, setSelectedExercise] = useState<Exercise | null>(null);
 
-  const weekViewRef = React.useRef<HTMLDivElement>(null);
-  const [weekViewImageStr, setWeekViewImageStr] = useState<string | null>(null);
+  const avatarRef = React.useRef<HTMLDivElement>(null);
+  const [avatarImageStr, setAvatarImageStr] = useState<string | null>(null);
   const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
 
   const handlePreparePdf = async () => {
-    if (!weekViewRef.current) return;
+    if (!avatarRef.current) return;
     setIsGeneratingPdf(true);
     try {
-      // Pour éviter les bugs de scrollbars avec html-to-image, on s'assure de capturer la taille totale
-      const dataUrl = await toPng(weekViewRef.current, { cacheBust: true, backgroundColor: '#09090b', pixelRatio: 2 });
-      setWeekViewImageStr(dataUrl);
+      const dataUrl = await toPng(avatarRef.current, { cacheBust: true, backgroundColor: '#09090b', pixelRatio: 2 });
+      setAvatarImageStr(dataUrl);
     } catch (err) {
       console.error("Failed to generate PDF images", err);
     } finally {
@@ -602,7 +601,7 @@ export default function Home() {
 
             {viewMode === 'week' && (
               <div className="flex items-center">
-                {!weekViewImageStr ? (
+                {!avatarImageStr ? (
                   <button
                     onClick={handlePreparePdf}
                     disabled={isGeneratingPdf}
@@ -614,7 +613,7 @@ export default function Home() {
                   <PDFDownloadButton 
                     simulation={simulationResult} 
                     blueprint={blueprint} 
-                    weekViewImageStr={weekViewImageStr}
+                    avatarImageStr={avatarImageStr}
                     toggledDays={toggledDays}
                   />
                 )}
@@ -696,9 +695,9 @@ export default function Home() {
             </button>
           </>
         ) : (
-          <div ref={weekViewRef} className="flex-1 flex flex-col md:flex-row gap-4 min-h-0 bg-[#09090b] p-2 rounded-xl">
+          <div className="flex-1 flex flex-col md:flex-row gap-4 min-h-0">
             {/* Left Portion: SVG Anatomical Avatar — 30% width */}
-            <div className="w-full md:w-[32%] h-[300px] md:h-full shrink-0 bg-zinc-950 border border-zinc-900 rounded-xl overflow-hidden flex flex-col relative">
+            <div ref={avatarRef} className="w-full md:w-[32%] h-[300px] md:h-full shrink-0 bg-zinc-950 border border-zinc-900 rounded-xl overflow-hidden flex flex-col relative">
               <HumanAvatar 
                 simulation={simulationResult} 
                 selectedDay={selectedDay} 
@@ -712,7 +711,7 @@ export default function Home() {
             </div>
             
             {/* Right Portion: Analytics Dashboard — 68% width */}
-            <div className="flex-1 min-w-0 h-full overflow-y-auto pr-1">
+            <div className="flex-1 min-w-0 h-full overflow-y-auto">
               <WeekDashboard simulation={simulationResult} blueprint={blueprint} toggledDays={toggledDays} />
             </div>
           </div>

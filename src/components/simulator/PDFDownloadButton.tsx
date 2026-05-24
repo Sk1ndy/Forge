@@ -8,18 +8,18 @@ import { SimulationResult, WeeklyBlueprint } from '@/lib/calculations';
 interface PDFDownloadButtonProps {
   simulation: SimulationResult;
   blueprint: WeeklyBlueprint;
-  weekViewImageStr?: string | null;
+  avatarImageStr?: string | null;
   toggledDays?: { [day: string]: boolean };
 }
 
-export default function PDFDownloadButton({ simulation, blueprint, weekViewImageStr, toggledDays }: PDFDownloadButtonProps) {
+export default function PDFDownloadButton({ simulation, blueprint, avatarImageStr, toggledDays }: PDFDownloadButtonProps) {
   return (
     <PDFDownloadLink
       document={
         <PDFReport
           simulation={simulation}
           blueprint={blueprint}
-          weekViewImageStr={weekViewImageStr}
+          avatarImageStr={avatarImageStr}
           toggledDays={toggledDays}
         />
       }
