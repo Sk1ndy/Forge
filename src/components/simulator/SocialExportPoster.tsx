@@ -21,15 +21,16 @@ export default function SocialExportPoster({
   highlightedMuscles
 }: SocialExportPosterProps) {
   return (
-    <div
-      id="forge-social-poster"
-      className="fixed top-0 left-[-10000px] z-[-50] pointer-events-none w-[1400px] bg-zinc-950 p-10 flex flex-col gap-8"
-      style={{
-        // On s'assure qu'il n'y a aucune restriction de hauteur pour forcer l'expansion complète
-        height: 'auto',
-        minHeight: '100%',
-      }}
-    >
+    <div className="fixed top-0 left-[-10000px] z-[-50] pointer-events-none">
+      <div
+        id="forge-social-poster"
+        className="w-[1400px] bg-zinc-950 p-10 flex flex-col gap-8"
+        style={{
+          // On s'assure qu'il n'y a aucune restriction de hauteur pour forcer l'expansion complète
+          height: 'auto',
+          minHeight: '100%',
+        }}
+      >
       {/* Header Premium */}
       <div className="flex items-center justify-between border-b border-zinc-800 pb-6">
         <div>
@@ -80,6 +81,7 @@ export default function SocialExportPoster({
         <p className="text-zinc-500 font-medium">
           Généré par <strong className="text-emerald-400">FORGE</strong> — Optimise ton entraînement sur <span className="text-white">forge.app</span>
         </p>
+      </div>
       </div>
     </div>
   );
