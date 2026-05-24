@@ -23,7 +23,39 @@ export const DEFAULT_EXERCISE_LIBRARY: Exercise[] = [
   { id: 'lunges', nom: 'Fentes Haltères', tier_snc: 2, muscle_primaire: 'quadriceps', muscles_secondaires: ['gluteal', 'hamstring'], equipment: 'poids_libre', ppl_category: 'legs' },
   { id: 'hip_thrust', nom: 'Hip Thrust', tier_snc: 2, muscle_primaire: 'gluteal', muscles_secondaires: ['hamstring'], equipment: 'poids_libre', ppl_category: 'legs' },
   { id: 'pec_deck', nom: 'Pec Deck', tier_snc: 3, muscle_primaire: 'chest', muscles_secondaires: [], equipment: 'machine', ppl_category: 'push' },
-  { id: 'lat_pulldown', nom: 'Tirage Poitrine Poulie', tier_snc: 2, muscle_primaire: 'upperBack', muscles_secondaires: ['biceps', 'trapezius', 'forearm'], equipment: 'machine', ppl_category: 'pull' }
+  { id: 'lat_pulldown', nom: 'Tirage Poitrine Poulie', tier_snc: 2, muscle_primaire: 'upperBack', muscles_secondaires: ['biceps', 'trapezius', 'forearm'], equipment: 'machine', ppl_category: 'pull' },
+  
+  // Pectoraux (Extra)
+  { id: 'flat_db_press', nom: 'Développé Couché Haltères', tier_snc: 2, muscle_primaire: 'chest', muscles_secondaires: ['frontDeltoid', 'triceps'], equipment: 'poids_libre', ppl_category: 'push' },
+  { id: 'incline_db_press', nom: 'Développé Incliné Haltères', tier_snc: 2, muscle_primaire: 'upperChest', muscles_secondaires: ['chest', 'frontDeltoid', 'triceps'], equipment: 'poids_libre', ppl_category: 'push' },
+  { id: 'cable_fly', nom: 'Écarté Poulie', tier_snc: 3, muscle_primaire: 'chest', muscles_secondaires: ['serratus'], equipment: 'machine', ppl_category: 'push' },
+  { id: 'machine_chest_press', nom: 'Développé Machine Assis', tier_snc: 2, muscle_primaire: 'chest', muscles_secondaires: ['triceps'], equipment: 'machine', ppl_category: 'push' },
+  
+  // Dos (Extra)
+  { id: 'seated_row', nom: 'Rowing Assis Poulie', tier_snc: 2, muscle_primaire: 'upperBack', muscles_secondaires: ['trapezius', 'biceps'], equipment: 'machine', ppl_category: 'pull' },
+  { id: 't_bar_row', nom: 'T-Bar Row', tier_snc: 2, muscle_primaire: 'upperBack', muscles_secondaires: ['trapezius', 'lowerBack', 'biceps'], equipment: 'poids_libre', ppl_category: 'pull' },
+  { id: 'single_arm_db_row', nom: 'Rowing Bûcheron Haltère', tier_snc: 2, muscle_primaire: 'upperBack', muscles_secondaires: ['biceps', 'lowerBack'], equipment: 'poids_libre', ppl_category: 'pull' },
+  { id: 'straight_arm_pulldown', nom: 'Pull-over Poulie Haute', tier_snc: 3, muscle_primaire: 'upperBack', muscles_secondaires: ['serratus'], equipment: 'machine', ppl_category: 'pull' },
+  
+  // Jambes (Extra)
+  { id: 'goblet_squat', nom: 'Goblet Squat', tier_snc: 2, muscle_primaire: 'quadriceps', muscles_secondaires: ['gluteal', 'abs'], equipment: 'poids_libre', ppl_category: 'legs' },
+  { id: 'seated_leg_curl', nom: 'Leg Curl Assis', tier_snc: 3, muscle_primaire: 'hamstring', muscles_secondaires: [], equipment: 'machine', ppl_category: 'legs' },
+  { id: 'leg_extension_unilateral', nom: 'Leg Extension Unilatéral', tier_snc: 3, muscle_primaire: 'quadriceps', muscles_secondaires: [], equipment: 'machine', ppl_category: 'legs' },
+  { id: 'stiff_leg_deadlift', nom: 'Soulevé de Terre Jambes Tendues', tier_snc: 1, muscle_primaire: 'hamstring', muscles_secondaires: ['gluteal', 'lowerBack'], equipment: 'poids_libre', ppl_category: 'legs' },
+  
+  // Épaules (Extra)
+  { id: 'arnold_press', nom: 'Développé Arnold', tier_snc: 2, muscle_primaire: 'frontDeltoid', muscles_secondaires: ['triceps', 'upperChest'], equipment: 'poids_libre', ppl_category: 'push' },
+  { id: 'db_lateral_raise', nom: 'Élévations Latérales Haltères', tier_snc: 3, muscle_primaire: 'deltoids', muscles_secondaires: [], equipment: 'poids_libre', ppl_category: 'push' },
+  { id: 'reverse_pec_deck', nom: 'Oiseau Machine (Reverse Pec Deck)', tier_snc: 3, muscle_primaire: 'rearDeltoid', muscles_secondaires: ['rhomboids'], equipment: 'machine', ppl_category: 'pull' },
+  
+  // Bras (Extra)
+  { id: 'hammer_curl', nom: 'Curl Marteau', tier_snc: 3, muscle_primaire: 'biceps', muscles_secondaires: ['forearm'], equipment: 'poids_libre', ppl_category: 'pull' },
+  { id: 'skull_crushers', nom: 'Barre au Front (Skullcrushers)', tier_snc: 3, muscle_primaire: 'triceps', muscles_secondaires: [], equipment: 'poids_libre', ppl_category: 'push' },
+  { id: 'overhead_triceps_extension', nom: 'Extension Triceps Nuque', tier_snc: 3, muscle_primaire: 'triceps', muscles_secondaires: [], equipment: 'poids_libre', ppl_category: 'push' },
+  
+  // Abs (Extra)
+  { id: 'hanging_leg_raise', nom: 'Relevé de Jambes Suspendu', tier_snc: 2, muscle_primaire: 'lowerAbs', muscles_secondaires: ['upperAbs'], equipment: 'pdc', ppl_category: 'core' },
+  { id: 'cable_crunch', nom: 'Crunch Poulie Haute', tier_snc: 3, muscle_primaire: 'abs', muscles_secondaires: [], equipment: 'machine', ppl_category: 'core' }
 ];
 
 export const MUSCLE_DETAILS: Record<MuscleId, string> = {
@@ -88,7 +120,39 @@ export const DEFAULT_EXERCISE_TENSION_MATRICES: Record<string, Partial<Record<Mu
   lunges: { quadriceps: 0.8, gluteal: 0.7, hamstring: 0.2 },
   hip_thrust: { gluteal: 1.0, hamstring: 0.3 },
   pec_deck: { chest: 1.0 },
-  lat_pulldown: { upperBack: 1.0, biceps: 0.5, trapezius: 0.3, forearm: 0.2 }
+  lat_pulldown: { upperBack: 1.0, biceps: 0.5, trapezius: 0.3, forearm: 0.2 },
+  
+  // Pectoraux (Extra)
+  flat_db_press: { chest: 1.0, frontDeltoid: 0.5, triceps: 0.4 },
+  incline_db_press: { upperChest: 1.0, chest: 0.3, frontDeltoid: 0.6, triceps: 0.3 },
+  cable_fly: { chest: 1.0, serratus: 0.2 },
+  machine_chest_press: { chest: 1.0, triceps: 0.4 },
+  
+  // Dos (Extra)
+  seated_row: { upperBack: 1.0, trapezius: 0.4, biceps: 0.4 },
+  t_bar_row: { upperBack: 1.0, trapezius: 0.5, lowerBack: 0.3, biceps: 0.4 },
+  single_arm_db_row: { upperBack: 1.0, biceps: 0.5, lowerBack: 0.2 },
+  straight_arm_pulldown: { upperBack: 1.0, serratus: 0.3 },
+  
+  // Jambes (Extra)
+  goblet_squat: { quadriceps: 0.9, gluteal: 0.5, abs: 0.2 },
+  seated_leg_curl: { hamstring: 1.0 },
+  leg_extension_unilateral: { quadriceps: 1.0 },
+  stiff_leg_deadlift: { hamstring: 1.0, gluteal: 0.5, lowerBack: 0.4 },
+  
+  // Épaules (Extra)
+  arnold_press: { frontDeltoid: 1.0, triceps: 0.4, upperChest: 0.2 },
+  db_lateral_raise: { deltoids: 1.0 },
+  reverse_pec_deck: { rearDeltoid: 1.0, rhomboids: 0.4 },
+  
+  // Bras (Extra)
+  hammer_curl: { biceps: 0.8, forearm: 0.5 },
+  skull_crushers: { triceps: 1.0 },
+  overhead_triceps_extension: { triceps: 1.0 },
+  
+  // Abs (Extra)
+  hanging_leg_raise: { lowerAbs: 1.0, upperAbs: 0.5 },
+  cable_crunch: { abs: 1.0 }
 };
 
 // ─── 2. CINÉTIQUES DE RÉCUPÉRATION SPÉCIFIQUES AUX MUSCLES (Taux de rétention de fatigue par 24h) ───
