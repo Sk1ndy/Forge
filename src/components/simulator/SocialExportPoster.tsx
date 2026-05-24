@@ -2,6 +2,7 @@ import React from 'react';
 import HumanAvatar from './HumanAvatar';
 import WeekDashboard from './WeekDashboard';
 import { SimulationResult, WeeklyBlueprint, MuscleId } from '@/lib/types';
+import { DEFAULT_EXERCISE_LIBRARY } from '@/lib/constants';
 
 interface SocialExportPosterProps {
   simulation: SimulationResult;
@@ -73,6 +74,65 @@ export default function SocialExportPoster({
             blueprint={blueprint} 
             toggledDays={toggledDays} 
           />
+        </div>
+      </div>
+
+      {/* Programme Détaillé (Blueprint) */}
+      <div className="bg-black border border-zinc-900 rounded-2xl p-6">
+        <h3 className="text-xl font-black text-white mb-6 uppercase tracking-wider">Programme Détaillé</h3>
+        <div className="grid grid-cols-7 gap-4">
+          {['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche'].map((day) => {
+            const dayPlan = blueprint[day] || [];
+            // Si la journée est désactivée via toggledDays, on la considère comme vide
+            const isActiveDay = toggledDays[day] !== false;
+            const activeExs = isActiveDay ? dayPlan.filter((ex) => ex.active) : [];
+
+            return (
+              <div key={day} className="flex flex-col gap-3">
+                {/* En-tête du jour */}
+                <div className="bg-zinc-900 rounded-lg p-2 text-center border border-zinc-800 shadow-inner">
+                  <span className="text-zinc-300 font-bold text-sm uppercase tracking-widest">{day.substring(0, 3)}</span>
+                </div>
+                
+                {/* Liste des exercices ou Repos */}
+                {activeExs.length === 0 ? (
+                  <div className="flex-1 flex items-center justify-center p-4 border border-dashed border-zinc-800 rounded-xl bg-zinc-950/50">
+                    <span className="text-zinc-600 text-xs font-semibold tracking-widest">REPOS</span>
+                  </div>
+                ) : (
+                  <div className="flex flex-col gap-2">
+                    {activeExs.map((ex) => {
+                      const def = DEFAULT_EXERCISE_LIBRARY.find((d) => d.id === ex.exerciseId);
+                      const name = def ? def.nom : ex.exerciseId;
+                      const activeSets = ex.sets.filter((s) => s.active);
+                      if (activeSets.length === 0) return null;
+
+                      // Agrégation des séries
+                      const totalSeries = activeSets.reduce((sum, s) => sum + s.series, 0);
+                      const avgReps = Math.round(activeSets.reduce((sum, s) => sum + s.reps * s.series, 0) / totalSeries);
+                      const avgRpe = (activeSets.reduce((sum, s) => sum + s.rpe * s.series, 0) / totalSeries).toFixed(1);
+
+                      return (
+                        <div key={ex.id} className="bg-zinc-900/40 border border-zinc-800/80 rounded-xl p-3 flex flex-col gap-2 hover:border-zinc-700 transition-colors">
+                          <span className="text-emerald-400 font-bold text-[11px] leading-tight line-clamp-2" title={name}>
+                            {name}
+                          </span>
+                          <div className="flex justify-between items-center text-[10px] mt-auto pt-2 border-t border-zinc-800/50">
+                            <span className="text-zinc-300 font-mono bg-zinc-950 px-1.5 py-0.5 rounded">
+                              {totalSeries}×{avgReps}
+                            </span>
+                            <span className="text-orange-400 font-mono font-bold">
+                              RPE {avgRpe}
+                            </span>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            );
+          })}
         </div>
       </div>
 
