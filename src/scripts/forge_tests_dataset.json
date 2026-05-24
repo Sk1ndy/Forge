@@ -21,7 +21,7 @@
       "blueprint": {
         "Lundi": [
           {
-            "id": "7dl3tmb",
+            "id": "ahhk88l",
             "exerciseId": "bench_press",
             "sets": [
               {
@@ -35,7 +35,7 @@
             "active": true
           },
           {
-            "id": "y3kpb9u",
+            "id": "7aglfnr",
             "exerciseId": "ohp",
             "sets": [
               {
@@ -49,7 +49,7 @@
             "active": true
           },
           {
-            "id": "x528yvr",
+            "id": "f0o94su",
             "exerciseId": "incline_bench",
             "sets": [
               {
@@ -63,7 +63,7 @@
             "active": true
           },
           {
-            "id": "m7ndz24",
+            "id": "k4b3wqu",
             "exerciseId": "dips",
             "sets": [
               {
@@ -77,7 +77,7 @@
             "active": true
           },
           {
-            "id": "zld3bbj",
+            "id": "go57ypi",
             "exerciseId": "triceps_pushdown",
             "sets": [
               {
@@ -93,7 +93,7 @@
         ],
         "Mardi": [
           {
-            "id": "paw91p6",
+            "id": "miynh69",
             "exerciseId": "deadlift",
             "sets": [
               {
@@ -107,7 +107,7 @@
             "active": true
           },
           {
-            "id": "aceuyzv",
+            "id": "crbqioz",
             "exerciseId": "pull_ups",
             "sets": [
               {
@@ -121,7 +121,7 @@
             "active": true
           },
           {
-            "id": "58twe5s",
+            "id": "hxo9axl",
             "exerciseId": "barbell_row",
             "sets": [
               {
@@ -135,7 +135,7 @@
             "active": true
           },
           {
-            "id": "5m2i89n",
+            "id": "6u2sbck",
             "exerciseId": "face_pull",
             "sets": [
               {
@@ -149,7 +149,7 @@
             "active": true
           },
           {
-            "id": "m8ksckc",
+            "id": "wrl1yn9",
             "exerciseId": "biceps_curl",
             "sets": [
               {
@@ -165,7 +165,7 @@
         ],
         "Mercredi": [
           {
-            "id": "urk98e8",
+            "id": "n7vt4r5",
             "exerciseId": "squat",
             "sets": [
               {
@@ -179,7 +179,7 @@
             "active": true
           },
           {
-            "id": "hajk1cs",
+            "id": "llmpuoh",
             "exerciseId": "leg_press",
             "sets": [
               {
@@ -193,7 +193,7 @@
             "active": true
           },
           {
-            "id": "vkho3a1",
+            "id": "9l0f09o",
             "exerciseId": "leg_extension",
             "sets": [
               {
@@ -207,7 +207,7 @@
             "active": true
           },
           {
-            "id": "62t76iw",
+            "id": "g8nur5s",
             "exerciseId": "leg_curl",
             "sets": [
               {
@@ -221,7 +221,7 @@
             "active": true
           },
           {
-            "id": "wbhcxj1",
+            "id": "kr35yv1",
             "exerciseId": "calf_raise",
             "sets": [
               {
@@ -238,7 +238,7 @@
         "Jeudi": [],
         "Vendredi": [
           {
-            "id": "ermv8jr",
+            "id": "cdle2yh",
             "exerciseId": "bench_press",
             "sets": [
               {
@@ -252,7 +252,7 @@
             "active": true
           },
           {
-            "id": "h15t2fa",
+            "id": "l920kqz",
             "exerciseId": "ohp",
             "sets": [
               {
@@ -266,7 +266,7 @@
             "active": true
           },
           {
-            "id": "ftwfikc",
+            "id": "qzste9x",
             "exerciseId": "incline_bench",
             "sets": [
               {
@@ -280,7 +280,7 @@
             "active": true
           },
           {
-            "id": "ll36t06",
+            "id": "0nfa2ow",
             "exerciseId": "triceps_pushdown",
             "sets": [
               {
@@ -296,7 +296,7 @@
         ],
         "Samedi": [
           {
-            "id": "y614zrc",
+            "id": "e9kmvm0",
             "exerciseId": "pull_ups",
             "sets": [
               {
@@ -310,7 +310,7 @@
             "active": true
           },
           {
-            "id": "00hglcl",
+            "id": "2ya5nap",
             "exerciseId": "barbell_row",
             "sets": [
               {
@@ -324,7 +324,7 @@
             "active": true
           },
           {
-            "id": "wl3wkz3",
+            "id": "ujuwfc6",
             "exerciseId": "face_pull",
             "sets": [
               {
@@ -338,7 +338,7 @@
             "active": true
           },
           {
-            "id": "2vf3rfa",
+            "id": "s33yz5j",
             "exerciseId": "biceps_curl",
             "sets": [
               {
@@ -380,7 +380,7 @@
         "biceps": {
           "name": "Biceps",
           "inol": 5.7,
-          "sets": 18,
+          "sets": 12.6,
           "color": "grey",
           "statusLabel": "Volume Insuffisant (Repos / Maintien)",
           "contributors": [
@@ -441,38 +441,38 @@
         },
         "chest": {
           "name": "Pectoraux",
-          "inol": 5.07,
-          "sets": 21,
+          "inol": 3.64,
+          "sets": 15,
           "color": "grey",
           "statusLabel": "Volume Insuffisant (Repos / Maintien)",
           "contributors": [
             {
               "nom": "Développé Incliné",
-              "value": 0.2057,
-              "percentage": 81
+              "value": 0.1469,
+              "percentage": 76
             },
             {
               "nom": "Développé Couché",
               "value": 0.0392,
-              "percentage": 15
+              "percentage": 20
             },
             {
               "nom": "Dips",
-              "value": 0.0102,
+              "value": 0.0068,
               "percentage": 4
             }
           ],
-          "remainingCapacity": 0.8948,
-          "jointStress": 1.19,
-          "readiness": -0.13,
+          "remainingCapacity": 0.9228,
+          "jointStress": 0.86,
+          "readiness": -0.1,
           "fatigueHistory": [
-            1.72,
-            0.86,
-            0.43,
-            0.22,
-            1.05,
-            0.53,
-            0.26
+            1.22,
+            0.61,
+            0.31,
+            0.15,
+            0.77,
+            0.39,
+            0.19
           ]
         },
         "deltoids": {
@@ -518,7 +518,7 @@
         "forearm": {
           "name": "Avant-bras",
           "inol": 2.69,
-          "sets": 21,
+          "sets": 7.8,
           "color": "grey",
           "statusLabel": "Volume Insuffisant (Repos / Maintien)",
           "contributors": [
@@ -554,7 +554,7 @@
         "gluteal": {
           "name": "Fessiers",
           "inol": 0.74,
-          "sets": 9,
+          "sets": 5.7,
           "color": "grey",
           "statusLabel": "Volume Insuffisant (Repos / Maintien)",
           "contributors": [
@@ -590,7 +590,7 @@
         "hamstring": {
           "name": "Ischio-jambiers",
           "inol": 1.51,
-          "sets": 9,
+          "sets": 6,
           "color": "grey",
           "statusLabel": "Volume Insuffisant (Repos / Maintien)",
           "contributors": [
@@ -686,7 +686,7 @@
         "lowerBack": {
           "name": "Lombaires",
           "inol": 1.15,
-          "sets": 12,
+          "sets": 7.2,
           "color": "grey",
           "statusLabel": "Volume Insuffisant (Repos / Maintien)",
           "contributors": [
@@ -834,7 +834,7 @@
         "triceps": {
           "name": "Triceps",
           "inol": 5.88,
-          "sets": 27,
+          "sets": 16.8,
           "color": "grey",
           "statusLabel": "Volume Insuffisant (Repos / Maintien)",
           "contributors": [
@@ -856,7 +856,7 @@
           ],
           "remainingCapacity": 0.8629,
           "jointStress": 1.41,
-          "readiness": 1.28,
+          "readiness": 1.21,
           "fatigueHistory": [
             1.86,
             0.93,
@@ -946,7 +946,7 @@
         "rhomboids": {
           "name": "Rhomboïdes",
           "inol": 2.63,
-          "sets": 12,
+          "sets": 7.2,
           "color": "grey",
           "statusLabel": "Volume Insuffisant (Repos / Maintien)",
           "contributors": [
@@ -1056,39 +1056,34 @@
         },
         "upperChest": {
           "name": "Pectoraux Supérieurs",
-          "inol": 2.31,
-          "sets": 12,
+          "inol": 2.19,
+          "sets": 6,
           "color": "grey",
           "statusLabel": "Volume Insuffisant (Repos / Maintien)",
           "contributors": [
             {
               "nom": "Développé Incliné",
               "value": 0.1469,
-              "percentage": 95
-            },
-            {
-              "nom": "Overhead Press (OHP)",
-              "value": 0.0079,
-              "percentage": 5
+              "percentage": 100
             }
           ],
-          "remainingCapacity": 0.9381,
-          "jointStress": 0.57,
-          "readiness": 0.5,
+          "remainingCapacity": 0.9412,
+          "jointStress": 0.54,
+          "readiness": 0.47,
           "fatigueHistory": [
-            0.65,
-            0.33,
-            0.16,
-            0.08,
             0.62,
             0.31,
+            0.16,
+            0.08,
+            0.59,
+            0.29,
             0.15
           ]
         },
         "lowerChest": {
           "name": "Pectoraux Inférieurs",
           "inol": 0.86,
-          "sets": 3,
+          "sets": 2.4,
           "color": "grey",
           "statusLabel": "Volume Insuffisant (Repos / Maintien)",
           "contributors": [
@@ -1298,7 +1293,7 @@
       "sncPercentage": 4,
       "cnsFailure": false,
       "junkVolumeAlerts": [],
-      "globalWorkCapacity": 90.6,
+      "globalWorkCapacity": 90.9,
       "topSurcharged": [],
       "topNeglected": [
         {
@@ -1370,7 +1365,7 @@
       "weeklyMacro": {
         "peakFatigue": {
           "chest": {
-            "value": 1.72,
+            "value": 1.22,
             "day": "Lundi"
           },
           "upperBack": {
@@ -1399,13 +1394,13 @@
           }
         },
         "weeklyEffectiveSets": {
-          "chest": 15,
-          "upperBack": 15,
-          "frontDeltoid": 21,
-          "biceps": 18,
-          "triceps": 27,
-          "quadriceps": 9,
-          "hamstring": 9
+          "chest": 0,
+          "upperBack": 0,
+          "frontDeltoid": 0,
+          "biceps": 0,
+          "triceps": 0,
+          "quadriceps": 0,
+          "hamstring": 0
         },
         "pushPullRatio": {
           "push": 53,
@@ -1439,7 +1434,7 @@
       "blueprint": {
         "Lundi": [
           {
-            "id": "cdowex4",
+            "id": "gqd7z89",
             "exerciseId": "squat",
             "sets": [
               {
@@ -1453,7 +1448,7 @@
             "active": true
           },
           {
-            "id": "c55ymyp",
+            "id": "033wa5x",
             "exerciseId": "bench_press",
             "sets": [
               {
@@ -1467,7 +1462,7 @@
             "active": true
           },
           {
-            "id": "xzdpnf5",
+            "id": "e2e27wz",
             "exerciseId": "barbell_row",
             "sets": [
               {
@@ -1481,7 +1476,7 @@
             "active": true
           },
           {
-            "id": "tj8dg6h",
+            "id": "me8ni1j",
             "exerciseId": "biceps_curl",
             "sets": [
               {
@@ -1495,7 +1490,7 @@
             "active": true
           },
           {
-            "id": "svxq3au",
+            "id": "2p64tgj",
             "exerciseId": "crunchs",
             "sets": [
               {
@@ -1512,7 +1507,7 @@
         "Mardi": [],
         "Mercredi": [
           {
-            "id": "crbxvf2",
+            "id": "htc21p5",
             "exerciseId": "deadlift",
             "sets": [
               {
@@ -1526,7 +1521,7 @@
             "active": true
           },
           {
-            "id": "c4aravc",
+            "id": "u39f6fa",
             "exerciseId": "ohp",
             "sets": [
               {
@@ -1540,7 +1535,7 @@
             "active": true
           },
           {
-            "id": "p0d3fnz",
+            "id": "0j3vgmj",
             "exerciseId": "pull_ups",
             "sets": [
               {
@@ -1554,7 +1549,7 @@
             "active": true
           },
           {
-            "id": "72fqhgf",
+            "id": "z2a5r11",
             "exerciseId": "leg_press",
             "sets": [
               {
@@ -1568,7 +1563,7 @@
             "active": true
           },
           {
-            "id": "tbv999p",
+            "id": "07coxzr",
             "exerciseId": "triceps_pushdown",
             "sets": [
               {
@@ -1585,7 +1580,7 @@
         "Jeudi": [],
         "Vendredi": [
           {
-            "id": "vitsets",
+            "id": "xv4amma",
             "exerciseId": "squat",
             "sets": [
               {
@@ -1599,7 +1594,7 @@
             "active": true
           },
           {
-            "id": "topqcjq",
+            "id": "zfpxyqw",
             "exerciseId": "incline_bench",
             "sets": [
               {
@@ -1613,7 +1608,7 @@
             "active": true
           },
           {
-            "id": "sfg1le3",
+            "id": "dgpdkmm",
             "exerciseId": "lat_pulldown",
             "sets": [
               {
@@ -1627,7 +1622,7 @@
             "active": true
           },
           {
-            "id": "59q7kt3",
+            "id": "jvipizp",
             "exerciseId": "leg_curl",
             "sets": [
               {
@@ -1641,7 +1636,7 @@
             "active": true
           },
           {
-            "id": "fexenme",
+            "id": "6qd3guc",
             "exerciseId": "lateral_raise",
             "sets": [
               {
@@ -1690,7 +1685,7 @@
         "biceps": {
           "name": "Biceps",
           "inol": 2.5,
-          "sets": 11,
+          "sets": 6.8,
           "color": "grey",
           "statusLabel": "Volume Insuffisant (Repos / Maintien)",
           "contributors": [
@@ -1745,38 +1740,33 @@
         },
         "chest": {
           "name": "Pectoraux",
-          "inol": 1.58,
-          "sets": 9,
+          "inol": 1.17,
+          "sets": 6,
           "color": "grey",
           "statusLabel": "Volume Insuffisant (Repos / Maintien)",
           "contributors": [
             {
               "nom": "Développé Incliné",
-              "value": 0.155,
+              "value": 0.1107,
               "percentage": 98
             },
             {
               "nom": "Développé Couché",
               "value": 0.0023,
-              "percentage": 1
-            },
-            {
-              "nom": "Overhead Press (OHP)",
-              "value": 0.0019,
-              "percentage": 1
+              "percentage": 2
             }
           ],
-          "remainingCapacity": 0.9364,
-          "jointStress": 0.44,
-          "readiness": -0.08,
+          "remainingCapacity": 0.9548,
+          "jointStress": 0.32,
+          "readiness": -0.06,
           "fatigueHistory": [
+            0.2,
+            0.1,
+            0.05,
+            0.03,
+            0.45,
             0.23,
-            0.11,
-            0.09,
-            0.04,
-            0.64,
-            0.32,
-            0.16
+            0.11
           ]
         },
         "deltoids": {
@@ -1828,7 +1818,7 @@
         "forearm": {
           "name": "Avant-bras",
           "inol": 1.33,
-          "sets": 14,
+          "sets": 4.8,
           "color": "grey",
           "statusLabel": "Volume Insuffisant (Repos / Maintien)",
           "contributors": [
@@ -1864,7 +1854,7 @@
         "gluteal": {
           "name": "Fessiers",
           "inol": 0.89,
-          "sets": 12,
+          "sets": 7.8,
           "color": "grey",
           "statusLabel": "Volume Insuffisant (Repos / Maintien)",
           "contributors": [
@@ -1900,7 +1890,7 @@
         "hamstring": {
           "name": "Ischio-jambiers",
           "inol": 1.54,
-          "sets": 12,
+          "sets": 6.45,
           "color": "grey",
           "statusLabel": "Volume Insuffisant (Repos / Maintien)",
           "contributors": [
@@ -1996,7 +1986,7 @@
         "lowerBack": {
           "name": "Lombaires",
           "inol": 0.8,
-          "sets": 12,
+          "sets": 6.9,
           "color": "grey",
           "statusLabel": "Volume Insuffisant (Repos / Maintien)",
           "contributors": [
@@ -2139,7 +2129,7 @@
         "triceps": {
           "name": "Triceps",
           "inol": 1.96,
-          "sets": 12,
+          "sets": 7.2,
           "color": "grey",
           "statusLabel": "Volume Insuffisant (Repos / Maintien)",
           "contributors": [
@@ -2251,7 +2241,7 @@
         "rhomboids": {
           "name": "Rhomboïdes",
           "inol": 0.53,
-          "sets": 3,
+          "sets": 1.8,
           "color": "grey",
           "statusLabel": "Volume Insuffisant (Repos / Maintien)",
           "contributors": [
@@ -2356,32 +2346,27 @@
         },
         "upperChest": {
           "name": "Pectoraux Supérieurs",
-          "inol": 0.94,
-          "sets": 6,
+          "inol": 0.88,
+          "sets": 3,
           "color": "grey",
           "statusLabel": "Volume Insuffisant (Repos / Maintien)",
           "contributors": [
             {
               "nom": "Développé Incliné",
               "value": 0.1107,
-              "percentage": 98
-            },
-            {
-              "nom": "Overhead Press (OHP)",
-              "value": 0.0019,
-              "percentage": 2
+              "percentage": 100
             }
           ],
-          "remainingCapacity": 0.955,
-          "jointStress": 0.28,
-          "readiness": 0.19,
+          "remainingCapacity": 0.9557,
+          "jointStress": 0.26,
+          "readiness": 0.18,
           "fatigueHistory": [
-            0.06,
+            0.05,
             0.03,
-            0.04,
-            0.02,
-            0.45,
-            0.23,
+            0.01,
+            0.01,
+            0.44,
+            0.22,
             0.11
           ]
         },
@@ -2592,7 +2577,7 @@
       "sncPercentage": 1,
       "cnsFailure": false,
       "junkVolumeAlerts": [],
-      "globalWorkCapacity": 95.8,
+      "globalWorkCapacity": 96,
       "topSurcharged": [],
       "topNeglected": [
         {
@@ -2664,7 +2649,7 @@
       "weeklyMacro": {
         "peakFatigue": {
           "chest": {
-            "value": 0.64,
+            "value": 0.45,
             "day": "Vendredi"
           },
           "upperBack": {
@@ -2693,13 +2678,13 @@
           }
         },
         "weeklyEffectiveSets": {
-          "chest": 6,
-          "upperBack": 12,
-          "frontDeltoid": 9,
-          "biceps": 11,
-          "triceps": 12,
-          "quadriceps": 9,
-          "hamstring": 12
+          "chest": 0,
+          "upperBack": 0,
+          "frontDeltoid": 0,
+          "biceps": 0,
+          "triceps": 0,
+          "quadriceps": 0,
+          "hamstring": 0
         },
         "pushPullRatio": {
           "push": 58,
@@ -2733,7 +2718,7 @@
       "blueprint": {
         "Lundi": [
           {
-            "id": "f4tvsf2",
+            "id": "y0ljcle",
             "exerciseId": "bench_press",
             "sets": [
               {
@@ -2747,7 +2732,7 @@
             "active": true
           },
           {
-            "id": "p75f82b",
+            "id": "9kauvbt",
             "exerciseId": "incline_bench",
             "sets": [
               {
@@ -2763,7 +2748,7 @@
         ],
         "Mardi": [
           {
-            "id": "4krb859",
+            "id": "kby04sv",
             "exerciseId": "pull_ups",
             "sets": [
               {
@@ -2777,7 +2762,7 @@
             "active": true
           },
           {
-            "id": "2r90rzo",
+            "id": "xa35bls",
             "exerciseId": "barbell_row",
             "sets": [
               {
@@ -2793,7 +2778,7 @@
         ],
         "Mercredi": [
           {
-            "id": "yijzmsr",
+            "id": "556hcog",
             "exerciseId": "squat",
             "sets": [
               {
@@ -2807,7 +2792,7 @@
             "active": true
           },
           {
-            "id": "wcpjw1m",
+            "id": "9qvxm18",
             "exerciseId": "leg_press",
             "sets": [
               {
@@ -2823,7 +2808,7 @@
         ],
         "Jeudi": [
           {
-            "id": "w8lthe6",
+            "id": "fhm0ota",
             "exerciseId": "ohp",
             "sets": [
               {
@@ -2837,7 +2822,7 @@
             "active": true
           },
           {
-            "id": "70mpimc",
+            "id": "9ieol7j",
             "exerciseId": "lateral_raise",
             "sets": [
               {
@@ -2853,7 +2838,7 @@
         ],
         "Vendredi": [
           {
-            "id": "65zxat5",
+            "id": "mdn7ruj",
             "exerciseId": "biceps_curl",
             "sets": [
               {
@@ -2867,7 +2852,7 @@
             "active": true
           },
           {
-            "id": "z1nndkr",
+            "id": "l8htccb",
             "exerciseId": "triceps_pushdown",
             "sets": [
               {
@@ -2910,7 +2895,7 @@
         "biceps": {
           "name": "Biceps",
           "inol": 3.04,
-          "sets": 12,
+          "sets": 8.4,
           "color": "grey",
           "statusLabel": "Volume Insuffisant (Repos / Maintien)",
           "contributors": [
@@ -2965,38 +2950,33 @@
         },
         "chest": {
           "name": "Pectoraux",
-          "inol": 5.96,
-          "sets": 12,
+          "inol": 4.95,
+          "sets": 8,
           "color": "grey",
           "statusLabel": "Volume Insuffisant (Repos / Maintien)",
           "contributors": [
             {
               "nom": "Développé Couché",
               "value": 0.0277,
-              "percentage": 39
-            },
-            {
-              "nom": "Overhead Press (OHP)",
-              "value": 0.0277,
-              "percentage": 39
+              "percentage": 71
             },
             {
               "nom": "Développé Incliné",
-              "value": 0.016,
-              "percentage": 22
+              "value": 0.0114,
+              "percentage": 29
             }
           ],
-          "remainingCapacity": 0.9715,
-          "jointStress": 1.2,
-          "readiness": -0.04,
+          "remainingCapacity": 0.9844,
+          "jointStress": 0.97,
+          "readiness": -0.02,
           "fatigueHistory": [
-            2.8,
-            1.4,
-            0.7,
-            0.57,
-            0.28,
-            0.14,
-            0.07
+            2.49,
+            1.25,
+            0.62,
+            0.31,
+            0.16,
+            0.08,
+            0.04
           ]
         },
         "deltoids": {
@@ -3048,7 +3028,7 @@
         "forearm": {
           "name": "Avant-bras",
           "inol": 1.59,
-          "sets": 12,
+          "sets": 4.4,
           "color": "grey",
           "statusLabel": "Volume Insuffisant (Repos / Maintien)",
           "contributors": [
@@ -3084,7 +3064,7 @@
         "gluteal": {
           "name": "Fessiers",
           "inol": 2.11,
-          "sets": 8,
+          "sets": 4.4,
           "color": "grey",
           "statusLabel": "Volume Insuffisant (Repos / Maintien)",
           "contributors": [
@@ -3115,7 +3095,7 @@
         "hamstring": {
           "name": "Ischio-jambiers",
           "inol": 0.33,
-          "sets": 4,
+          "sets": 0.6,
           "color": "grey",
           "statusLabel": "Volume Insuffisant (Repos / Maintien)",
           "contributors": [
@@ -3201,7 +3181,7 @@
         "lowerBack": {
           "name": "Lombaires",
           "inol": 1.6,
-          "sets": 8,
+          "sets": 3.6,
           "color": "grey",
           "statusLabel": "Volume Insuffisant (Repos / Maintien)",
           "contributors": [
@@ -3339,7 +3319,7 @@
         "triceps": {
           "name": "Triceps",
           "inol": 4.88,
-          "sets": 16,
+          "sets": 9.6,
           "color": "grey",
           "statusLabel": "Volume Insuffisant (Repos / Maintien)",
           "contributors": [
@@ -3446,7 +3426,7 @@
         "rhomboids": {
           "name": "Rhomboïdes",
           "inol": 0.86,
-          "sets": 4,
+          "sets": 2.4,
           "color": "grey",
           "statusLabel": "Volume Insuffisant (Repos / Maintien)",
           "contributors": [
@@ -3551,33 +3531,28 @@
         },
         "upperChest": {
           "name": "Pectoraux Supérieurs",
-          "inol": 1.87,
-          "sets": 8,
+          "inol": 1.44,
+          "sets": 4,
           "color": "grey",
           "statusLabel": "Volume Insuffisant (Repos / Maintien)",
           "contributors": [
             {
-              "nom": "Overhead Press (OHP)",
-              "value": 0.0277,
-              "percentage": 71
-            },
-            {
               "nom": "Développé Incliné",
               "value": 0.0114,
-              "percentage": 29
+              "percentage": 100
             }
           ],
-          "remainingCapacity": 0.9844,
-          "jointStress": 0.4,
-          "readiness": 0.43,
+          "remainingCapacity": 0.9954,
+          "jointStress": 0.28,
+          "readiness": 0.33,
           "fatigueHistory": [
-            0.74,
-            0.37,
+            0.72,
+            0.36,
             0.18,
-            0.31,
-            0.16,
-            0.08,
-            0.04
+            0.09,
+            0.05,
+            0.02,
+            0.01
           ]
         },
         "lowerChest": {
@@ -3787,7 +3762,7 @@
       "sncPercentage": 6,
       "cnsFailure": false,
       "junkVolumeAlerts": [],
-      "globalWorkCapacity": 91.4,
+      "globalWorkCapacity": 91.5,
       "topSurcharged": [],
       "topNeglected": [
         {
@@ -3859,7 +3834,7 @@
       "weeklyMacro": {
         "peakFatigue": {
           "chest": {
-            "value": 2.8,
+            "value": 2.49,
             "day": "Lundi"
           },
           "upperBack": {
@@ -3888,30 +3863,22 @@
           }
         },
         "weeklyEffectiveSets": {
-          "chest": 8,
-          "upperBack": 8,
-          "frontDeltoid": 12,
-          "biceps": 12,
-          "triceps": 16,
-          "quadriceps": 8,
-          "hamstring": 4
+          "chest": 0,
+          "upperBack": 0,
+          "frontDeltoid": 0,
+          "biceps": 0,
+          "triceps": 0,
+          "quadriceps": 0,
+          "hamstring": 0
         },
         "pushPullRatio": {
           "push": 63,
           "pull": 38
         },
         "axialSncLoad": 19,
-        "traumaAlerts": [
-          "Pectoraux — pic critique Lundi (fatigue 2.80)"
-        ]
+        "traumaAlerts": []
       },
-      "weeklyTraumas": [
-        {
-          "muscleName": "Pectoraux",
-          "peakInol": 2.8,
-          "dayIndex": 0
-        }
-      ]
+      "weeklyTraumas": []
     }
   },
   {
@@ -3936,7 +3903,7 @@
       "blueprint": {
         "Lundi": [
           {
-            "id": "4zka5ng",
+            "id": "9biht01",
             "exerciseId": "bench_press",
             "sets": [
               {
@@ -3950,7 +3917,7 @@
             "active": true
           },
           {
-            "id": "7nnofii",
+            "id": "snqluoj",
             "exerciseId": "incline_bench",
             "sets": [
               {
@@ -3964,7 +3931,7 @@
             "active": true
           },
           {
-            "id": "n8ute6i",
+            "id": "pux7lrm",
             "exerciseId": "dips",
             "sets": [
               {
@@ -4050,38 +4017,38 @@
         },
         "chest": {
           "name": "Pectoraux",
-          "inol": 13.72,
+          "inol": 10.85,
           "sets": 30,
           "color": "grey",
           "statusLabel": "Volume Insuffisant (Repos / Maintien)",
           "contributors": [
             {
-              "nom": "Développé Incliné",
-              "value": 0.0397,
-              "percentage": 37
-            },
-            {
               "nom": "Développé Couché",
               "value": 0.0346,
-              "percentage": 32
+              "percentage": 40
+            },
+            {
+              "nom": "Développé Incliné",
+              "value": 0.0283,
+              "percentage": 33
             },
             {
               "nom": "Dips",
-              "value": 0.0341,
-              "percentage": 31
+              "value": 0.0227,
+              "percentage": 27
             }
           ],
-          "remainingCapacity": 0.9567,
-          "jointStress": 2.69,
-          "readiness": -0.05,
+          "remainingCapacity": 0.9658,
+          "jointStress": 2.13,
+          "readiness": -0.04,
           "fatigueHistory": [
-            6.91,
-            3.46,
-            1.73,
-            0.86,
-            0.43,
-            0.22,
-            0.11
+            5.47,
+            2.73,
+            1.37,
+            0.68,
+            0.34,
+            0.17,
+            0.09
           ]
         },
         "deltoids": {
@@ -4347,7 +4314,7 @@
         "triceps": {
           "name": "Triceps",
           "inol": 6.5,
-          "sets": 30,
+          "sets": 17,
           "color": "grey",
           "statusLabel": "Volume Insuffisant (Repos / Maintien)",
           "contributors": [
@@ -4369,7 +4336,7 @@
           ],
           "remainingCapacity": 0.9795,
           "jointStress": 1.28,
-          "readiness": 1.48,
+          "readiness": 0.74,
           "fatigueHistory": [
             3.28,
             1.64,
@@ -4555,7 +4522,7 @@
           ],
           "remainingCapacity": 0.9887,
           "jointStress": 0.7,
-          "readiness": 0.82,
+          "readiness": 0.66,
           "fatigueHistory": [
             1.81,
             0.9,
@@ -4569,7 +4536,7 @@
         "lowerChest": {
           "name": "Pectoraux Inférieurs",
           "inol": 2.87,
-          "sets": 10,
+          "sets": 8,
           "color": "grey",
           "statusLabel": "Volume Insuffisant (Repos / Maintien)",
           "contributors": [
@@ -4773,7 +4740,7 @@
       "sncPercentage": 1,
       "cnsFailure": false,
       "junkVolumeAlerts": [],
-      "globalWorkCapacity": 99.1,
+      "globalWorkCapacity": 99.2,
       "topSurcharged": [],
       "topNeglected": [
         {
@@ -4845,7 +4812,7 @@
       "weeklyMacro": {
         "peakFatigue": {
           "chest": {
-            "value": 6.91,
+            "value": 5.47,
             "day": "Lundi"
           },
           "upperBack": {
@@ -4874,11 +4841,11 @@
           }
         },
         "weeklyEffectiveSets": {
-          "chest": 30,
+          "chest": 0,
           "upperBack": 0,
-          "frontDeltoid": 30,
+          "frontDeltoid": 0,
           "biceps": 0,
-          "triceps": 30,
+          "triceps": 0,
           "quadriceps": 0,
           "hamstring": 0
         },
@@ -4888,7 +4855,7 @@
         },
         "axialSncLoad": 0,
         "traumaAlerts": [
-          "Pectoraux — pic critique Lundi (fatigue 6.91)",
+          "Pectoraux — pic critique Lundi (fatigue 5.47)",
           "Épaules — pic critique Lundi (fatigue 3.47)",
           "Triceps — pic critique Lundi (fatigue 3.28)"
         ]
@@ -4896,7 +4863,7 @@
       "weeklyTraumas": [
         {
           "muscleName": "Pectoraux",
-          "peakInol": 6.91,
+          "peakInol": 5.47,
           "dayIndex": 0
         },
         {
@@ -4934,7 +4901,7 @@
       "blueprint": {
         "Lundi": [
           {
-            "id": "bhbqq0j",
+            "id": "q2k9a05",
             "exerciseId": "deadlift",
             "sets": [
               {
@@ -4950,7 +4917,7 @@
         ],
         "Mardi": [
           {
-            "id": "l31fzi7",
+            "id": "5brgjei",
             "exerciseId": "squat",
             "sets": [
               {
@@ -4966,7 +4933,7 @@
         ],
         "Mercredi": [
           {
-            "id": "go8kbok",
+            "id": "7oeecrj",
             "exerciseId": "barbell_row",
             "sets": [
               {
@@ -4982,7 +4949,7 @@
         ],
         "Jeudi": [
           {
-            "id": "8k9ss99",
+            "id": "ayr0owo",
             "exerciseId": "deadlift",
             "sets": [
               {
@@ -4998,7 +4965,7 @@
         ],
         "Vendredi": [
           {
-            "id": "cmfua74",
+            "id": "672s5a4",
             "exerciseId": "squat",
             "sets": [
               {
@@ -5014,7 +4981,7 @@
         ],
         "Samedi": [
           {
-            "id": "d3hjfha",
+            "id": "52fgbeb",
             "exerciseId": "barbell_row",
             "sets": [
               {
@@ -5030,7 +4997,7 @@
         ],
         "Dimanche": [
           {
-            "id": "spdggvn",
+            "id": "asj7zg7",
             "exerciseId": "deadlift",
             "sets": [
               {
@@ -5071,7 +5038,7 @@
         "biceps": {
           "name": "Biceps",
           "inol": 2.22,
-          "sets": 10,
+          "sets": 5,
           "color": "grey",
           "statusLabel": "Volume Insuffisant (Repos / Maintien)",
           "contributors": [
@@ -5177,7 +5144,7 @@
         "forearm": {
           "name": "Avant-bras",
           "inol": 4.76,
-          "sets": 25,
+          "sets": 10,
           "color": "green",
           "statusLabel": "Stimulus Optimal (Zone d'Adaptation)",
           "contributors": [
@@ -5208,7 +5175,7 @@
         "gluteal": {
           "name": "Fessiers",
           "inol": 11.14,
-          "sets": 25,
+          "sets": 19,
           "color": "red",
           "statusLabel": "Risque Lésionnel (MRV Dépassé)",
           "contributors": [
@@ -5225,7 +5192,7 @@
           ],
           "remainingCapacity": 0,
           "jointStress": 12.23,
-          "readiness": 0.27,
+          "readiness": -2.43,
           "fatigueHistory": [
             2.97,
             3.52,
@@ -5239,7 +5206,7 @@
         "hamstring": {
           "name": "Ischio-jambiers",
           "inol": 7.44,
-          "sets": 25,
+          "sets": 14.25,
           "color": "orange",
           "statusLabel": "Surcharge Fonctionnelle (Attention)",
           "contributors": [
@@ -5256,7 +5223,7 @@
           ],
           "remainingCapacity": 0.0643,
           "jointStress": 8.44,
-          "readiness": 0,
+          "readiness": -0.82,
           "fatigueHistory": [
             2.49,
             2.15,
@@ -5330,7 +5297,7 @@
         "lowerBack": {
           "name": "Lombaires",
           "inol": 12.63,
-          "sets": 35,
+          "sets": 24,
           "color": "red",
           "statusLabel": "Risque Lésionnel (MRV Dépassé)",
           "contributors": [
@@ -5352,7 +5319,7 @@
           ],
           "remainingCapacity": 0,
           "jointStress": 14.2,
-          "readiness": 0.15,
+          "readiness": -3.13,
           "fatigueHistory": [
             3.62,
             3.46,
@@ -5554,7 +5521,7 @@
         "rhomboids": {
           "name": "Rhomboïdes",
           "inol": 2.67,
-          "sets": 10,
+          "sets": 6,
           "color": "grey",
           "statusLabel": "Volume Insuffisant (Repos / Maintien)",
           "contributors": [
@@ -5867,7 +5834,7 @@
         {
           "name": "Dos",
           "inol": 12.63,
-          "sets": 35,
+          "sets": 24,
           "color": "red",
           "statusLabel": "Risque Lésionnel (MRV Dépassé)",
           "contributors": [
@@ -5889,7 +5856,7 @@
           ],
           "remainingCapacity": 0,
           "jointStress": 14.2,
-          "readiness": 0.15,
+          "readiness": -3.13,
           "fatigueHistory": [
             3.62,
             3.46,
@@ -5903,7 +5870,7 @@
         {
           "name": "Ischios/Fessiers",
           "inol": 11.14,
-          "sets": 25,
+          "sets": 19,
           "color": "red",
           "statusLabel": "Risque Lésionnel (MRV Dépassé)",
           "contributors": [
@@ -5920,7 +5887,7 @@
           ],
           "remainingCapacity": 0,
           "jointStress": 12.23,
-          "readiness": 0.27,
+          "readiness": -2.43,
           "fatigueHistory": [
             2.97,
             3.52,
@@ -6058,12 +6025,12 @@
         },
         "weeklyEffectiveSets": {
           "chest": 0,
-          "upperBack": 25,
+          "upperBack": 0,
           "frontDeltoid": 0,
-          "biceps": 10,
+          "biceps": 0,
           "triceps": 0,
-          "quadriceps": 10,
-          "hamstring": 25
+          "quadriceps": 0,
+          "hamstring": 0
         },
         "pushPullRatio": {
           "push": 0,
@@ -6115,7 +6082,7 @@
       "blueprint": {
         "Lundi": [
           {
-            "id": "maj04y6",
+            "id": "hvag0b3",
             "exerciseId": "bench_press",
             "sets": [
               {
@@ -6131,7 +6098,7 @@
         ],
         "Mardi": [
           {
-            "id": "7lvs7f7",
+            "id": "a2v9r3h",
             "exerciseId": "ohp",
             "sets": [
               {
@@ -6147,7 +6114,7 @@
         ],
         "Mercredi": [
           {
-            "id": "pod56zo",
+            "id": "0olreu9",
             "exerciseId": "dips",
             "sets": [
               {
@@ -6163,7 +6130,7 @@
         ],
         "Jeudi": [
           {
-            "id": "62i4q6b",
+            "id": "pya8v7x",
             "exerciseId": "bench_press",
             "sets": [
               {
@@ -6179,7 +6146,7 @@
         ],
         "Vendredi": [
           {
-            "id": "7irqxb0",
+            "id": "uk0klq2",
             "exerciseId": "incline_bench",
             "sets": [
               {
@@ -6261,38 +6228,38 @@
         },
         "chest": {
           "name": "Pectoraux",
-          "inol": 13.99,
-          "sets": 25,
+          "inol": 12.01,
+          "sets": 20,
           "color": "green",
           "statusLabel": "Stimulus Optimal (Zone d'Adaptation)",
           "contributors": [
             {
-              "nom": "Développé Incliné",
-              "value": 0.3166,
-              "percentage": 46
-            },
-            {
               "nom": "Développé Couché",
               "value": 0.3111,
-              "percentage": 44
+              "percentage": 53
+            },
+            {
+              "nom": "Développé Incliné",
+              "value": 0.2261,
+              "percentage": 39
             },
             {
               "nom": "Dips",
-              "value": 0.068,
-              "percentage": 10
+              "value": 0.0453,
+              "percentage": 8
             }
           ],
-          "remainingCapacity": 0.7184,
-          "jointStress": 3.44,
-          "readiness": -0.35,
+          "remainingCapacity": 0.767,
+          "jointStress": 2.93,
+          "readiness": -0.29,
           "fatigueHistory": [
-            2.54,
-            1.55,
-            1.85,
-            3.12,
-            2.82,
-            1.41,
-            0.7
+            2.48,
+            1.24,
+            1.34,
+            2.86,
+            2.33,
+            1.16,
+            0.58
           ]
         },
         "deltoids": {
@@ -6564,7 +6531,7 @@
         "triceps": {
           "name": "Triceps",
           "inol": 7.91,
-          "sets": 25,
+          "sets": 13.5,
           "color": "grey",
           "statusLabel": "Volume Insuffisant (Repos / Maintien)",
           "contributors": [
@@ -6586,7 +6553,7 @@
           ],
           "remainingCapacity": 0.8749,
           "jointStress": 1.88,
-          "readiness": 1.86,
+          "readiness": 1.75,
           "fatigueHistory": [
             1.25,
             1.31,
@@ -6759,39 +6726,34 @@
         },
         "upperChest": {
           "name": "Pectoraux Supérieurs",
-          "inol": 2.34,
-          "sets": 10,
+          "inol": 1.79,
+          "sets": 5,
           "color": "grey",
           "statusLabel": "Volume Insuffisant (Repos / Maintien)",
           "contributors": [
             {
               "nom": "Développé Incliné",
               "value": 0.2261,
-              "percentage": 96
-            },
-            {
-              "nom": "Overhead Press (OHP)",
-              "value": 0.0087,
-              "percentage": 4
+              "percentage": 100
             }
           ],
-          "remainingCapacity": 0.9061,
-          "jointStress": 0.66,
-          "readiness": 0.5,
+          "remainingCapacity": 0.9096,
+          "jointStress": 0.54,
+          "readiness": 0.37,
           "fatigueHistory": [
-            0.12,
-            0.33,
-            0.17,
-            0.08,
-            0.94,
-            0.47,
+            0.11,
+            0.06,
+            0.03,
+            0.01,
+            0.9,
+            0.45,
             0.23
           ]
         },
         "lowerChest": {
           "name": "Pectoraux Inférieurs",
           "inol": 1.44,
-          "sets": 5,
+          "sets": 4,
           "color": "grey",
           "statusLabel": "Volume Insuffisant (Repos / Maintien)",
           "contributors": [
@@ -6995,7 +6957,7 @@
       "sncPercentage": 6,
       "cnsFailure": false,
       "junkVolumeAlerts": [],
-      "globalWorkCapacity": 94.2,
+      "globalWorkCapacity": 94.7,
       "topSurcharged": [],
       "topNeglected": [
         {
@@ -7067,7 +7029,7 @@
       "weeklyMacro": {
         "peakFatigue": {
           "chest": {
-            "value": 3.12,
+            "value": 2.86,
             "day": "Jeudi"
           },
           "upperBack": {
@@ -7096,11 +7058,11 @@
           }
         },
         "weeklyEffectiveSets": {
-          "chest": 20,
+          "chest": 0,
           "upperBack": 0,
-          "frontDeltoid": 25,
+          "frontDeltoid": 0,
           "biceps": 0,
-          "triceps": 25,
+          "triceps": 0,
           "quadriceps": 0,
           "hamstring": 0
         },
@@ -7110,13 +7072,13 @@
         },
         "axialSncLoad": 9,
         "traumaAlerts": [
-          "Pectoraux — pic critique Jeudi (fatigue 3.12)"
+          "Pectoraux — pic critique Jeudi (fatigue 2.86)"
         ]
       },
       "weeklyTraumas": [
         {
           "muscleName": "Pectoraux",
-          "peakInol": 3.12,
+          "peakInol": 2.86,
           "dayIndex": 3
         }
       ]
