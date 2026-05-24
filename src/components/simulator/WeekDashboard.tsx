@@ -6,6 +6,7 @@ import {
   Tooltip, ResponsiveContainer, CartesianGrid,
 } from 'recharts';
 import { SimulationResult, WeeklyBlueprint, MuscleId } from '@/lib/calculations';
+import { MuscleStatus } from '@/lib/types';
 
 // ─── Props ───────────────────────────────────────────────────────────────────
 interface WeekDashboardProps {
@@ -36,43 +37,42 @@ const GRAND_GROUPS: { id: MuscleId; label: string }[] = [
 ];
 
 // ─── Utilities ────────────────────────────────────────────────────────────────
-function calculateCycleQualityScore(sim: SimulationResult): { score: number; grade: string; critique: string } {
+function calculateProgramScore(sim: SimulationResult, blueprint: WeeklyBlueprint, toggledDays?: { [day: string]: boolean }): { score: number; grade: string; critique: string } {
   let score = 100;
   const penalties: string[] = [];
 
-  const musclesList = Object.entries(sim.muscles)
-    .filter(([_, m]) => m !== undefined)
-    .map(([id, m]) => ({ id: id as string, ...m! }));
-
-  // 1. Fréquence : Chaque muscle majeur doit avoir un score INOL > 0.5
-  const underStimulated = musclesList.filter(m => m.inol < 0.5 && GRAND_GROUPS.some(g => g.id === m.id));
-  if (underStimulated.length > 0) {
-    score -= underStimulated.length * 10;
-    penalties.push(`Fréquence insuffisante (< 0.5 INOL) pour : ${underStimulated.map(m => m.name).join(', ')}.`);
-  }
-
-  // 2. Purge de fatigue : La fatigue doit être < 0.2 au Jour 7 pour tous les muscles
-  // Dans le modèle, la propriété 'fatigueHistory' contient la fatigue pour chaque jour. Le jour 7 est l'index 6.
-  const overFatigued = musclesList.filter(m => (m.fatigueHistory?.[6] || 0) > 0.2);
-  if (overFatigued.length > 0) {
-    score -= overFatigued.length * 8;
-    penalties.push(`Fatigue résiduelle élevée au Jour 7 (pas de purge complète) pour : ${overFatigued.map(m => m.name).join(', ')}.`);
-  }
-
-  // 3. Diversité : Ratio PPL équilibré (pas de groupe à 0 sets)
-  if (sim.pushPullLegsRatio.pull === 0 && sim.pushPullLegsRatio.push > 0) {
-    score -= 25;
-    penalties.push("Asymétrie critique : Aucun exercice de Tirage.");
-  } else if (sim.pushPullLegsRatio.pull > 0 && sim.pushPullLegsRatio.push > sim.pushPullLegsRatio.pull * 1.5) {
-    score -= 15;
-    penalties.push("Déséquilibre postural : Poussée dominante.");
-  }
-
-  // Hard caps de sécurité physique (SNC / Lésionnel)
+  // 1. Décompte des statuts musculaires
+  const musclesList = Object.values(sim.muscles).filter(m => m !== undefined) as MuscleStatus[];
   const redMuscles = musclesList.filter(m => m.color === 'red');
+  const orangeMuscles = musclesList.filter(m => m.color === 'orange');
+
+  // 2. Pénalités soustractives
+  if (orangeMuscles.length > 0) {
+    score -= orangeMuscles.length * 10;
+    penalties.push(`${orangeMuscles.length} muscle(s) en surcharge (Orange).`);
+  }
+
+  if (sim.junkVolumeAlerts && sim.junkVolumeAlerts.length > 0) {
+    score -= sim.junkVolumeAlerts.length * 5;
+    penalties.push(`${sim.junkVolumeAlerts.length} alerte(s) de Volume Poubelle.`);
+  }
+
+  if (sim.topNeglected && sim.topNeglected.length > 0) {
+    score -= Math.min(15, sim.topNeglected.length * 3);
+  }
+
+  // Déséquilibre postural (Protection épaules)
+  if (sim.pushPullLegsRatio.pull > 0 && sim.pushPullLegsRatio.push > sim.pushPullLegsRatio.pull * 1.5) {
+    score -= 15;
+    penalties.push("Asymétrie : Beaucoup trop de Poussée par rapport au Tirage.");
+  } else if (sim.pushPullLegsRatio.pull === 0 && sim.pushPullLegsRatio.push > 0) {
+    score -= 25; // Pire cas : Zéro tirage
+  }
+
+  // 3. Application des Hard Caps (Échecs critiques)
   if (redMuscles.length > 0) {
     score = Math.min(score, 40);
-    penalties.push(`DANGER : Risque lésionnel détecté sur ${redMuscles.map(m => m.name).join(', ')}.`);
+    penalties.push(`DANGER : Risque lésionnel sur ${redMuscles.map(m => m.name).join(', ')}.`);
   }
 
   if (sim.cnsFailure) {
@@ -80,9 +80,33 @@ function calculateCycleQualityScore(sim: SimulationResult): { score: number; gra
     penalties.push("DANGER : Échec du Système Nerveux Central (Burnout).");
   }
 
+  // 4. Mauvaise Distribution (Concentration excessive)
+  const dailySets: Record<string, number> = {};
+  let totalSetsWeek = 0;
+  Object.entries(blueprint).forEach(([day, dayExercises]) => {
+    if (toggledDays && toggledDays[day] === false) return;
+    let daySets = 0;
+    dayExercises.forEach(ex => {
+      if (!ex.active) return;
+      ex.sets.forEach(set => {
+        if (!set.active) return;
+        daySets += set.series;
+      });
+    });
+    dailySets[day] = daySets;
+    totalSetsWeek += daySets;
+  });
+
+  const maxDailySets = Math.max(0, ...Object.values(dailySets));
+  if (totalSetsWeek > 0 && maxDailySets > totalSetsWeek * 0.6) {
+    score -= 10;
+    penalties.push("Distribution déséquilibrée : Plus de 60% du volume de la semaine est concentré sur une seule journée.");
+  }
+
   // Normalisation
   score = Math.max(0, Math.min(100, Math.round(score)));
 
+  // 4. Attribution du Grade
   let grade = 'F';
   if (score >= 90) grade = 'S';
   else if (score >= 80) grade = 'A';
@@ -93,7 +117,7 @@ function calculateCycleQualityScore(sim: SimulationResult): { score: number; gra
   return { 
     score, 
     grade, 
-    critique: penalties.length > 0 ? penalties.join(' ') : "Structure de cycle optimale : fréquence, purge et diversité parfaites." 
+    critique: penalties.length > 0 ? penalties.join(' ') : "Programme optimisé et sécurisé." 
   };
 }
 
@@ -180,7 +204,7 @@ const ChartTooltip = ({ active, payload, label }: { active?: boolean; payload?: 
 
 // ─── Component ────────────────────────────────────────────────────────────────
 export default function WeekDashboard({ simulation, blueprint, toggledDays }: WeekDashboardProps) {
-  const { score: programmeScore, grade: gradeLetter, critique } = useMemo(() => calculateCycleQualityScore(simulation), [simulation]);
+  const { score: programmeScore, grade: gradeLetter, critique } = useMemo(() => calculateProgramScore(simulation, blueprint, toggledDays), [simulation, blueprint, toggledDays]);
   const grade = useMemo(() => getGradeInfo(gradeLetter), [gradeLetter]);
   const prescriptions = useMemo(() => generatePrescriptions(simulation), [simulation]);
 
@@ -273,22 +297,14 @@ export default function WeekDashboard({ simulation, blueprint, toggledDays }: We
           </p>
         </div>
 
-        {/* Volume de Travail du Cycle */}
+        {/* Tonnage Hebdomadaire */}
         <div className={cardBase}>
-          <p className="text-[10px] text-zinc-500 uppercase tracking-wider font-bold mb-3">🏋️ Volume de Travail du Cycle</p>
+          <p className="text-[10px] text-zinc-500 uppercase tracking-wider font-bold mb-3">🏋️ Tonnage Hebdomadaire</p>
           <p className="text-3xl font-black font-mono text-zinc-100 leading-none mb-1">
             {weeklyTonnage >= 1000 ? (weeklyTonnage / 1000).toFixed(1) : weeklyTonnage}
             <span className="text-base text-zinc-600 font-normal">{weeklyTonnage >= 1000 ? ' t' : ' kg'}</span>
           </p>
-          <p className="text-[10px] text-zinc-600 leading-relaxed mt-2 font-medium">
-            {weeklyTonnage > 40000 
-              ? "Volume exceptionnel pour un cycle de 7 jours, réservé aux athlètes avancés." 
-              : weeklyTonnage > 25000 
-              ? "Vous êtes dans la moyenne haute pour ce cycle de 7 jours, excellent volume de base." 
-              : weeklyTonnage > 15000 
-              ? "Volume modéré, parfait pour une reprise ou un maintien."
-              : "Volume léger, privilégiez l'augmentation progressive de la charge."}
-          </p>
+          <p className="text-[10px] text-zinc-600 leading-relaxed mt-2">Charge totale déplacée cette semaine (séries × reps × poids). Indicateur de surcharge progressive.</p>
           {weeklyTonnage === 0 && (
             <p className="text-[10px] text-zinc-700 italic mt-1">Ajoutez des exercices avec des poids pour voir cette métrique.</p>
           )}
