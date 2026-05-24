@@ -8,33 +8,47 @@ import { SimulationResult, WeeklyBlueprint } from '@/lib/calculations';
 interface PDFDownloadButtonProps {
   simulation: SimulationResult;
   blueprint: WeeklyBlueprint;
-  avatarImageStr: string;
+  avatarImageStr?: string;
+  chartImageStr?: string;
   score: number;
   grade: string;
   critique: string;
+  toggledDays?: { [day: string]: boolean };
 }
 
-export default function PDFDownloadButton({ simulation, blueprint, avatarImageStr, score, grade, critique }: PDFDownloadButtonProps) {
+export default function PDFDownloadButton({ simulation, blueprint, avatarImageStr, chartImageStr, score, grade, critique, toggledDays }: PDFDownloadButtonProps) {
   return (
     <PDFDownloadLink
-      document={<PDFReport simulation={simulation} blueprint={blueprint} avatarImageStr={avatarImageStr} score={score} grade={grade} critique={critique} />}
+      document={
+        <PDFReport
+          simulation={simulation}
+          blueprint={blueprint}
+          avatarImageStr={avatarImageStr}
+          chartImageStr={chartImageStr}
+          score={score}
+          grade={grade}
+          critique={critique}
+          toggledDays={toggledDays}
+        />
+      }
       fileName="Forge_Rapport_Hebdomadaire.pdf"
-      className="flex items-center gap-2 px-4 py-2 bg-zinc-100 hover:bg-white text-zinc-950 text-xs font-bold rounded-lg shadow-lg transition-colors cursor-pointer"
     >
-      {/* react-pdf passes a blob state internally, but standard children work too. The types for children in PDFDownloadLink are sometimes tricky, so we use a function if needed. */}
       {({ loading }) => (
-        <>
+        <button
+          className="flex items-center gap-2 px-4 py-2 bg-zinc-100 hover:bg-white text-zinc-950 text-xs font-bold rounded-lg shadow-lg transition-all duration-200 cursor-pointer"
+          disabled={loading}
+        >
           {loading ? (
-            <span className="animate-pulse">Génération du PDF...</span>
+            <span className="animate-pulse">Génération...</span>
           ) : (
             <>
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
               </svg>
-              Télécharger le PDF
+              Télécharger PDF
             </>
           )}
-        </>
+        </button>
       )}
     </PDFDownloadLink>
   );

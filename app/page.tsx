@@ -24,7 +24,7 @@ import Sequencer from '@/components/simulator/Sequencer';
 import LibraryDrawer from '@/components/simulator/LibraryDrawer';
 import CalibrageModal from '@/components/simulator/CalibrageModal';
 import BlueprintsModal from '@/components/simulator/BlueprintsModal';
-import WeekDashboard, { calculateProgramScore } from '@/components/simulator/WeekDashboard';
+import WeekDashboard from '@/components/simulator/WeekDashboard';
 import { toPng } from 'html-to-image';
 import dynamic from 'next/dynamic';
 
@@ -76,17 +76,23 @@ export default function Home() {
   const [selectedExercise, setSelectedExercise] = useState<Exercise | null>(null);
 
   const avatarRef = React.useRef<HTMLDivElement>(null);
+  const chartRef = React.useRef<HTMLDivElement>(null);
   const [avatarImageStr, setAvatarImageStr] = useState<string | null>(null);
+  const [chartImageStr, setChartImageStr] = useState<string | null>(null);
   const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
 
   const handlePreparePdf = async () => {
     if (!avatarRef.current) return;
     setIsGeneratingPdf(true);
     try {
-      const dataUrl = await toPng(avatarRef.current, { cacheBust: true, backgroundColor: '#09090b' });
-      setAvatarImageStr(dataUrl);
+      const [avatarUrl, chartUrl] = await Promise.all([
+        toPng(avatarRef.current, { cacheBust: true, backgroundColor: '#09090b' }),
+        chartRef.current ? toPng(chartRef.current, { cacheBust: true, backgroundColor: '#09090b' }) : Promise.resolve(null),
+      ]);
+      setAvatarImageStr(avatarUrl);
+      if (chartUrl) setChartImageStr(chartUrl);
     } catch (err) {
-      console.error("Failed to generate avatar image for PDF", err);
+      console.error("Failed to generate PDF images", err);
     } finally {
       setIsGeneratingPdf(false);
     }
@@ -613,10 +619,9 @@ export default function Home() {
                   <PDFDownloadButton 
                     simulation={simulationResult} 
                     blueprint={blueprint} 
-                    avatarImageStr={avatarImageStr} 
-                    score={calculateProgramScore(simulationResult, blueprint, toggledDays).score}
-                    grade={calculateProgramScore(simulationResult, blueprint, toggledDays).grade}
-                    critique={calculateProgramScore(simulationResult, blueprint, toggledDays).critique}
+                    avatarImageStr={avatarImageStr ?? undefined} 
+                    chartImageStr={chartImageStr ?? undefined}
+                    toggledDays={toggledDays}
                   />
                 )}
               </div>
@@ -714,7 +719,7 @@ export default function Home() {
             
             {/* Right Portion: Analytics Dashboard — 68% width */}
             <div className="flex-1 min-w-0 h-full overflow-y-auto">
-              <WeekDashboard simulation={simulationResult} blueprint={blueprint} toggledDays={toggledDays} />
+              <WeekDashboard simulation={simulationResult} blueprint={blueprint} toggledDays={toggledDays} chartRef={chartRef} />
             </div>
           </div>
         )}

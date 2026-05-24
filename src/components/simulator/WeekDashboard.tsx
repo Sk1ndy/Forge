@@ -13,6 +13,7 @@ interface WeekDashboardProps {
   simulation: SimulationResult;
   blueprint: WeeklyBlueprint;
   toggledDays?: { [day: string]: boolean };
+  chartRef?: React.RefObject<HTMLDivElement | null>;
 }
 
 // ─── Constants ───────────────────────────────────────────────────────────────
@@ -37,7 +38,7 @@ const GRAND_GROUPS: { id: MuscleId; label: string }[] = [
 ];
 
 // ─── Utilities ────────────────────────────────────────────────────────────────
-function calculateProgramScore(sim: SimulationResult, blueprint: WeeklyBlueprint, toggledDays?: { [day: string]: boolean }): { score: number; grade: string; critique: string } {
+export function calculateProgramScore(sim: SimulationResult, blueprint: WeeklyBlueprint, toggledDays?: { [day: string]: boolean }): { score: number; grade: string; critique: string } {
   let score = 100;
   const penalties: string[] = [];
 
@@ -203,7 +204,7 @@ const ChartTooltip = ({ active, payload, label }: { active?: boolean; payload?: 
 };
 
 // ─── Component ────────────────────────────────────────────────────────────────
-export default function WeekDashboard({ simulation, blueprint, toggledDays }: WeekDashboardProps) {
+export default function WeekDashboard({ simulation, blueprint, toggledDays, chartRef }: WeekDashboardProps) {
   const { score: programmeScore, grade: gradeLetter, critique } = useMemo(() => calculateProgramScore(simulation, blueprint, toggledDays), [simulation, blueprint, toggledDays]);
   const grade = useMemo(() => getGradeInfo(gradeLetter), [gradeLetter]);
   const prescriptions = useMemo(() => generatePrescriptions(simulation), [simulation]);
@@ -356,7 +357,7 @@ export default function WeekDashboard({ simulation, blueprint, toggledDays }: We
               ))}
             </div>
           </div>
-          <div style={{ height: 180 }}>
+          <div ref={chartRef} style={{ height: 180, backgroundColor: 'transparent' }}>
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={timelineData} margin={{ top: 4, right: 4, left: -24, bottom: 0 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.04)" />
