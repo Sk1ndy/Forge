@@ -1,14 +1,27 @@
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, Pressable } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { supabase } from '../../src/lib/supabase';
+import { useRouter } from 'expo-router';
 
 export default function ProfileScreen() {
+  const router = useRouter();
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    router.replace('/login');
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.title}>Profil</Text>
       </View>
       <View style={styles.content}>
-        <Text style={styles.text}>Paramètres & Synchronisation (Work in progress)</Text>
+        <Text style={styles.text}>Connecté à Supabase</Text>
+        
+        <Pressable style={styles.logoutBtn} onPress={handleLogout}>
+          <Text style={styles.logoutBtnText}>Se déconnecter</Text>
+        </Pressable>
       </View>
     </SafeAreaView>
   );
@@ -38,5 +51,16 @@ const styles = StyleSheet.create({
   text: {
     color: '#71717a',
     fontSize: 16,
+    marginBottom: 40,
+  },
+  logoutBtn: {
+    backgroundColor: '#3f3f46',
+    paddingHorizontal: 24,
+    paddingVertical: 12,
+    borderRadius: 8,
+  },
+  logoutBtnText: {
+    color: '#fff',
+    fontWeight: 'bold',
   }
 });

@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, Pressable, ScrollView, TextInput, Modal, Alert } from 'react-native';
+import { View, Text, StyleSheet, Pressable, ScrollView, TextInput, Modal, Alert, ActivityIndicator } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { PlannedExercise } from '@forge/shared';
+import { loadLatestBlueprint, saveExerciseLog } from '../../src/lib/supabase';
 
 // -- Types Locaux --
 type SetStatus = 'pending' | 'completed' | 'skipped';
@@ -12,6 +13,7 @@ interface SetState {
   index: number;
   weight: string;
   reps: string;
+  rpe: string;
   status: SetStatus;
   skippedReason?: string;
 }
@@ -23,60 +25,43 @@ interface ExState {
   isExpanded: boolean;
 }
 
-// -- Mock Data (Last Week's Performance for Option B) --
-const MOCK_SESSION: PlannedExercise[] = [
-  {
-    id: "pe-1",
-    exerciseId: "ex-bench-press",
-    active: true,
-    sets: [
-      { series: 1, poids: 100, reps: 8, rpe: 8, active: true },
-      { series: 2, poids: 100, reps: 8, rpe: 8, active: true },
-      { series: 3, poids: 100, reps: 8, rpe: 8, active: true }
-    ]
-  },
-  {
-    id: "pe-2",
-    exerciseId: "ex-squat",
-    active: true,
-    sets: [
-      { series: 1, poids: 140, reps: 5, rpe: 8, active: true },
-      { series: 2, poids: 140, reps: 5, rpe: 8, active: true },
-    ]
-  }
-];
-
-const EXERCISE_NAMES: Record<string, string> = {
-  "ex-bench-press": "Développé Couché",
-  "ex-squat": "Squat"
-};
-
 export default function SessionScreen() {
-  const { id } = useLocalSearchParams();
+  const { id, day } = useLocalSearchParams<{ id: string; day: string }>();
   const router = useRouter();
 
-  // État de la session (exercices avec leurs séries)
+  // État de la session
   const [exercises, setExercises] = useState<ExState[]>([]);
+  const [loading, setLoading] = useState(true);
   
   // État du timer
   const [isTimerVisible, setIsTimerVisible] = useState(false);
   const [timeLeft, setTimeLeft] = useState(0);
 
-  // Initialisation avec pré-remplissage basé sur la semaine dernière (Option B)
   useEffect(() => {
-    const initData: ExState[] = MOCK_SESSION.map((ex, exIdx) => ({
-      exerciseId: ex.exerciseId,
-      name: EXERCISE_NAMES[ex.exerciseId] || ex.exerciseId,
-      isExpanded: exIdx === 0, // Le premier exercice est ouvert par défaut
-      sets: ex.sets.map((s, sIdx) => ({
-        index: sIdx,
-        weight: s.poids.toString(),
-        reps: s.reps.toString(),
-        status: 'pending'
-      }))
-    }));
-    setExercises(initData);
-  }, []);
+    async function initSession() {
+      const result = await loadLatestBlueprint();
+      if (result && day) {
+        // @ts-ignore
+        const plan: PlannedExercise[] = result.blueprint[day] || [];
+        
+        const initData: ExState[] = plan.map((ex, exIdx) => ({
+          exerciseId: ex.exerciseId,
+          name: ex.exerciseId.replace('ex-', '').replace(/-/g, ' ').toUpperCase(), // Basic formatting since we don't have exercisesLib here yet
+          isExpanded: exIdx === 0,
+          sets: ex.sets.map((s, sIdx) => ({
+            index: sIdx,
+            weight: s.poids.toString(),
+            reps: s.reps.toString(),
+            rpe: s.rpe.toString(),
+            status: 'pending'
+          }))
+        }));
+        setExercises(initData);
+      }
+      setLoading(false);
+    }
+    initSession();
+  }, [day]);
 
   // Gestion du Chrono (Option A : Automatique)
   useEffect(() => {
@@ -105,14 +90,28 @@ export default function SessionScreen() {
     });
   };
 
-  const validateSet = (exIdx: number, setIdx: number) => {
+  const validateSet = async (exIdx: number, setIdx: number) => {
     setExercises(prev => {
       const newEx = [...prev];
       newEx[exIdx].sets[setIdx].status = 'completed';
       return newEx;
     });
     
-    // Déclenchement automatique du Timer (ex: 90 secondes)
+    // Save to DB
+    const ex = exercises[exIdx];
+    const set = ex.sets[setIdx];
+    await saveExerciseLog({
+      session_id: id as string,
+      exercise_id: ex.exerciseId,
+      day: day as string,
+      set_index: setIdx,
+      actual_weight: parseFloat(set.weight) || 0,
+      actual_reps: parseInt(set.reps) || 0,
+      actual_rpe: parseFloat(set.rpe) || 0,
+      is_completed: true
+    });
+
+    // Déclenchement automatique du Timer
     setTimeLeft(90);
     setIsTimerVisible(true);
   };
@@ -130,12 +129,23 @@ export default function SessionScreen() {
     );
   };
 
-  const markSkipped = (exIdx: number, setIdx: number, reason: string) => {
+  const markSkipped = async (exIdx: number, setIdx: number, reason: string) => {
     setExercises(prev => {
       const newEx = [...prev];
       newEx[exIdx].sets[setIdx].status = 'skipped';
       newEx[exIdx].sets[setIdx].skippedReason = reason;
       return newEx;
+    });
+
+    // Save to DB
+    const ex = exercises[exIdx];
+    await saveExerciseLog({
+      session_id: id as string,
+      exercise_id: ex.exerciseId,
+      day: day as string,
+      set_index: setIdx,
+      is_completed: false,
+      skipped_reason: reason
     });
   };
 
