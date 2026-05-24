@@ -4,7 +4,7 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { PlannedExercise } from '@forge/shared';
-import { loadLatestBlueprint, saveExerciseLog } from '../../src/lib/supabase';
+import { loadLatestBlueprint, saveExerciseLog, loadExercises } from '../../src/lib/supabase';
 
 // -- Types Locaux --
 type SetStatus = 'pending' | 'completed' | 'skipped';
@@ -39,23 +39,30 @@ export default function SessionScreen() {
 
   useEffect(() => {
     async function initSession() {
-      const result = await loadLatestBlueprint();
-      if (result && day) {
+      const [bpResult, libResult] = await Promise.all([
+        loadLatestBlueprint(),
+        loadExercises()
+      ]);
+
+      if (bpResult && day) {
         // @ts-ignore
-        const plan: PlannedExercise[] = result.blueprint[day] || [];
+        const plan: PlannedExercise[] = bpResult.blueprint[day] || [];
         
-        const initData: ExState[] = plan.map((ex, exIdx) => ({
-          exerciseId: ex.exerciseId,
-          name: ex.exerciseId.replace('ex-', '').replace(/-/g, ' ').toUpperCase(), // Basic formatting since we don't have exercisesLib here yet
-          isExpanded: exIdx === 0,
-          sets: ex.sets.map((s, sIdx) => ({
-            index: sIdx,
-            weight: s.poids.toString(),
-            reps: s.reps.toString(),
-            rpe: s.rpe.toString(),
-            status: 'pending'
-          }))
-        }));
+        const initData: ExState[] = plan.map((ex, exIdx) => {
+          const exDef = libResult.find(e => e.id === ex.exerciseId);
+          return {
+            exerciseId: ex.exerciseId,
+            name: exDef ? exDef.nom : ex.exerciseId.replace('ex-', '').replace(/-/g, ' ').toUpperCase(),
+            isExpanded: exIdx === 0,
+            sets: ex.sets.map((s, sIdx) => ({
+              index: sIdx,
+              weight: s.poids.toString(),
+              reps: s.reps.toString(),
+              rpe: s.rpe.toString(),
+              status: 'pending'
+            }))
+          };
+        });
         setExercises(initData);
       }
       setLoading(false);

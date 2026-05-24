@@ -2,13 +2,34 @@ import 'react-native-url-polyfill/auto';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createClient } from '@supabase/supabase-js';
 import { WeeklyBlueprint, ExerciseLog } from '@forge/shared';
+import { Platform } from 'react-native';
 
-const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL || '';
-const supabaseAnonKey = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY || '';
+const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL || 'https://cphqilfezxvtsjfumsfc.supabase.co';
+const supabaseAnonKey = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY || 'sb_publishable_5ss9lGsOqokU6pIPSnKshg_71LB_zGW';
+
+if (!supabaseUrl || !supabaseAnonKey) {
+  console.error("⚠️ SUPABASE ENV VARS MISSING! Please restart Metro bundler.");
+}
+
+// Custom storage adapter that doesn't crash on SSR
+const ExpoSecureStoreAdapter = {
+  getItem: (key: string) => {
+    if (Platform.OS === 'web' && typeof window === 'undefined') return Promise.resolve(null);
+    return AsyncStorage.getItem(key);
+  },
+  setItem: (key: string, value: string) => {
+    if (Platform.OS === 'web' && typeof window === 'undefined') return Promise.resolve();
+    return AsyncStorage.setItem(key, value);
+  },
+  removeItem: (key: string) => {
+    if (Platform.OS === 'web' && typeof window === 'undefined') return Promise.resolve();
+    return AsyncStorage.removeItem(key);
+  },
+};
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
   auth: {
-    storage: AsyncStorage,
+    storage: ExpoSecureStoreAdapter,
     autoRefreshToken: true,
     persistSession: true,
     detectSessionInUrl: false,
@@ -75,4 +96,28 @@ export async function saveExerciseLog(log: Omit<ExerciseLog, 'id' | 'created_at'
     console.error("Error saving exercise log", e);
     return false;
   }
+}
+
+import { Exercise, DEFAULT_EXERCISE_LIBRARY } from '@forge/shared';
+
+export async function loadExercises(): Promise<Exercise[]> {
+  try {
+    const { data, error } = await supabase
+      .from('exercises')
+      .select('*');
+
+    if (!error && data && data.length > 0) {
+      return data.map(dbEx => {
+        const defaultEx = DEFAULT_EXERCISE_LIBRARY.find(e => e.id === dbEx.id);
+        return {
+          ...defaultEx,
+          ...dbEx,
+          ppl_category: dbEx.ppl_category || defaultEx?.ppl_category || 'none'
+        } as Exercise;
+      });
+    }
+  } catch (e) {
+    console.warn("Supabase loadExercises error. Falling back to default library.", e);
+  }
+  return DEFAULT_EXERCISE_LIBRARY;
 }

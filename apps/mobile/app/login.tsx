@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, Pressable, Alert } from 'react-native';
+import { View, Text, StyleSheet, Pressable, Alert, ImageBackground, Dimensions } from 'react-native';
 import { supabase } from '../src/lib/supabase';
 import * as WebBrowser from 'expo-web-browser';
 import * as AuthSession from 'expo-auth-session';
@@ -8,12 +8,14 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 WebBrowser.maybeCompleteAuthSession();
 
+const { width, height } = Dimensions.get('window');
+
 export default function LoginScreen() {
   const performOAuth = async () => {
     try {
-      const redirectUrl = AuthSession.makeRedirectUri({
-        path: '/auth/callback'
-      });
+      // Pour Expo Go, ça génère exp://<ip>:8081
+      // ASSUREZ-VOUS d'ajouter exp://* dans les Redirect URLs de Supabase !
+      const redirectUrl = AuthSession.makeRedirectUri();
 
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
@@ -29,9 +31,6 @@ export default function LoginScreen() {
       const result = await WebBrowser.openAuthSessionAsync(data.url, redirectUrl);
 
       if (result.type === 'success' && result.url) {
-        // Parse the URL to extract the token
-        // supabase.auth.setSession is handled automatically by the URL polyfill if we use createSessionFromUrl
-        // or we can manually parse it if needed. Let's let Supabase try to handle the URL.
         const urlParams = new URL(result.url).hash
           .substring(1)
           .split('&')
@@ -48,7 +47,6 @@ export default function LoginScreen() {
           });
           if (sessionError) throw sessionError;
         } else {
-           // Si pas de hash, vérifier s'il y a un code
            await supabase.auth.getSession();
         }
       }
@@ -59,24 +57,49 @@ export default function LoginScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      {/* Background Effects (DA) */}
-      <View style={styles.bgGlow} />
+      {/* Decorative Tech Grid/Lines */}
+      <View style={styles.gridOverlay}>
+        <View style={styles.gridLineHorizontal} />
+        <View style={styles.gridLineVertical} />
+      </View>
 
-      <View style={styles.content}>
-        <View style={styles.logoBox}>
-          <Text style={styles.logoText}>F</Text>
+      <View style={styles.topSection}>
+        <View style={styles.badge}>
+          <Text style={styles.badgeText}>MODULE DE TRACKING</Text>
         </View>
+        
+        <Text style={styles.brandName}>FORGE</Text>
+        <Text style={styles.tagline}>SPORTS CAD SIMULATOR</Text>
+        
+        <View style={styles.separator} />
+        
+        <View style={styles.statsRow}>
+          <View style={styles.statBox}>
+            <Text style={styles.statLabel}>STATUS</Text>
+            <Text style={styles.statValueActive}>OFFLINE</Text>
+          </View>
+          <View style={styles.statBox}>
+            <Text style={styles.statLabel}>SYNC</Text>
+            <Text style={styles.statValue}>AWAITING AUTH</Text>
+          </View>
+        </View>
+      </View>
 
-        <Text style={styles.title}>FORGE</Text>
-        <Text style={styles.subtitle}>Tracker d'Exécution</Text>
-
-        <Pressable 
-          style={({ pressed }) => [styles.btn, pressed && styles.btnPressed]}
-          onPress={performOAuth}
-        >
-          <MaterialCommunityIcons name="google" size={24} color="#000" />
-          <Text style={styles.btnText}>Continuer avec Google</Text>
-        </Pressable>
+      <View style={styles.bottomSection}>
+        <View style={styles.card}>
+          <Text style={styles.cardTitle}>AUTHENTIFICATION REQUISE</Text>
+          <Text style={styles.cardDesc}>
+            Veuillez connecter votre compte Google pour synchroniser les Blueprints et initialiser le moteur biomécanique.
+          </Text>
+          
+          <Pressable 
+            style={({ pressed }) => [styles.btn, pressed && styles.btnPressed]}
+            onPress={performOAuth}
+          >
+            <MaterialCommunityIcons name="google" size={20} color="#fff" />
+            <Text style={styles.btnText}>CONNEXION SÉCURISÉE</Text>
+          </Pressable>
+        </View>
       </View>
     </SafeAreaView>
   );
@@ -85,76 +108,132 @@ export default function LoginScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#000', // DA: Black background
-    alignItems: 'center',
-    justifyContent: 'center',
+    backgroundColor: '#000',
+    justifyContent: 'space-between',
   },
-  bgGlow: {
+  gridOverlay: {
+    ...(StyleSheet.absoluteFill as any),
+    opacity: 0.1,
+    zIndex: -1,
+  },
+  gridLineHorizontal: {
     position: 'absolute',
-    width: 400,
-    height: 400,
-    backgroundColor: 'rgba(59, 130, 246, 0.15)', // DA: Blue-500 glow for WORK
-    borderRadius: 200,
-    top: '20%',
-    left: '50%',
-    transform: [{ translateX: -200 }],
-  },
-  content: {
-    alignItems: 'center',
+    top: '30%',
     width: '100%',
-    padding: 20,
-    zIndex: 10,
+    height: 1,
+    backgroundColor: '#3b82f6',
   },
-  logoBox: {
-    width: 80,
-    height: 80,
-    borderRadius: 20,
-    backgroundColor: '#3b82f6', // DA: Blue-500
-    alignItems: 'center',
-    justifyContent: 'center',
+  gridLineVertical: {
+    position: 'absolute',
+    left: '15%',
+    height: '100%',
+    width: 1,
+    backgroundColor: '#3b82f6',
+  },
+  topSection: {
+    flex: 1,
+    paddingHorizontal: 32,
+    paddingTop: height * 0.1,
+  },
+  badge: {
+    alignSelf: 'flex-start',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    backgroundColor: 'rgba(59, 130, 246, 0.1)',
+    borderWidth: 1,
+    borderColor: '#3b82f6',
+    borderRadius: 4,
     marginBottom: 24,
-    shadowColor: '#3b82f6',
-    shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0.5,
-    shadowRadius: 20,
-    elevation: 10,
   },
-  logoText: {
-    color: '#000',
-    fontSize: 40,
-    fontWeight: '900',
+  badgeText: {
+    color: '#3b82f6',
+    fontSize: 10,
+    fontWeight: 'bold',
+    letterSpacing: 1,
   },
-  title: {
-    color: '#fff',
+  brandName: {
     fontSize: 48,
     fontWeight: '900',
+    color: '#fff',
     letterSpacing: 2,
-    marginBottom: 8,
   },
-  subtitle: {
-    color: '#a1a1aa', // DA: zinc-400
-    fontSize: 18,
+  tagline: {
+    fontSize: 12,
     fontWeight: '600',
-    marginBottom: 60,
+    color: '#a1a1aa', // zinc-400
+    letterSpacing: 3,
+    marginTop: 4,
+  },
+  separator: {
+    width: 40,
+    height: 2,
+    backgroundColor: '#3b82f6',
+    marginTop: 32,
+    marginBottom: 32,
+  },
+  statsRow: {
+    flexDirection: 'row',
+    gap: 32,
+  },
+  statBox: {},
+  statLabel: {
+    color: '#71717a', // zinc-500
+    fontSize: 10,
+    fontWeight: 'bold',
+    letterSpacing: 1,
+    marginBottom: 4,
+  },
+  statValue: {
+    color: '#a1a1aa',
+    fontSize: 12,
+    fontWeight: 'bold',
+    letterSpacing: 1,
+  },
+  statValueActive: {
+    color: '#ef4444', // red-500
+    fontSize: 12,
+    fontWeight: 'bold',
+    letterSpacing: 1,
+  },
+  bottomSection: {
+    paddingHorizontal: 24,
+    paddingBottom: 40,
+  },
+  card: {
+    backgroundColor: '#09090b', // zinc-950
+    borderWidth: 1,
+    borderColor: '#27272a', // zinc-800
+    padding: 24,
+  },
+  cardTitle: {
+    fontSize: 14,
+    fontWeight: '900',
+    color: '#fff',
+    letterSpacing: 1,
+    marginBottom: 12,
+  },
+  cardDesc: {
+    fontSize: 12,
+    color: '#a1a1aa',
+    lineHeight: 20,
+    marginBottom: 32,
   },
   btn: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     gap: 12,
-    backgroundColor: '#fff',
-    width: '100%',
-    maxWidth: 320,
+    backgroundColor: '#3b82f6', // solid blue
     paddingVertical: 16,
-    borderRadius: 16,
+    borderRadius: 4, // sharper corners
   },
   btnPressed: {
-    opacity: 0.8,
-    transform: [{ scale: 0.98 }],
+    backgroundColor: '#2563eb',
   },
   btnText: {
-    color: '#000',
-    fontSize: 18,
-    fontWeight: 'bold',
+    color: '#fff',
+    fontSize: 12,
+    fontWeight: '900',
+    letterSpacing: 1,
   }
 });
