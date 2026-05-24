@@ -77,6 +77,12 @@ export default function Home() {
   const [hoveredExercise, setHoveredExercise] = useState<Exercise | null>(null);
   const [selectedExercise, setSelectedExercise] = useState<Exercise | null>(null);
 
+  // Comparaison A/B
+  const [isComparing, setIsComparing] = useState(false);
+  const [compareBlueprint, setCompareBlueprint] = useState<WeeklyBlueprint | null>(null);
+  const [compareBlueprintName, setCompareBlueprintName] = useState<string | null>(null);
+  const [isCompareModalOpen, setIsCompareModalOpen] = useState(false);
+
   const avatarRef = React.useRef<HTMLDivElement>(null);
   const [avatarImageStr, setAvatarImageStr] = useState<string | null>(null);
   const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
@@ -149,6 +155,21 @@ export default function Home() {
   }, [blueprint, profile, toggledDays, selectedDay, exercises]);
 
   const simulationResult = viewMode === 'week' ? weeklySimulationResult : dailySimulationResult;
+
+  // Comparaison A/B : On simule avec tous les jours actifs pour que la comparaison de volume soit équitable
+  const fullyActiveDays = useMemo(() => ({
+    Lundi: true, Mardi: true, Mercredi: true, Jeudi: true, Vendredi: true, Samedi: true, Dimanche: true
+  }), []);
+
+  const compareSimulationResult = useMemo(() => {
+    if (!compareBlueprint) return null;
+    return runWeeklySimulation(compareBlueprint, profile, fullyActiveDays, undefined, exercises);
+  }, [compareBlueprint, profile, fullyActiveDays, exercises]);
+
+  const mainSimulationForCompare = useMemo(() => {
+    if (!isComparing) return weeklySimulationResult;
+    return runWeeklySimulation(blueprint, profile, fullyActiveDays, undefined, exercises);
+  }, [isComparing, blueprint, profile, fullyActiveDays, exercises, weeklySimulationResult]);
 
   // 4. Ajouter un exercice au séquenceur
   const handleAddExercise = useCallback((exerciseId: string, day: string) => {
@@ -269,6 +290,15 @@ export default function Home() {
     }
   };
 
+  // 7b. Charger un Blueprint pour la comparaison
+  const handleLoadCompareBlueprint = (id: string) => {
+    const item = savedBlueprints.find(s => s.id === id);
+    if (item) {
+      setCompareBlueprint(item.blueprint);
+      setCompareBlueprintName(item.name);
+    }
+  };
+
   // 8. Créer un nouveau Blueprint vierge
   const handleNewBlueprint = () => {
     if (confirm("Voulez-vous réinitialiser le séquenceur actuel pour créer un nouveau programme ?")) {
@@ -338,10 +368,6 @@ export default function Home() {
           {/* Brand Logo & Cloud Status */}
           <div className="flex items-center justify-between pb-4 border-b border-zinc-900">
             <div>
-              <h1 className="text-2xl font-black tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-teal-500 flex items-center gap-1.5">
-                FORGE
-              </h1>
-              <p className="text-[10px] text-zinc-500 tracking-wider uppercase font-semibold">Sports CAD Simulator</p>
             </div>
             
             {supabaseUser ? (
@@ -620,6 +646,29 @@ export default function Home() {
                   />
                 )}
                 <SocialExportButton />
+                
+                {/* Comparaison A/B Bouton */}
+                <button
+                  onClick={() => {
+                    if (isComparing) {
+                      setIsComparing(false);
+                      setCompareBlueprint(null);
+                      setCompareBlueprintName(null);
+                    } else {
+                      setIsComparing(true);
+                      if (!compareBlueprint) {
+                        setIsCompareModalOpen(true);
+                      }
+                    }
+                  }}
+                  className={`ml-2 flex items-center gap-2 px-3 py-1.5 text-xs font-bold rounded-lg transition-colors border ${
+                    isComparing 
+                      ? 'bg-blue-500/20 text-blue-400 border-blue-500/50 hover:bg-blue-500/30' 
+                      : 'bg-zinc-800 text-zinc-300 border-zinc-700 hover:bg-zinc-700'
+                  }`}
+                >
+                  {isComparing ? 'Fermer Comparaison' : 'Comparer A/B'}
+                </button>
               </div>
             )}
           </div>
@@ -699,24 +748,63 @@ export default function Home() {
           </>
         ) : (
           <div className="flex-1 flex flex-col md:flex-row gap-4 min-h-0 bg-black p-2 rounded-xl">
-            {/* Left Portion: SVG Anatomical Avatar — 30% width */}
-            <div ref={avatarRef} className="w-full md:w-[32%] h-[300px] md:h-full shrink-0 bg-zinc-950 border border-zinc-900 rounded-xl overflow-hidden flex flex-col relative">
-              <HumanAvatar 
-                simulation={simulationResult} 
-                selectedDay={selectedDay} 
-                selectedMuscle={selectedMuscle}
-                onMuscleClick={(muscleId) => {
-                  setSelectedMuscle(prev => prev === muscleId ? 'all' : muscleId);
-                }}
-                highlightedMuscles={highlightedMuscles}
-                viewMode={viewMode}
-              />
-            </div>
-            
-            {/* Right Portion: Analytics Dashboard — 68% width */}
-            <div className="flex-1 min-w-0 h-full overflow-y-auto">
-              <WeekDashboard simulation={simulationResult} blueprint={blueprint} toggledDays={toggledDays} />
-            </div>
+            {isComparing && compareSimulationResult && compareBlueprint ? (
+              <>
+                {/* Programme A (Travail) */}
+                <div className="flex-1 min-w-0 h-full overflow-y-auto border-r border-zinc-900 pr-2">
+                  <div className="sticky top-0 z-10 bg-black/90 backdrop-blur-md pb-2 mb-2 border-b border-zinc-900">
+                    <h3 className="text-center font-black text-emerald-400 text-sm uppercase tracking-widest">
+                      {currentBlueprintName} (A)
+                    </h3>
+                  </div>
+                  <WeekDashboard 
+                    simulation={mainSimulationForCompare} 
+                    blueprint={blueprint} 
+                    toggledDays={fullyActiveDays} 
+                  />
+                </div>
+                {/* Programme B (Comparaison) */}
+                <div className="flex-1 min-w-0 h-full overflow-y-auto pl-2">
+                  <div className="sticky top-0 z-10 bg-black/90 backdrop-blur-md pb-2 mb-2 border-b border-zinc-900 flex justify-center items-center relative">
+                    <h3 className="text-center font-black text-blue-400 text-sm uppercase tracking-widest">
+                      {compareBlueprintName || 'Programme B'} (B)
+                    </h3>
+                    <button 
+                      onClick={() => setIsCompareModalOpen(true)}
+                      className="absolute right-0 text-[10px] text-zinc-500 hover:text-white border border-zinc-800 rounded px-2 py-1"
+                    >
+                      Changer
+                    </button>
+                  </div>
+                  <WeekDashboard 
+                    simulation={compareSimulationResult} 
+                    blueprint={compareBlueprint} 
+                    toggledDays={fullyActiveDays} 
+                  />
+                </div>
+              </>
+            ) : (
+              <>
+                {/* Left Portion: SVG Anatomical Avatar — 30% width */}
+                <div ref={avatarRef} className="w-full md:w-[32%] h-[300px] md:h-full shrink-0 bg-zinc-950 border border-zinc-900 rounded-xl overflow-hidden flex flex-col relative">
+                  <HumanAvatar 
+                    simulation={simulationResult} 
+                    selectedDay={selectedDay} 
+                    selectedMuscle={selectedMuscle}
+                    onMuscleClick={(muscleId) => {
+                      setSelectedMuscle(prev => prev === muscleId ? 'all' : muscleId);
+                    }}
+                    highlightedMuscles={highlightedMuscles}
+                    viewMode={viewMode}
+                  />
+                </div>
+                
+                {/* Right Portion: Analytics Dashboard — 68% width */}
+                <div className="flex-1 min-w-0 h-full overflow-y-auto">
+                  <WeekDashboard simulation={simulationResult} blueprint={blueprint} toggledDays={toggledDays} />
+                </div>
+              </>
+            )}
           </div>
         )}
       </section>
@@ -752,6 +840,26 @@ export default function Home() {
         onDeleteBlueprint={handleDeleteBlueprintById}
         activeBlueprintId={activeBlueprintId}
       />
+      
+      {/* Modal pour la Comparaison A/B */}
+      <BlueprintsModal
+        isOpen={isCompareModalOpen}
+        onClose={() => {
+          setIsCompareModalOpen(false);
+          if (!compareBlueprint) {
+            setIsComparing(false); // Cancel comparison if user closes modal without selecting
+          }
+        }}
+        savedBlueprints={savedBlueprints}
+        onLoadBlueprint={(id) => {
+          handleLoadCompareBlueprint(id);
+          setIsComparing(true);
+        }}
+        onRenameBlueprint={handleRenameBlueprintById}
+        onDeleteBlueprint={handleDeleteBlueprintById}
+        activeBlueprintId={null} // Pas de surbrillance pour le blueprint B
+      />
+      
       <SocialExportPoster
         simulation={simulationResult}
         blueprint={blueprint}
