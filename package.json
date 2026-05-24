@@ -5,6 +5,10 @@
     "apps/*",
     "packages/*"
   ],
+  "devDependencies": {
+    "expo": "~56.0.4",
+    "expo-router": "~56.2.6"
+  },
   "scripts": {
     "dev": "npm run dev --workspace=apps/web",
     "build": "npm run build --workspaces",
