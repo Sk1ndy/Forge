@@ -24,7 +24,11 @@ import Sequencer from '@/components/simulator/Sequencer';
 import LibraryDrawer from '@/components/simulator/LibraryDrawer';
 import CalibrageModal from '@/components/simulator/CalibrageModal';
 import BlueprintsModal from '@/components/simulator/BlueprintsModal';
-import WeekDashboard from '@/components/simulator/WeekDashboard';
+import WeekDashboard, { calculateProgramScore } from '@/components/simulator/WeekDashboard';
+import { toPng } from 'html-to-image';
+import dynamic from 'next/dynamic';
+
+const PDFDownloadButton = dynamic(() => import('@/components/simulator/PDFDownloadButton'), { ssr: false });
 
 export default function Home() {
   const [profile, setProfile] = useState<UserProfile>({
@@ -70,6 +74,23 @@ export default function Home() {
   const [exercises, setExercises] = useState<Exercise[]>([]);
   const [hoveredExercise, setHoveredExercise] = useState<Exercise | null>(null);
   const [selectedExercise, setSelectedExercise] = useState<Exercise | null>(null);
+
+  const avatarRef = React.useRef<HTMLDivElement>(null);
+  const [avatarImageStr, setAvatarImageStr] = useState<string | null>(null);
+  const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
+
+  const handlePreparePdf = async () => {
+    if (!avatarRef.current) return;
+    setIsGeneratingPdf(true);
+    try {
+      const dataUrl = await toPng(avatarRef.current, { cacheBust: true, backgroundColor: '#09090b' });
+      setAvatarImageStr(dataUrl);
+    } catch (err) {
+      console.error("Failed to generate avatar image for PDF", err);
+    } finally {
+      setIsGeneratingPdf(false);
+    }
+  };
 
   const highlightedMuscles = useMemo(() => {
     const activeEx = hoveredExercise || selectedExercise;
@@ -553,27 +574,53 @@ export default function Home() {
         
         {/* View Mode Toggle Switch */}
         <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-2 shrink-0">
-          <div className="flex bg-zinc-900/80 p-1 border border-zinc-850 rounded-xl max-w-max">
-            <button
-              onClick={() => setViewMode('day')}
-              className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
-                viewMode === 'day'
-                  ? 'bg-emerald-500 text-zinc-950 shadow-md'
-                  : 'text-zinc-400 hover:text-white'
-              }`}
-            >
-              Vue Journée
-            </button>
-            <button
-              onClick={() => setViewMode('week')}
-              className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
-                viewMode === 'week'
-                  ? 'bg-emerald-500 text-zinc-950 shadow-md'
-                  : 'text-zinc-400 hover:text-white'
-              }`}
-            >
-              Vue Semaine Globale
-            </button>
+          {/* Vue Toggle + PDF */}
+          <div className="flex items-center gap-3">
+            <div className="flex bg-zinc-950 rounded-lg p-1 border border-zinc-800 shadow-inner">
+              <button
+                onClick={() => setViewMode('day')}
+                className={`px-4 py-1.5 rounded-md text-xs font-bold transition-all ${
+                  viewMode === 'day' 
+                    ? 'bg-zinc-800 text-white shadow-sm' 
+                    : 'text-zinc-500 hover:text-zinc-300 hover:bg-zinc-900/50'
+                }`}
+              >
+                Vue Journée
+              </button>
+              <button
+                onClick={() => setViewMode('week')}
+                className={`px-4 py-1.5 rounded-md text-xs font-bold transition-all ${
+                  viewMode === 'week' 
+                    ? 'bg-zinc-800 text-white shadow-sm' 
+                    : 'text-zinc-500 hover:text-zinc-300 hover:bg-zinc-900/50'
+                }`}
+              >
+                Vue Semaine
+              </button>
+            </div>
+
+            {viewMode === 'week' && (
+              <div className="flex items-center">
+                {!avatarImageStr ? (
+                  <button
+                    onClick={handlePreparePdf}
+                    disabled={isGeneratingPdf}
+                    className="flex items-center gap-2 px-3 py-1.5 bg-zinc-800 hover:bg-zinc-700 text-white text-xs font-bold rounded-lg transition-colors disabled:opacity-50"
+                  >
+                    {isGeneratingPdf ? 'Préparation...' : 'Générer PDF'}
+                  </button>
+                ) : (
+                  <PDFDownloadButton 
+                    simulation={simulationResult} 
+                    blueprint={blueprint} 
+                    avatarImageStr={avatarImageStr} 
+                    score={calculateProgramScore(simulationResult, blueprint, toggledDays).score}
+                    grade={calculateProgramScore(simulationResult, blueprint, toggledDays).grade}
+                    critique={calculateProgramScore(simulationResult, blueprint, toggledDays).critique}
+                  />
+                )}
+              </div>
+            )}
           </div>
           <span className="text-[10px] text-zinc-500 uppercase tracking-wider font-extrabold font-mono">
             {viewMode === 'day' ? `Aperçu quotidien : ${selectedDay}` : 'Bilan cumulé hebdomadaire'}
@@ -652,7 +699,7 @@ export default function Home() {
         ) : (
           <div className="flex-1 flex flex-col md:flex-row gap-4 min-h-0">
             {/* Left Portion: SVG Anatomical Avatar — 30% width */}
-            <div className="w-full md:w-[32%] h-[300px] md:h-full shrink-0 bg-zinc-950 border border-zinc-900 rounded-xl overflow-hidden flex flex-col">
+            <div ref={avatarRef} className="w-full md:w-[32%] h-[300px] md:h-full shrink-0 bg-zinc-950 border border-zinc-900 rounded-xl overflow-hidden flex flex-col relative">
               <HumanAvatar 
                 simulation={simulationResult} 
                 selectedDay={selectedDay} 
