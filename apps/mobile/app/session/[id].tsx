@@ -1,19 +1,23 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, Pressable, ScrollView, TextInput, Modal, Alert, ActivityIndicator } from 'react-native';
+import React, { useState, useEffect, useRef } from 'react';
+import { View, Text, StyleSheet, ScrollView, Pressable, Alert } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { PlannedExercise } from '@forge/shared';
+import { PlannedExercise, PlannedSetSchema } from '@forge/shared';
 import { loadLatestBlueprint, saveExerciseLog, loadExercises } from '../../src/lib/supabase';
+import { Stepper } from '../../src/components/Stepper';
+import Swipeable from 'react-native-gesture-handler/Swipeable';
+import * as Haptics from 'expo-haptics';
+import { z } from 'zod';
 
 // -- Types Locaux --
 type SetStatus = 'pending' | 'completed' | 'skipped';
 
 interface SetState {
   index: number;
-  weight: string;
-  reps: string;
-  rpe: string;
+  weight: number;
+  reps: number;
+  rpe: number;
   status: SetStatus;
   skippedReason?: string;
 }
@@ -34,8 +38,8 @@ export default function SessionScreen() {
   const [loading, setLoading] = useState(true);
   
   // État du timer
-  const [isTimerVisible, setIsTimerVisible] = useState(false);
   const [timeLeft, setTimeLeft] = useState(0);
+  const [isTimerVisible, setIsTimerVisible] = useState(false);
 
   useEffect(() => {
     async function initSession() {
@@ -56,9 +60,9 @@ export default function SessionScreen() {
             isExpanded: exIdx === 0,
             sets: ex.sets.map((s, sIdx) => ({
               index: sIdx,
-              weight: s.poids.toString(),
-              reps: s.reps.toString(),
-              rpe: s.rpe.toString(),
+              weight: s.poids,
+              reps: s.reps,
+              rpe: s.rpe,
               status: 'pending'
             }))
           };
@@ -70,96 +74,89 @@ export default function SessionScreen() {
     initSession();
   }, [day]);
 
-  // Gestion du Chrono (Option A : Automatique)
   useEffect(() => {
-    let interval: ReturnType<typeof setInterval>;
-    if (isTimerVisible && timeLeft > 0) {
+    let interval: ReturnType<typeof setTimeout>;
+    if (timeLeft > 0 && isTimerVisible) {
       interval = setInterval(() => {
-        setTimeLeft(prev => prev - 1);
+        setTimeLeft((prev) => prev - 1);
       }, 1000);
     } else if (timeLeft === 0 && isTimerVisible) {
-      setIsTimerVisible(false); // Fin du timer
+      setIsTimerVisible(false);
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
     }
     return () => clearInterval(interval);
-  }, [isTimerVisible, timeLeft]);
+  }, [timeLeft, isTimerVisible]);
 
-  const toggleAccordion = (exIdx: number) => {
-    setExercises(prev => prev.map((ex, i) => 
-      i === exIdx ? { ...ex, isExpanded: !ex.isExpanded } : ex
-    ));
+  const updateSetState = (exIndex: number, setIndex: number, field: keyof SetState, value: any) => {
+    const newExs = [...exercises];
+    newExs[exIndex].sets[setIndex] = { ...newExs[exIndex].sets[setIndex], [field]: value };
+    setExercises(newExs);
   };
 
-  const updateSet = (exIdx: number, setIdx: number, field: 'weight' | 'reps', value: string) => {
-    setExercises(prev => {
-      const newEx = [...prev];
-      newEx[exIdx].sets[setIdx][field] = value;
-      return newEx;
-    });
-  };
-
-  const validateSet = async (exIdx: number, setIdx: number) => {
-    setExercises(prev => {
-      const newEx = [...prev];
-      newEx[exIdx].sets[setIdx].status = 'completed';
-      return newEx;
-    });
+  const validateSet = (exIndex: number, setIndex: number) => {
+    const currentSet = exercises[exIndex].sets[setIndex];
     
-    // Save to DB
-    const ex = exercises[exIdx];
-    const set = ex.sets[setIdx];
-    await saveExerciseLog({
-      session_id: id as string,
-      exercise_id: ex.exerciseId,
-      day: day as string,
-      set_index: setIdx,
-      actual_weight: parseFloat(set.weight) || 0,
-      actual_reps: parseInt(set.reps) || 0,
-      actual_rpe: parseFloat(set.rpe) || 0,
+    // Zod Validation
+    try {
+      PlannedSetSchema.parse({
+        series: 1, // Dummy value just for schema compliance if needed, though schema asks for it
+        reps: currentSet.reps,
+        poids: currentSet.weight,
+        rpe: currentSet.rpe,
+        active: true
+      });
+    } catch (e: any) {
+      Alert.alert("Erreur de Validation", "Les valeurs entrées ne sont pas valides.");
+      return;
+    }
+
+    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+    
+    updateSetState(exIndex, setIndex, 'status', 'completed');
+    
+    saveExerciseLog({
+      session_id: id,
+      exercise_id: exercises[exIndex].exerciseId,
+      day: day || '',
+      set_index: setIndex,
+      actual_weight: currentSet.weight,
+      actual_reps: currentSet.reps,
+      actual_rpe: currentSet.rpe,
       is_completed: true
     });
 
-    // Déclenchement automatique du Timer
-    setTimeLeft(90);
+    setTimeLeft(90); // 1m30 de repos par défaut
     setIsTimerVisible(true);
   };
 
-  const skipSet = (exIdx: number, setIdx: number) => {
-    Alert.alert(
-      "Sauter la série",
-      "Quelle est la raison principale ?",
-      [
-        { text: "Fatigue excessive", onPress: () => markSkipped(exIdx, setIdx, "Fatigue") },
-        { text: "Douleur / Blessure", onPress: () => markSkipped(exIdx, setIdx, "Blessure") },
-        { text: "Manque de temps", onPress: () => markSkipped(exIdx, setIdx, "Temps") },
-        { text: "Annuler", style: "cancel" }
-      ]
-    );
-  };
-
-  const markSkipped = async (exIdx: number, setIdx: number, reason: string) => {
-    setExercises(prev => {
-      const newEx = [...prev];
-      newEx[exIdx].sets[setIdx].status = 'skipped';
-      newEx[exIdx].sets[setIdx].skippedReason = reason;
-      return newEx;
-    });
-
-    // Save to DB
-    const ex = exercises[exIdx];
-    await saveExerciseLog({
-      session_id: id as string,
-      exercise_id: ex.exerciseId,
-      day: day as string,
-      set_index: setIdx,
+  const skipSet = (exIndex: number, setIndex: number) => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
+    updateSetState(exIndex, setIndex, 'status', 'skipped');
+    
+    saveExerciseLog({
+      session_id: id,
+      exercise_id: exercises[exIndex].exerciseId,
+      day: day || '',
+      set_index: setIndex,
       is_completed: false,
-      skipped_reason: reason
+      skipped_reason: 'Skipped by user'
     });
   };
 
-  const finishSession = () => {
-    Alert.alert("Terminé !", "Séance enregistrée avec succès.", [
-      { text: "OK", onPress: () => router.back() }
-    ]);
+  const renderRightActions = (exIndex: number, setIndex: number) => (
+    <Pressable 
+      style={styles.skipAction} 
+      onPress={() => skipSet(exIndex, setIndex)}
+    >
+      <MaterialCommunityIcons name="cancel" size={24} color="#fff" />
+      <Text style={styles.skipText}>Sauter</Text>
+    </Pressable>
+  );
+
+  const toggleExpand = (exIndex: number) => {
+    const newExs = [...exercises];
+    newExs[exIndex].isExpanded = !newExs[exIndex].isExpanded;
+    setExercises(newExs);
   };
 
   const formatTime = (seconds: number) => {
@@ -168,26 +165,46 @@ export default function SessionScreen() {
     return `${m}:${s < 10 ? '0' : ''}${s}`;
   };
 
+  const totalSets = exercises.reduce((acc, ex) => acc + ex.sets.length, 0);
+  const completedSets = exercises.reduce((acc, ex) => acc + ex.sets.filter(s => s.status !== 'pending').length, 0);
+  const progressPercent = totalSets > 0 ? (completedSets / totalSets) * 100 : 0;
+
+  if (loading) return <SafeAreaView style={styles.container} />;
+
   return (
     <SafeAreaView style={styles.container}>
-      {/* Header */}
+      {/* Header & Progress */}
       <View style={styles.header}>
-        <Pressable onPress={() => router.back()} style={styles.backBtn}>
-          <MaterialCommunityIcons name="chevron-down" size={32} color="#fff" />
-        </Pressable>
-        <Text style={styles.headerTitle}>SESSION EN COURS</Text>
-        <View style={{ width: 32 }} />
+        <View style={styles.headerTop}>
+          <Pressable onPress={() => router.back()} style={styles.backBtn}>
+            <MaterialCommunityIcons name="chevron-left" size={32} color="#fff" />
+          </Pressable>
+          <Text style={styles.title}>{day?.toUpperCase()}</Text>
+          <View style={{ width: 32 }} />
+        </View>
+
+        <View style={styles.progressContainer}>
+          <View style={[styles.progressBar, { width: `${progressPercent}%` }]} />
+        </View>
+        <Text style={styles.progressText}>{completedSets} / {totalSets} Séries Complétées</Text>
+
+        {isTimerVisible && (
+          <View style={styles.timerContainer}>
+            <MaterialCommunityIcons name="timer-outline" size={24} color="#10b981" />
+            <Text style={styles.timerText}>{formatTime(timeLeft)}</Text>
+            <Pressable onPress={() => setIsTimerVisible(false)} style={styles.timerSkip}>
+              <Text style={styles.timerSkipText}>Sauter le repos</Text>
+            </Pressable>
+          </View>
+        )}
       </View>
 
-      <ScrollView style={styles.scrollView} contentContainerStyle={{ paddingBottom: 100 }}>
-        {exercises.map((ex, exIdx) => (
-          <View key={exIdx} style={styles.exerciseCard}>
-            {/* Accordion Header */}
-            <Pressable 
-              style={styles.exHeader} 
-              onPress={() => toggleAccordion(exIdx)}
-            >
-              <Text style={styles.exName}>{ex.name}</Text>
+      {/* Exercises List */}
+      <ScrollView style={styles.content} contentContainerStyle={{ paddingBottom: 100 }}>
+        {exercises.map((ex, exIndex) => (
+          <View key={exIndex} style={styles.exerciseCard}>
+            <Pressable style={styles.exHeader} onPress={() => toggleExpand(exIndex)}>
+              <Text style={styles.exTitle}>{ex.name}</Text>
               <MaterialCommunityIcons 
                 name={ex.isExpanded ? "chevron-up" : "chevron-down"} 
                 size={24} 
@@ -195,90 +212,82 @@ export default function SessionScreen() {
               />
             </Pressable>
 
-            {/* Accordion Content (Liste déroulante) */}
             {ex.isExpanded && (
-              <View style={styles.exContent}>
-                {ex.sets.map((set, setIdx) => (
-                  <View key={setIdx} style={styles.setRow}>
-                    <View style={styles.setNumberBox}>
-                      <Text style={styles.setNumber}>{set.index + 1}</Text>
-                    </View>
-
-                    {/* Inputs */}
-                    <View style={styles.inputGroup}>
-                      <View style={styles.inputWrapper}>
-                        <Text style={styles.inputLabel}>KG</Text>
-                        <TextInput
-                          style={[styles.input, set.status !== 'pending' && styles.inputDisabled]}
-                          keyboardType="numeric"
-                          value={set.weight}
-                          onChangeText={(v) => updateSet(exIdx, setIdx, 'weight', v)}
-                          editable={set.status === 'pending'}
-                        />
-                      </View>
-                      <MaterialCommunityIcons name="close" size={16} color="#3f3f46" style={{ marginTop: 15 }} />
-                      <View style={styles.inputWrapper}>
-                        <Text style={styles.inputLabel}>REPS</Text>
-                        <TextInput
-                          style={[styles.input, set.status !== 'pending' && styles.inputDisabled]}
-                          keyboardType="numeric"
-                          value={set.reps}
-                          onChangeText={(v) => updateSet(exIdx, setIdx, 'reps', v)}
-                          editable={set.status === 'pending'}
-                        />
-                      </View>
-                    </View>
-
-                    {/* Actions */}
-                    <View style={styles.actionGroup}>
-                      {set.status === 'pending' ? (
-                        <>
-                          <Pressable style={styles.skipBtn} onPress={() => skipSet(exIdx, setIdx)}>
-                            <MaterialCommunityIcons name="debug-step-over" size={24} color="#71717a" />
-                          </Pressable>
-                          <Pressable style={styles.validateBtn} onPress={() => validateSet(exIdx, setIdx)}>
-                            <MaterialCommunityIcons name="check-bold" size={24} color="#fff" />
-                          </Pressable>
-                        </>
-                      ) : set.status === 'completed' ? (
-                        <View style={styles.completedBadge}>
-                          <MaterialCommunityIcons name="check-circle" size={28} color="#10b981" />
+              <View style={styles.exBody}>
+                {ex.sets.map((set, setIndex) => {
+                  const isDone = set.status === 'completed';
+                  const isSkipped = set.status === 'skipped';
+                  
+                  return (
+                    <Swipeable 
+                      key={setIndex}
+                      renderRightActions={() => renderRightActions(exIndex, setIndex)}
+                      overshootRight={false}
+                    >
+                      <View style={[styles.setRow, isDone && styles.setRowDone, isSkipped && styles.setRowSkipped]}>
+                        <View style={styles.setInfoBox}>
+                          <Text style={styles.setIndex}>Série {setIndex + 1}</Text>
+                          {(isDone || isSkipped) && (
+                            <MaterialCommunityIcons 
+                              name={isDone ? "check-circle" : "close-circle"} 
+                              size={16} 
+                              color={isDone ? "#10b981" : "#ef4444"} 
+                            />
+                          )}
                         </View>
-                      ) : (
-                        <View style={styles.skippedBadge}>
-                          <Text style={styles.skippedText}>{set.skippedReason}</Text>
+                        
+                        <View style={styles.inputsRow}>
+                          <View style={styles.inputGroup}>
+                            <Text style={styles.inputLabel}>POIDS</Text>
+                            <Stepper 
+                              value={set.weight} 
+                              onValueChange={(val) => updateSetState(exIndex, setIndex, 'weight', val)}
+                              step={2.5}
+                              unit="KG"
+                            />
+                          </View>
+
+                          <View style={styles.inputGroup}>
+                            <Text style={styles.inputLabel}>REPS</Text>
+                            <Stepper 
+                              value={set.reps} 
+                              onValueChange={(val) => updateSetState(exIndex, setIndex, 'reps', val)}
+                              step={1}
+                              min={1}
+                            />
+                          </View>
                         </View>
-                      )}
-                    </View>
-                  </View>
-                ))}
+
+                        {set.status === 'pending' && (
+                          <Pressable 
+                            style={styles.validateBtn}
+                            onPress={() => validateSet(exIndex, setIndex)}
+                          >
+                            <MaterialCommunityIcons name="check" size={24} color="#000" />
+                          </Pressable>
+                        )}
+                      </View>
+                    </Swipeable>
+                  );
+                })}
               </View>
             )}
           </View>
         ))}
-
-        <Pressable style={styles.finishBtn} onPress={finishSession}>
-          <Text style={styles.finishBtnText}>TERMINER LA SÉANCE</Text>
-        </Pressable>
       </ScrollView>
 
-      {/* Timer Modal (Option A) */}
-      <Modal visible={isTimerVisible} animationType="slide" transparent={true}>
-        <View style={styles.timerOverlay}>
-          <View style={styles.timerBox}>
-            <Text style={styles.timerTitle}>TEMPS DE REPOS</Text>
-            <Text style={styles.timerText}>{formatTime(timeLeft)}</Text>
-            
-            <Pressable 
-              style={styles.skipTimerBtn} 
-              onPress={() => setIsTimerVisible(false)}
-            >
-              <Text style={styles.skipTimerText}>PASSER</Text>
-            </Pressable>
-          </View>
-        </View>
-      </Modal>
-
+      {/* Footer */}
+      <View style={styles.footer}>
+        <Pressable 
+          style={styles.finishBtn}
+          onPress={() => {
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+            router.push('/');
+          }}
+        >
+          <Text style={styles.finishBtnText}>TERMINER LA SÉANCE</Text>
+        </Pressable>
+      </View>
     </SafeAreaView>
   );
 }
@@ -289,190 +298,186 @@ const styles = StyleSheet.create({
     backgroundColor: '#000',
   },
   header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 20,
-    paddingVertical: 15,
+    padding: 24,
     borderBottomWidth: 1,
     borderBottomColor: '#27272a',
+    backgroundColor: '#09090b',
+  },
+  headerTop: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 24,
   },
   backBtn: {
-    padding: 5,
+    marginLeft: -8,
   },
-  headerTitle: {
-    color: '#3b82f6',
+  title: {
+    fontSize: 24,
     fontWeight: '900',
-    fontSize: 16,
+    color: '#fff',
+    letterSpacing: 2,
+  },
+  progressContainer: {
+    height: 4,
+    backgroundColor: '#27272a',
+    borderRadius: 2,
+    overflow: 'hidden',
+    marginBottom: 8,
+  },
+  progressBar: {
+    height: '100%',
+    backgroundColor: '#10b981', // Emerald
+  },
+  progressText: {
+    color: '#a1a1aa',
+    fontSize: 12,
+    fontWeight: 'bold',
+    textAlign: 'center',
     letterSpacing: 1,
   },
-  scrollView: {
+  timerContainer: {
+    marginTop: 24,
+    backgroundColor: 'rgba(16, 185, 129, 0.1)',
+    borderRadius: 8,
+    padding: 16,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    borderWidth: 1,
+    borderColor: 'rgba(16, 185, 129, 0.3)',
+  },
+  timerText: {
+    color: '#10b981',
+    fontSize: 24,
+    fontWeight: '900',
     flex: 1,
-    padding: 15,
+  },
+  timerSkip: {
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    backgroundColor: 'rgba(16, 185, 129, 0.2)',
+    borderRadius: 4,
+  },
+  timerSkipText: {
+    color: '#10b981',
+    fontSize: 12,
+    fontWeight: 'bold',
+  },
+  content: {
+    flex: 1,
+    padding: 16,
   },
   exerciseCard: {
     backgroundColor: '#09090b',
-    borderRadius: 20,
+    borderRadius: 16,
     borderWidth: 1,
     borderColor: '#27272a',
-    marginBottom: 20,
+    marginBottom: 16,
     overflow: 'hidden',
   },
   exHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    padding: 20,
+    padding: 16,
     backgroundColor: '#18181b',
   },
-  exName: {
-    fontSize: 18,
-    fontWeight: '800',
+  exTitle: {
+    fontSize: 16,
+    fontWeight: '900',
     color: '#fff',
+    textTransform: 'uppercase',
   },
-  exContent: {
-    padding: 15,
+  exBody: {
+    padding: 12,
   },
   setRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginBottom: 15,
     backgroundColor: '#000',
-    padding: 10,
-    borderRadius: 15,
+    borderRadius: 12,
     borderWidth: 1,
     borderColor: '#27272a',
+    padding: 16,
+    marginBottom: 12,
   },
-  setNumberBox: {
-    width: 30,
-    height: 30,
-    borderRadius: 15,
-    backgroundColor: '#27272a',
+  setRowDone: {
+    borderColor: 'rgba(16, 185, 129, 0.5)',
+    backgroundColor: 'rgba(16, 185, 129, 0.05)',
+  },
+  setRowSkipped: {
+    borderColor: 'rgba(239, 68, 68, 0.5)',
+    backgroundColor: 'rgba(239, 68, 68, 0.05)',
+  },
+  setInfoBox: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
     alignItems: 'center',
-    justifyContent: 'center',
+    marginBottom: 16,
   },
-  setNumber: {
+  setIndex: {
     color: '#a1a1aa',
-    fontWeight: '900',
     fontSize: 14,
-  },
-  inputGroup: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 10,
-  },
-  inputWrapper: {
-    alignItems: 'center',
-  },
-  inputLabel: {
-    fontSize: 10,
-    color: '#71717a',
     fontWeight: 'bold',
-    marginBottom: 4,
+    letterSpacing: 1,
   },
-  input: {
-    backgroundColor: '#18181b',
-    color: '#fff',
-    fontSize: 20,
-    fontWeight: '900',
-    width: 60,
-    height: 50,
-    borderRadius: 12,
-    textAlign: 'center',
-    borderWidth: 1,
-    borderColor: '#3f3f46',
+  inputsRow: {
+    flexDirection: 'column',
+    gap: 16,
+    marginBottom: 16,
   },
-  inputDisabled: {
-    color: '#52525b',
-    borderColor: '#27272a',
-  },
-  actionGroup: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  skipBtn: {
-    width: 45,
-    height: 45,
-    borderRadius: 12,
-    backgroundColor: '#18181b',
-    alignItems: 'center',
-    justifyContent: 'center',
+  inputGroup: {},
+  inputLabel: {
+    color: '#71717a',
+    fontSize: 10,
+    fontWeight: 'bold',
+    marginBottom: 8,
+    letterSpacing: 1,
   },
   validateBtn: {
-    width: 45,
-    height: 45,
+    backgroundColor: '#10b981',
     borderRadius: 12,
-    backgroundColor: '#2563eb',
+    height: 56,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  completedBadge: {
-    width: 98, // To match width of two buttons + gap
-    alignItems: 'flex-end',
+  skipAction: {
+    backgroundColor: '#ef4444',
     justifyContent: 'center',
-  },
-  skippedBadge: {
-    width: 98,
     alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#450a0a',
-    paddingVertical: 5,
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: '#7f1d1d',
+    width: 80,
+    height: '100%',
+    borderRadius: 12,
+    marginBottom: 12,
+    marginLeft: 12,
   },
-  skippedText: {
-    color: '#ef4444',
-    fontSize: 10,
+  skipText: {
+    color: '#fff',
+    fontSize: 12,
     fontWeight: 'bold',
+    marginTop: 4,
+  },
+  footer: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    padding: 24,
+    backgroundColor: '#000',
+    borderTopWidth: 1,
+    borderTopColor: '#27272a',
   },
   finishBtn: {
-    backgroundColor: '#10b981',
-    paddingVertical: 20,
+    backgroundColor: '#18181b',
+    borderWidth: 1,
+    borderColor: '#27272a',
+    paddingVertical: 18,
     borderRadius: 16,
     alignItems: 'center',
-    marginTop: 20,
   },
   finishBtnText: {
-    color: '#000',
-    fontSize: 18,
-    fontWeight: '900',
-  },
-  timerOverlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.95)',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  timerBox: {
-    alignItems: 'center',
-  },
-  timerTitle: {
-    color: '#3b82f6',
-    fontSize: 16,
-    fontWeight: 'bold',
-    letterSpacing: 2,
-    marginBottom: 20,
-  },
-  timerText: {
     color: '#fff',
-    fontSize: 80,
+    fontSize: 14,
     fontWeight: '900',
-    fontVariant: ['tabular-nums'],
-    marginBottom: 40,
-  },
-  skipTimerBtn: {
-    paddingHorizontal: 40,
-    paddingVertical: 15,
-    borderRadius: 30,
-    borderWidth: 2,
-    borderColor: '#3f3f46',
-  },
-  skipTimerText: {
-    color: '#a1a1aa',
-    fontSize: 16,
-    fontWeight: 'bold',
+    letterSpacing: 2,
   }
 });

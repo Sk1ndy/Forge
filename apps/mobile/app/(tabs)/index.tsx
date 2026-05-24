@@ -1,90 +1,127 @@
+import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, Pressable, ActivityIndicator } from 'react-native';
-import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useEffect, useState } from 'react';
-import { loadLatestBlueprint, createWorkoutSession } from '../../src/lib/supabase';
-import { WeeklyBlueprint, PlannedExercise } from '@forge/shared';
+import { loadLatestBlueprint, loadExercises } from '../../src/lib/supabase';
+import { WeeklyBlueprint, PlannedExercise, Exercise } from '@forge/shared';
+import { useRouter } from 'expo-router';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
+import * as Haptics from 'expo-haptics';
 
 export default function TodayScreen() {
   const router = useRouter();
-  const [blueprint, setBlueprint] = useState<WeeklyBlueprint | null>(null);
   const [loading, setLoading] = useState(true);
+  const [blueprintName, setBlueprintName] = useState<string>('');
+  const [todayName, setTodayName] = useState('');
   const [dayPlan, setDayPlan] = useState<PlannedExercise[]>([]);
-  const [todayName, setTodayName] = useState<string>('');
+  const [pplFocus, setPplFocus] = useState<string>('N/A');
+  const [estimatedTime, setEstimatedTime] = useState<number>(0);
 
   useEffect(() => {
     async function init() {
-      const result = await loadLatestBlueprint();
-      if (result) {
-        setBlueprint(result.blueprint);
-        
-        // Trouver le jour actuel (Lundi, Mardi, etc.)
-        const days = ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'];
-        const currentDay = days[new Date().getDay()];
-        setTodayName(currentDay);
-        
-        // @ts-ignore - Indexing WeeklyBlueprint with string
-        const plan = result.blueprint[currentDay] || [];
+      const [bpResult, libResult] = await Promise.all([
+        loadLatestBlueprint(),
+        loadExercises()
+      ]);
+
+      const days = ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'];
+      const currentDay = days[new Date().getDay()];
+      setTodayName(currentDay);
+
+      if (bpResult) {
+        setBlueprintName(bpResult.name);
+        // @ts-ignore
+        const plan = bpResult.blueprint[currentDay] || [];
         setDayPlan(plan);
+
+        // Compute PPL focus and Time
+        let time = 0;
+        const pushCount = { push: 0, pull: 0, legs: 0, core: 0 };
+        
+        plan.forEach((pEx: PlannedExercise) => {
+          const exDef = libResult.find(e => e.id === pEx.exerciseId);
+          time += (pEx.sets.length * 3); // Approx 3 mins per set
+          if (exDef && exDef.ppl_category !== 'none') {
+            pushCount[exDef.ppl_category as keyof typeof pushCount]++;
+          }
+        });
+
+        setEstimatedTime(time);
+        
+        const topCategory = Object.entries(pushCount).sort((a, b) => b[1] - a[1])[0];
+        if (topCategory[1] > 0) {
+          setPplFocus(topCategory[0].toUpperCase());
+        }
       }
       setLoading(false);
     }
     init();
   }, []);
 
-  const handleStartSession = async () => {
-    // Créer une session en BDD
-    const sessionId = await createWorkoutSession();
-    if (sessionId) {
-      router.push(`/session/${sessionId}?day=${todayName}`);
-    } else {
-      alert("Erreur lors de la création de la session. Mode hors-ligne activé.");
-      router.push(`/session/offline?day=${todayName}`);
-    }
+  const startSession = () => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
+    router.push(`/session/today?day=${todayName}`);
   };
 
   if (loading) {
     return (
-      <SafeAreaView style={styles.container}>
-        <ActivityIndicator size="large" color="#3b82f6" style={{ marginTop: 100 }} />
+      <SafeAreaView style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="#10b981" />
       </SafeAreaView>
     );
   }
 
+  const isRestDay = dayPlan.length === 0;
+
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.title}>Aujourd'hui</Text>
-        <Text style={styles.subtitle}>{todayName}, {new Date().toLocaleDateString()}</Text>
+        <View style={styles.badge}>
+          <Text style={styles.badgeText}>DASHBOARD • AUJOURD'HUI</Text>
+        </View>
+        <Text style={styles.title}>{todayName.toUpperCase()}</Text>
+        <Text style={styles.subtitle}>{blueprintName ? `BLUEPRINT: ${blueprintName}` : 'AUCUN BLUEPRINT ACTIF'}</Text>
       </View>
 
       <View style={styles.content}>
-        {dayPlan.length > 0 ? (
-          <View style={styles.sessionCard}>
-            <Text style={styles.cardTitle}>Séance du jour</Text>
-            <Text style={styles.cardDesc}>{dayPlan.length} Exercices programmés</Text>
-            
-            <Pressable 
-              style={({ pressed }) => [
-                styles.startBtn,
-                pressed && styles.startBtnPressed
-              ]}
-              onPress={handleStartSession}
-            >
-              <Text style={styles.startBtnText}>DÉMARRER LA SESSION</Text>
-            </Pressable>
+        <View style={styles.statusCard}>
+          <Text style={styles.statusLabel}>STATUT DE LA JOURNÉE</Text>
+          {isRestDay ? (
+            <Text style={styles.statusRest}>REPOS PROGRAMMÉ</Text>
+          ) : (
+            <Text style={styles.statusTodo}>SÉANCE EN ATTENTE</Text>
+          )}
+
+          <View style={styles.statsRow}>
+            <View style={styles.statBox}>
+              <MaterialCommunityIcons name="dumbbell" size={20} color="#71717a" />
+              <Text style={styles.statValue}>{dayPlan.length}</Text>
+              <Text style={styles.statSub}>EXERCICES</Text>
+            </View>
+            <View style={styles.statBox}>
+              <MaterialCommunityIcons name="clock-outline" size={20} color="#71717a" />
+              <Text style={styles.statValue}>{estimatedTime > 0 ? `~${estimatedTime}m` : '-'}</Text>
+              <Text style={styles.statSub}>DURÉE</Text>
+            </View>
+            <View style={styles.statBox}>
+              <MaterialCommunityIcons name="target" size={20} color="#71717a" />
+              <Text style={styles.statValue}>{pplFocus}</Text>
+              <Text style={styles.statSub}>FOCUS</Text>
+            </View>
           </View>
-        ) : (
-          <View style={styles.emptyState}>
-            <Text style={styles.emptyText}>Jour de repos.</Text>
-            {!blueprint && (
-              <Text style={[styles.emptyText, { fontSize: 14, marginTop: 10 }]}>
-                (Aucun Blueprint trouvé)
-              </Text>
-            )}
-          </View>
-        )}
+        </View>
       </View>
+
+      {!isRestDay && (
+        <View style={styles.fabContainer}>
+          <Pressable 
+            style={({ pressed }) => [styles.fab, pressed && styles.fabPressed]}
+            onPress={startSession}
+          >
+            <Text style={styles.fabText}>LANCER LA SÉANCE</Text>
+            <MaterialCommunityIcons name="play" size={24} color="#000" />
+          </Pressable>
+        </View>
+      )}
     </SafeAreaView>
   );
 }
@@ -94,75 +131,126 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#000',
   },
+  loadingContainer: {
+    flex: 1,
+    backgroundColor: '#000',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   header: {
-    paddingHorizontal: 20,
-    paddingTop: 20,
-    paddingBottom: 10,
+    padding: 32,
+    paddingTop: 48,
+  },
+  badge: {
+    alignSelf: 'flex-start',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    backgroundColor: 'rgba(16, 185, 129, 0.1)',
+    borderWidth: 1,
+    borderColor: '#10b981',
+    borderRadius: 4,
+    marginBottom: 24,
+  },
+  badgeText: {
+    color: '#10b981',
+    fontSize: 10,
+    fontWeight: 'bold',
+    letterSpacing: 1,
   },
   title: {
-    fontSize: 32,
+    fontSize: 40,
     fontWeight: '900',
     color: '#fff',
-    textTransform: 'uppercase',
+    letterSpacing: 2,
   },
   subtitle: {
-    fontSize: 16,
+    fontSize: 12,
+    fontWeight: '700',
     color: '#71717a',
-    fontWeight: '600',
+    letterSpacing: 2,
+    marginTop: 8,
   },
   content: {
     flex: 1,
-    padding: 20,
-    justifyContent: 'center',
+    paddingHorizontal: 24,
   },
-  sessionCard: {
-    backgroundColor: '#18181b', // DA: zinc-900
-    borderRadius: 24,
-    padding: 24,
+  statusCard: {
+    backgroundColor: '#09090b',
     borderWidth: 1,
-    borderColor: '#27272a', // DA: zinc-800
-    alignItems: 'center',
+    borderColor: '#27272a',
+    borderRadius: 16,
+    padding: 24,
   },
-  cardTitle: {
-    fontSize: 24,
+  statusLabel: {
+    color: '#71717a',
+    fontSize: 10,
     fontWeight: 'bold',
-    color: '#fff',
+    letterSpacing: 1,
     marginBottom: 8,
   },
-  cardDesc: {
-    fontSize: 14,
-    color: '#a1a1aa',
-    marginBottom: 32,
-  },
-  startBtn: {
-    backgroundColor: '#3b82f6', // DA: blue-500
-    width: '100%',
-    paddingVertical: 20,
-    borderRadius: 16,
-    alignItems: 'center',
-    shadowColor: '#3b82f6',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 10,
-    elevation: 8,
-  },
-  startBtnPressed: {
-    backgroundColor: '#2563eb', // DA: blue-600
-    transform: [{ scale: 0.98 }],
-  },
-  startBtnText: {
-    color: '#fff',
-    fontSize: 18,
+  statusTodo: {
+    color: '#10b981',
+    fontSize: 24,
     fontWeight: '900',
     letterSpacing: 1,
+    marginBottom: 32,
   },
-  emptyState: {
+  statusRest: {
+    color: '#3b82f6',
+    fontSize: 24,
+    fontWeight: '900',
+    letterSpacing: 1,
+    marginBottom: 32,
+  },
+  statsRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    borderTopWidth: 1,
+    borderTopColor: '#27272a',
+    paddingTop: 24,
+  },
+  statBox: {
+    alignItems: 'center',
+  },
+  statValue: {
+    color: '#fff',
+    fontSize: 20,
+    fontWeight: '900',
+    marginTop: 8,
+  },
+  statSub: {
+    color: '#71717a',
+    fontSize: 10,
+    fontWeight: 'bold',
+    letterSpacing: 1,
+    marginTop: 4,
+  },
+  fabContainer: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    padding: 24,
+    backgroundColor: '#000',
+    borderTopWidth: 1,
+    borderTopColor: '#27272a',
+  },
+  fab: {
+    backgroundColor: '#10b981', // Emerald
+    borderRadius: 16,
+    flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
+    paddingVertical: 20,
+    gap: 8,
   },
-  emptyText: {
-    color: '#71717a',
-    fontSize: 18,
-    fontWeight: '600',
+  fabPressed: {
+    backgroundColor: '#059669', // Darker Emerald
+  },
+  fabText: {
+    color: '#000',
+    fontSize: 16,
+    fontWeight: '900',
+    letterSpacing: 2,
   }
 });

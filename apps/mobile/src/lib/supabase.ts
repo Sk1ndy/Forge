@@ -81,20 +81,54 @@ export async function createWorkoutSession(blueprintId?: string): Promise<string
   }
 }
 
+import { getUnsyncedLogs, markLogAsSynced, saveLogLocally } from './sqlite';
+
 export async function saveExerciseLog(log: Omit<ExerciseLog, 'id' | 'created_at'>): Promise<boolean> {
   try {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return false;
 
-    const { error } = await supabase
-      .from('exercise_logs')
-      .insert([{ ...log, user_id: user.id }]);
+    // 1. Save Locally (Offline First)
+    saveLogLocally({ ...log, user_id: user.id } as any);
+    
+    // 2. Try to sync immediately (fire and forget)
+    syncLocalLogsToSupabase().catch(console.error);
 
-    if (error) throw error;
     return true;
   } catch (e) {
-    console.error("Error saving exercise log", e);
+    console.error("Error saving exercise log locally", e);
     return false;
+  }
+}
+
+export async function syncLocalLogsToSupabase() {
+  const unsynced = getUnsyncedLogs();
+  if (unsynced.length === 0) return;
+
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return;
+
+  for (const log of unsynced) {
+    try {
+      const payload = JSON.parse(log.payload);
+      
+      const { error } = await supabase
+        .from('exercise_logs')
+        .insert([{
+          session_id: payload.session_id,
+          exercise_id: payload.exercise_id,
+          user_id: user.id,
+          sets: payload.sets,
+          ppl_category: payload.ppl_category,
+          metadata: payload.metadata || {}
+        }]);
+
+      if (!error) {
+        markLogAsSynced(log.id);
+      }
+    } catch (e) {
+      console.error(`Failed to sync log ${log.id}`, e);
+    }
   }
 }
 
