@@ -21,7 +21,7 @@
       "blueprint": {
         "Lundi": [
           {
-            "id": "9213rw9",
+            "id": "2r6xjwd",
             "exerciseId": "bench_press",
             "sets": [
               {
@@ -35,7 +35,7 @@
             "active": true
           },
           {
-            "id": "v8t5kbw",
+            "id": "xn2bl9c",
             "exerciseId": "ohp",
             "sets": [
               {
@@ -49,7 +49,7 @@
             "active": true
           },
           {
-            "id": "abb9iyi",
+            "id": "9x4ws59",
             "exerciseId": "incline_bench",
             "sets": [
               {
@@ -63,7 +63,7 @@
             "active": true
           },
           {
-            "id": "3zecinw",
+            "id": "p321ug4",
             "exerciseId": "dips",
             "sets": [
               {
@@ -77,7 +77,7 @@
             "active": true
           },
           {
-            "id": "3bm63iw",
+            "id": "l5dk03i",
             "exerciseId": "triceps_pushdown",
             "sets": [
               {
@@ -93,7 +93,7 @@
         ],
         "Mardi": [
           {
-            "id": "hry1492",
+            "id": "2nazcpf",
             "exerciseId": "deadlift",
             "sets": [
               {
@@ -107,7 +107,7 @@
             "active": true
           },
           {
-            "id": "jtkembi",
+            "id": "o5zjisq",
             "exerciseId": "pull_ups",
             "sets": [
               {
@@ -121,7 +121,7 @@
             "active": true
           },
           {
-            "id": "zpxgw16",
+            "id": "k8w533r",
             "exerciseId": "barbell_row",
             "sets": [
               {
@@ -135,7 +135,7 @@
             "active": true
           },
           {
-            "id": "g91ps5b",
+            "id": "epf7bxp",
             "exerciseId": "face_pull",
             "sets": [
               {
@@ -149,7 +149,7 @@
             "active": true
           },
           {
-            "id": "ewsm11p",
+            "id": "bid0trv",
             "exerciseId": "biceps_curl",
             "sets": [
               {
@@ -165,7 +165,7 @@
         ],
         "Mercredi": [
           {
-            "id": "fhwremq",
+            "id": "4fqliwi",
             "exerciseId": "squat",
             "sets": [
               {
@@ -179,7 +179,7 @@
             "active": true
           },
           {
-            "id": "73yqe6b",
+            "id": "zkhwa11",
             "exerciseId": "leg_press",
             "sets": [
               {
@@ -193,7 +193,7 @@
             "active": true
           },
           {
-            "id": "mivdo68",
+            "id": "gajla4k",
             "exerciseId": "leg_extension",
             "sets": [
               {
@@ -207,7 +207,7 @@
             "active": true
           },
           {
-            "id": "dcqoo7x",
+            "id": "7jbabz0",
             "exerciseId": "leg_curl",
             "sets": [
               {
@@ -221,7 +221,7 @@
             "active": true
           },
           {
-            "id": "0t3apxo",
+            "id": "wdvnx9w",
             "exerciseId": "calf_raise",
             "sets": [
               {
@@ -238,7 +238,7 @@
         "Jeudi": [],
         "Vendredi": [
           {
-            "id": "m8inal4",
+            "id": "2l16qnf",
             "exerciseId": "bench_press",
             "sets": [
               {
@@ -252,7 +252,7 @@
             "active": true
           },
           {
-            "id": "or2ej51",
+            "id": "7pox9gy",
             "exerciseId": "ohp",
             "sets": [
               {
@@ -266,7 +266,7 @@
             "active": true
           },
           {
-            "id": "lf2k8lx",
+            "id": "aj8nms0",
             "exerciseId": "incline_bench",
             "sets": [
               {
@@ -280,7 +280,7 @@
             "active": true
           },
           {
-            "id": "ura3bzh",
+            "id": "81kuqn8",
             "exerciseId": "triceps_pushdown",
             "sets": [
               {
@@ -296,7 +296,7 @@
         ],
         "Samedi": [
           {
-            "id": "zhni4oz",
+            "id": "37qonsw",
             "exerciseId": "pull_ups",
             "sets": [
               {
@@ -310,7 +310,7 @@
             "active": true
           },
           {
-            "id": "2q9loiu",
+            "id": "9rv67rc",
             "exerciseId": "barbell_row",
             "sets": [
               {
@@ -324,7 +324,7 @@
             "active": true
           },
           {
-            "id": "nwxr3zn",
+            "id": "antgggk",
             "exerciseId": "face_pull",
             "sets": [
               {
@@ -338,7 +338,7 @@
             "active": true
           },
           {
-            "id": "n87l4v3",
+            "id": "902ydq0",
             "exerciseId": "biceps_curl",
             "sets": [
               {
@@ -1434,7 +1434,7 @@
       "blueprint": {
         "Lundi": [
           {
-            "id": "7t5s83c",
+            "id": "cpq0j2x",
             "exerciseId": "squat",
             "sets": [
               {
@@ -1448,7 +1448,7 @@
             "active": true
           },
           {
-            "id": "1z706tp",
+            "id": "6jvbf37",
             "exerciseId": "bench_press",
             "sets": [
               {
@@ -1462,7 +1462,7 @@
             "active": true
           },
           {
-            "id": "6a424r2",
+            "id": "qjv9kr5",
             "exerciseId": "barbell_row",
             "sets": [
               {
@@ -1476,7 +1476,7 @@
             "active": true
           },
           {
-            "id": "n3xk5x1",
+            "id": "cneku5f",
             "exerciseId": "biceps_curl",
             "sets": [
               {
@@ -1490,7 +1490,7 @@
             "active": true
           },
           {
-            "id": "g2kowxw",
+            "id": "47cktqk",
             "exerciseId": "crunchs",
             "sets": [
               {
@@ -1507,7 +1507,7 @@
         "Mardi": [],
         "Mercredi": [
           {
-            "id": "hm9muzo",
+            "id": "xcem76q",
             "exerciseId": "deadlift",
             "sets": [
               {
@@ -1521,7 +1521,7 @@
             "active": true
           },
           {
-            "id": "9zzkglh",
+            "id": "85gsbpb",
             "exerciseId": "ohp",
             "sets": [
               {
@@ -1535,7 +1535,7 @@
             "active": true
           },
           {
-            "id": "f117pgn",
+            "id": "dmz1err",
             "exerciseId": "pull_ups",
             "sets": [
               {
@@ -1549,7 +1549,7 @@
             "active": true
           },
           {
-            "id": "lqlswej",
+            "id": "eab00t1",
             "exerciseId": "leg_press",
             "sets": [
               {
@@ -1563,7 +1563,7 @@
             "active": true
           },
           {
-            "id": "uyi6xsq",
+            "id": "c68q21p",
             "exerciseId": "triceps_pushdown",
             "sets": [
               {
@@ -1580,7 +1580,7 @@
         "Jeudi": [],
         "Vendredi": [
           {
-            "id": "g2hl18j",
+            "id": "wvgxa6h",
             "exerciseId": "squat",
             "sets": [
               {
@@ -1594,7 +1594,7 @@
             "active": true
           },
           {
-            "id": "adfhu1x",
+            "id": "rph04ng",
             "exerciseId": "incline_bench",
             "sets": [
               {
@@ -1608,7 +1608,7 @@
             "active": true
           },
           {
-            "id": "vqs4ltw",
+            "id": "hcl5g1s",
             "exerciseId": "lat_pulldown",
             "sets": [
               {
@@ -1622,7 +1622,7 @@
             "active": true
           },
           {
-            "id": "bmc4391",
+            "id": "jae2gc8",
             "exerciseId": "leg_curl",
             "sets": [
               {
@@ -1636,7 +1636,7 @@
             "active": true
           },
           {
-            "id": "f5ofsxl",
+            "id": "k1mlbjz",
             "exerciseId": "lateral_raise",
             "sets": [
               {

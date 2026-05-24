@@ -303,7 +303,14 @@ export async function loadExercises(): Promise<Exercise[]> {
         .select('*');
 
       if (!error && data && data.length > 0) {
-        return data as Exercise[];
+        return data.map(dbEx => {
+          const defaultEx = DEFAULT_EXERCISE_LIBRARY.find(e => e.id === dbEx.id);
+          return {
+            ...defaultEx,
+            ...dbEx,
+            ppl_category: dbEx.ppl_category || defaultEx?.ppl_category || 'none'
+          } as Exercise;
+        });
       }
     } catch (e) {
       console.warn("Supabase loadExercises error. Falling back to default library.", e);
