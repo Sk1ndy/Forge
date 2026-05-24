@@ -1,6 +1,6 @@
 import { 
   MuscleId, Exercise, UserProfile, WeeklyBlueprint, 
-  PlannedSetSchema, MuscleStatus, WeeklyMacro, WeeklyTrauma, SimulationResult 
+  PlannedSetSchema, MuscleStatus, WeeklyMacro, WeeklyTrauma, SimulationResult, ExerciseLog 
 } from './types';
 import { 
   DEFAULT_EXERCISE_LIBRARY, DEFAULT_EXERCISE_TENSION_MATRICES, 
@@ -23,11 +23,12 @@ export function runWeeklySimulation(
   toggledDays: { [day: string]: boolean } = {},
   selectedDay?: string,
   exerciseLibrary: Exercise[] = DEFAULT_EXERCISE_LIBRARY,
-  week2Blueprint?: WeeklyBlueprint
+  week2Blueprint?: WeeklyBlueprint,
+  sessionLogs?: ExerciseLog[]
 ): SimulationResult {
   // ─── MÉCANISME DE CACHE (MEMOIZATION) ───
   // Génération d'une empreinte unique basée sur les paramètres d'entrée stricts
-  const cacheKey = JSON.stringify({ blueprint, profile, toggledDays, selectedDay, week2Blueprint });
+  const cacheKey = JSON.stringify({ blueprint, profile, toggledDays, selectedDay, week2Blueprint, sessionLogs });
 
   if (simulationCache.has(cacheKey)) {
     return simulationCache.get(cacheKey)!;
@@ -158,7 +159,31 @@ export function runWeeklySimulation(
             const parsedSet = PlannedSetSchema.safeParse(set);
             if (!parsedSet.success || !parsedSet.data.active) return;
             
-            const validSet = parsedSet.data;
+            let validSet = parsedSet.data;
+
+            // ─── SURCHARGE AVEC LES LOGS RÉELS DU MOBILE (SI DISPONIBLES) ───
+            if (sessionLogs && sessionLogs.length > 0) {
+              const logMatch = sessionLogs.find(
+                l => l.exercise_id === plannedEx.exerciseId && 
+                     l.day === day && 
+                     l.set_index === setIndex
+              );
+
+              if (logMatch) {
+                if (logMatch.is_completed === false) {
+                  // La série a été sautée sur le mobile (fatigue/blessure/etc), elle ne génère aucune fatigue
+                  return;
+                }
+                // Remplacement des prévisions par la performance réelle
+                validSet = {
+                  ...validSet,
+                  reps: logMatch.actual_reps ?? validSet.reps,
+                  poids: logMatch.actual_weight ?? validSet.poids,
+                  rpe: logMatch.actual_rpe ?? validSet.rpe
+                };
+              }
+            }
+
             const { inol, sncPoints } = calculateSetImpact(validSet, exercise, profile, profile.isBeginner);
 
             const setIdBase = `${week}-${day}-${plannedEx.exerciseId}-${setIndex}`;

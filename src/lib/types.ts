@@ -108,3 +108,30 @@ export interface SimulationResult {
   weeklyMacro: WeeklyMacro;
   weeklyTraumas: WeeklyTrauma[];
 }
+
+// ─── WORK MODE ───
+
+export interface ExerciseLog {
+  id?: string;
+  session_id?: string;
+  exercise_id: string;
+  day: string;
+  set_index: number;
+  planned_weight?: number;
+  planned_reps?: number;
+  planned_rpe?: number;
+  actual_weight?: number;
+  actual_reps?: number;
+  actual_rpe?: number;
+  is_completed?: boolean;
+  skipped_reason?: string;
+  created_at?: string;
+}
+
+export interface WorkoutSession {
+  id?: string;
+  user_id?: string;
+  date: string;
+  blueprint_id?: string;
+  exercise_data?: Record<string, unknown>;
+}
