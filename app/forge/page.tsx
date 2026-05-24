@@ -850,7 +850,7 @@ export default function Home() {
             setIsComparing(false); // Cancel comparison if user closes modal without selecting
           }
         }}
-        savedBlueprints={savedBlueprints}
+        savedBlueprints={savedBlueprints.filter(sb => sb.id !== activeBlueprintId)}
         onLoadBlueprint={(id) => {
           handleLoadCompareBlueprint(id);
           setIsComparing(true);
@@ -858,6 +858,7 @@ export default function Home() {
         onRenameBlueprint={handleRenameBlueprintById}
         onDeleteBlueprint={handleDeleteBlueprintById}
         activeBlueprintId={null} // Pas de surbrillance pour le blueprint B
+        mode="select"
       />
       
       <SocialExportPoster

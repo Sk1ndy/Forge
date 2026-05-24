@@ -9,6 +9,7 @@ interface BlueprintsModalProps {
   onRenameBlueprint: (id: string, name: string) => void;
   onDeleteBlueprint: (id: string) => void;
   activeBlueprintId: string | null;
+  mode?: 'manage' | 'select'; // 'manage' par défaut, 'select' pour choisir un blueprint B
 }
 
 export default function BlueprintsModal({
@@ -19,6 +20,7 @@ export default function BlueprintsModal({
   onRenameBlueprint,
   onDeleteBlueprint,
   activeBlueprintId,
+  mode = 'manage',
 }: BlueprintsModalProps) {
   if (!isOpen) return null;
 
@@ -64,11 +66,17 @@ export default function BlueprintsModal({
               return (
                 <div
                   key={sb.id}
+                  onClick={() => {
+                    if (mode === 'select') {
+                      onLoadBlueprint(sb.id);
+                      onClose();
+                    }
+                  }}
                   className={`flex flex-col sm:flex-row sm:items-center justify-between p-3.5 rounded-xl border transition-all duration-200 gap-3 ${
                     isActive
                       ? 'border-emerald-500 bg-emerald-950/10 shadow-[0_0_15px_rgba(16,185,129,0.08)]'
                       : 'border-zinc-900 bg-zinc-900/30 hover:border-zinc-800'
-                  }`}
+                  } ${mode === 'select' ? 'cursor-pointer hover:bg-zinc-800/50' : ''}`}
                 >
                   {/* Metadata */}
                   <div className="flex flex-col min-w-0">
@@ -81,42 +89,51 @@ export default function BlueprintsModal({
                   </div>
 
                   {/* Actions buttons */}
-                  <div className="flex items-center gap-2 shrink-0">
-                    <button
-                      onClick={() => {
-                        onLoadBlueprint(sb.id);
-                        onClose();
-                      }}
-                      className={`text-xs font-bold px-3 py-1.5 rounded-lg transition-colors cursor-pointer ${
-                        isActive
-                          ? 'bg-emerald-500 text-zinc-950 hover:bg-emerald-600'
-                          : 'bg-zinc-900 hover:bg-zinc-800 text-zinc-300'
-                      }`}
-                      title={isActive ? "Blueprint actif" : "Charger ce blueprint"}
-                    >
-                      {isActive ? 'Actif' : 'Sélectionner'}
-                    </button>
-                    
-                    <button
-                      onClick={() => onRenameBlueprint(sb.id, sb.name)}
-                      className="p-1.5 rounded-lg bg-zinc-900/50 hover:bg-zinc-800 border border-zinc-850 hover:border-zinc-700 text-zinc-400 hover:text-white transition-colors cursor-pointer"
-                      title="Renommer"
-                    >
-                      <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-                      </svg>
-                    </button>
+                  {mode === 'manage' && (
+                    <div className="flex items-center gap-2 shrink-0">
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onLoadBlueprint(sb.id);
+                          onClose();
+                        }}
+                        className={`text-xs font-bold px-3 py-1.5 rounded-lg transition-colors cursor-pointer ${
+                          isActive
+                            ? 'bg-emerald-500 text-zinc-950 hover:bg-emerald-600'
+                            : 'bg-zinc-900 hover:bg-zinc-800 text-zinc-300'
+                        }`}
+                        title={isActive ? "Blueprint actif" : "Charger ce blueprint"}
+                      >
+                        {isActive ? 'Actif' : 'Sélectionner'}
+                      </button>
+                      
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onRenameBlueprint(sb.id, sb.name);
+                        }}
+                        className="p-1.5 rounded-lg bg-zinc-900/50 hover:bg-zinc-800 border border-zinc-850 hover:border-zinc-700 text-zinc-400 hover:text-white transition-colors cursor-pointer"
+                        title="Renommer"
+                      >
+                        <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                        </svg>
+                      </button>
 
-                    <button
-                      onClick={() => onDeleteBlueprint(sb.id)}
-                      className="p-1.5 rounded-lg bg-zinc-900/50 hover:bg-red-500/10 border border-zinc-850 hover:border-red-500/20 text-zinc-400 hover:text-red-400 transition-colors cursor-pointer"
-                      title="Supprimer"
-                    >
-                      <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                      </svg>
-                    </button>
-                  </div>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onDeleteBlueprint(sb.id);
+                        }}
+                        className="p-1.5 rounded-lg bg-zinc-900/50 hover:bg-red-500/10 border border-zinc-850 hover:border-red-500/20 text-zinc-400 hover:text-red-400 transition-colors cursor-pointer"
+                        title="Supprimer"
+                      >
+                        <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
+                      </button>
+                    </div>
+                  )}
                 </div>
               );
             })
