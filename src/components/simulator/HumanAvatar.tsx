@@ -612,7 +612,7 @@ export default function HumanAvatar({
         flexShrink: 0,
       }}>
         <span style={{ fontSize: 12, fontWeight: 800, color: '#f4f4f5', letterSpacing: '0.08em', textTransform: 'uppercase' }}>
-          CARTE ANATOMIQUE {selectedDay ? `— ${selectedDay.toUpperCase()}` : ''}
+          CARTE ANATOMIQUE {viewMode === 'week' ? '— SEMAINE GLOBALE' : (selectedDay ? `— ${selectedDay.toUpperCase()}` : '')}
         </span>
         {simulation.cnsFailure && (
           <span style={{
