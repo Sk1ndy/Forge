@@ -23,7 +23,7 @@ export default function SocialExportPoster({
   return (
     <div
       id="forge-social-poster"
-      className="fixed top-0 left-0 z-[-50] opacity-0 pointer-events-none w-[1400px] bg-zinc-950 p-10 flex flex-col gap-8"
+      className="fixed top-0 left-[-10000px] z-[-50] pointer-events-none w-[1400px] bg-zinc-950 p-10 flex flex-col gap-8"
       style={{
         // On s'assure qu'il n'y a aucune restriction de hauteur pour forcer l'expansion complète
         height: 'auto',
