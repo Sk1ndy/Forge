@@ -22,7 +22,7 @@ const DAY_LABELS = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'];
 const TIMELINE_MUSCLES: { id: MuscleId; label: string; color: string }[] = [
   { id: 'chest',        label: 'Pecto',   color: '#10b981' },
   { id: 'upperBack',    label: 'Dos',     color: '#3b82f6' },
-  { id: 'quadriceps',   label: 'Quads',   color: '#8b5cf6' },
+  { id: 'quadriceps',   label: 'Quads',   color: '#22d3ee' },
   { id: 'hamstring',    label: 'Ischios', color: '#f59e0b' },
   { id: 'frontDeltoid', label: 'Épaules', color: '#ec4899' },
 ];
@@ -441,7 +441,7 @@ export default function WeekDashboard({ simulation, blueprint, toggledDays, char
             <div className="pt-2 border-t border-zinc-900">
               <div className="flex justify-between items-center text-[10px]">
                 <span className="text-zinc-600">Part Jambes (total)</span>
-                <span className="text-violet-400 font-bold font-mono">{simulation.pushPullLegsRatio.legs}%</span>
+                <span className="text-violet-400 font-bold font-mono">{Math.round(simulation.pushPullLegsRatio.legs)}%</span>
               </div>
               <div className="mt-1 h-1 w-full bg-zinc-950 rounded-full overflow-hidden">
                 <div className="h-full bg-violet-500 rounded-full transition-all duration-700" style={{ width: `${Math.min(100, simulation.pushPullLegsRatio.legs)}%` }} />
