@@ -147,7 +147,7 @@ export function runWeeklySimulation(
             if (!parsedSet.success || !parsedSet.data.active) return;
             
             const validSet = parsedSet.data;
-            const { inol, sncPoints } = calculateSetImpact(validSet, exercise, profile);
+            const { inol, sncPoints } = calculateSetImpact(validSet, exercise, profile, profile.isBeginner);
 
             const setIdBase = `${week}-${day}-${plannedEx.exerciseId}-${setIndex}`;
 

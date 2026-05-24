@@ -33,6 +33,7 @@ export interface UserProfile {
   pdc: number; // Poids de Corps
   prs: UserPRs;
   maxSnc: number; // Capacité max SNC
+  isBeginner?: boolean;
   age?: number;
   sleepHours?: number;      // Heures de sommeil moyennes
   caloricStatus?: 'deficit' | 'maintenance' | 'surplus';

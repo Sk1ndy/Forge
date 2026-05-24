@@ -40,7 +40,8 @@ export const normalize = (val: number) => Math.round(val * 10000) / 10000;
 export function calculateSetImpact(
   set: PlannedSet,
   exercise: Exercise,
-  profile: UserProfile
+  profile: UserProfile,
+  isBeginner: boolean = false
 ): { inol: number; sncPoints: number } {
   if (!set.active || set.series <= 0 || set.reps <= 0) {
     return { inol: 0, sncPoints: 0 };
@@ -63,14 +64,22 @@ export function calculateSetImpact(
   }
   intensity = Math.min(99, Math.max(10, intensity));
 
-  // 3. Multiplicateur RPE basé sur la formule exponentielle Math.pow(1.35, clampedRpe - 10)
-  const clampedRpe = Math.min(10, Math.max(5, set.rpe || 8));
+  // 3. Multiplicateur RPE ajusté (Bride pour les débutants)
+  const clampedRpe = isBeginner 
+    ? Math.min(8, set.rpe) 
+    : Math.min(10, Math.max(5, set.rpe || 8));
+    
   const rpeFactor = Math.pow(1.35, clampedRpe - 10);
 
   // 4. Calcul de l'INOL brut accumulé par cette série
   const inolIntensity = Math.min(95, Math.max(10, intensity));
   const baseInol = set.reps / (100 - inolIntensity);
-  const totalInol = baseInol * rpeFactor * set.series;
+  let totalInol = baseInol * rpeFactor * set.series;
+
+  // Pénalité articulaire/musculaire pour les débutants (besoin de plus de repos)
+  if (isBeginner) {
+    totalInol *= 1.2;
+  }
 
   // 5. Calcul de l'impact SNC (Système Nerveux Central)
   const pdc = profile.pdc || 75;
