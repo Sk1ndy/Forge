@@ -8,8 +8,9 @@ const createSet = (series: number, reps: number, rpe: number = 8): PlannedSet =>
   active: true
 });
 
+let idCounter = 0;
 const createExercise = (exerciseId: string, sets: PlannedSet[]): PlannedExercise => ({
-  id: Math.random().toString(36).substring(2, 9),
+  id: `ex-${exerciseId}-${++idCounter}`,
   exerciseId,
   sets,
   active: true
