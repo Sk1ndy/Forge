@@ -388,16 +388,16 @@ export default function WeekDashboard({ simulation, blueprint, toggledDays }: We
         <div className={cardBase}>
           <h5 className="text-[10px] font-bold text-red-400 uppercase tracking-wider mb-3">🧠 SNC & Traumatismes Aigus</h5>
           <div className="space-y-2.5 mb-3">
-            <div className="flex justify-between items-center text-xs">
-              <span className="text-zinc-400 font-semibold">Charge Axiale (Tier 1)</span>
+            <div className="flex justify-between items-center text-xs group relative" title="La Charge Axiale représente le stress imposé sur ta colonne vertébrale par les exercices lourds (ex: Squat, Soulevé de Terre). Trop de charge axiale fatigue ton système nerveux et augmente le risque de blessure au dos.">
+              <span className="text-zinc-400 font-semibold cursor-help">Charge Axiale (Tier 1) ❓</span>
               <span className="font-black font-mono" style={{ color: axialColor }}>{axial}%</span>
             </div>
             <div className="h-2.5 w-full bg-zinc-950 border border-zinc-900 rounded-full overflow-hidden p-0.5">
               <div className={`h-full rounded-full transition-all duration-700 ${axial > 80 ? 'animate-pulse' : ''}`}
                 style={{ width: `${axial}%`, backgroundColor: axialColor, boxShadow: axial > 80 ? `0 0 8px ${axialColor}80` : 'none' }} />
             </div>
-            <div className="flex justify-between items-center text-xs">
-              <span className="text-zinc-400 font-semibold">Saturation SNC</span>
+            <div className="flex justify-between items-center text-xs group relative" title="Le Système Nerveux Central (SNC) est la 'batterie' qui envoie le signal à tes muscles. S'il est saturé (au-delà de 80%), tu perdras de la force globale même si tes muscles sont reposés.">
+              <span className="text-zinc-400 font-semibold cursor-help">Saturation SNC ❓</span>
               <span className={`font-black font-mono ${simulation.cnsFailure ? 'text-red-400 animate-pulse' : 'text-zinc-300'}`}>{sncPct}%</span>
             </div>
             <div className="h-2 w-full bg-zinc-950 border border-zinc-900 rounded-full overflow-hidden">
@@ -407,7 +407,7 @@ export default function WeekDashboard({ simulation, blueprint, toggledDays }: We
           </div>
 
           <div className="pt-2.5 border-t border-zinc-900">
-            <p className="text-[9px] font-bold text-zinc-500 uppercase tracking-wider mb-1.5">🚨 Traumatismes Détectés</p>
+            <p className="text-[9px] font-bold text-zinc-500 uppercase tracking-wider mb-1.5">Statut des Traumatismes</p>
             {simulation.weeklyTraumas && simulation.weeklyTraumas.length > 0 ? (
               <ul className="space-y-1">
                 {simulation.weeklyTraumas.slice(0, 3).map((t, i) => (
