@@ -6,6 +6,7 @@ import {
   Tooltip, ResponsiveContainer, CartesianGrid,
 } from 'recharts';
 import { SimulationResult, WeeklyBlueprint, MuscleId } from '@/lib/calculations';
+import { MuscleStatus } from '@/lib/types';
 
 // ─── Props ───────────────────────────────────────────────────────────────────
 interface WeekDashboardProps {
@@ -36,41 +37,75 @@ const GRAND_GROUPS: { id: MuscleId; label: string }[] = [
 ];
 
 // ─── Utilities ────────────────────────────────────────────────────────────────
-function computeProgrammeScore(simulation: SimulationResult): number {
+function calculateProgramScore(sim: SimulationResult): { score: number; grade: string; critique: string } {
   let score = 100;
-  const macro = simulation.weeklyMacro;
+  const penalties: string[] = [];
 
-  const push = macro?.pushPullRatio?.push ?? 50;
-  if (push < 35 || push > 65) score -= 15;
-  else if (push < 40 || push > 60) score -= 7;
+  // 1. Décompte des statuts musculaires
+  const musclesList = Object.values(sim.muscles).filter(m => m !== undefined) as MuscleStatus[];
+  const redMuscles = musclesList.filter(m => m.color === 'red');
+  const orangeMuscles = musclesList.filter(m => m.color === 'orange');
 
-  const sets = macro?.weeklyEffectiveSets ?? {};
-  (Object.values(sets) as number[]).forEach((v) => {
-    if (v > 22) score -= 10;
-    else if (v > 20) score -= 4;
-  });
+  // 2. Pénalités soustractives
+  if (orangeMuscles.length > 0) {
+    score -= orangeMuscles.length * 10;
+    penalties.push(`${orangeMuscles.length} muscle(s) en surcharge (Orange).`);
+  }
 
-  score -= (simulation.weeklyTraumas?.length ?? 0) * 20;
+  if (sim.junkVolumeAlerts && sim.junkVolumeAlerts.length > 0) {
+    score -= sim.junkVolumeAlerts.length * 5;
+    penalties.push(`${sim.junkVolumeAlerts.length} alerte(s) de Volume Poubelle.`);
+  }
 
-  if (simulation.cnsFailure) score -= 25;
-  else if (simulation.sncPercentage > 80) score -= 10;
+  if (sim.topNeglected && sim.topNeglected.length > 0) {
+    score -= Math.min(15, sim.topNeglected.length * 3);
+  }
 
-  if (simulation.globalWorkCapacity < 30) score -= 15;
-  else if (simulation.globalWorkCapacity < 50) score -= 7;
+  // Déséquilibre postural (Protection épaules)
+  if (sim.pushPullLegsRatio.pull > 0 && sim.pushPullLegsRatio.push > sim.pushPullLegsRatio.pull * 1.5) {
+    score -= 15;
+    penalties.push("Asymétrie : Beaucoup trop de Poussée par rapport au Tirage.");
+  } else if (sim.pushPullLegsRatio.pull === 0 && sim.pushPullLegsRatio.push > 0) {
+    score -= 25; // Pire cas : Zéro tirage
+  }
 
-  if ((macro?.axialSncLoad ?? 0) > 80) score -= 10;
+  // 3. Application des Hard Caps (Échecs critiques)
+  if (redMuscles.length > 0) {
+    score = Math.min(score, 40);
+    penalties.push(`DANGER : Risque lésionnel sur ${redMuscles.map(m => m.name).join(', ')}.`);
+  }
 
-  return Math.max(0, Math.min(100, Math.round(score)));
+  if (sim.cnsFailure) {
+    score = Math.min(score, 20);
+    penalties.push("DANGER : Échec du Système Nerveux Central (Burnout).");
+  }
+
+  // Normalisation
+  score = Math.max(0, Math.min(100, Math.round(score)));
+
+  // 4. Attribution du Grade
+  let grade = 'F';
+  if (score >= 90) grade = 'S';
+  else if (score >= 80) grade = 'A';
+  else if (score >= 70) grade = 'B';
+  else if (score >= 50) grade = 'C';
+  else if (score >= 40) grade = 'D';
+
+  return { 
+    score, 
+    grade, 
+    critique: penalties.length > 0 ? penalties.join(' ') : "Programme optimisé et sécurisé." 
+  };
 }
 
 interface GradeInfo { label: string; color: string; glow: string; description: string }
-function getGrade(score: number): GradeInfo {
-  if (score >= 90) return { label: 'S', color: '#10b981', glow: 'rgba(16,185,129,0.5)',  description: 'Programme Élite'  };
-  if (score >= 80) return { label: 'A', color: '#14b8a6', glow: 'rgba(20,184,166,0.45)', description: 'Excellent'        };
-  if (score >= 70) return { label: 'B', color: '#3b82f6', glow: 'rgba(59,130,246,0.45)', description: 'Très Bon'         };
-  if (score >= 60) return { label: 'C', color: '#f59e0b', glow: 'rgba(245,158,11,0.45)', description: 'Correct'          };
-  if (score >= 45) return { label: 'D', color: '#f97316', glow: 'rgba(249,115,22,0.4)',  description: 'À Améliorer'      };
-  return               { label: 'F', color: '#ef4444', glow: 'rgba(239,68,68,0.5)',   description: 'Programme Risqué' };
+function getGradeInfo(grade: string): GradeInfo {
+  if (grade === 'S') return { label: 'S', color: '#10b981', glow: 'rgba(16,185,129,0.5)',  description: 'Programme Élite'  };
+  if (grade === 'A') return { label: 'A', color: '#14b8a6', glow: 'rgba(20,184,166,0.45)', description: 'Excellent'        };
+  if (grade === 'B') return { label: 'B', color: '#3b82f6', glow: 'rgba(59,130,246,0.45)', description: 'Très Bon'         };
+  if (grade === 'C') return { label: 'C', color: '#f59e0b', glow: 'rgba(245,158,11,0.45)', description: 'Correct'          };
+  if (grade === 'D') return { label: 'D', color: '#f97316', glow: 'rgba(249,115,22,0.4)',  description: 'À Améliorer'      };
+  return             { label: 'F', color: '#ef4444', glow: 'rgba(239,68,68,0.5)',   description: 'Programme Risqué' };
 }
 
 function toReadinessPct(readiness: number): number {
@@ -146,8 +181,8 @@ const ChartTooltip = ({ active, payload, label }: { active?: boolean; payload?: 
 
 // ─── Component ────────────────────────────────────────────────────────────────
 export default function WeekDashboard({ simulation, blueprint, toggledDays }: WeekDashboardProps) {
-  const programmeScore = useMemo(() => computeProgrammeScore(simulation), [simulation]);
-  const grade = useMemo(() => getGrade(programmeScore), [programmeScore]);
+  const { score: programmeScore, grade: gradeLetter, critique } = useMemo(() => calculateProgramScore(simulation), [simulation]);
+  const grade = useMemo(() => getGradeInfo(gradeLetter), [gradeLetter]);
   const prescriptions = useMemo(() => generatePrescriptions(simulation), [simulation]);
 
   // Weekly tonnage (Σ series × reps × poids)
@@ -204,14 +239,21 @@ export default function WeekDashboard({ simulation, blueprint, toggledDays }: We
       <div className="grid grid-cols-3 gap-4 shrink-0">
 
         {/* Programme Score */}
-        <div className={`${cardBase} flex items-center gap-4`} style={{ borderColor: `${grade.color}30`, background: `linear-gradient(135deg, rgba(9,9,11,0.9) 0%, ${grade.color}08 100%)` }}>
-          <div style={{ width: 56, height: 56, borderRadius: 14, border: `2px solid ${grade.color}50`, background: `${grade.color}10`, display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: `0 0 20px ${grade.glow}`, flexShrink: 0 }}>
-            <span style={{ fontSize: 28, fontWeight: 900, color: grade.color, fontFamily: 'monospace', lineHeight: 1 }}>{grade.label}</span>
+        <div className={`${cardBase} flex flex-col justify-center gap-3`} style={{ borderColor: `${grade.color}30`, background: `linear-gradient(135deg, rgba(9,9,11,0.9) 0%, ${grade.color}08 100%)` }}>
+          <div className="flex items-center gap-4">
+            <div style={{ width: 56, height: 56, borderRadius: 14, border: `2px solid ${grade.color}50`, background: `${grade.color}10`, display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: `0 0 20px ${grade.glow}`, flexShrink: 0 }}>
+              <span style={{ fontSize: 28, fontWeight: 900, color: grade.color, fontFamily: 'monospace', lineHeight: 1 }}>{grade.label}</span>
+            </div>
+            <div className="min-w-0">
+              <p className="text-[10px] text-zinc-500 uppercase tracking-wider font-bold mb-0.5">Score Programme</p>
+              <p style={{ color: grade.color }} className="text-2xl font-black font-mono leading-none">{programmeScore}<span className="text-sm text-zinc-600 font-normal">/100</span></p>
+              <p style={{ color: grade.color }} className="text-[10px] font-semibold mt-0.5 opacity-80">{grade.description}</p>
+            </div>
           </div>
-          <div className="min-w-0">
-            <p className="text-[10px] text-zinc-500 uppercase tracking-wider font-bold mb-0.5">Score Programme</p>
-            <p style={{ color: grade.color }} className="text-2xl font-black font-mono leading-none">{programmeScore}<span className="text-sm text-zinc-600 font-normal">/100</span></p>
-            <p style={{ color: grade.color }} className="text-[10px] font-semibold mt-0.5 opacity-80">{grade.description}</p>
+          <div className="pt-2 border-t border-zinc-800/60 mt-auto">
+            <p className="text-[9px] leading-relaxed" style={{ color: grade.color }}>
+              {critique}
+            </p>
           </div>
         </div>
 
@@ -413,7 +455,7 @@ export default function WeekDashboard({ simulation, blueprint, toggledDays }: We
               
               {/* Custom Tooltip */}
               <div className="absolute bottom-full left-0 mb-2 w-56 p-2.5 bg-[#09090b]/95 border border-white/10 rounded-xl text-[10px] text-zinc-300 shadow-[0_12px_32px_rgba(0,0,0,0.8)] backdrop-blur-md opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity duration-200 z-[9999]">
-                Le Système Nerveux Central (SNC) est la 'batterie' qui envoie le signal à tes muscles. S'il est saturé (au-delà de 80%), tu perdras de la force globale même si tes muscles sont reposés.
+                Le Système Nerveux Central (SNC) est la &apos;batterie&apos; qui envoie le signal à tes muscles. S&apos;il est saturé (au-delà de 80%), tu perdras de la force globale même si tes muscles sont reposés.
               </div>
             </div>
             <div className="h-2 w-full bg-zinc-950 border border-zinc-900 rounded-full overflow-hidden">
