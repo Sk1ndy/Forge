@@ -13,12 +13,16 @@ const createSet = (series: number, reps: number, rpe: number = 8, poids: number 
   active: true
 });
 
-const createExercise = (exerciseId: string, sets: PlannedSet[]): PlannedExercise => ({
-  id: Math.random().toString(36).substring(2, 9),
-  exerciseId,
-  sets,
-  active: true
-});
+let idCounter = 0;
+const createExercise = (exerciseId: string, sets: PlannedSet[]): PlannedExercise => {
+  idCounter++;
+  return {
+    id: `ex-${exerciseId}-${idCounter}`,
+    exerciseId,
+    sets,
+    active: true
+  };
+};
 
 // Profile and PRs par défaut
 const defaultPrs: UserPRs = {
@@ -83,14 +87,29 @@ const SEDENTARY_TEMPLATE: WeeklyBlueprint = {
   Lundi: [], Mardi: [], Mercredi: [], Jeudi: [], Vendredi: [], Samedi: [], Dimanche: []
 };
 
-const testCases = [
+const SEDENTARY_RECOVERY_TEMPLATE: WeeklyBlueprint = {
+  Lundi: [
+    createExercise('bench_press', [createSet(5, 10, 9, 80)]),
+    createExercise('squat', [createSet(5, 10, 9, 100)]),
+    createExercise('deadlift', [createSet(5, 5, 9, 120)])
+  ],
+  Mardi: [createExercise('pull_ups', [createSet(5, 10, 9, 0)])],
+  Mercredi: [createExercise('ohp', [createSet(5, 10, 9, 50)])],
+  Jeudi: [createExercise('dips', [createSet(5, 10, 9, 0)])],
+  Vendredi: [createExercise('barbell_row', [createSet(5, 10, 9, 70)])],
+  Samedi: [createExercise('leg_press', [createSet(5, 12, 9, 150)])],
+  Dimanche: [createExercise('hip_thrust', [createSet(5, 12, 9, 100)])]
+};
+
+const testCases: { name: string; blueprint: WeeklyBlueprint; week2Blueprint?: WeeklyBlueprint }[] = [
   { name: 'PPL_Standard', blueprint: PPL_TEMPLATE },
   { name: 'FullBody_3x', blueprint: FULL_BODY_TEMPLATE },
   { name: 'Bro_Split', blueprint: BRO_SPLIT_TEMPLATE },
   { name: 'Extreme_Volume_Chest', blueprint: EXTREME_VOLUME_TEMPLATE },
   { name: 'CNS_Fried', blueprint: CNS_FRIED_TEMPLATE },
   { name: 'Push_Imbalance', blueprint: IMBALANCE_TEMPLATE },
-  { name: 'Sedentary', blueprint: SEDENTARY_TEMPLATE }
+  { name: 'Sedentary', blueprint: SEDENTARY_TEMPLATE },
+  { name: 'Sedentary_Recovery', blueprint: SEDENTARY_RECOVERY_TEMPLATE, week2Blueprint: SEDENTARY_TEMPLATE }
 ];
 
 async function generateTests() {
@@ -101,7 +120,8 @@ async function generateTests() {
       defaultProfile,
       {},
       undefined,
-      DEFAULT_EXERCISE_LIBRARY
+      DEFAULT_EXERCISE_LIBRARY,
+      tc.week2Blueprint
     );
 
     return {

@@ -24,6 +24,7 @@ import Sequencer from '@/components/simulator/Sequencer';
 import LibraryDrawer from '@/components/simulator/LibraryDrawer';
 import CalibrageModal from '@/components/simulator/CalibrageModal';
 import BlueprintsModal from '@/components/simulator/BlueprintsModal';
+import WeekDashboard from '@/components/simulator/WeekDashboard';
 
 export default function Home() {
   const [profile, setProfile] = useState<UserProfile>({
@@ -579,72 +580,96 @@ export default function Home() {
           </span>
         </div>
 
-        {/* Upper Portion: SVG Anatomical Avatar — fixed height, no scroll */}
-        <div className="w-full flex justify-center shrink-0 h-[340px] sm:h-[380px] md:h-[45vh] min-h-[280px]">
-          <div className="w-full h-full max-w-5xl bg-zinc-950 border border-zinc-900 rounded-xl overflow-hidden flex flex-col">
-            <HumanAvatar 
-              simulation={simulationResult} 
-              selectedDay={selectedDay} 
-              selectedMuscle={selectedMuscle}
-              onMuscleClick={(muscleId) => {
-                setSelectedMuscle(prev => prev === muscleId ? 'all' : muscleId);
-                setLibraryOpen(true);
-              }}
-              highlightedMuscles={highlightedMuscles}
-              viewMode={viewMode}
-            />
-          </div>
-        </div>
+        {/* Layout Conditionnel : Vue Journée vs Vue Semaine Globale */}
+        {viewMode === 'day' ? (
+          <>
+            {/* Upper Portion: SVG Anatomical Avatar — fixed height, no scroll */}
+            <div className="w-full flex justify-center shrink-0 h-[340px] sm:h-[380px] md:h-[45vh] min-h-[280px]">
+              <div className="w-full h-full max-w-5xl bg-zinc-950 border border-zinc-900 rounded-xl overflow-hidden flex flex-col">
+                <HumanAvatar 
+                  simulation={simulationResult} 
+                  selectedDay={selectedDay} 
+                  selectedMuscle={selectedMuscle}
+                  onMuscleClick={(muscleId) => {
+                    setSelectedMuscle(prev => prev === muscleId ? 'all' : muscleId);
+                    setLibraryOpen(true);
+                  }}
+                  highlightedMuscles={highlightedMuscles}
+                  viewMode={viewMode}
+                />
+              </div>
+            </div>
 
-        {/* Lower Portion: Sequencer — takes remaining space and scrolls internally */}
-        <div className="flex flex-col flex-1 min-h-0">
-          <div className="flex items-center justify-between pb-3 shrink-0">
-            <h3 className="text-sm font-bold tracking-wider uppercase text-zinc-400 flex items-center gap-2">
-              <svg className="h-4 w-4 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-              </svg>
-              Séquenceur Hebdomadaire
-            </h3>
-          </div>
+            {/* Lower Portion: Sequencer — takes remaining space and scrolls internally */}
+            <div className="flex flex-col flex-1 min-h-0">
+              <div className="flex items-center justify-between pb-3 shrink-0">
+                <h3 className="text-sm font-bold tracking-wider uppercase text-zinc-400 flex items-center gap-2">
+                  <svg className="h-4 w-4 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                  </svg>
+                  Séquenceur Quotidien
+                </h3>
+              </div>
 
-          <Sequencer
-            blueprint={blueprint}
-            toggledDays={toggledDays}
-            onUpdateExercise={handleUpdateExercise}
-            onDeleteExercise={handleDeleteExercise}
-            onReorderExercises={handleReorderExercises}
-            onClearDay={handleClearDay}
-            onUpdateToggledDays={setToggledDays}
-            selectedDay={selectedDay}
-            onSelectDay={setSelectedDay}
-            onAddExercise={handleAddExercise}
-            simulation={simulationResult}
-            exercises={exercises}
-            onLoadTemplate={handleLoadTemplate}
-            onHoverExerciseChange={setHoveredExercise}
-            selectedExercise={selectedExercise}
-            onSelectExercise={setSelectedExercise}
-            viewMode={viewMode}
-          />
-        </div>
-        {viewMode !== 'week' && (
-          <button
-            onClick={() => setLibraryOpen(!libraryOpen)}
-            className={`absolute top-1/2 -translate-y-1/2 z-40 w-7 h-7 bg-zinc-900 border border-zinc-800 text-zinc-400 hover:text-white rounded-full hover:bg-zinc-800 transition-all flex items-center justify-center cursor-pointer shadow-md ${
-              libraryOpen ? 'right-0 translate-x-1/2' : 'right-3'
-            }`}
-            title={libraryOpen ? "Masquer la bibliothèque" : "Afficher la bibliothèque"}
-          >
-            {libraryOpen ? (
-              <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
-              </svg>
-            ) : (
-              <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 19l-7-7 7-7" />
-              </svg>
-            )}
-          </button>
+              <Sequencer
+                blueprint={blueprint}
+                toggledDays={toggledDays}
+                onUpdateExercise={handleUpdateExercise}
+                onDeleteExercise={handleDeleteExercise}
+                onReorderExercises={handleReorderExercises}
+                onClearDay={handleClearDay}
+                onUpdateToggledDays={setToggledDays}
+                selectedDay={selectedDay}
+                onSelectDay={setSelectedDay}
+                onAddExercise={handleAddExercise}
+                simulation={simulationResult}
+                exercises={exercises}
+                onLoadTemplate={handleLoadTemplate}
+                onHoverExerciseChange={setHoveredExercise}
+                selectedExercise={selectedExercise}
+                onSelectExercise={setSelectedExercise}
+              />
+            </div>
+            {/* Library Toggle Button (Only in Day mode) */}
+            <button
+              onClick={() => setLibraryOpen(!libraryOpen)}
+              className={`absolute top-1/2 -translate-y-1/2 z-40 w-7 h-7 bg-zinc-900 border border-zinc-800 text-zinc-400 hover:text-white rounded-full hover:bg-zinc-800 transition-all flex items-center justify-center cursor-pointer shadow-md ${
+                libraryOpen ? 'right-0 translate-x-1/2' : 'right-3'
+              }`}
+              title={libraryOpen ? "Masquer la bibliothèque" : "Afficher la bibliothèque"}
+            >
+              {libraryOpen ? (
+                <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
+                </svg>
+              ) : (
+                <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 19l-7-7 7-7" />
+                </svg>
+              )}
+            </button>
+          </>
+        ) : (
+          <div className="flex-1 flex flex-col md:flex-row gap-4 min-h-0">
+            {/* Left Portion: SVG Anatomical Avatar — 30% width */}
+            <div className="w-full md:w-[32%] h-[300px] md:h-full shrink-0 bg-zinc-950 border border-zinc-900 rounded-xl overflow-hidden flex flex-col">
+              <HumanAvatar 
+                simulation={simulationResult} 
+                selectedDay={selectedDay} 
+                selectedMuscle={selectedMuscle}
+                onMuscleClick={(muscleId) => {
+                  setSelectedMuscle(prev => prev === muscleId ? 'all' : muscleId);
+                }}
+                highlightedMuscles={highlightedMuscles}
+                viewMode={viewMode}
+              />
+            </div>
+            
+            {/* Right Portion: Analytics Dashboard — 68% width */}
+            <div className="flex-1 min-w-0 h-full overflow-y-auto">
+              <WeekDashboard simulation={simulationResult} blueprint={blueprint} toggledDays={toggledDays} />
+            </div>
+          </div>
         )}
       </section>
 

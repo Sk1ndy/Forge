@@ -36,7 +36,6 @@ interface SequencerProps {
   onHoverExerciseChange?: (exercise: Exercise | null) => void;
   selectedExercise?: Exercise | null;
   onSelectExercise?: (exercise: Exercise | null) => void;
-  viewMode?: 'day' | 'week';
 }
 
 export default function Sequencer({
@@ -54,60 +53,9 @@ export default function Sequencer({
   onLoadTemplate,
   onHoverExerciseChange,
   selectedExercise,
-  onSelectExercise,
-  viewMode = 'day'
+  onSelectExercise
 }: SequencerProps) {
   const [isDragOver, setIsDragOver] = React.useState(false);
-
-  const groupSeries = useMemo(() => {
-    let chest = 0;
-    let back = 0;
-    let shoulders = 0;
-    let biceps = 0;
-    let triceps = 0;
-    let quads = 0;
-    let posterior = 0;
-
-    Object.values(blueprint).forEach(dayExercises => {
-      dayExercises.forEach(plannedEx => {
-        if (!plannedEx.active) return;
-        const exDef = exercises.find(e => e.id === plannedEx.exerciseId);
-        if (!exDef) return;
-
-        const m = exDef.muscle_primaire;
-        const setsCount = plannedEx.sets.reduce((sum, s) => sum + (s.active ? s.series : 0), 0);
-
-        if (m === 'chest' || m === 'upperChest' || m === 'lowerChest') {
-          chest += setsCount;
-        } else if (m === 'upperBack' || m === 'lowerBack' || m === 'rhomboids' || m === 'trapezius' || m === 'upperTrapezius' || m === 'lowerTrapezius') {
-          back += setsCount;
-        } else if (m === 'deltoids' || m === 'frontDeltoid' || m === 'rearDeltoid') {
-          shoulders += setsCount;
-        } else if (m === 'biceps') {
-          biceps += setsCount;
-        } else if (m === 'triceps') {
-          triceps += setsCount;
-        } else if (m === 'quadriceps' || m === 'innerQuad' || m === 'outerQuad') {
-          quads += setsCount;
-        } else if (m === 'hamstring' || m === 'gluteal') {
-          posterior += setsCount;
-        }
-      });
-    });
-
-    return { chest, back, shoulders, biceps, triceps, quads, posterior };
-  }, [blueprint, exercises]);
-
-  const posturaleRatio = useMemo(() => {
-    const push = groupSeries.chest + groupSeries.shoulders + groupSeries.triceps;
-    const pull = groupSeries.back + groupSeries.biceps;
-    const total = push + pull;
-    
-    const pushPct = total > 0 ? Math.round((push / total) * 100) : 50;
-    const pullPct = total > 0 ? 100 - pushPct : 50;
-    
-    return { pushPct, pullPct, push, pull };
-  }, [groupSeries]);
 
   // DND Sensors (distance 5 to allow clicks inside inputs)
   const sensors = useSensors(
@@ -187,168 +135,9 @@ export default function Sequencer({
 
   return (
     <div className="w-full h-full select-none min-h-0 flex flex-col">
-      {viewMode === 'week' ? (
-        <div className="flex-1 border rounded-xl p-4 flex flex-col min-h-0 border-zinc-900 bg-zinc-900/20">
-          {/* Workspace Header */}
-          <div className="flex items-center justify-between pb-3 border-b border-zinc-900 shrink-0">
-            <h4 className="font-extrabold text-base text-zinc-100 flex items-center gap-1.5 font-sans">
-              Rapport Hebdomadaire Analytique
-              <span className="text-[10px] bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">
-                Cumulé Semaine
-              </span>
-            </h4>
-          </div>
-
-          {/* 3 columns macro analysis dashboard */}
-          <div className="flex-1 grid grid-cols-1 md:grid-cols-3 gap-6 mt-4 min-h-0 overflow-y-auto pr-1">
-            
-            {/* Column 1: Volume de croissance (Séries réelles) */}
-            <div className="bg-zinc-900/10 border border-zinc-900 rounded-xl p-4.5 flex flex-col justify-between h-full">
-              <div>
-                <h5 className="text-xs font-bold text-emerald-450 uppercase tracking-wider flex items-center gap-2 mb-3">
-                  📊 Volume Hebdomadaire (Séries)
-                </h5>
-                <p className="text-[11px] text-zinc-500 mb-4 leading-normal">
-                  Séries effectives par grand groupe musculaire. Cible : 10 à 20 séries pour une croissance maximale.
-                </p>
-                
-                <div className="space-y-2.5">
-                  {[
-                    { label: 'Pectoraux', value: groupSeries.chest, max: 20 },
-                    { label: 'Dos', value: groupSeries.back, max: 20 },
-                    { label: 'Épaules', value: groupSeries.shoulders, max: 20 },
-                    { label: 'Biceps', value: groupSeries.biceps, max: 20 },
-                    { label: 'Triceps', value: groupSeries.triceps, max: 20 },
-                    { label: 'Quadriceps', value: groupSeries.quads, max: 20 },
-                    { label: 'Ischios/Fessiers', value: groupSeries.posterior, max: 20 }
-                  ].map((group) => {
-                    let statusColor = 'text-zinc-400';
-                    let barColor = 'bg-zinc-700';
-                    if (group.value >= 10 && group.value <= 20) {
-                      statusColor = 'text-emerald-400 font-bold';
-                      barColor = 'bg-emerald-500';
-                    } else if (group.value > 20) {
-                      statusColor = 'text-red-400 font-bold';
-                      barColor = 'bg-red-500 animate-pulse';
-                    } else if (group.value > 0) {
-                      statusColor = 'text-sky-400 font-semibold';
-                      barColor = 'bg-sky-500';
-                    }
-                    const pct = Math.min(100, (group.value / group.max) * 100);
-
-                    return (
-                      <div key={group.label} className="space-y-1">
-                        <div className="flex justify-between text-[11px]">
-                          <span className="text-zinc-300 font-medium">{group.label}</span>
-                          <span className={statusColor}>{group.value} / {group.max} sér.</span>
-                        </div>
-                        <div className="h-1.5 w-full bg-zinc-950 border border-zinc-900 rounded-full overflow-hidden">
-                          <div className={`h-full ${barColor} rounded-full transition-all duration-500`} style={{ width: `${pct}%` }} />
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-            </div>
-
-            {/* Column 2: Balance Posturale */}
-            <div className="bg-zinc-900/10 border border-zinc-900 rounded-xl p-4.5 flex flex-col justify-between h-full">
-              <div>
-                <h5 className="text-xs font-bold text-sky-450 uppercase tracking-wider flex items-center gap-2 mb-3">
-                  ⚖️ Balance Posturale (Poussée / Tirage)
-                </h5>
-                <p className="text-[11px] text-zinc-500 mb-4 leading-normal">
-                  Équilibre agoniste/antagoniste entre les mouvements de poussée et de tirage pour la santé de l&apos;épaule.
-                </p>
-
-                <div className="space-y-5 pt-3">
-                  <div className="flex justify-between items-center text-xs">
-                    <div className="flex flex-col">
-                      <span className="text-zinc-400 font-semibold">Poussée (Push)</span>
-                      <span className="text-[10px] text-zinc-500 mt-0.5">{posturaleRatio.push} séries</span>
-                    </div>
-                    <span className="text-sky-400 font-black text-sm">{posturaleRatio.pushPct}%</span>
-                  </div>
-
-                  <div className="flex justify-between items-center text-xs">
-                    <div className="flex flex-col">
-                      <span className="text-zinc-400 font-semibold">Tirage (Pull)</span>
-                      <span className="text-[10px] text-zinc-500 mt-0.5">{posturaleRatio.pull} séries</span>
-                    </div>
-                    <span className="text-amber-400 font-black text-sm">{posturaleRatio.pullPct}%</span>
-                  </div>
-
-                  {/* Visual ratio bar */}
-                  <div className="h-3 w-full bg-zinc-950 border border-zinc-900 rounded-full overflow-hidden flex">
-                    <div className="h-full bg-sky-500" style={{ width: `${posturaleRatio.pushPct}%` }} />
-                    <div className="h-full bg-amber-500" style={{ width: `${posturaleRatio.pullPct}%` }} />
-                  </div>
-                </div>
-              </div>
-
-              <div className="text-[10px] text-zinc-400 bg-zinc-900/30 p-2.5 rounded-lg border border-zinc-850 mt-4 leading-relaxed shrink-0">
-                💡 **Ratio Idéal** : Visez environ **45% Poussée / 55% Tirage** pour compenser la dominance naturelle antérieure et stabiliser la coiffe des rotateurs.
-              </div>
-            </div>
-
-            {/* Column 3: Diagnostic SNC Global */}
-            <div className="bg-zinc-900/10 border border-zinc-900 rounded-xl p-4.5 flex flex-col justify-between h-full">
-              <div>
-                <h5 className="text-xs font-bold text-red-450 uppercase tracking-wider flex items-center gap-2 mb-3">
-                  🧠 Diagnostic SNC Global (Stress Axial)
-                </h5>
-                <p className="text-[11px] text-zinc-500 mb-4 leading-normal">
-                  Évaluation de la charge accumulée sur le Système Nerveux Central par les exercices polyarticulaires lourds.
-                </p>
-
-                <div className="space-y-4 pt-2">
-                  <div className="flex justify-between items-center text-xs">
-                    <span className="text-zinc-400 font-semibold">Score cumulé</span>
-                    <span className={`font-black font-mono ${simulation.cnsFailure ? 'text-red-400' : 'text-emerald-400'}`}>
-                      {simulation.sncScore} pts
-                    </span>
-                  </div>
-
-                  <div className="space-y-1.5">
-                    <div className="flex justify-between text-[11px] font-bold">
-                      <span className="text-zinc-500">Saturation nerveuse</span>
-                      <span className={simulation.cnsFailure ? 'text-red-400 font-extrabold animate-pulse' : 'text-zinc-300'}>
-                        {simulation.sncPercentage}%
-                      </span>
-                    </div>
-                    <div className="h-3.5 w-full bg-zinc-950 border border-zinc-900 rounded-full overflow-hidden p-0.5 relative">
-                      <div 
-                        className={`h-full rounded-full transition-all duration-500 ${
-                          simulation.sncPercentage > 100
-                            ? 'bg-red-500 shadow-[0_0_10px_rgba(239,68,68,0.6)] animate-pulse'
-                            : simulation.sncPercentage > 80
-                            ? 'bg-amber-500'
-                            : 'bg-emerald-500'
-                        }`}
-                        style={{ width: `${simulation.sncPercentage}%` }}
-                      />
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div className="text-[10px] text-zinc-400 bg-zinc-900/30 p-2.5 rounded-lg border border-zinc-850 mt-4 leading-relaxed shrink-0">
-                {simulation.cnsFailure ? (
-                  <span className="text-red-400 font-semibold">🚨 **Alerte Rouge** : Le SNC est saturé. La fatigue accumulée altère le recrutement des fibres musculaires rapides. Allégez ou planifiez une semaine de deload.</span>
-                ) : simulation.sncPercentage > 80 ? (
-                  <span className="text-amber-400 font-semibold">⚠️ **Fatigue Importante** : Charge nerveuse très élevée. Surveillez votre sommeil et évitez d&apos;ajouter d&apos;autres exercices polyarticulaires Tier 1.</span>
-                ) : (
-                  <span className="text-emerald-400 font-semibold">✅ **SNC Stable** : La charge nerveuse globale est parfaitement tolérée. Vos capacités de récupération systémique sont optimales.</span>
-                )}
-              </div>
-            </div>
-          </div>
-        </div>
-      ) : (
-        <div 
-          onDragOver={(e) => {
-            e.preventDefault();
+      <div 
+        onDragOver={(e) => {
+          e.preventDefault();
             if (isCurrentDayActive) {
               setIsDragOver(true);
               e.dataTransfer.dropEffect = 'copy';
@@ -581,7 +370,6 @@ export default function Sequencer({
           </div>
         )}
       </div>
-      )}
     </div>
   );
 }

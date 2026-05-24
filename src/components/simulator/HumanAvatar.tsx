@@ -476,6 +476,23 @@ export default function HumanAvatar({
     let filter = isHovered ? hover.filter : undefined;
     let className = '';
 
+    // ── TRAUMA OVERRIDE (week mode only) ──────────────────────────────────────
+    // If the muscle had a fatigue spike > 2.5 at any point during the week, mark
+    // it with a red pulsing stroke regardless of its current fill color (volume).
+    // Dissipation must NOT hide past traumatic events from the macro dashboard.
+    if (viewMode === 'week' && status?.fatigueHistory && status.fatigueHistory.length > 0) {
+      const hasTrauma = Math.max(...status.fatigueHistory) > 2.5;
+      if (hasTrauma && !isHighlighted && !isSelected) {
+        stroke = '#ef4444';
+        strokeWidth = isHovered ? 2.5 : 1.8;
+        filter = isHovered
+          ? 'drop-shadow(0 0 10px rgba(239,68,68,0.9))'
+          : 'drop-shadow(0 0 5px rgba(239,68,68,0.65))';
+        className = 'animate-glow-red';
+      }
+    }
+    // ─────────────────────────────────────────────────────────────────────────
+
     if (isHighlighted) {
       strokeWidth = isHovered ? 2.5 : 2.0;
       stroke = '#c084fc';
@@ -508,6 +525,7 @@ export default function HumanAvatar({
       onClick: () => onMuscleClick?.(id)
     };
   };
+
 
   const hoveredMuscle = hoveredId ? simulation.muscles[hoveredId as MuscleId] : null;
 
@@ -973,6 +991,28 @@ export default function HumanAvatar({
               ))}
             </div>
           )}
+
+          {viewMode === 'week' && (() => {
+            const trauma = simulation.weeklyTraumas?.find(t => t.muscleName === hoveredMuscle.name);
+            const readinessPct = hoveredMuscle.readiness !== undefined 
+              ? Math.round(Math.max(0, Math.min(100, ((hoveredMuscle.readiness + 2.5) / 4) * 100)))
+              : 0;
+            const readinessColor = readinessPct >= 65 ? '#10b981' : readinessPct >= 40 ? '#f59e0b' : '#ef4444';
+            return (
+              <div style={{ marginTop: 6, paddingTop: 6, borderTop: '1px solid rgba(255,255,255,0.06)', marginBottom: 4 }}>
+                <div style={{ fontSize: 10, display: 'flex', justifyContent: 'space-between', marginBottom: trauma ? 3 : 0 }}>
+                  <span style={{ color: '#71717a' }}>Readiness J+1</span>
+                  <span style={{ color: readinessColor, fontWeight: 700 }}>{readinessPct}%</span>
+                </div>
+                {trauma && (
+                  <div style={{ fontSize: 10, display: 'flex', justifyContent: 'space-between', color: '#ef4444' }}>
+                    <span style={{ fontWeight: 600 }}>⚡ Pic Trauma</span>
+                    <span style={{ fontFamily: 'monospace', fontWeight: 700 }}>{trauma.peakInol}</span>
+                  </div>
+                )}
+              </div>
+            );
+          })()}
 
           {/* Graphique Sparkline d'historique de fatigue */}
           <Sparkline data={hoveredMuscle.fatigueHistory} />
