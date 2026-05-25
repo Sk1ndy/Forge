@@ -2,6 +2,7 @@
 
 import { createClient } from '@/lib/supabase/client'
 import { useState, useEffect } from 'react'
+import Image from 'next/image'
 
 export default function LoginPage() {
   const [loading, setLoading] = useState(false)
@@ -181,6 +182,17 @@ export default function LoginPage() {
               </div>
             </div>
           </div>
+          
+          <div className="absolute top-12 left-12 z-20">
+            <Image 
+              src="/logo/Forge_Avec_text.png" 
+              alt="Forge Logo" 
+              width={160} 
+              height={50} 
+              className="drop-shadow-md h-auto w-40" 
+              priority
+            />
+          </div>
         </div>
 
         {/* Right Panel (Auth) */}
@@ -188,15 +200,30 @@ export default function LoginPage() {
           {/* Subtle background texture */}
           <div className="absolute inset-0 opacity-[0.03] pointer-events-none" style={{ backgroundImage: 'radial-gradient(rgba(255,255,255,1) 1px, transparent 1px)', backgroundSize: '32px 32px' }}></div>
           
-          <div className="w-full max-w-md relative z-10 flex flex-col items-center">
+          {/* Mobile Header (Hidden on large screens) */}
+          <div className="lg:hidden absolute top-8 left-1/2 -translate-x-1/2 z-20">
+            <Image 
+              src="/logo/Forge_Avec_text.png" 
+              alt="Forge Logo" 
+              width={140} 
+              height={45} 
+              className="drop-shadow-md h-auto w-36" 
+              priority
+            />
+          </div>
+
+          <div className="w-full max-w-md relative z-10 flex flex-col items-center mt-12 lg:mt-0">
             <div className="text-center mb-10">
               {/* Branding Logo */}
               <div className="inline-block mb-6 transition-transform hover:scale-105 duration-300">
-                <div className="w-16 h-16 rounded-2xl bg-black border border-zinc-800 flex items-center justify-center shadow-[0_0_30px_rgba(78,222,163,0.15)] mx-auto">
-                  <span className="text-transparent text-3xl font-black bg-clip-text bg-gradient-to-br from-[#4edea3] to-[#10B981]">
-                    F
-                  </span>
-                </div>
+                <Image 
+                  src="/logo/Forge_sanstext.png" 
+                  alt="Forge Icon" 
+                  width={80} 
+                  height={80} 
+                  className="mx-auto rounded-2xl drop-shadow-[0_0_30px_rgba(78,222,163,0.15)]"
+                  priority
+                />
               </div>
               <h2 className="text-3xl font-bold tracking-tight text-zinc-100 mb-2">Welcome to Forge</h2>
               <p className="text-base text-zinc-400 max-w-xs mx-auto">
