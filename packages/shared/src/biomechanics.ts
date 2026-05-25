@@ -4,7 +4,7 @@ import { PlannedSet, Exercise, UserProfile, UserPRs } from './types';
  * Estime le 1RM théorique en utilisant la formule d'Epley modifiée par le RPE.
  */
 export function estimate1RM(weight: number, reps: number, rpe: number): number {
-  if (reps <= 0) return 0;
+  if (reps <= 0 || weight < 0) return 0; // Guard : poids négatif ou zéro reps = résultat invalide
   const rpeDiff = 10 - Math.min(10, Math.max(0, rpe));
   const effectiveReps = reps + rpeDiff;
   
@@ -47,15 +47,27 @@ export function calculateSetImpact(
     return { inol: 0, sncPoints: 0 };
   }
 
+  // ─── GUARDS DÉFENSIFS ANTI-INJECTION ─────────────────────────────────────
+  // Même si Zod a validé en amont, on clampe ici pour garantir
+  // que des valeurs extrêmes ne polluent jamais le modèle Banister.
+  const safeSeries = Math.max(1,  Math.min(20,   Math.floor(set.series)));
+  const safeReps   = Math.max(1,  Math.min(100,  Math.floor(set.reps)));
+  const safePoids  = Math.max(0,  Math.min(1000, set.poids));
+  const safeRpe    = Math.max(1,  Math.min(10,   set.rpe));
+  const safePdc    = Math.max(30, Math.min(300,  profile.pdc || 75));
+  const safeSet    = { ...set, series: safeSeries, reps: safeReps, poids: safePoids, rpe: safeRpe };
+  const safeProfile = { ...profile, pdc: safePdc };
+  // ─────────────────────────────────────────────────────────────────────────
+
   // Intégration de la charge réelle deplacée par le poids de corps (PDC)
-  let effectiveWeight = set.poids;
+  let effectiveWeight = safeSet.poids;
   if (exercise.equipment === 'pdc') {
     const bodyweightContribution = (exercise.id === 'pull_ups' || exercise.id === 'dips') ? 0.90 : 0.65;
-    effectiveWeight = set.poids + ((profile.pdc || 75) * bodyweightContribution);
+    effectiveWeight = safeSet.poids + (safePdc * bodyweightContribution);
   }
 
   // 1. Détermination du 1RM de référence
-  const pr = getApplicable1RM(exercise.id, profile.prs, effectiveWeight, set.reps, set.rpe);
+  const pr = getApplicable1RM(exercise.id, safeProfile.prs, effectiveWeight, safeSet.reps, safeSet.rpe);
   
   // 2. Calcul de l'intensité relative (%)
   let intensity = 70;
@@ -66,15 +78,15 @@ export function calculateSetImpact(
 
   // 3. Multiplicateur RPE ajusté (Bride pour les débutants)
   const clampedRpe = isBeginner 
-    ? Math.min(8, set.rpe) 
-    : Math.min(10, Math.max(5, set.rpe || 8));
+    ? Math.min(8, safeSet.rpe) 
+    : Math.min(10, Math.max(5, safeSet.rpe || 8));
     
   const rpeFactor = Math.pow(1.35, clampedRpe - 10);
 
   // 4. Calcul de l'INOL brut accumulé par cette série
   const inolIntensity = Math.min(95, Math.max(10, intensity));
-  const baseInol = set.reps / (100 - inolIntensity);
-  let totalInol = baseInol * rpeFactor * set.series;
+  const baseInol = safeSet.reps / (100 - inolIntensity);
+  let totalInol = baseInol * rpeFactor * safeSet.series;
 
   // Pénalité articulaire/musculaire pour les débutants (besoin de plus de repos)
   if (isBeginner) {
@@ -82,8 +94,7 @@ export function calculateSetImpact(
   }
 
   // 5. Calcul de l'impact SNC (Système Nerveux Central)
-  const pdc = profile.pdc || 75;
-  const weightRatio = effectiveWeight / pdc;
+  const weightRatio = effectiveWeight / safePdc;
   
   // Fatigue axiale SNC de base : Tier 1 = 100%, Tier 2 = 50%, Tier 3 (isolation) = 5%
   let sncMultiplier = exercise.tier_snc === 1 ? 1.0 : (exercise.tier_snc === 2 ? 0.5 : 0.05);
@@ -94,7 +105,7 @@ export function calculateSetImpact(
   }
 
   // Formule SNC finale
-  const sncPoints = weightRatio * sncMultiplier * rpeFactor * set.series * 1.2;
+  const sncPoints = weightRatio * sncMultiplier * rpeFactor * safeSet.series * 1.2;
 
   return { inol: totalInol, sncPoints };
 }
