@@ -45,3 +45,6 @@ Pour TOUTE réponse impliquant une modification architecturale ou du code, tu DO
 - Si ma demande manque de contexte, ne l'invente pas. Demande une clarification.
 - Si je te demande de coder une fonctionnalité qui casse le découplage Web/Mobile (ex: faire tourner la simulation sur le mobile), tu DOIS refuser, m'expliquer pourquoi, et me proposer la solution architecturale correcte (ex: webhook, edge function, synchronisation asynchrone).
 - Utilise un ton professionnel, direct, d'ingénieur à ingénieur. Pas de bavardage inutile.
+
+
+a la fin toujours faire npm run build et npm run dev
