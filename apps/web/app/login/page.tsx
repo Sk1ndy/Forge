@@ -182,17 +182,6 @@ export default function LoginPage() {
               </div>
             </div>
           </div>
-          
-          <div className="absolute top-12 left-12 z-20">
-            <Image 
-              src="/logo/Forge_Avec_text.png" 
-              alt="Forge Logo" 
-              width={160} 
-              height={50} 
-              className="drop-shadow-md h-auto w-40" 
-              priority
-            />
-          </div>
         </div>
 
         {/* Right Panel (Auth) */}
@@ -200,18 +189,6 @@ export default function LoginPage() {
           {/* Subtle background texture */}
           <div className="absolute inset-0 opacity-[0.03] pointer-events-none" style={{ backgroundImage: 'radial-gradient(rgba(255,255,255,1) 1px, transparent 1px)', backgroundSize: '32px 32px' }}></div>
           
-          {/* Mobile Header (Hidden on large screens) */}
-          <div className="lg:hidden absolute top-8 left-1/2 -translate-x-1/2 z-20">
-            <Image 
-              src="/logo/Forge_Avec_text.png" 
-              alt="Forge Logo" 
-              width={140} 
-              height={45} 
-              className="drop-shadow-md h-auto w-36" 
-              priority
-            />
-          </div>
-
           <div className="w-full max-w-md relative z-10 flex flex-col items-center mt-12 lg:mt-0">
             <div className="text-center mb-10">
               {/* Branding Logo */}
