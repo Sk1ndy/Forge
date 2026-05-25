@@ -18,4 +18,7 @@ config.resolver.nodeModulesPaths = [
 // Force Metro to resolve (sub)dependencies only from the `nodeModulesPaths`
 config.resolver.disableHierarchicalLookup = true;
 
+// Fix for wa-sqlite.wasm on Web
+config.resolver.assetExts.push('wasm');
+
 module.exports = config;
