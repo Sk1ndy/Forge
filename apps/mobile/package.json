@@ -43,6 +43,7 @@
     "typescript": "~6.0.3"
   },
   "scripts": {
+    "build": "echo 'No build required for mobile'",
     "start": "expo start",
     "reset-project": "node ./scripts/reset-project.js",
     "android": "expo start --android",
