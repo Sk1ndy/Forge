@@ -371,7 +371,7 @@ export default function Home() {
             </div>
             
             {supabaseUser ? (
-              <div className="flex items-center gap-2">
+              <div className="flex flex-col items-end gap-1">
                 <span className="text-[9px] bg-emerald-950 text-emerald-400 border border-emerald-900 font-bold px-2 py-0.5 rounded-full" title="Connecté au Cloud (Supabase)">
                   CLOUD
                 </span>
@@ -382,14 +382,7 @@ export default function Home() {
                   Déconnexion
                 </button>
               </div>
-            ) : (
-              <a
-                href="/login"
-                className="text-[9px] bg-zinc-900 hover:bg-zinc-800 text-zinc-300 font-bold px-2.5 py-1 rounded border border-zinc-800 transition-colors"
-              >
-                MODE LOCAL (HORS LIGNE)
-              </a>
-            )}
+            ) : null}
           </div>
 
           {/* Profil & Calibrage */}
