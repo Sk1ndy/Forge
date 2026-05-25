@@ -11,6 +11,13 @@ export type MuscleId =
   | 'upperAbs' | 'lowerAbs' | 'frontDeltoid' | 'rearDeltoid' 
   | 'upperTrapezius' | 'lowerTrapezius';
 
+/**
+ * Tokens machine agnostiques pour le statut musculaire.
+ * La traduction en chaîne lisible (FR/EN) est gérée côté UI uniquement
+ * (voir apps/web/src/lib/muscleLabels.ts).
+ */
+export type MuscleStatusToken = 'REST' | 'OPTIMAL' | 'OVERLOAD' | 'DANGER';
+
 export interface Exercise {
   id: string;
   nom: string;
@@ -72,7 +79,11 @@ export interface MuscleStatus {
   inol: number; // Modélise l'accumulation cumulée de fatigue/volume
   sets: number;
   color: 'grey' | 'green' | 'orange' | 'red';
-  statusLabel: string;
+  /**
+   * Token machine agnostique — traduit côté UI via muscleLabels.ts.
+   * NE PAS utiliser directement comme chaîne affichée dans les composants.
+   */
+  statusLabel: MuscleStatusToken;
   contributors: { nom: string; percentage: number }[];
   remainingCapacity: number; // Valeur de 0 à 1 représentant le budget d'entraînement restant
   jointStress: number; // Jauge de stress articulaire/tendineux
@@ -90,7 +101,7 @@ export interface WeeklyMacro {
 }
 
 export interface WeeklyTrauma {
-  muscleName: string;
+  muscleId: string;  // ID brut du muscle (ex: 'chest') — traduit côté UI
   peakInol: number;
   dayIndex: number; // 0 = Lundi … 6 = Dimanche
 }
@@ -116,6 +127,12 @@ export interface ExerciseLog {
   session_id?: string;
   exercise_id: string;
   day: string;
+  /**
+   * Semaine de la simulation (1 ou 2).
+   * Optionnel pour rétrocompatibilité — les anciens logs sans ce champ
+   * seront traités comme appartenant à la semaine 1 uniquement.
+   */
+  week?: 1 | 2;
   set_index: number;
   planned_weight?: number;
   planned_reps?: number;

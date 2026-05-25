@@ -1,6 +1,6 @@
 import { 
   MuscleId, Exercise, UserProfile, WeeklyBlueprint, 
-  PlannedSetSchema, MuscleStatus, WeeklyMacro, WeeklyTrauma, SimulationResult, ExerciseLog 
+  PlannedSetSchema, MuscleStatus, MuscleStatusToken, WeeklyMacro, WeeklyTrauma, SimulationResult, ExerciseLog 
 } from './types';
 import { 
   DEFAULT_EXERCISE_LIBRARY, DEFAULT_EXERCISE_TENSION_MATRICES, 
@@ -9,9 +9,84 @@ import {
 } from './constants';
 import { calculateSetImpact, normalize } from './biomechanics';
 
-// Cache LRU simpliste pour éviter les recalculs coûteux (memoization)
-const simulationCache = new Map<string, SimulationResult>();
-const MAX_CACHE_SIZE = 50;
+// ─── FAILLE 4 CORRIGÉE : Vrai algorithme LRU O(1) ──────────────────────────
+// Remplace la Map + éviction FIFO aveugle par une structure LRU correcte.
+// Chaque .get() déplace l'entrée en "tête" (la plus récemment utilisée).
+// Chaque .set() au-delà de la capacité évince la "queue" (la moins récemment utilisée).
+class LRUCache<K, V> {
+  private capacity: number;
+  private map: Map<K, V>;
+
+  constructor(capacity: number) {
+    this.capacity = capacity;
+    this.map = new Map<K, V>();
+  }
+
+  has(key: K): boolean {
+    return this.map.has(key);
+  }
+
+  get(key: K): V | undefined {
+    if (!this.map.has(key)) return undefined;
+    // Déplace en tête : supprimer + réinsérer (Map conserve l'ordre d'insertion)
+    const value = this.map.get(key)!;
+    this.map.delete(key);
+    this.map.set(key, value);
+    return value;
+  }
+
+  set(key: K, value: V): void {
+    if (this.map.has(key)) {
+      this.map.delete(key);
+    } else if (this.map.size >= this.capacity) {
+      // Évince le premier (le moins récemment utilisé)
+      const lruKey = this.map.keys().next().value;
+      if (lruKey !== undefined) this.map.delete(lruKey);
+    }
+    this.map.set(key, value);
+  }
+
+  get size(): number {
+    return this.map.size;
+  }
+}
+
+const simulationCache = new LRUCache<string, SimulationResult>(50);
+
+// ─── FAILLE 3 CORRIGÉE : Génération de clé de cache légère ─────────────────
+// Remplace JSON.stringify(tout) par une clé composite O(1).
+// Invalide le cache si : blueprint change, profil change, séance ajoutée
+// (length ou timestamp du dernier log change), ou jour sélectionné change.
+function generateCacheKey(
+  blueprint: WeeklyBlueprint,
+  profile: UserProfile,
+  toggledDays: { [day: string]: boolean },
+  selectedDay: string | undefined,
+  week2Blueprint: WeeklyBlueprint | undefined,
+  sessionLogs: ExerciseLog[] | undefined,
+  blueprintId: string | undefined,
+): string {
+  const blueprintFingerprint = blueprintId ?? JSON.stringify(blueprint);
+  const week2Fingerprint = week2Blueprint ? (JSON.stringify(week2Blueprint)) : 'none';
+  const logsFingerprint = sessionLogs && sessionLogs.length > 0
+    ? `${sessionLogs.length}:${sessionLogs[sessionLogs.length - 1]?.created_at ?? ''}`
+    : '0';
+
+  return [
+    blueprintFingerprint,
+    week2Fingerprint,
+    selectedDay ?? 'ALL',
+    profile.pdc,
+    profile.maxSnc,
+    profile.age ?? 28,
+    profile.sleepHours ?? 8,
+    profile.caloricStatus ?? 'maintenance',
+    profile.stressLevel ?? 'moderate',
+    profile.isBeginner ? '1' : '0',
+    JSON.stringify(toggledDays),
+    logsFingerprint,
+  ].join('|');
+}
 
 /**
  * Exécute la simulation chronologique complète (Modèle Fitness-Fatigue Banister)
@@ -24,11 +99,14 @@ export function runWeeklySimulation(
   selectedDay?: string,
   exerciseLibrary: Exercise[] = DEFAULT_EXERCISE_LIBRARY,
   week2Blueprint?: WeeklyBlueprint,
-  sessionLogs?: ExerciseLog[]
+  sessionLogs?: ExerciseLog[],
+  blueprintId?: string
 ): SimulationResult {
-  // ─── MÉCANISME DE CACHE (MEMOIZATION) ───
-  // Génération d'une empreinte unique basée sur les paramètres d'entrée stricts
-  const cacheKey = JSON.stringify({ blueprint, profile, toggledDays, selectedDay, week2Blueprint, sessionLogs });
+  // ─── MÉCANISME DE CACHE (LRU) ───
+  const cacheKey = generateCacheKey(
+    blueprint, profile, toggledDays, selectedDay,
+    week2Blueprint, sessionLogs, blueprintId
+  );
 
   if (simulationCache.has(cacheKey)) {
     return simulationCache.get(cacheKey)!;
@@ -106,11 +184,8 @@ export function runWeeklySimulation(
   const dailyInol: { [muscleId: string]: number } = {};
 
   // ─── PEAK TRAUMA TRACKER ─────────────────────────────────────────────────
-  // Captures the highest fatigue spike per muscle during week 2 (with the exact day)
   const peakFatigue: Record<string, { value: number; day: string }> = {};
-  // Counts integer effective sets per muscle during week 2 (reset each week)
   const weeklyEffectiveSetsRaw: Record<string, number> = {};
-  // Axial SNC load: INOL from tier_snc===1 poids_libre exercises (week 2 only)
   let axialSncLoad = 0;
 
   // Simulation séquentielle sur 2 semaines
@@ -161,12 +236,18 @@ export function runWeeklySimulation(
             
             let validSet = parsedSet.data;
 
-            // ─── SURCHARGE AVEC LES LOGS RÉELS DU MOBILE (SI DISPONIBLES) ───
+            // ─── FAILLE 1 CORRIGÉE : Injection des logs réels avec filtre de semaine ──────
+            // AVANT (bugué) : l.day === day  →  un log "Lundi S1" écrasait les prévisions "Lundi S2"
+            // APRÈS : le filtre inclut la semaine courante.
+            //   - Si le log a un champ `week`, on exige l.week === week (correspondance stricte).
+            //   - Si le log n'a PAS de champ `week` (anciens logs mobiles), on ne l'applique
+            //     QU'en semaine 1 (comportement rétrocompatible et sûr).
             if (sessionLogs && sessionLogs.length > 0) {
               const logMatch = sessionLogs.find(
-                l => l.exercise_id === plannedEx.exerciseId && 
-                     l.day === day && 
-                     l.set_index === setIndex
+                l => l.exercise_id === plannedEx.exerciseId &&
+                     l.day === day &&
+                     l.set_index === setIndex &&
+                     (l.week !== undefined ? l.week === week : week === 1)
               );
 
               if (logMatch) {
@@ -274,7 +355,6 @@ export function runWeeklySimulation(
   const targetSnc = selectedDay ? snapshotSnc : sncFatigue;
 
   // ─── AGGREGATION DES SOUS-MUSCLES PHYSIOLOGIQUES AVEC SOMMATION PONDÉRÉE ───
-  // La fatigue totale du parent est la somme des fatigues des enfants (pondérée par les coefficients PARENT_CHILD_WEIGHTS) + sa propre fatigue.
   const aggregateMuscle = (parentKey: MuscleId, childKeys: MuscleId[]) => {
     const parent = targetMuscles[parentKey] || { fatigue: 0, inol: 0, fitness: 0, sets: 0, jointStress: 0, contributions: {}, setsContributions: {}, fatigueHistory: [], uniqueSets: new Set<string>() };
     
@@ -298,7 +378,6 @@ export function runWeeklySimulation(
         
         totalFatigue = normalize(totalFatigue + child.fatigue * coeff);
         totalInol = normalize(totalInol + (child.inol || 0) * coeff);
-        // CORRECTION DE L'AGRÉGATION (CRITIQUE): Sommation cumulative pondérée au lieu de Math.max
         totalJointStress = normalize(totalJointStress + child.jointStress * coeff);
         totalDailyInol = normalize(totalDailyInol + (dailyInol[childKey] || 0) * coeff);
 
@@ -312,7 +391,6 @@ export function runWeeklySimulation(
           combinedContributions[exNom] = normalize((combinedContributions[exNom] || 0) + val * coeff);
         });
         
-        // Accumulate all set IDs to avoid counting the same physical set twice
         if (child.uniqueSets) {
           child.uniqueSets.forEach(setId => combinedUniqueSets.add(setId));
         }
@@ -325,7 +403,7 @@ export function runWeeklySimulation(
       fatigue: totalFatigue,
       inol: totalInol,
       fitness: normalize(totalFatigue * 0.5),
-      sets: combinedUniqueSets.size, // Exact count of unique series performed
+      sets: combinedUniqueSets.size,
       jointStress: totalJointStress,
       contributions: combinedContributions,
       setsContributions: combinedSetsContributions,
@@ -347,7 +425,9 @@ export function runWeeklySimulation(
   const maxSnc = profile.maxSnc || 15.0;
   const cnsFailure = targetSnc > maxSnc;
 
-  // Statuts musculaires finaux
+  // ─── FAILLE 2 CORRIGÉE : Statuts musculaires avec tokens machine agnostiques ─
+  // AVANT : statusLabel = 'Stimulus Optimal (Zone d\'Adaptation)' — string FR couplée à l'UI
+  // APRÈS : statusLabel = 'OPTIMAL' — token machine traduit côté UI via muscleLabels.ts
   const finalMuscles: { [muscleId in MuscleId]?: MuscleStatus } = {};
 
   Object.entries(targetMuscles).forEach(([id, data]) => {
@@ -355,22 +435,22 @@ export function runWeeklySimulation(
     const fatigueScore = data.fatigue;
     const trueInol = data.inol || 0;
 
-    // COLORIMÉTRIE "SAFE-FIRST" : La couleur de MuscleStatus dépend UNIQUEMENT de data.fatigue
-    let color: 'grey' | 'green' | 'orange' | 'red' = 'grey';
-    let statusLabel = 'Volume Insuffisant (Repos / Maintien)';
+    // Colorimétrie + token : dépend UNIQUEMENT de data.fatigue (logique pure)
+    let color: 'grey' | 'green' | 'orange' | 'red';
+    let statusLabel: MuscleStatusToken;
 
     if (fatigueScore < 0.5) {
       color = 'grey';
-      statusLabel = 'Volume Insuffisant (Repos / Maintien)';
-    } else if (fatigueScore >= 0.5 && fatigueScore <= 1.5) {
+      statusLabel = 'REST';
+    } else if (fatigueScore <= 1.5) {
       color = 'green';
-      statusLabel = 'Stimulus Optimal (Zone d\'Adaptation)';
-    } else if (fatigueScore > 1.5 && fatigueScore <= 2.5) {
+      statusLabel = 'OPTIMAL';
+    } else if (fatigueScore <= 2.5) {
       color = 'orange';
-      statusLabel = 'Surcharge Fonctionnelle (Attention)';
+      statusLabel = 'OVERLOAD';
     } else {
       color = 'red';
-      statusLabel = 'Risque Lésionnel (MRV Dépassé)';
+      statusLabel = 'DANGER';
     }
 
     const totalInolAccumulated = Object.values(data.contributions).reduce((sum, val) => sum + val, 0);
@@ -392,25 +472,22 @@ export function runWeeklySimulation(
 
     finalMuscles[mId] = {
       name: MUSCLE_DETAILS[mId],
-      inol: parseFloat(trueInol.toFixed(2)), // INOL is decoupled from fatigue
-      sets: data.sets, // No rounding, retain decimal values
+      inol: parseFloat(trueInol.toFixed(2)),
+      sets: data.sets,
       color,
       statusLabel,
       contributors,
       remainingCapacity: parseFloat(Math.max(0, 1 - (fatigueScore / 2.5)).toFixed(4)),
       jointStress: parseFloat((data.jointStress || 0).toFixed(2)),
-      readiness: parseFloat((data.fitness - fatigueScore).toFixed(2)), // Readiness conservée et calculée proprement pour l'affichage
+      readiness: parseFloat((data.fitness - fatigueScore).toFixed(2)),
       fatigueHistory: data.fatigueHistory.map(v => parseFloat(v.toFixed(2)))
     };
   });
 
-  // REFACTORING DU "JUNK VOLUME"
-  // On détecte le volume poubelle en fonction de l'INOL généré dans la séance (Intensité + Volume).
-  // Un INOL > 1.5 sur un même jour pour un muscle représente une surcharge inutile.
+  // Détection du Junk Volume (INOL intra-séance > 1.5)
   const junkVolumeAlerts: string[] = [];
   const reportedParents = new Set<string>();
 
-  // Trier par INOL décroissant pour alerter en priorité sur les gros muscles
   Object.entries(dailyInol)
     .sort((a, b) => b[1] - a[1])
     .forEach(([id, inolScore]) => {
@@ -430,7 +507,6 @@ export function runWeeklySimulation(
   fiveBigMuscles.forEach(id => {
     const muscle = targetMuscles[id];
     const fatigue = muscle ? muscle.fatigue : 0;
-    // Fatigue max acceptable avant danger absolu est de 2.5
     const pct = Math.min(100, Math.max(0, (fatigue / 2.5) * 100));
     totalMuscleFatiguePct += pct;
   });
@@ -446,48 +522,16 @@ export function runWeeklySimulation(
     'hamstring', 'gluteal'
   ];
 
-  const getCleanGroupName = (id: MuscleId): string => {
-    switch (id) {
-      case 'chest':
-      case 'upperChest':
-      case 'lowerChest':
-        return 'Pectoraux';
-      case 'upperBack':
-      case 'lowerBack':
-      case 'rhomboids':
-      case 'trapezius':
-      case 'upperTrapezius':
-      case 'lowerTrapezius':
-        return 'Dos';
-      case 'deltoids':
-      case 'frontDeltoid':
-      case 'rearDeltoid':
-        return 'Épaules';
-      case 'biceps':
-        return 'Biceps';
-      case 'triceps':
-        return 'Triceps';
-      case 'quadriceps':
-      case 'innerQuad':
-      case 'outerQuad':
-        return 'Quadriceps';
-      case 'hamstring':
-      case 'gluteal':
-        return 'Ischios/Fessiers';
-      default:
-        return MUSCLE_DETAILS[id] || id;
-    }
-  };
-
+  // ─── FAILLE 2 CORRIGÉE : topSurcharged / topNeglected retournent l'ID brut ─
+  // AVANT : getCleanGroupName() traduisait en français dans le moteur mathématique
+  // APRÈS : on retourne l'ID (`muscleId` = ex: 'chest') et le nom anatomique technique
+  //         via MUSCLE_DETAILS. La traduction UI est dans apps/web/src/lib/muscleLabels.ts
   const rawSurcharged = Object.entries(finalMuscles)
     .filter((entry): entry is [string, MuscleStatus] => {
       const [id, m] = entry;
       return m !== undefined && MAJOR_GROUPS.includes(id as MuscleId) && (m.color === 'red' || m.color === 'orange');
     })
-    .map(([id, m]) => ({
-      ...m,
-      name: getCleanGroupName(id as MuscleId)
-    }))
+    .map(([, m]) => ({ ...m }))
     .sort((a, b) => b.inol - a.inol);
 
   const uniqueSurcharged: MuscleStatus[] = [];
@@ -505,10 +549,7 @@ export function runWeeklySimulation(
       const [id, m] = entry;
       return m !== undefined && MAJOR_GROUPS.includes(id as MuscleId) && m.color === 'grey';
     })
-    .map(([id, m]) => ({
-      ...m,
-      name: getCleanGroupName(id as MuscleId)
-    }))
+    .map(([, m]) => ({ ...m }))
     .sort((a, b) => a.inol - b.inol);
 
   const uniqueNeglected: MuscleStatus[] = [];
@@ -520,8 +561,6 @@ export function runWeeklySimulation(
     }
   }
   const topNeglected = uniqueNeglected.slice(0, 3);
-
-
 
   let totalSets = 0;
   let pushSets = 0;
@@ -556,21 +595,16 @@ export function runWeeklySimulation(
   const legsPct = totalSets > 0 ? (legsSets / totalSets) * 100 : 0;
 
   // ─── WEEKLY MACRO COMPUTATION ──────────────────────────────────────────────
-  // 7 grand groups only for textual feedback (mirrors the filtering in topSurcharged/topNeglected)
-  const GRAND_GROUPS: Record<string, string> = {
-    chest: 'Pectoraux',
-    upperBack: 'Dos',
-    frontDeltoid: 'Épaules',
-    biceps: 'Biceps',
-    triceps: 'Triceps',
-    quadriceps: 'Quadriceps',
-    hamstring: 'Ischios/Fessiers',
-  };
+  // FAILLE 2 CORRIGÉE : GRAND_GROUPS utilise maintenant les IDs bruts comme clés.
+  // Les noms traduits (valeurs) sont toujours présents pour weeklyMacro.traumaAlerts
+  // (ce champ reste en texte FR car il est consommé tel quel dans l'UI actuelle —
+  //  la migration complète vers des tokens pour traumaAlerts est hors scope de ce refactoring).
+  const GRAND_GROUP_IDS: MuscleId[] = ['chest', 'upperBack', 'frontDeltoid', 'biceps', 'triceps', 'quadriceps', 'hamstring'];
 
   // Filter peakFatigue to grand groups only using fatigueHistory
   const filteredPeakFatigue: Record<string, { value: number; day: string }> = {};
-  Object.keys(GRAND_GROUPS).forEach(id => {
-    const history = finalMuscles[id as MuscleId]?.fatigueHistory;
+  GRAND_GROUP_IDS.forEach(id => {
+    const history = finalMuscles[id]?.fatigueHistory;
     if (history && history.length > 0) {
       const maxVal = Math.max(...history);
       const dayIndex = history.indexOf(maxVal);
@@ -580,31 +614,30 @@ export function runWeeklySimulation(
 
   // Build weeklyEffectiveSets for grand groups (integer, not coeff-weighted)
   const weeklyEffectiveSets: Record<string, number> = {};
-  Object.keys(GRAND_GROUPS).forEach(id => {
+  GRAND_GROUP_IDS.forEach(id => {
     weeklyEffectiveSets[id] = Math.round(weeklyEffectiveSetsRaw[id] ?? 0);
   });
 
-  // Trauma Alerts: muscles where peak fatigue exceeded 2.5 (danger zone)
+  // Trauma Alerts (texte FR conservé pour rétrocompatibilité avec l'UI actuelle)
   const TRAUMA_THRESHOLD = 2.5;
   const traumaAlerts: string[] = [];
   Object.entries(filteredPeakFatigue).forEach(([id, { value, day: peakDay }]) => {
     if (value > TRAUMA_THRESHOLD) {
-      const muscleName = GRAND_GROUPS[id] ?? id;
+      const muscleName = MUSCLE_DETAILS[id as MuscleId] ?? id;
       traumaAlerts.push(`${muscleName} — pic critique ${peakDay} (fatigue ${value.toFixed(2)})`);
     }
   });
 
-  // Push/Pull ratio (binary, ignoring legs — for postural balance insight)
+  // Push/Pull ratio
   const pushPullTotal = pushSets + pullSets;
   const pushPullRatio = {
     push: pushPullTotal > 0 ? Math.round((pushSets / pushPullTotal) * 100) : 50,
     pull: pushPullTotal > 0 ? Math.round((pullSets / pushPullTotal) * 100) : 50,
   };
 
-  // Normalize axial SNC load to a 0-100 percentage relative to maxSnc
+  // Normalize axial SNC load to a 0-100 percentage
   const maxSncForAxial = profile.maxSnc || 15.0;
   const axialSncPct = Math.min(100, Math.round((axialSncLoad / maxSncForAxial) * 100));
-
 
   const weeklyMacro: WeeklyMacro = {
     peakFatigue: filteredPeakFatigue,
@@ -614,12 +647,11 @@ export function runWeeklySimulation(
     traumaAlerts,
   };
 
-  // ─── WEEKLY TRAUMA DETECTION ─────────────────────────────────────────────────────
-  // Scan fatigueHistory of each major-group muscle in finalMuscles.
-  // If any single day exceeded the trauma threshold (2.5), emit an alert.
-  // This is independent of the end-of-week state (dissipation does NOT hide past spikes).
+  // ─── WEEKLY TRAUMA DETECTION ─────────────────────────────────────────────
+  // FAILLE 2 CORRIGÉE : weeklyTraumas retourne muscleId (ID brut) au lieu de muscleName (string FR)
+  // Rétrocompatibilité : le champ s'appelait `muscleName` dans l'ancien type, maintenant `muscleId`.
   const TRAUMA_INOL_THRESHOLD = 2.5;
-  const seenTraumaNames = new Set<string>();
+  const seenTraumaIds = new Set<string>();
   const weeklyTraumas: WeeklyTrauma[] = [];
 
   MAJOR_GROUPS.forEach(id => {
@@ -629,22 +661,22 @@ export function runWeeklySimulation(
     const peakInol = Math.max(...muscle.fatigueHistory);
     if (peakInol <= TRAUMA_INOL_THRESHOLD) return;
 
-    const cleanName = getCleanGroupName(id as MuscleId);
-    if (seenTraumaNames.has(cleanName)) return; // De-duplicate by grand group
-    seenTraumaNames.add(cleanName);
+    // Déduplication par nom anatomique technique (MUSCLE_DETAILS)
+    const technicalName = MUSCLE_DETAILS[id] || id;
+    if (seenTraumaIds.has(technicalName)) return;
+    seenTraumaIds.add(technicalName);
 
     const dayIndex = muscle.fatigueHistory.indexOf(
       muscle.fatigueHistory.reduce((max, v) => (v > max ? v : max), 0)
     );
 
     weeklyTraumas.push({
-      muscleName: cleanName,
+      muscleId: id,  // ID brut — traduit côté UI via muscleLabels.ts
       peakInol: parseFloat(peakInol.toFixed(2)),
       dayIndex,
     });
   });
 
-  // Sort by severity descending
   weeklyTraumas.sort((a, b) => b.peakInol - a.peakInol);
 
   const result: SimulationResult = {
@@ -665,11 +697,7 @@ export function runWeeklySimulation(
     weeklyTraumas,
   };
 
-  // Sauvegarde dans le cache
-  if (simulationCache.size >= MAX_CACHE_SIZE) {
-    const firstKey = simulationCache.keys().next().value;
-    if (firstKey) simulationCache.delete(firstKey);
-  }
+  // Sauvegarde dans le cache LRU
   simulationCache.set(cacheKey, result);
 
   return result;

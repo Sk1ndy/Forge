@@ -1,6 +1,7 @@
 'use client';
 import React, { useState, useMemo } from 'react';
 import { SimulationResult, MuscleStatus, MuscleId } from '@/lib/calculations';
+import { getStatusLabel, getMuscleGroupName } from '@/lib/muscleLabels';
 
 const Sparkline = ({ data }: { data?: number[] }) => {
   if (!data || data.length < 2) return null;
@@ -963,7 +964,7 @@ export default function HumanAvatar({
             {hoveredMuscle.name}
           </div>
           <div style={{ fontSize: 11, color: getStatusColor(hoveredMuscle.color), marginBottom: 2 }}>
-            {hoveredMuscle.statusLabel}
+            {getStatusLabel(hoveredMuscle.statusLabel)}
           </div>
           <div style={{ fontSize: 11, color: '#71717a', marginBottom: 6 }}>
             INOL: <span style={{ color: '#a1a1aa' }}>{hoveredMuscle.inol.toFixed(2)}</span>
@@ -1034,7 +1035,7 @@ export default function HumanAvatar({
           )}
 
           {viewMode === 'week' && (() => {
-            const trauma = simulation.weeklyTraumas?.find(t => t.muscleName === hoveredMuscle.name);
+            const trauma = simulation.weeklyTraumas?.find(t => t.muscleId === hoveredId);
             const readinessPct = hoveredMuscle.readiness !== undefined 
               ? Math.round(Math.max(0, Math.min(100, ((hoveredMuscle.readiness + 2.5) / 4) * 100)))
               : 0;

@@ -7,6 +7,7 @@ import {
 } from 'recharts';
 import { SimulationResult, WeeklyBlueprint, MuscleId } from '@/lib/calculations';
 import { MuscleStatus } from '@forge/shared';
+import { getMuscleGroupName } from '@/lib/muscleLabels';
 
 // ─── Props ───────────────────────────────────────────────────────────────────
 interface WeekDashboardProps {
@@ -160,7 +161,8 @@ function generatePrescriptions(simulation: SimulationResult): string[] {
   if (traumas.length > 0 && recs.length < 3) {
     const t = traumas[0];
     const dayName = DAY_LABELS[t.dayIndex] ?? '';
-    recs.push(`🔴 ${t.muscleName} : Pic traumatique ${dayName} (INOL ${t.peakInol}) — Réduisez l'intensité de 20% ou passez sur machine au prochain cycle.`);
+    const traumaName = getMuscleGroupName(t.muscleId as MuscleId);
+    recs.push(`🔴 ${traumaName} : Pic traumatique ${dayName} (INOL ${t.peakInol}) — Réduisez l'intensité de 20% ou passez sur machine au prochain cycle.`);
   }
 
   // CNS
@@ -495,7 +497,7 @@ export default function WeekDashboard({ simulation, blueprint, toggledDays, char
                 {simulation.weeklyTraumas.slice(0, 3).map((t, i) => (
                   <li key={i} className="flex items-start gap-1.5 bg-red-950/20 border border-red-500/20 rounded-lg px-2 py-1">
                     <span className="text-red-400 text-[10px] shrink-0 mt-px">⚡</span>
-                    <span className="text-[10px] text-red-300 font-semibold">{t.muscleName}</span>
+                    <span className="text-[10px] text-red-300 font-semibold">{getMuscleGroupName(t.muscleId as MuscleId)}</span>
                     <span className="text-[10px] text-zinc-600 ml-auto font-mono shrink-0">{t.peakInol}</span>
                   </li>
                 ))}
