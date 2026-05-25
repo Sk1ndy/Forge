@@ -11,7 +11,7 @@
   },
   "scripts": {
     "dev": "npm run dev --workspace=apps/web",
-    "build": "npm run build --workspaces",
+    "build": "npm run build --workspace=apps/web --workspace=@forge/shared",
     "lint": "npm run lint --workspaces",
     "test": "npm run test --workspace=apps/web"
   }
