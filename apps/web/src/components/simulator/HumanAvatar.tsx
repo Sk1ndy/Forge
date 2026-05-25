@@ -873,6 +873,47 @@ export default function HumanAvatar({
           {/* Divider */}
           <line x1="723" y1="100" x2="723" y2="1370" stroke="#27272a" strokeWidth="1" strokeDasharray="6 4" />
         </svg>
+
+        {/* Smart Tags (Surcharge / Sous-travaillé) in Week View */}
+        {viewMode === 'week' && (
+          <>
+            {/* Surcharge Gauche */}
+            <div className="absolute left-2 top-1/2 -translate-y-1/2 flex flex-col gap-2 pointer-events-none">
+              {simulation.topSurcharged && simulation.topSurcharged.length > 0 && (
+                <>
+                  <div className="text-[10px] font-black text-red-400 uppercase tracking-widest text-center mb-1 shadow-sm">
+                    Surcharge
+                  </div>
+                  {simulation.topSurcharged.map((m, i) => (
+                    <div key={`surch-${i}`} className="bg-red-950/80 border border-red-900 px-2 py-1.5 rounded text-[10px] text-red-200 shadow-[0_0_10px_rgba(220,38,38,0.3)] backdrop-blur-sm whitespace-nowrap flex items-center gap-1.5">
+                      <div className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" />
+                      <span className="font-bold">{m.name}</span>
+                      <span className="opacity-75">({m.sets}s)</span>
+                    </div>
+                  ))}
+                </>
+              )}
+            </div>
+
+            {/* Sous-travaillé Droite */}
+            <div className="absolute right-2 top-1/2 -translate-y-1/2 flex flex-col gap-2 pointer-events-none items-end">
+              {simulation.topNeglected && simulation.topNeglected.length > 0 && (
+                <>
+                  <div className="text-[10px] font-black text-zinc-500 uppercase tracking-widest text-center mb-1">
+                    Sous-travaillé
+                  </div>
+                  {simulation.topNeglected.map((m, i) => (
+                    <div key={`neg-${i}`} className="bg-zinc-900/80 border border-zinc-800 px-2 py-1.5 rounded text-[10px] text-zinc-400 backdrop-blur-sm whitespace-nowrap flex items-center gap-1.5">
+                      <span className="font-bold">{m.name}</span>
+                      <span className="opacity-75">({m.sets}s)</span>
+                      <div className="w-1.5 h-1.5 rounded-full bg-zinc-600" />
+                    </div>
+                  ))}
+                </>
+              )}
+            </div>
+          </>
+        )}
       </div>
 
       {/* Legend */}

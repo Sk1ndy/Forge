@@ -785,9 +785,9 @@ export default function Home() {
               </>
             ) : (
               <>
-                {/* Left Portion: SVG Anatomical Avatar — 30% width */}
-                <div ref={avatarRef} className="w-full md:w-[32%] h-[300px] md:h-full shrink-0 bg-zinc-950 border border-zinc-900 rounded-xl overflow-hidden flex flex-col relative">
-                  <HumanAvatar 
+                {/* Left Portion: SVG Anatomical Avatar — 40% width */}
+                <div ref={avatarRef} className="w-full md:w-[40%] h-[300px] md:h-full shrink-0 bg-zinc-950 border border-zinc-900 rounded-xl overflow-hidden flex flex-col relative">
+                  <HumanAvatar
                     simulation={simulationResult} 
                     selectedDay={selectedDay} 
                     selectedMuscle={selectedMuscle}

@@ -258,9 +258,14 @@ export function runWeeklySimulation(
       }
 
       // C. Capture légère du snapshot uniquement lors de la semaine 2 stabilisée
-      if (week === 2 && selectedDay && day.toLowerCase() === selectedDay.toLowerCase()) {
-        snapshotMuscles = createLightSnapshot(musclesMap);
-        snapshotSnc = sncFatigue;
+      if (week === 2) {
+        if (selectedDay && day.toLowerCase() === selectedDay.toLowerCase()) {
+          snapshotMuscles = createLightSnapshot(musclesMap);
+          snapshotSnc = sncFatigue;
+        } else if (!selectedDay && day === 'Dimanche') {
+          snapshotMuscles = createLightSnapshot(musclesMap);
+          snapshotSnc = sncFatigue;
+        }
       }
     });
   }
