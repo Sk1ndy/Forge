@@ -36,10 +36,44 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
   },
 });
 
+const CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes
+
+async function getCachedData<T>(key: string): Promise<{ data: T; isStale: boolean } | null> {
+  try {
+    const raw = await AsyncStorage.getItem(key);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    if (parsed && typeof parsed === 'object' && 'timestamp' in parsed && 'payload' in parsed) {
+      return {
+        data: parsed.payload as T,
+        isStale: Date.now() - parsed.timestamp > CACHE_TTL_MS
+      };
+    }
+    return { data: parsed as T, isStale: true };
+  } catch {
+    return null;
+  }
+}
+
+async function setCachedData<T>(key: string, data: T) {
+  try {
+    await AsyncStorage.setItem(key, JSON.stringify({ timestamp: Date.now(), payload: data }));
+  } catch {
+    // Ignore storage errors
+  }
+}
+
 export async function loadLatestBlueprint(): Promise<{ id: string; name: string; blueprint: WeeklyBlueprint } | null> {
+  const CACHE_KEY = 'forge_mobile_latest_blueprint';
+  const cached = await getCachedData<{ id: string; name: string; blueprint: WeeklyBlueprint }>(CACHE_KEY);
+  
+  if (cached && !cached.isStale) {
+    return cached.data;
+  }
+
   try {
     const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return null;
+    if (!user) return cached?.data || null;
 
     const { data, error } = await supabase
       .from('blueprints')
@@ -49,16 +83,19 @@ export async function loadLatestBlueprint(): Promise<{ id: string; name: string;
       .limit(1)
       .single();
 
-    if (error || !data) return null;
+    if (error || !data) return cached?.data || null;
 
-    return {
+    const result = {
       id: data.id,
       name: data.nom,
       blueprint: data.state as WeeklyBlueprint
     };
+    
+    await setCachedData(CACHE_KEY, result);
+    return result;
   } catch (e) {
     console.warn("Error loading blueprint:", e);
-    return null;
+    return cached?.data || null;
   }
 }
 
@@ -118,9 +155,17 @@ export async function syncLocalLogsToSupabase() {
           session_id: payload.session_id,
           exercise_id: payload.exercise_id,
           user_id: user.id,
-          sets: payload.sets,
-          ppl_category: payload.ppl_category,
-          metadata: payload.metadata || {}
+          day: payload.day || 'Lundi',
+          set_index: payload.set_index || 0,
+          week: payload.week || 1,
+          planned_weight: payload.planned_weight,
+          planned_reps: payload.planned_reps,
+          planned_rpe: payload.planned_rpe,
+          actual_weight: payload.actual_weight,
+          actual_reps: payload.actual_reps,
+          actual_rpe: payload.actual_rpe,
+          is_completed: payload.is_completed ?? true,
+          skipped_reason: payload.skipped_reason
         }]);
 
       if (!error) {
@@ -135,13 +180,20 @@ export async function syncLocalLogsToSupabase() {
 import { Exercise, DEFAULT_EXERCISE_LIBRARY } from '@forge/shared';
 
 export async function loadExercises(): Promise<Exercise[]> {
+  const CACHE_KEY = 'forge_mobile_exercises';
+  const cached = await getCachedData<Exercise[]>(CACHE_KEY);
+  
+  if (cached && !cached.isStale) {
+    return cached.data;
+  }
+
   try {
     const { data, error } = await supabase
       .from('exercises')
       .select('*');
 
     if (!error && data && data.length > 0) {
-      return data.map(dbEx => {
+      const mapped = data.map(dbEx => {
         const defaultEx = DEFAULT_EXERCISE_LIBRARY.find(e => e.id === dbEx.id);
         return {
           ...defaultEx,
@@ -149,9 +201,12 @@ export async function loadExercises(): Promise<Exercise[]> {
           ppl_category: dbEx.ppl_category || defaultEx?.ppl_category || 'none'
         } as Exercise;
       });
+      await setCachedData(CACHE_KEY, mapped);
+      return mapped;
     }
   } catch (e) {
     console.warn("Supabase loadExercises error. Falling back to default library.", e);
   }
-  return DEFAULT_EXERCISE_LIBRARY;
+  
+  return cached?.data || DEFAULT_EXERCISE_LIBRARY;
 }

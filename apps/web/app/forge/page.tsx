@@ -6,8 +6,11 @@ import {
   UserProfile,
   WeeklyBlueprint,
   runWeeklySimulation,
+  runWeeklySimulationAsync,
+  emptySimulationResult,
   PlannedExercise,
-  Exercise
+  Exercise,
+  SimulationResult
 } from '@/lib/calculations';
 import {
   loadUserProfile,
@@ -145,13 +148,21 @@ export default function Home() {
     saveCurrentWorkPlan(blueprint, toggledDays);
   }, [blueprint, toggledDays]);
 
-  // 3. Calculs des simulations mémoïsées (Bascule instantanée Jour vs Semaine Cumulée)
-  const weeklySimulationResult = useMemo(() => {
-    return runWeeklySimulation(blueprint, profile, toggledDays, undefined, exercises);
+  // 3. Calculs des simulations asynchrones (Non-blocking UI)
+  const [weeklySimulationResult, setWeeklySimulationResult] = useState<SimulationResult>(emptySimulationResult);
+  useEffect(() => {
+    let active = true;
+    runWeeklySimulationAsync(blueprint, profile, toggledDays, undefined, exercises)
+      .then(res => { if (active) setWeeklySimulationResult(res); });
+    return () => { active = false; };
   }, [blueprint, profile, toggledDays, exercises]);
 
-  const dailySimulationResult = useMemo(() => {
-    return runWeeklySimulation(blueprint, profile, toggledDays, selectedDay, exercises);
+  const [dailySimulationResult, setDailySimulationResult] = useState<SimulationResult>(emptySimulationResult);
+  useEffect(() => {
+    let active = true;
+    runWeeklySimulationAsync(blueprint, profile, toggledDays, selectedDay, exercises)
+      .then(res => { if (active) setDailySimulationResult(res); });
+    return () => { active = false; };
   }, [blueprint, profile, toggledDays, selectedDay, exercises]);
 
   const simulationResult = viewMode === 'week' ? weeklySimulationResult : dailySimulationResult;
@@ -161,14 +172,28 @@ export default function Home() {
     Lundi: true, Mardi: true, Mercredi: true, Jeudi: true, Vendredi: true, Samedi: true, Dimanche: true
   }), []);
 
-  const compareSimulationResult = useMemo(() => {
-    if (!compareBlueprint) return null;
-    return runWeeklySimulation(compareBlueprint, profile, fullyActiveDays, undefined, exercises);
+  const [compareSimulationResult, setCompareSimulationResult] = useState<SimulationResult | null>(null);
+  useEffect(() => {
+    if (!compareBlueprint) {
+      setCompareSimulationResult(null);
+      return;
+    }
+    let active = true;
+    runWeeklySimulationAsync(compareBlueprint, profile, fullyActiveDays, undefined, exercises)
+      .then(res => { if (active) setCompareSimulationResult(res); });
+    return () => { active = false; };
   }, [compareBlueprint, profile, fullyActiveDays, exercises]);
 
-  const mainSimulationForCompare = useMemo(() => {
-    if (!isComparing) return weeklySimulationResult;
-    return runWeeklySimulation(blueprint, profile, fullyActiveDays, undefined, exercises);
+  const [mainSimulationForCompare, setMainSimulationForCompare] = useState<SimulationResult>(emptySimulationResult);
+  useEffect(() => {
+    if (!isComparing) {
+      setMainSimulationForCompare(weeklySimulationResult);
+      return;
+    }
+    let active = true;
+    runWeeklySimulationAsync(blueprint, profile, fullyActiveDays, undefined, exercises)
+      .then(res => { if (active) setMainSimulationForCompare(res); });
+    return () => { active = false; };
   }, [isComparing, blueprint, profile, fullyActiveDays, exercises, weeklySimulationResult]);
 
   // 4. Ajouter un exercice au séquenceur

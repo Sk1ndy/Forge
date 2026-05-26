@@ -17,6 +17,33 @@ const STORAGE_KEYS = {
   TOGGLED_DAYS: 'forge_toggled_days'
 };
 
+const CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes
+
+function getCachedData<T>(key: string): { data: T; isStale: boolean } | null {
+  if (typeof window === 'undefined') return null;
+  const raw = localStorage.getItem(key);
+  if (!raw) return null;
+  try {
+    const parsed = JSON.parse(raw);
+    if (parsed && typeof parsed === 'object' && 'timestamp' in parsed && 'payload' in parsed) {
+      return {
+        data: parsed.payload as T,
+        isStale: Date.now() - parsed.timestamp > CACHE_TTL_MS
+      };
+    }
+    // Backward compatibility for old cache format
+    return { data: parsed as T, isStale: true };
+  } catch {
+    return null;
+  }
+}
+
+function setCachedData<T>(key: string, data: T) {
+  if (typeof window !== 'undefined') {
+    localStorage.setItem(key, JSON.stringify({ timestamp: Date.now(), payload: data }));
+  }
+}
+
 // Valeurs par défaut du profil utilisateur
 const DEFAULT_PROFILE: UserProfile = {
   pdc: 75,
@@ -58,6 +85,14 @@ const DEFAULT_TOGGLED_DAYS = {
  * Charge le profil de l'utilisateur
  */
 export async function loadUserProfile(): Promise<UserProfile> {
+  const cached = getCachedData<UserProfile>(STORAGE_KEYS.PROFILE);
+  
+  // 1. Retourner le cache immédiatement s'il est frais
+  if (cached && !cached.isStale) {
+    return cached.data;
+  }
+
+  // 2. Fetch Supabase si pas de cache ou cache expiré
   if (supabaseClient) {
     try {
       const { data: { user } } = await supabaseClient.auth.getUser();
@@ -69,7 +104,7 @@ export async function loadUserProfile(): Promise<UserProfile> {
           .single();
 
         if (!error && data) {
-          return {
+          const profile = {
             pdc: data.pdc || 75,
             prs: {
               squat: data.pr_squat || 100,
@@ -82,25 +117,19 @@ export async function loadUserProfile(): Promise<UserProfile> {
             sleepHours: data.sleep_hours !== null && data.sleep_hours !== undefined ? Number(data.sleep_hours) : 8,
             caloricStatus: data.caloric_status || 'maintenance',
             stressLevel: data.stress_level || 'moderate'
-          };
+          } as UserProfile;
+          
+          setCachedData(STORAGE_KEYS.PROFILE, profile);
+          return profile;
         }
       }
     } catch (e) {
-      console.warn("Supabase loadUserProfile error. Falling back to local storage.", e);
+      console.warn("Supabase loadUserProfile error. Falling back to stale local storage.", e);
     }
   }
 
-  // Fallback Local Storage
-  if (typeof window !== 'undefined') {
-    const local = localStorage.getItem(STORAGE_KEYS.PROFILE);
-    if (local) {
-      try {
-        return JSON.parse(local);
-      } catch {
-        return DEFAULT_PROFILE;
-      }
-    }
-  }
+  // 3. Fallback sur le cache expiré en cas d'erreur réseau
+  if (cached) return cached.data;
   return DEFAULT_PROFILE;
 }
 
@@ -108,10 +137,8 @@ export async function loadUserProfile(): Promise<UserProfile> {
  * Sauvegarde le profil utilisateur
  */
 export async function saveUserProfile(profile: UserProfile): Promise<boolean> {
-  // Toujours persister localement d'abord
-  if (typeof window !== 'undefined') {
-    localStorage.setItem(STORAGE_KEYS.PROFILE, JSON.stringify(profile));
-  }
+  // Toujours persister localement d'abord avec le format SWR
+  setCachedData(STORAGE_KEYS.PROFILE, profile);
 
   if (supabaseClient) {
     try {
@@ -148,6 +175,12 @@ export async function saveUserProfile(profile: UserProfile): Promise<boolean> {
  * Charge tous les Blueprints sauvegardés de l'utilisateur
  */
 export async function loadSavedBlueprints(): Promise<{ id: string; name: string; blueprint: WeeklyBlueprint }[]> {
+  const cached = getCachedData<{ id: string; name: string; blueprint: WeeklyBlueprint }[]>(STORAGE_KEYS.BLUEPRINTS);
+  
+  if (cached && !cached.isStale) {
+    return cached.data;
+  }
+
   if (supabaseClient) {
     try {
       const { data: { user } } = await supabaseClient.auth.getUser();
@@ -159,29 +192,21 @@ export async function loadSavedBlueprints(): Promise<{ id: string; name: string;
           .order('updated_at', { ascending: false });
 
         if (!error && data) {
-          return data.map((d: { id: string; nom: string; state: unknown }) => ({
+          const mapped = data.map((d: { id: string; nom: string; state: unknown }) => ({
             id: d.id,
             name: d.nom,
             blueprint: d.state as WeeklyBlueprint
           }));
+          setCachedData(STORAGE_KEYS.BLUEPRINTS, mapped);
+          return mapped;
         }
       }
     } catch (e) {
-      console.warn("Supabase loadSavedBlueprints error. Falling back to local storage.", e);
+      console.warn("Supabase loadSavedBlueprints error. Falling back to stale local storage.", e);
     }
   }
 
-  // Fallback Local Storage
-  if (typeof window !== 'undefined') {
-    const local = localStorage.getItem(STORAGE_KEYS.BLUEPRINTS);
-    if (local) {
-      try {
-        return JSON.parse(local);
-      } catch {
-        return [];
-      }
-    }
-  }
+  if (cached) return cached.data;
   return [];
 }
 
@@ -191,19 +216,17 @@ export async function loadSavedBlueprints(): Promise<{ id: string; name: string;
 export async function saveBlueprint(name: string, blueprint: WeeklyBlueprint, id?: string): Promise<string> {
   const newId = id || Math.random().toString(36).substring(2, 9);
   
-  // 1. Sauvegarde locale
-  if (typeof window !== 'undefined') {
-    const saved = await loadSavedBlueprints();
-    const existingIndex = saved.findIndex(s => s.id === newId);
-    
-    if (existingIndex > -1) {
-      saved[existingIndex] = { id: newId, name, blueprint };
-    } else {
-      saved.unshift({ id: newId, name, blueprint });
-    }
-    
-    localStorage.setItem(STORAGE_KEYS.BLUEPRINTS, JSON.stringify(saved));
+  // 1. Sauvegarde locale optimiste
+  const saved = (getCachedData<{ id: string; name: string; blueprint: WeeklyBlueprint }[]>(STORAGE_KEYS.BLUEPRINTS)?.data) || [];
+  const existingIndex = saved.findIndex(s => s.id === newId);
+  
+  if (existingIndex > -1) {
+    saved[existingIndex] = { id: newId, name, blueprint };
+  } else {
+    saved.unshift({ id: newId, name, blueprint });
   }
+  
+  setCachedData(STORAGE_KEYS.BLUEPRINTS, saved);
 
   // 2. Sauvegarde Supabase
   if (supabaseClient) {
@@ -237,11 +260,9 @@ export async function saveBlueprint(name: string, blueprint: WeeklyBlueprint, id
  */
 export async function deleteBlueprint(id: string): Promise<boolean> {
   // 1. Suppression locale
-  if (typeof window !== 'undefined') {
-    const saved = await loadSavedBlueprints();
-    const filtered = saved.filter(s => s.id !== id);
-    localStorage.setItem(STORAGE_KEYS.BLUEPRINTS, JSON.stringify(filtered));
-  }
+  const saved = (getCachedData<{ id: string; name: string; blueprint: WeeklyBlueprint }[]>(STORAGE_KEYS.BLUEPRINTS)?.data) || [];
+  const filtered = saved.filter(s => s.id !== id);
+  setCachedData(STORAGE_KEYS.BLUEPRINTS, filtered);
 
   // 2. Suppression Supabase
   if (supabaseClient) {

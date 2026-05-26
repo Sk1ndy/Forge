@@ -88,6 +88,26 @@ function generateCacheKey(
   ].join('|');
 }
 
+export const emptySimulationResult: SimulationResult = {
+  muscles: {},
+  sncScore: 0,
+  sncPercentage: 0,
+  cnsFailure: false,
+  junkVolumeAlerts: [],
+  globalWorkCapacity: 100,
+  topSurcharged: [],
+  topNeglected: [],
+  pushPullLegsRatio: { push: 0, pull: 0, legs: 0 },
+  weeklyMacro: {
+    peakFatigue: {},
+    weeklyEffectiveSets: {},
+    pushPullRatio: { push: 50, pull: 50 },
+    axialSncLoad: 0,
+    traumaAlerts: []
+  },
+  weeklyTraumas: []
+};
+
 /**
  * Exécute la simulation chronologique complète (Modèle Fitness-Fatigue Banister)
  * Retourne le snapshot de l'avatar pour le jour sélectionné (ou Dimanche par défaut)
@@ -197,7 +217,7 @@ export function runWeeklySimulation(
       musclesMap[id].uniqueSets.clear();
     });
 
-    DAYS_OF_WEEK.forEach(day => {
+    for (const day of DAYS_OF_WEEK) {
       // A. Dissipation quotidienne de la fatigue et de l'adaptation
       Object.keys(musclesMap).forEach(id => {
         const baseDecay = MUSCLE_FATIGUE_DECAY[id as MuscleId] ?? 0.5;
@@ -348,8 +368,8 @@ export function runWeeklySimulation(
           snapshotSnc = sncFatigue;
         }
       }
-    });
-  }
+    } // Fin for day
+  } // Fin for week
 
   const targetMuscles = selectedDay ? snapshotMuscles : musclesMap;
   const targetSnc = selectedDay ? snapshotSnc : sncFatigue;
@@ -702,3 +722,40 @@ export function runWeeklySimulation(
 
   return result;
 }
+
+/**
+ * Version asynchrone (Non-blocking) du moteur.
+ * Rend la main à l'Event Loop (chunking) pour éviter de figer l'UI (60fps lock)
+ * lors du traitement de gros volumes de logs.
+ */
+export async function runWeeklySimulationAsync(
+  blueprint: WeeklyBlueprint,
+  profile: UserProfile,
+  toggledDays: { [day: string]: boolean } = {},
+  selectedDay?: string,
+  exerciseLibrary: Exercise[] = DEFAULT_EXERCISE_LIBRARY,
+  week2Blueprint?: WeeklyBlueprint,
+  sessionLogs?: ExerciseLog[],
+  blueprintId?: string
+): Promise<SimulationResult> {
+  const cacheKey = generateCacheKey(
+    blueprint, profile, toggledDays, selectedDay,
+    week2Blueprint, sessionLogs, blueprintId
+  );
+
+  if (simulationCache.has(cacheKey)) {
+    return simulationCache.get(cacheKey)!;
+  }
+
+  // Appelle la version synchrone, mais encapsulée dans un Promise avec un délai
+  // En production on utiliserait des Web Workers, mais pour préserver la compatibilité
+  // Expo Mobile (hors-ligne) sans library complexe, on décale l'exécution.
+  // Une vraie implémentation chunking diviserait la boucle ici. Pour l'instant on libère le thread avant.
+  await new Promise(resolve => setTimeout(resolve, 0));
+  
+  return runWeeklySimulation(
+    blueprint, profile, toggledDays, selectedDay,
+    exerciseLibrary, week2Blueprint, sessionLogs, blueprintId
+  );
+}
+
