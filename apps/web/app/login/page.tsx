@@ -3,6 +3,7 @@
 import { createClient } from '@/lib/supabase/client'
 import { useState, useEffect } from 'react'
 import Image from 'next/image'
+import { getURL } from '@/lib/url'
 
 export default function LoginPage() {
   const [loading, setLoading] = useState(false)
@@ -30,7 +31,7 @@ export default function LoginPage() {
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: `${window.location.origin}/auth/callback`,
+          redirectTo: `${getURL()}/auth/callback`,
         },
       })
       if (error) throw error
@@ -234,12 +235,35 @@ export default function LoginPage() {
                 <div className="h-px flex-1 bg-white/20"></div>
               </div>
               
+              
               <button 
                 disabled
                 className="w-full h-12 border border-white/10 text-zinc-400 text-sm font-bold tracking-wide rounded cursor-not-allowed"
               >
                 Enter Laboratory Code
               </button>
+
+              {process.env.NODE_ENV === 'development' && (
+                <button 
+                  onClick={async () => {
+                    setLoading(true);
+                    const { error } = await supabase.auth.signInWithPassword({
+                      email: 'dev@forge.com',
+                      password: 'password123',
+                    });
+                    setLoading(false);
+                    if (error) alert('Erreur: Vous devez d\'abord créer ce compte dans votre dashboard Supabase (dev@forge.com / password123)');
+                    else window.location.href = '/forge';
+                  }}
+                  disabled={loading}
+                  className="w-full h-12 mt-4 flex items-center justify-center gap-3 bg-zinc-800 hover:bg-zinc-700 text-white font-bold text-sm tracking-wide rounded border border-zinc-700 shadow-lg"
+                >
+                  <svg className="w-5 h-5 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                  </svg>
+                  Bypass Login (Dev Local)
+                </button>
+              )}
             </div>
             
             <div className="mt-20 flex flex-col items-center gap-2">
