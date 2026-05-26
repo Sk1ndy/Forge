@@ -8,6 +8,7 @@ export const metadata: Metadata = {
 };
 
 import Navbar from "@/components/Navbar";
+import { ToastProvider } from "@/components/ui/ToastProvider";
 
 export default function RootLayout({
   children,
@@ -17,8 +18,10 @@ export default function RootLayout({
   return (
     <html lang="fr">
       <body className="min-h-screen antialiased bg-black">
-        <Navbar />
-        {children}
+        <ToastProvider>
+          <Navbar />
+          {children}
+        </ToastProvider>
       </body>
     </html>
   );

@@ -15,6 +15,7 @@ interface LibraryDrawerProps {
   onSelectMuscle: (muscle: string) => void;
   simulation: SimulationResult;
   exercises: Exercise[];
+  isLoading?: boolean;
   onHoverExerciseChange?: (exercise: Exercise | null) => void;
 }
 
@@ -42,6 +43,7 @@ export default function LibraryDrawer({
   onSelectMuscle,
   simulation,
   exercises,
+  isLoading = false,
   onHoverExerciseChange
 }: LibraryDrawerProps) {
   const [search, setSearch] = useState('');
@@ -168,8 +170,28 @@ export default function LibraryDrawer({
 
       {/* Liste des exercices */}
       <div className="mt-4 flex-1 overflow-y-auto space-y-2 pr-1 select-none">
-        {filteredExercises.length === 0 ? (
-          <p className="text-xs text-zinc-500 text-center py-8">Aucun exercice trouvé.</p>
+        {isLoading ? (
+          // Skeleton loader — différencie "chargement" de "pas de résultat"
+          <div className="space-y-2">
+            {[...Array(6)].map((_, i) => (
+              <div key={i} className="h-16 bg-zinc-900/60 border border-zinc-800/40 rounded-lg animate-pulse" style={{ opacity: 1 - i * 0.12 }} />
+            ))}
+          </div>
+        ) : filteredExercises.length === 0 ? (
+          exercises.length === 0 ? (
+            // Vraiment aucun exercice en base
+            <div className="flex flex-col items-center gap-3 py-10 text-center">
+              <span className="text-3xl opacity-20">📭</span>
+              <p className="text-xs text-zinc-500">Aucun exercice dans la base de données.</p>
+            </div>
+          ) : (
+            // Résultat de recherche vide
+            <div className="flex flex-col items-center gap-3 py-10 text-center">
+              <span className="text-2xl opacity-20">🔍</span>
+              <p className="text-xs text-zinc-500">Aucun exercice ne correspond à ta recherche.</p>
+              <button onClick={() => { setSearch(''); onSelectMuscle('all'); }} className="text-[10px] text-emerald-400 underline cursor-pointer">Effacer les filtres</button>
+            </div>
+          )
         ) : (
           filteredExercises.map(({ ex, impact }) => {
             const muscleColor = simulation?.muscles?.[ex.muscle_primaire]?.color;
@@ -217,7 +239,10 @@ export default function LibraryDrawer({
                   </div>
                   <div className="flex items-center gap-1">
                     {selectedMuscle !== 'all' && (
-                      <span className="text-[9px] bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-1.5 py-0.5 rounded-full font-bold">
+                      <span
+                        className="text-[9px] bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-1.5 py-0.5 rounded-full font-bold"
+                        title={`Cet exercice sollicite ce muscle à ${Math.round(impact * 100)}% de son potentiel maximal de tension`}
+                      >
                         {Math.round(impact * 100)}%
                       </span>
                     )}
@@ -229,6 +254,13 @@ export default function LibraryDrawer({
                           ? 'bg-amber-500/10 text-amber-400'
                           : 'bg-zinc-500/10 text-zinc-400'
                       }`}
+                      title={
+                        ex.tier_snc === 1
+                          ? 'Tier 1 SNC : Charge Neurologique Élevée (Squat, Soulevé de Terre…) — Fatigue le système nerveux fortement.'
+                          : ex.tier_snc === 2
+                          ? 'Tier 2 SNC : Charge Modérée (Presse, Tractions…) — Récupération plus rapide.'
+                          : 'Tier 3 SNC : Charge Légère (Isolation, Curl…) — Peu de fatigue nerveuse.'
+                      }
                     >
                       T{ex.tier_snc}
                     </span>
@@ -254,11 +286,12 @@ export default function LibraryDrawer({
 
                 {/* Click to add day list */}
                 {isBlocked ? (
-                  <div className="mt-1 flex items-center justify-center gap-1 w-full rounded bg-red-950/20 text-[9px] py-1.5 text-red-400 font-extrabold border border-red-500/20 cursor-not-allowed">
+                  <div className="mt-1 flex items-center justify-center gap-1 w-full rounded bg-red-950/20 text-[9px] py-1.5 text-red-400 font-extrabold border border-red-500/20 cursor-not-allowed"
+                    title="MRV = Maximum Recoverable Volume : le volume maximum au-delà duquel ton corps ne peut plus récupérer.">
                     <svg className="h-3 w-3 animate-pulse" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                     </svg>
-                    <span>MRV Dépassé : Bloqué 🔴</span>
+                    <span>MRV Dépassé — Bloqué 🔴</span>
                   </div>
                 ) : activeAddMenu === ex.id ? (
                   <div className="mt-2 border-t border-zinc-850 pt-2 animate-fadeIn">

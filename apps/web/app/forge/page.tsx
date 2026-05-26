@@ -33,6 +33,7 @@ import EmptyDayState from '@/components/simulator/EmptyDayState';
 import DayPillSelector from '@/components/simulator/DayPillSelector';
 import WeekScoreHeader from '@/components/simulator/WeekScoreHeader';
 import WelcomeSpotlight from '@/components/ui/WelcomeSpotlight';
+import { useToast } from '@/components/ui/ToastProvider';
 import { toPng } from 'html-to-image';
 import dynamic from 'next/dynamic';
 
@@ -82,8 +83,11 @@ export default function Home() {
   const [selectedDay, setSelectedDay] = useState<string>('Dimanche');
   const [selectedMuscle, setSelectedMuscle] = useState<string>('all');
   const [exercises, setExercises] = useState<Exercise[]>([]);
+  const [isLoadingExercises, setIsLoadingExercises] = useState(true);
   const [hoveredExercise, setHoveredExercise] = useState<Exercise | null>(null);
   const [selectedExercise, setSelectedExercise] = useState<Exercise | null>(null);
+
+  const { toast, confirm, prompt } = useToast();
 
   // Comparaison A/B
   const [isComparing, setIsComparing] = useState(false);
@@ -143,6 +147,7 @@ export default function Home() {
       // Charger les exercices dynamiques
       const loadedExercises = await loadExercises();
       setExercises(loadedExercises);
+      setIsLoadingExercises(false);
     }
     initData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -209,7 +214,7 @@ export default function Home() {
     // Blocage de sécurité si le muscle cible a dépassé son Volume Récupérable Maximal (MRV / Rouge)
     const muscleStatus = simulationResult.muscles[exercise.muscle_primaire];
     if (muscleStatus?.color === 'red') {
-      alert(`⚠️ Ajout Bloqué ! Le muscle cible (${muscleStatus.name || exercise.muscle_primaire}) a dépassé son Volume Récupérable Maximal (MRV).`);
+      toast(`🛑 Muscle ${muscleStatus.name || exercise.muscle_primaire} saturé — Volume Récupérable Maximal dépassé. Repose ce groupe avant de continuer.`, 'error', 5000);
       return;
     }
 
@@ -297,16 +302,18 @@ export default function Home() {
 
   // 6. Sauvegarder le Blueprint dans la liste
   const handleSaveBlueprint = async () => {
-    const name = prompt("Entrez un nom pour votre Blueprint hebdomadaire :", activeBlueprintId ? currentBlueprintName : "Mon Programme Force");
-    if (!name) return;
-
-    const id = await saveBlueprint(name, blueprint, activeBlueprintId || undefined);
-    setCurrentBlueprintName(name);
-    setActiveBlueprintId(id);
-
-    // Recharger l'historique
-    const history = await loadSavedBlueprints();
-    setSavedBlueprints(history);
+    prompt(
+      "Entrez un nom pour votre Blueprint hebdomadaire :",
+      activeBlueprintId ? currentBlueprintName : "Mon Programme Force",
+      async (name) => {
+        const id = await saveBlueprint(name, blueprint, activeBlueprintId || undefined);
+        setCurrentBlueprintName(name);
+        setActiveBlueprintId(id);
+        const history = await loadSavedBlueprints();
+        setSavedBlueprints(history);
+        toast('✅ Blueprint sauvegardé !', 'success');
+      }
+    );
   };
 
 
@@ -331,50 +338,52 @@ export default function Home() {
 
   // 8. Créer un nouveau Blueprint vierge
   const handleNewBlueprint = () => {
-    if (confirm("Voulez-vous réinitialiser le séquenceur actuel pour créer un nouveau programme ?")) {
-      const blankBlueprint: WeeklyBlueprint = {
-        Lundi: [],
-        Mardi: [],
-        Mercredi: [],
-        Jeudi: [],
-        Vendredi: [],
-        Samedi: [],
-        Dimanche: []
-      };
-      setBlueprint(blankBlueprint);
-      setActiveBlueprintId(null);
-      setCurrentBlueprintName('Nouveau Blueprint');
-    }
+    confirm(
+      "Réinitialiser le séquenceur actuel pour créer un nouveau programme ?",
+      () => {
+        const blankBlueprint: WeeklyBlueprint = {
+          Lundi: [], Mardi: [], Mercredi: [], Jeudi: [], Vendredi: [], Samedi: [], Dimanche: []
+        };
+        setBlueprint(blankBlueprint);
+        setActiveBlueprintId(null);
+        setCurrentBlueprintName('Nouveau Blueprint');
+        toast('Nouveau blueprint créé.', 'info');
+      }
+    );
   };
 
 
   const handleRenameBlueprintById = async (id: string, oldName: string) => {
-    const name = prompt("Entrez un nouveau nom pour ce Blueprint :", oldName);
-    if (!name || name === oldName) return;
-
-    const bp = savedBlueprints.find(s => s.id === id);
-    if (!bp) return;
-
-    await saveBlueprint(name, bp.blueprint, id);
-    if (activeBlueprintId === id) {
-      setCurrentBlueprintName(name);
-    }
-
-    // Recharger l'historique
-    const history = await loadSavedBlueprints();
-    setSavedBlueprints(history);
+    prompt(
+      "Entrez un nouveau nom pour ce Blueprint :",
+      oldName,
+      async (name) => {
+        if (name === oldName) return;
+        const bp = savedBlueprints.find(s => s.id === id);
+        if (!bp) return;
+        await saveBlueprint(name, bp.blueprint, id);
+        if (activeBlueprintId === id) setCurrentBlueprintName(name);
+        const history = await loadSavedBlueprints();
+        setSavedBlueprints(history);
+        toast('Blueprint renommé.', 'success');
+      }
+    );
   };
 
   const handleDeleteBlueprintById = async (id: string) => {
-    if (confirm("Êtes-vous sûr de vouloir supprimer ce Blueprint ?")) {
-      await deleteBlueprint(id);
-      if (activeBlueprintId === id) {
-        setActiveBlueprintId(null);
-        setCurrentBlueprintName('Mon Programme Force');
+    confirm(
+      "Supprimer définitivement ce Blueprint ?",
+      async () => {
+        await deleteBlueprint(id);
+        if (activeBlueprintId === id) {
+          setActiveBlueprintId(null);
+          setCurrentBlueprintName('Mon Programme Force');
+        }
+        const history = await loadSavedBlueprints();
+        setSavedBlueprints(history);
+        toast('Blueprint supprimé.', 'warning');
       }
-      const history = await loadSavedBlueprints();
-      setSavedBlueprints(history);
-    }
+    );
   };
 
   const handleLogout = async () => {
@@ -667,6 +676,7 @@ export default function Home() {
                   onHoverExerciseChange={setHoveredExercise}
                   selectedExercise={selectedExercise}
                   onSelectExercise={setSelectedExercise}
+                  onBlockedDrop={(msg) => toast(msg, 'error', 5000)}
                 />
               )}
             </div>
@@ -763,6 +773,7 @@ export default function Home() {
           onSelectMuscle={setSelectedMuscle}
           simulation={simulationResult}
           exercises={exercises}
+          isLoading={isLoadingExercises}
           onHoverExerciseChange={setHoveredExercise}
         />
       </section>

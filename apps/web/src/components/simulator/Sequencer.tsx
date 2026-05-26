@@ -36,6 +36,7 @@ interface SequencerProps {
   onHoverExerciseChange?: (exercise: Exercise | null) => void;
   selectedExercise?: Exercise | null;
   onSelectExercise?: (exercise: Exercise | null) => void;
+  onBlockedDrop?: (message: string) => void;
 }
 
 export default function Sequencer({
@@ -53,7 +54,8 @@ export default function Sequencer({
   onLoadTemplate,
   onHoverExerciseChange,
   selectedExercise,
-  onSelectExercise
+  onSelectExercise,
+  onBlockedDrop
 }: SequencerProps) {
   const [isDragOver, setIsDragOver] = React.useState(false);
 
@@ -78,10 +80,8 @@ export default function Sequencer({
   }, [toggledDays, onUpdateToggledDays]);
 
   const handleClearDayConfirm = useCallback((day: string, e: React.MouseEvent) => {
-    e.stopPropagation(); // Avoid triggering day selection if just clearing
-    if (confirm(`Voulez-vous vider la séance de ${day} ?`)) {
-      onClearDay(day);
-    }
+    e.stopPropagation();
+    onClearDay(day);
   }, [onClearDay]);
 
   // Helper to calculate summary for a day
@@ -151,13 +151,13 @@ export default function Sequencer({
           const exerciseId = e.dataTransfer.getData('text/plain');
           if (exerciseId) {
             const exercise = exercises.find(ex => ex.id === exerciseId);
-            if (exercise) {
-              const muscleStatus = simulation?.muscles?.[exercise.muscle_primaire];
-              if (muscleStatus?.color === 'red') {
-                alert(`⚠️ Ajout Bloqué ! Le muscle cible (${muscleStatus.name || exercise.muscle_primaire}) a dépassé son Volume Récupérable Maximal (MRV).`);
-                return;
+              if (exercise) {
+                const muscleStatus = simulation?.muscles?.[exercise.muscle_primaire];
+                if (muscleStatus?.color === 'red') {
+                  if (onBlockedDrop) onBlockedDrop(`🛑 ${muscleStatus.name || exercise.muscle_primaire} saturé — MRV dépassé. Repose ce groupe musculaire.`);
+                  return;
+                }
               }
-            }
             if (onAddExercise) {
               onAddExercise(exerciseId, currentDay);
             }
