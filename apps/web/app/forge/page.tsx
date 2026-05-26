@@ -29,6 +29,10 @@ import CalibrageModal from '@/components/simulator/CalibrageModal';
 import BlueprintsModal from '@/components/simulator/BlueprintsModal';
 import WeekDashboard from '@/components/simulator/WeekDashboard';
 import ReadinessGauge from '@/components/simulator/ReadinessGauge';
+import EmptyDayState from '@/components/simulator/EmptyDayState';
+import DayPillSelector from '@/components/simulator/DayPillSelector';
+import WeekScoreHeader from '@/components/simulator/WeekScoreHeader';
+import WelcomeSpotlight from '@/components/ui/WelcomeSpotlight';
 import { toPng } from 'html-to-image';
 import dynamic from 'next/dynamic';
 
@@ -387,7 +391,10 @@ export default function Home() {
 
   return (
     <main className="h-screen bg-zinc-950 text-zinc-100 flex flex-col md:flex-row overflow-hidden font-sans">
-      
+
+      {/* Onboarding Spotlight — first visit only */}
+      <WelcomeSpotlight />
+
       {/* 1. LEFT PANEL (25% Width) - Biometrics, SNC, Saved Blueprints */}
       <section className="w-full md:w-[320px] h-full bg-zinc-950 border-r border-zinc-900 flex flex-col justify-between shrink-0 p-4 md:p-6 overflow-y-auto">
         <div className="space-y-6">
@@ -441,87 +448,23 @@ export default function Home() {
             </div>
           </div>
 
-          {/* Gamified Readiness Score (Replacing raw SNC) */}
-          <ReadinessGauge score={simulationResult.systemicReadiness} />
+          {/* Gamified Readiness Score — Hero Widget */}
+          <div data-onboard="readiness">
+            <ReadinessGauge score={simulationResult.systemicReadiness} simulation={simulationResult} />
+          </div>
 
-          {/* 1. Planning Hebdomadaire (Day Selector moved from middle rail) */}
-          <div className="space-y-3 p-3.5 border border-zinc-900 bg-zinc-950/60 rounded-xl">
+          {/* 1. Planning Hebdomadaire — DayPillSelector */}
+          <div className="space-y-2 p-3.5 border border-zinc-900 bg-zinc-950/60 rounded-xl">
             <span className="text-xs font-bold text-zinc-300 uppercase tracking-wider block">
               Planning Hebdomadaire
             </span>
-            <div className="space-y-1.5 pr-1">
-              {['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche'].map((day) => {
-                const dayExercises = blueprint[day] || [];
-                const isDayActive = toggledDays[day] !== false;
-                const isSelected = selectedDay === day;
-                
-                // Day summary logic
-                let summaryText = 'Repos ⚡';
-                let isRest = true;
-                if (!isDayActive) {
-                  summaryText = 'Désactivé';
-                } else if (dayExercises.length > 0) {
-                  const activeExs = dayExercises.filter(e => e.active);
-                  if (activeExs.length > 0) {
-                    const totalSets = activeExs.reduce(
-                      (sum, ex) => sum + ex.sets.reduce((sSum, s) => sSum + (s.active ? s.series : 0), 0),
-                      0
-                    );
-                    summaryText = `${activeExs.length} exo${activeExs.length > 1 ? 's' : ''} · ${totalSets} sér.`;
-                    isRest = false;
-                  }
-                }
-
-                return (
-                  <div
-                    key={day}
-                    onClick={() => setSelectedDay(day)}
-                    className={`group flex items-center justify-between p-2 rounded-lg border text-xs cursor-pointer transition-all duration-200 ${
-                      isSelected
-                        ? 'border-emerald-500 bg-emerald-950/15 ring-1 ring-emerald-500/20 shadow-[0_0_10px_rgba(16,185,129,0.08)] text-white font-bold'
-                        : isDayActive
-                        ? 'border-zinc-900 bg-zinc-900/10 text-zinc-400 hover:bg-zinc-900/40 hover:text-white'
-                        : 'border-zinc-950 bg-zinc-950/10 opacity-40 hover:opacity-60 text-zinc-500'
-                    }`}
-                  >
-                    <div className="flex items-center gap-2 min-w-0">
-                      <input
-                        type="checkbox"
-                        checked={isDayActive}
-                        onChange={(e) => {
-                          e.stopPropagation();
-                          setToggledDays(prev => ({
-                            ...prev,
-                            [day]: !prev[day]
-                          }));
-                        }}
-                        className="rounded border-zinc-800 bg-zinc-950 text-emerald-500 focus:ring-emerald-500 h-3.5 w-3.5 cursor-pointer shrink-0"
-                        onClick={(e) => e.stopPropagation()}
-                      />
-                      <div className="flex flex-col min-w-0">
-                        <span className="font-bold text-[11px] truncate">{day}</span>
-                        <span className={`text-[9px] font-semibold mt-0.5 leading-none ${isRest ? 'text-zinc-600' : 'text-emerald-500'}`}>
-                          {summaryText}
-                        </span>
-                      </div>
-                    </div>
-                    {dayExercises.length > 0 && isDayActive && (
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          if (confirm(`Voulez-vous vider la séance de ${day} ?`)) {
-                            handleClearDay(day);
-                          }
-                        }}
-                        className="opacity-0 group-hover:opacity-100 text-[9px] text-zinc-550 hover:text-red-400 font-bold px-1.5 py-0.5 rounded hover:bg-zinc-900 transition-all cursor-pointer shrink-0"
-                      >
-                        Vider
-                      </button>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
+            <DayPillSelector
+              blueprint={blueprint}
+              toggledDays={toggledDays}
+              selectedDay={selectedDay}
+              onSelectDay={setSelectedDay}
+              simulation={simulationResult}
+            />
           </div>
 
           {/* 2. Blueprints Section (Compact: 2 last used, plus Gérer button) */}
@@ -673,7 +616,7 @@ export default function Home() {
         {viewMode === 'day' ? (
           <>
             {/* Upper Portion: SVG Anatomical Avatar — fixed height, no scroll */}
-            <div className="w-full flex justify-center shrink-0 h-[340px] sm:h-[380px] md:h-[45vh] min-h-[280px]">
+            <div className="w-full flex justify-center shrink-0 h-[340px] sm:h-[380px] md:h-[45vh] min-h-[280px]" data-onboard="avatar">
               <div className="w-full h-full max-w-5xl bg-zinc-950 border border-zinc-900 rounded-xl overflow-hidden flex flex-col">
                 <HumanAvatar 
                   simulation={simulationResult} 
@@ -690,34 +633,42 @@ export default function Home() {
             </div>
 
             {/* Lower Portion: Sequencer — takes remaining space and scrolls internally */}
-            <div className="flex flex-col flex-1 min-h-0">
+            <div className="flex flex-col flex-1 min-h-0" data-onboard="sequencer">
               <div className="flex items-center justify-between pb-3 shrink-0">
                 <h3 className="text-sm font-bold tracking-wider uppercase text-zinc-400 flex items-center gap-2">
                   <svg className="h-4 w-4 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                   </svg>
-                  Séquenceur Quotidien
+                  Séquenceur — {selectedDay}
                 </h3>
               </div>
 
-              <Sequencer
-                blueprint={blueprint}
-                toggledDays={toggledDays}
-                onUpdateExercise={handleUpdateExercise}
-                onDeleteExercise={handleDeleteExercise}
-                onReorderExercises={handleReorderExercises}
-                onClearDay={handleClearDay}
-                onUpdateToggledDays={setToggledDays}
-                selectedDay={selectedDay}
-                onSelectDay={setSelectedDay}
-                onAddExercise={handleAddExercise}
-                simulation={simulationResult}
-                exercises={exercises}
-                onLoadTemplate={handleLoadTemplate}
-                onHoverExerciseChange={setHoveredExercise}
-                selectedExercise={selectedExercise}
-                onSelectExercise={setSelectedExercise}
-              />
+              {/* Empty Day State */}
+              {(blueprint[selectedDay] || []).filter(e => e.active).length === 0 ? (
+                <EmptyDayState
+                  day={selectedDay}
+                  onOpenLibrary={() => setLibraryOpen(true)}
+                />
+              ) : (
+                <Sequencer
+                  blueprint={blueprint}
+                  toggledDays={toggledDays}
+                  onUpdateExercise={handleUpdateExercise}
+                  onDeleteExercise={handleDeleteExercise}
+                  onReorderExercises={handleReorderExercises}
+                  onClearDay={handleClearDay}
+                  onUpdateToggledDays={setToggledDays}
+                  selectedDay={selectedDay}
+                  onSelectDay={setSelectedDay}
+                  onAddExercise={handleAddExercise}
+                  simulation={simulationResult}
+                  exercises={exercises}
+                  onLoadTemplate={handleLoadTemplate}
+                  onHoverExerciseChange={setHoveredExercise}
+                  selectedExercise={selectedExercise}
+                  onSelectExercise={setSelectedExercise}
+                />
+              )}
             </div>
             {/* Library Toggle Button (Only in Day mode) */}
             <button
@@ -793,6 +744,7 @@ export default function Home() {
                 
                 {/* Right Portion: Analytics Dashboard — 68% width */}
                 <div className="flex-1 min-w-0 h-full overflow-y-auto">
+                  <WeekScoreHeader simulation={simulationResult} blueprint={blueprint} toggledDays={toggledDays} />
                   <WeekDashboard simulation={simulationResult} blueprint={blueprint} toggledDays={toggledDays} />
                 </div>
               </>
