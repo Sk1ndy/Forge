@@ -95,6 +95,7 @@ export const emptySimulationResult: SimulationResult = {
   cnsFailure: false,
   junkVolumeAlerts: [],
   globalWorkCapacity: 100,
+  systemicReadiness: 100,
   topSurcharged: [],
   topNeglected: [],
   pushPullLegsRatio: { push: 0, pull: 0, legs: 0 },
@@ -706,6 +707,7 @@ export function runWeeklySimulation(
     cnsFailure,
     junkVolumeAlerts,
     globalWorkCapacity,
+    systemicReadiness: globalWorkCapacity,
     topSurcharged,
     topNeglected,
     pushPullLegsRatio: {

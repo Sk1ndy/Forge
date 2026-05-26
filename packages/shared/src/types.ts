@@ -113,6 +113,7 @@ export interface SimulationResult {
   cnsFailure: boolean;
   junkVolumeAlerts: string[]; // Alertes de junk volume basées sur l'INOL de la séance
   globalWorkCapacity: number; // Capacité de travail systémique restante (0-100)
+  systemicReadiness: number; // Score gamifié de Readiness globale (0-100)
   topSurcharged: MuscleStatus[];
   topNeglected: MuscleStatus[];
   pushPullLegsRatio: { push: number; pull: number; legs: number };

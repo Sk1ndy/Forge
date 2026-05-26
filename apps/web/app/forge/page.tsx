@@ -28,6 +28,7 @@ import LibraryDrawer from '@/components/simulator/LibraryDrawer';
 import CalibrageModal from '@/components/simulator/CalibrageModal';
 import BlueprintsModal from '@/components/simulator/BlueprintsModal';
 import WeekDashboard from '@/components/simulator/WeekDashboard';
+import ReadinessGauge from '@/components/simulator/ReadinessGauge';
 import { toPng } from 'html-to-image';
 import dynamic from 'next/dynamic';
 
@@ -440,35 +441,8 @@ export default function Home() {
             </div>
           </div>
 
-          {/* Jauge SNC (Central Nervous System) */}
-          <div className="space-y-3 p-3.5 border border-zinc-900 bg-zinc-950/60 rounded-xl relative overflow-hidden">
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-bold text-zinc-300 uppercase tracking-wider flex items-center gap-1.5">
-                <svg className="h-3.5 w-3.5 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                </svg>
-                Stress Global (SNC)
-              </span>
-              <span className={`text-xs font-black ${simulationResult.cnsFailure ? 'text-red-400' : 'text-emerald-400'}`}>
-                {simulationResult.sncScore} / {profile.maxSnc}
-              </span>
-            </div>
-            
-            {/* Progress Bar Container */}
-            <div className="w-full h-3 rounded-full bg-zinc-900 overflow-hidden border border-zinc-850 p-0.5">
-              <div
-                className={`h-full rounded-full transition-all duration-500 ${getSncColorClass(simulationResult.sncPercentage)}`}
-                style={{ width: `${simulationResult.sncPercentage}%` }}
-              />
-            </div>
-
-            <div className="flex justify-between items-center text-[10px] text-zinc-500 mt-1">
-              <span>Niveau de stress : <span className="text-zinc-300 font-bold">{simulationResult.sncPercentage}%</span></span>
-              {simulationResult.cnsFailure && (
-                <span className="text-red-400 font-extrabold tracking-widest animate-pulse">SATURE</span>
-              )}
-            </div>
-          </div>
+          {/* Gamified Readiness Score (Replacing raw SNC) */}
+          <ReadinessGauge score={simulationResult.systemicReadiness} />
 
           {/* 1. Planning Hebdomadaire (Day Selector moved from middle rail) */}
           <div className="space-y-3 p-3.5 border border-zinc-900 bg-zinc-950/60 rounded-xl">
