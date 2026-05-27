@@ -269,7 +269,7 @@ export async function deleteBlueprint(id: string): Promise<boolean> {
     try {
       const { error } = await supabaseClient
         .from('blueprints')
-        .delete()
+        .update({ deleted_at: new Date().toISOString() })
         .eq('id', id);
 
       if (error) {

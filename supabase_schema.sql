@@ -84,3 +84,78 @@ CREATE POLICY "Users can delete their own logs"
 CREATE INDEX idx_workout_sessions_user_id ON public.workout_sessions(user_id);
 CREATE INDEX idx_exercise_logs_user_id ON public.exercise_logs(user_id);
 CREATE INDEX idx_exercise_logs_session_id ON public.exercise_logs(session_id);
+
+-- 3. Table: users (Profiles)
+CREATE TABLE IF NOT EXISTS public.users (
+    id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
+    pdc NUMERIC DEFAULT 75,
+    pr_squat NUMERIC DEFAULT 100,
+    pr_bench NUMERIC DEFAULT 80,
+    pr_deadlift NUMERIC DEFAULT 120,
+    pr_ohp NUMERIC DEFAULT 50,
+    max_snc NUMERIC DEFAULT 15.0,
+    age INTEGER DEFAULT 28,
+    sleep_hours NUMERIC DEFAULT 8,
+    caloric_status TEXT DEFAULT 'maintenance',
+    stress_level TEXT DEFAULT 'moderate',
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+ALTER TABLE public.users ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Users can view their own profile" ON public.users FOR SELECT USING (auth.uid() = id);
+CREATE POLICY "Users can insert their own profile" ON public.users FOR INSERT WITH CHECK (auth.uid() = id);
+CREATE POLICY "Users can update their own profile" ON public.users FOR UPDATE USING (auth.uid() = id) WITH CHECK (auth.uid() = id);
+
+-- 4. Table: blueprints
+CREATE TABLE IF NOT EXISTS public.blueprints (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+    nom TEXT NOT NULL,
+    state JSONB NOT NULL,
+    deleted_at TIMESTAMP WITH TIME ZONE,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+ALTER TABLE public.blueprints ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Users can view their own non-deleted blueprints" ON public.blueprints FOR SELECT USING (auth.uid() = user_id AND deleted_at IS NULL);
+CREATE POLICY "Users can insert their own blueprints" ON public.blueprints FOR INSERT WITH CHECK (auth.uid() = user_id);
+CREATE POLICY "Users can update their own blueprints" ON public.blueprints FOR UPDATE USING (auth.uid() = user_id) WITH CHECK (auth.uid() = user_id);
+-- For soft deletes, users update deleted_at. Real deletes are possible but soft delete is preferred.
+CREATE POLICY "Users can delete their own blueprints" ON public.blueprints FOR DELETE USING (auth.uid() = user_id);
+
+-- Add total_tonnage to workout_sessions
+ALTER TABLE public.workout_sessions ADD COLUMN IF NOT EXISTS total_tonnage NUMERIC DEFAULT 0;
+
+-- Trigger Function: Update session tonnage
+CREATE OR REPLACE FUNCTION update_session_tonnage()
+RETURNS TRIGGER AS $$
+BEGIN
+    IF (TG_OP = 'DELETE') THEN
+        UPDATE public.workout_sessions
+        SET total_tonnage = (
+            SELECT COALESCE(SUM(actual_weight * actual_reps), 0)
+            FROM public.exercise_logs
+            WHERE session_id = OLD.session_id AND is_completed = true
+        )
+        WHERE id = OLD.session_id;
+        RETURN OLD;
+    ELSE
+        UPDATE public.workout_sessions
+        SET total_tonnage = (
+            SELECT COALESCE(SUM(actual_weight * actual_reps), 0)
+            FROM public.exercise_logs
+            WHERE session_id = NEW.session_id AND is_completed = true
+        )
+        WHERE id = NEW.session_id;
+        RETURN NEW;
+    END IF;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Trigger: On exercise_logs insert/update/delete
+DROP TRIGGER IF EXISTS trigger_update_session_tonnage ON public.exercise_logs;
+CREATE TRIGGER trigger_update_session_tonnage
+AFTER INSERT OR UPDATE OF actual_weight, actual_reps, is_completed OR DELETE
+ON public.exercise_logs
+FOR EACH ROW
+EXECUTE FUNCTION update_session_tonnage();
