@@ -230,7 +230,7 @@ const PDFReport = ({ simulation, blueprint, avatarImageStr, toggledDays }: PDFRe
 
         {DAYS_ORDER.map((day) => {
           const isToggledOn = !toggledDays || toggledDays[day] !== false;
-          const dayExercises = blueprint[day] || [];
+          const dayExercises = blueprint[day as keyof typeof blueprint] || [];
           const activeExercises = dayExercises.filter(ex => ex.active);
           
           if (!isToggledOn || activeExercises.length === 0) return null;

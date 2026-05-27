@@ -81,7 +81,7 @@ export default function SocialExportPoster({
         <h3 className="text-xl font-black text-white mb-6 uppercase tracking-wider">Programme Détaillé</h3>
         <div className="grid grid-cols-7 gap-4">
           {['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche'].map((day) => {
-            const dayPlan = blueprint[day] || [];
+            const dayPlan = blueprint[day as keyof typeof blueprint] || [];
             // Si la journée est désactivée via toggledDays, on la considère comme vide
             const isActiveDay = toggledDays[day] !== false;
             const activeExs = isActiveDay ? dayPlan.filter((ex) => ex.active) : [];

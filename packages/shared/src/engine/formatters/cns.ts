@@ -1,4 +1,4 @@
-import { MuscleId } from '../../../types';
+import { MuscleId } from '../../types';
 import { MusclesMap } from '../core/state';
 
 export function calculateGlobalWorkCapacity(

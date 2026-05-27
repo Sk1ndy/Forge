@@ -41,7 +41,7 @@ export default function DayPillSelector({
       style={{ scrollSnapType: 'x mandatory', WebkitOverflowScrolling: 'touch' }}
     >
       {DAYS.map((day, i) => {
-        const exercises = blueprint[day] || [];
+        const exercises = blueprint[day as keyof typeof blueprint] || [];
         const active = exercises.filter(e => e.active);
         const totalSets = active.reduce(
           (sum, ex) => sum + ex.sets.reduce((s, set) => s + (set.active ? set.series : 0), 0),

@@ -60,7 +60,7 @@ export default function BlueprintsModal({
               const isActive = activeBlueprintId === sb.id;
               
               // Calculate day summaries/count of exercises to show helpful metadata
-              const daysCount = Object.keys(sb.blueprint).filter(day => sb.blueprint[day].length > 0).length;
+              const daysCount = Object.keys(sb.blueprint).filter(day => (sb.blueprint[day as keyof typeof sb.blueprint] || []).length > 0).length;
               const totalExCount = Object.values(sb.blueprint).reduce((sum, exs) => sum + exs.length, 0);
 
               return (

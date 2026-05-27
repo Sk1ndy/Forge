@@ -42,7 +42,7 @@ export default function WorkPage() {
   }
 
   const daysOfWeek = ['lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi', 'dimanche'];
-  const dayPlan: PlannedExercise[] = blueprint[selectedDay] || [];
+  const dayPlan: PlannedExercise[] = blueprint[selectedDay as keyof typeof blueprint] || [];
 
   const handleSuggest = async (exerciseId: string, idx: number) => {
     const log = await getLatestExerciseLog(exerciseId);
@@ -70,7 +70,7 @@ export default function WorkPage() {
     // mais pour simplifier ici on enverra sans session_id si non implémenté.
     const success = await saveExerciseLog({
       exercise_id: exerciseId,
-      day: selectedDay,
+      day: selectedDay as 'Lundi' | 'Mardi' | 'Mercredi' | 'Jeudi' | 'Vendredi' | 'Samedi' | 'Dimanche',
       set_index: 0, // Simplified: needs real set tracking later
       actual_reps: currentInput.reps,
       actual_weight: currentInput.weight,

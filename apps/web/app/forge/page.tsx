@@ -245,14 +245,14 @@ export default function Home() {
 
     setBlueprint(prev => ({
       ...prev,
-      [day]: [...(prev[day] || []), newPlannedEx]
+      [day]: [...(prev[day as keyof typeof prev] || []), newPlannedEx]
     }));
   }, [exercises, simulationResult]);
 
   // Mises à jour d'état robustes (évite les stale closures de blueprint)
   const handleUpdateExercise = useCallback((day: string, index: number, updatedEx: PlannedExercise) => {
     setBlueprint(prev => {
-      const updatedDayExercises = [...(prev[day] || [])];
+      const updatedDayExercises = [...(prev[day as keyof typeof prev] || [])];
       updatedDayExercises[index] = updatedEx;
       return {
         ...prev,
@@ -263,7 +263,7 @@ export default function Home() {
 
   const handleReorderExercises = useCallback((day: string, startIndex: number, endIndex: number) => {
     setBlueprint(prev => {
-      const updatedDayExercises = [...(prev[day] || [])];
+      const updatedDayExercises = [...(prev[day as keyof typeof prev] || [])];
       const [moved] = updatedDayExercises.splice(startIndex, 1);
       updatedDayExercises.splice(endIndex, 0, moved);
       return {
@@ -275,7 +275,7 @@ export default function Home() {
 
   const handleDeleteExercise = useCallback((day: string, index: number) => {
     setBlueprint(prev => {
-      const updatedDayExercises = (prev[day] || []).filter((_, i) => i !== index);
+      const updatedDayExercises = (prev[day as keyof typeof prev] || []).filter((_, i) => i !== index);
       return {
         ...prev,
         [day]: updatedDayExercises
@@ -653,7 +653,7 @@ export default function Home() {
               </div>
 
               {/* Empty Day State */}
-              {(blueprint[selectedDay] || []).filter(e => e.active).length === 0 ? (
+              {(blueprint[selectedDay as keyof typeof blueprint] || []).filter(e => e.active).length === 0 ? (
                 <EmptyDayState
                   day={selectedDay}
                   onOpenLibrary={() => setLibraryOpen(true)}

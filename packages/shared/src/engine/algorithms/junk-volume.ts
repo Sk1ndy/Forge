@@ -3,7 +3,7 @@ import { MUSCLE_DETAILS } from '../../constants';
 
 export function calculateJunkVolumeAlerts(
   dailyInol: Record<string, number>, 
-  finalMuscles: Record<MuscleId, MuscleStatus | undefined>
+  finalMuscles: { [key in MuscleId]?: MuscleStatus }
 ): string[] {
   const alerts: string[] = [];
   Object.entries(dailyInol).sort((a, b) => b[1] - a[1]).forEach(([id, inolScore]) => {

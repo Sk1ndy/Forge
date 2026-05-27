@@ -1,7 +1,7 @@
 import { WeeklyBlueprint, UserProfile, ExerciseLog, Exercise, PlannedSetSchema } from '../../types';
-import { DEFAULT_EXERCISE_TENSION_MATRICES, MUSCLE_FATIGUE_DECAY } from '../../constants';
+import { DEFAULT_EXERCISE_TENSION_MATRICES, MUSCLE_FATIGUE_DECAY, FITNESS_RETENTION_RATE } from '../../constants';
 import { createInitialState, createLightSnapshot, aggregateMuscle, MusclesMap } from './state';
-import { calculateRecoveryProfile, getProgressionMultiplier, normalize, FITNESS_RETENTION_RATE } from '../biomechanics/physiology';
+import { calculateRecoveryProfile, getProgressionMultiplier, normalize } from '../biomechanics/physiology';
 import { calculateSetImpact } from '../biomechanics/impact';
 import { calculateInjuryPredictions } from '../algorithms/injury';
 
@@ -87,7 +87,7 @@ export function* executeSimulationGenerator(
       sncFatigue = normalize(sncFatigue * (isDeload ? 0.40 : 0.55));
 
       if (toggledDays[day] !== false) {
-        const plannedExercises = blueprint[day] || [];
+        const plannedExercises = blueprint[day as keyof typeof blueprint] || [];
         plannedExercises.forEach(plannedEx => {
           if (!plannedEx.active) return;
 

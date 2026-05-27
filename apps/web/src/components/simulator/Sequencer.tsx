@@ -86,7 +86,7 @@ export default function Sequencer({
 
   // Helper to calculate summary for a day
   const getDaySummary = useCallback((day: string) => {
-    const exercises = blueprint[day] || [];
+    const exercises = blueprint[day as keyof typeof blueprint] || [];
     const isDayActive = toggledDays[day] !== false;
     
     if (!isDayActive) {
@@ -112,7 +112,7 @@ export default function Sequencer({
 
   // Safe selected day fallback (ensure a day is always selected)
   const currentDay = selectedDay || 'Dimanche';
-  const currentExercises = useMemo(() => blueprint[currentDay] || [], [blueprint, currentDay]);
+  const currentExercises = useMemo(() => blueprint[currentDay as keyof typeof blueprint] || [], [blueprint, currentDay]);
   const isCurrentDayActive = toggledDays[currentDay] !== false;
   const currentSummary = useMemo(() => getDaySummary(currentDay), [getDaySummary, currentDay]);
 
