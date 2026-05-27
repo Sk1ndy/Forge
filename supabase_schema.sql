@@ -89,9 +89,9 @@ CREATE POLICY "Users can delete their own logs"
     USING (auth.uid() = user_id);
 
 -- Indexes for fast querying
-CREATE INDEX idx_workout_sessions_user_id ON public.workout_sessions(user_id);
-CREATE INDEX idx_exercise_logs_user_id ON public.exercise_logs(user_id);
-CREATE INDEX idx_exercise_logs_session_id ON public.exercise_logs(session_id);
+CREATE INDEX IF NOT EXISTS idx_workout_sessions_user_id ON public.workout_sessions(user_id);
+CREATE INDEX IF NOT EXISTS idx_exercise_logs_user_id ON public.exercise_logs(user_id);
+CREATE INDEX IF NOT EXISTS idx_exercise_logs_session_id ON public.exercise_logs(session_id);
 
 -- 3. Table: users (Profiles)
 CREATE TABLE IF NOT EXISTS public.users (
