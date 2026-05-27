@@ -4,6 +4,15 @@
 -- =====================================================================================
 
 -- ─────────────────────────────────────────────────────────────────────────────────
+-- 0. CLEANUP (Drop existing tables to ensure a clean reset)
+-- ─────────────────────────────────────────────────────────────────────────────────
+DROP TABLE IF EXISTS public.exercise_logs CASCADE;
+DROP TABLE IF EXISTS public.workout_sessions CASCADE;
+DROP TABLE IF EXISTS public.blueprints CASCADE;
+DROP TABLE IF EXISTS public.exercises CASCADE;
+DROP TABLE IF EXISTS public.users CASCADE;
+
+-- ─────────────────────────────────────────────────────────────────────────────────
 -- 1. USERS (Profiles)
 -- ─────────────────────────────────────────────────────────────────────────────────
 CREATE TABLE public.users (
