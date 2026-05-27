@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { runWeeklySimulationAsync, runWeeklySimulation } from '../engine';
+import { runMesocycleSimulation, runWeeklySimulationAsync } from '../engine';
 import { UserProfile, WeeklyBlueprint, Exercise } from '../types';
 
 const mockProfile: UserProfile = {
@@ -17,57 +17,91 @@ const mockLibrary: Exercise[] = [
   {
     id: 'bench_press',
     nom: 'Développé Couché',
-    description: '',
-    instructions: [],
     equipment: 'poids_libre',
     muscle_primaire: 'chest',
     muscles_secondaires: ['frontDeltoid', 'triceps'],
     tension_matrix: { chest: 1.0, frontDeltoid: 0.5, triceps: 0.5 },
-    systemic_fatigue_factor: 1.0,
-    poids_pdc_factor: 0,
     tier_snc: 2,
-    video_url: '',
     ppl_category: 'push',
-    biomechanics: { rom: 'normal', stability: 'moderate', movement_plane: 'horizontal' },
-    joint_stressors: []
-  }
+  } as Exercise
 ];
 
-const mockBlueprint: WeeklyBlueprint = {
+const heavyBlueprint: WeeklyBlueprint = {
   Lundi: [{
     id: 'ex1',
     exerciseId: 'bench_press',
     active: true,
-    sets: [{ active: true, type: 'work', reps: 10, poids: 80, rpe: 8, series: 3 }]
+    sets: [{ active: true, series: 10, reps: 5, poids: 95, rpe: 10 }]
+  }],
+  Mardi: [{
+    id: 'ex2',
+    exerciseId: 'bench_press',
+    active: true,
+    sets: [{ active: true, series: 10, reps: 5, poids: 95, rpe: 10 }]
+  }],
+  Mercredi: [{
+    id: 'ex3',
+    exerciseId: 'bench_press',
+    active: true,
+    sets: [{ active: true, series: 10, reps: 5, poids: 95, rpe: 10 }]
+  }],
+  Jeudi: [], Vendredi: [], Samedi: [], Dimanche: []
+};
+
+const normalBlueprint: WeeklyBlueprint = {
+  Lundi: [{
+    id: 'ex1',
+    exerciseId: 'bench_press',
+    active: true,
+    sets: [{ active: true, series: 3, reps: 10, poids: 80, rpe: 8 }]
   }],
   Mardi: [], Mercredi: [], Jeudi: [], Vendredi: [], Samedi: [], Dimanche: []
 };
 
-describe('engine math simulation', () => {
-  it('runWeeklySimulation génère un résultat valide (synchronous)', () => {
-    const result = runWeeklySimulation(mockBlueprint, mockProfile, {}, undefined, mockLibrary);
+describe('Engine: Phase 2 (Mesocycle Algorithms)', () => {
+  it('Progressive Overload: auto-increments future unlogged sets', () => {
+    const result = runMesocycleSimulation(normalBlueprint, mockProfile, {}, undefined, mockLibrary, 4, []);
     
-    expect(result.sncScore).toBeGreaterThan(0);
-    expect(result.muscles.chest).toBeDefined();
-    expect(['grey', 'green', 'orange']).toContain(result.muscles.chest?.color);
+    expect(result.progressiveOverload.chest).toBeDefined();
+    expect(result.progressiveOverload.chest.weekOverWeekGrowthPct).toBeGreaterThan(5);
   });
 
-  it('runWeeklySimulationAsync renvoie le même résultat', async () => {
-    const syncResult = runWeeklySimulation(mockBlueprint, mockProfile, {}, undefined, mockLibrary);
-    const asyncResult = await runWeeklySimulationAsync(mockBlueprint, mockProfile, {}, undefined, mockLibrary);
+  it('Deload: reduces fatigue and overload automatically', () => {
+    const normalResult = runMesocycleSimulation(normalBlueprint, mockProfile, {}, undefined, mockLibrary, 4, []);
+    const deloadResult = runMesocycleSimulation(normalBlueprint, mockProfile, {}, undefined, mockLibrary, 4, [4]);
     
-    expect(asyncResult.sncScore).toBe(syncResult.sncScore);
-    expect(asyncResult.muscles.chest?.inol).toBe(syncResult.muscles.chest?.inol);
+    // Remaining capacity should be HIGHER in the deload result
+    expect(deloadResult.muscles.chest!.remainingCapacity).toBeGreaterThan(normalResult.muscles.chest!.remainingCapacity);
   });
 
-  it('ne crashe pas avec un blueprint vide', async () => {
+  it('Injury Prediction: detects DANGER state sustained for >= 3 weeks', () => {
+    // 4 weeks of heavy RPE 10 every day will certainly trigger injury prediction
+    const result = runMesocycleSimulation(heavyBlueprint, mockProfile, {}, undefined, mockLibrary, 4, []);
+    
+    expect(result.injuryPredictions.length).toBeGreaterThan(0);
+    expect(result.injuryPredictions[0]).toContain('Pectoraux');
+  });
+
+  it('Monotony: detects robotic flat intensity across a week', () => {
+    const monotonousBlueprint: WeeklyBlueprint = {
+      Lundi: [{ id: 'ex', exerciseId: 'bench_press', active: true, sets: [{ active: true, series: 3, reps: 10, poids: 80, rpe: 8 }] }],
+      Mardi: [{ id: 'ex', exerciseId: 'bench_press', active: true, sets: [{ active: true, series: 3, reps: 10, poids: 80, rpe: 8 }] }],
+      Mercredi: [{ id: 'ex', exerciseId: 'bench_press', active: true, sets: [{ active: true, series: 3, reps: 10, poids: 80, rpe: 8 }] }],
+      Jeudi: [], Vendredi: [], Samedi: [], Dimanche: []
+    };
+
+    const result = runMesocycleSimulation(monotonousBlueprint, mockProfile, {}, undefined, mockLibrary, 1, []);
+    expect(result.monotonyAlerts.length).toBeGreaterThan(0);
+    expect(result.monotonyAlerts[0]).toContain('Monotonie critique détectée');
+  });
+
+  it('Backward compatibility: empty blueprint does not crash', async () => {
     const emptyBlueprint: WeeklyBlueprint = {
       Lundi: [], Mardi: [], Mercredi: [], Jeudi: [], Vendredi: [], Samedi: [], Dimanche: []
     };
     
     const result = await runWeeklySimulationAsync(emptyBlueprint, mockProfile, {}, undefined, mockLibrary);
     expect(result.sncScore).toBe(0);
-    // Au repos total, le chest devrait être au statut REST (grey) avec 0 fatigue
     expect(result.muscles.chest?.color).toBe('grey');
   });
 });

@@ -31,4 +31,7 @@ export interface SimulationResult {
   pushPullLegsRatio: { push: number; pull: number; legs: number };
   weeklyMacro: WeeklyMacro;
   weeklyTraumas: WeeklyTrauma[];
+  progressiveOverload: { [muscleId: string]: { weekOverWeekGrowthPct: number } };
+  injuryPredictions: string[]; // Alertes si un muscle est en DANGER (rouge) > 3 semaines
+  monotonyAlerts: string[]; // Alertes de faible variance de l'intensité inter-jours
 }
