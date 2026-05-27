@@ -1,25 +1,22 @@
 import { PlannedSet, Exercise, UserProfile, UserPRs } from '../../types';
+import { BiomechanicsConfig } from '../config';
 
 export function estimate1RM(weight: number, reps: number, rpe: number): number {
-  if (reps <= 0 || weight < 0) return 0;
-  const rpeDiff = 10 - Math.min(10, Math.max(0, rpe));
-  const effectiveReps = reps + rpeDiff;
+  if (reps <= 0 || weight <= 0) return 0;
+  // RIR = 10 - RPE. 
+  // Effective reps = reps actually done + reps in reserve
+  const rir = Math.max(0, 10 - rpe);
+  const effectiveReps = reps + rir;
   
-  if (effectiveReps <= 1) return weight;
-  
-  if (effectiveReps > 10) {
-    const denom = 1.0278 - (0.0278 * effectiveReps);
-    return weight / Math.max(0.1, denom);
-  }
-  
+  // Epley Formula: 1RM = weight * (1 + reps / 30)
   return weight * (1 + effectiveReps / 30);
 }
 
 export function getApplicable1RM(exerciseId: string, userPrs: UserPRs, weight: number, reps: number, rpe: number): number {
-  if (exerciseId === 'squat') return userPrs.squat || estimate1RM(weight, reps, rpe);
-  if (exerciseId === 'bench_press') return userPrs.bench || estimate1RM(weight, reps, rpe);
-  if (exerciseId === 'deadlift') return userPrs.deadlift || estimate1RM(weight, reps, rpe);
-  if (exerciseId === 'ohp') return userPrs.ohp || estimate1RM(weight, reps, rpe);
+  if (exerciseId === 'squat' && userPrs.squat) return Math.max(userPrs.squat, estimate1RM(weight, reps, rpe));
+  if (exerciseId === 'bench_press' && userPrs.bench) return Math.max(userPrs.bench, estimate1RM(weight, reps, rpe));
+  if (exerciseId === 'deadlift' && userPrs.deadlift) return Math.max(userPrs.deadlift, estimate1RM(weight, reps, rpe));
+  if (exerciseId === 'ohp' && userPrs.ohp) return Math.max(userPrs.ohp, estimate1RM(weight, reps, rpe));
   return estimate1RM(weight, reps, rpe);
 }
 
@@ -27,7 +24,7 @@ export function calculateSetImpact(
   set: PlannedSet,
   exercise: Exercise,
   profile: UserProfile,
-  isBeginner: boolean = false
+  config: BiomechanicsConfig
 ): { inol: number; sncPoints: number } {
   if (!set.active || set.series <= 0 || set.reps <= 0) {
     return { inol: 0, sncPoints: 0 };
@@ -47,21 +44,29 @@ export function calculateSetImpact(
 
   const pr = getApplicable1RM(exercise.id, profile.prs, effectiveWeight, safeReps, safeRpe);
   let intensity = 70;
-  if (pr > 0) intensity = (effectiveWeight / pr) * 100;
-  intensity = Math.min(99, Math.max(10, intensity));
+  if (pr > 0) {
+    intensity = (effectiveWeight / pr) * 100;
+  }
+  // Clamp intensity to realistic bounds for INOL
+  intensity = Math.min(99.9, Math.max(30, intensity));
 
-  const clampedRpe = isBeginner ? Math.min(8, safeRpe) : Math.min(10, Math.max(5, safeRpe));
-  const rpeFactor = Math.pow(1.35, clampedRpe - 10);
-  const inolIntensity = Math.min(95, Math.max(10, intensity));
-  const baseInol = safeReps / (100 - inolIntensity);
-  let totalInol = baseInol * rpeFactor * safeSeries;
+  // True Prilepin/Hristov INOL formula: sets * reps / (100 - intensity)
+  // Example: 3 sets of 5 at 80% = 15 / 20 = 0.75 INOL
+  const baseInol = (safeSeries * safeReps) / (100 - intensity);
+  
+  // Beginners get a multiplier to reflect lower adaptation capacity
+  let totalInol = baseInol;
+  if (profile.isBeginner) totalInol *= 1.2;
 
-  if (isBeginner) totalInol *= 1.2;
-
+  // CNS impact uses actual weight relative to bodyweight, tier, and RPE exponential scaling
   const weightRatio = effectiveWeight / safePdc;
-  let sncMultiplier = exercise.tier_snc === 1 ? 1.0 : (exercise.tier_snc === 2 ? 0.5 : 0.05);
-  if (exercise.id === 'deadlift') sncMultiplier *= 1.4;
+  let sncTierMultiplier = exercise.tier_snc === 1 ? 1.0 : (exercise.tier_snc === 2 ? 0.5 : 0.05);
+  if (exercise.id === 'deadlift') sncTierMultiplier *= 1.4;
 
-  const sncPoints = weightRatio * sncMultiplier * rpeFactor * safeSeries * 1.2;
+  const rpeStressFactor = Math.pow(1.35, safeRpe - 10);
+  
+  // CNS Resilience injected from ML-ready config
+  const sncPoints = (weightRatio * sncTierMultiplier * rpeStressFactor * safeSeries) / config.cnsResilience;
+  
   return { inol: totalInol, sncPoints };
 }

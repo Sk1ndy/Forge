@@ -1,0 +1,70 @@
+import { UserProfile } from '../types';
+
+export interface BiomechanicsConfig {
+  /** Decay time constant for fitness (in days). Usually longer than fatigue (e.g. 45 days) */
+  tauFitness: number;
+  
+  /** Decay time constant for fatigue (in days). Usually shorter than fitness (e.g. 15 days) */
+  tauFatigue: number;
+  
+  /** Multiplier for fitness impact on performance */
+  k1: number;
+  
+  /** Multiplier for fatigue impact on performance */
+  k2: number;
+  
+  /** Recovery rate multiplier (1.0 = baseline). Derived from sleep, age, nutrition. */
+  recoveryRate: number;
+  
+  /** Systemic (CNS) resilience factor. Defines how well the user handles high-tier exercises. */
+  cnsResilience: number;
+}
+
+/**
+ * Generates a BiomechanicsConfig based on a user profile.
+ * In the future, a Machine Learning model can inject a custom config here
+ * based on the user's historical data instead of static rules.
+ */
+export function generateBiomechanicsConfig(profile: UserProfile): BiomechanicsConfig {
+  const userAge = profile.age ?? 28;
+  const userSleep = profile.sleepHours ?? 8;
+  const userCaloric = profile.caloricStatus ?? 'maintenance';
+  const userStress = profile.stressLevel ?? 'moderate';
+
+  // 1. Calculate Recovery Rate (Baseline 1.0)
+  let recoveryRate = 1.0;
+  if (userAge > 40) recoveryRate *= Math.max(0.70, 1 - (userAge - 40) * 0.01);
+  if (userSleep < 7.5) recoveryRate *= Math.max(0.60, 0.60 + (userSleep / 7.5) * 0.40);
+  else if (userSleep >= 9) recoveryRate *= 1.05;
+  if (userCaloric === 'deficit') recoveryRate *= 0.80;
+  else if (userCaloric === 'surplus') recoveryRate *= 1.05;
+  if (userStress === 'high') recoveryRate *= 0.80;
+  else if (userStress === 'low') recoveryRate *= 1.05;
+
+  // 2. Determine Time Constants (Tau)
+  // Faster recovery = shorter tauFatigue, but also slightly shorter tauFitness
+  // A standard Banister model uses TauFitness = 45, TauFatigue = 15
+  const baseTauFitness = 45;
+  const baseTauFatigue = 15;
+
+  // If recovery is slow (rate < 1), fatigue takes longer to dissipate (larger tauFatigue)
+  const tauFatigue = baseTauFatigue / recoveryRate;
+  
+  // Fitness retention is also affected but to a lesser degree
+  const tauFitness = baseTauFitness * Math.sqrt(recoveryRate);
+
+  // 3. CNS Resilience
+  // Beginners have lower CNS resilience, older users might have lower resilience.
+  let cnsResilience = 1.0;
+  if (profile.isBeginner) cnsResilience = 0.8;
+  if (userAge > 50) cnsResilience *= 0.9;
+
+  return {
+    tauFitness,
+    tauFatigue,
+    k1: 1.0, // Base fitness weight
+    k2: 2.0, // Fatigue usually has a 2x immediate impact compared to fitness
+    recoveryRate,
+    cnsResilience
+  };
+}

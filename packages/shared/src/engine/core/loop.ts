@@ -1,9 +1,10 @@
 import { WeeklyBlueprint, UserProfile, ExerciseLog, Exercise, PlannedSetSchema } from '../../types';
 import { DEFAULT_EXERCISE_TENSION_MATRICES, MUSCLE_FATIGUE_DECAY, FITNESS_RETENTION_RATE } from '../../constants';
 import { createInitialState, createLightSnapshot, aggregateMuscle, MusclesMap } from './state';
-import { calculateRecoveryProfile, getProgressionMultiplier, normalize } from '../biomechanics/physiology';
+import { applyExponentialDecay, getProgressionMultiplier, normalize } from '../biomechanics/physiology';
 import { calculateSetImpact } from '../biomechanics/impact';
 import { calculateInjuryPredictions } from '../algorithms/injury';
+import { generateBiomechanicsConfig } from '../config';
 
 const DAYS_OF_WEEK = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche'];
 
@@ -17,7 +18,7 @@ export function* executeSimulationGenerator(
   deloadWeeks: number[],
   sessionLogs: ExerciseLog[] | undefined
 ) {
-  const recoveryMultiplier = calculateRecoveryProfile(profile);
+  const config = generateBiomechanicsConfig(profile);
   const musclesMap = createInitialState();
 
   let sncFatigue = 0;
@@ -69,22 +70,28 @@ export function* executeSimulationGenerator(
       let dailySystemicLoad = 0;
 
       Object.keys(musclesMap).forEach(id => {
-        const baseDecay = (MUSCLE_FATIGUE_DECAY as any)[id] ?? 0.5;
-        const deloadBonus = isDeload ? 0.85 : 1.0; 
-        const adjustedDecay = Math.max(0.05, Math.min(0.98, baseDecay + (1 - recoveryMultiplier) * (1 - baseDecay))) * deloadBonus;
+        // True Banister Exponential Decay
+        musclesMap[id].fatigue = applyExponentialDecay(musclesMap[id].fatigue, config.tauFatigue, 1);
+        musclesMap[id].fitness = applyExponentialDecay(musclesMap[id].fitness, config.tauFitness, 1);
+        
+        // Joint stress takes ~1.5x longer to heal than muscle fatigue
+        musclesMap[id].jointStress = applyExponentialDecay((musclesMap[id].jointStress || 0), config.tauFatigue * 1.5, 1);
 
-        musclesMap[id].fatigue = normalize(musclesMap[id].fatigue * adjustedDecay);
-        musclesMap[id].fitness = normalize(musclesMap[id].fitness * FITNESS_RETENTION_RATE);
-        musclesMap[id].jointStress = normalize((musclesMap[id].jointStress || 0) * (isDeload ? 0.70 : 0.90));
+        if (isDeload) {
+          // Accelerated flush during deload
+          musclesMap[id].fatigue = normalize(musclesMap[id].fatigue * 0.85);
+          musclesMap[id].jointStress = normalize((musclesMap[id].jointStress || 0) * 0.90);
+        }
 
         if (musclesMap[id].contributions) {
           Object.keys(musclesMap[id].contributions).forEach(exNom => {
-            musclesMap[id].contributions[exNom] = normalize(musclesMap[id].contributions[exNom] * adjustedDecay);
+            musclesMap[id].contributions[exNom] = applyExponentialDecay(musclesMap[id].contributions[exNom], config.tauFatigue, 1);
           });
         }
       });
 
-      sncFatigue = normalize(sncFatigue * (isDeload ? 0.40 : 0.55));
+      sncFatigue = applyExponentialDecay(sncFatigue, config.tauFatigue, 1);
+      if (isDeload) sncFatigue = normalize(sncFatigue * 0.70);
 
       if (toggledDays[day] !== false) {
         const plannedExercises = blueprint[day as keyof typeof blueprint] || [];
@@ -122,7 +129,7 @@ export function* executeSimulationGenerator(
               }
             }
 
-            const impact = calculateSetImpact(validSet, exercise, profile, profile.isBeginner);
+            const impact = calculateSetImpact(validSet, exercise, profile, config);
             const overloadMultiplier = getProgressionMultiplier(week, isDeload, !!logMatch);
 
             const finalInol = impact.inol * overloadMultiplier;
@@ -146,10 +153,10 @@ export function* executeSimulationGenerator(
                 musclesMap[muscleId].inol = normalize((musclesMap[muscleId].inol || 0) + muscleLoad);
                 musclesMap[muscleId].weeklyInol[week] = (musclesMap[muscleId].weeklyInol[week] || 0) + muscleLoad;
                 
-                let adaptationMultiplier = 1.0;
+                let adaptationMultiplier = config.k1;
                 const currentFatigue = musclesMap[muscleId].fatigue;
                 if (currentFatigue > 1.5) {
-                  adaptationMultiplier = Math.max(0.0, 1.0 - (currentFatigue - 1.5) * 0.6);
+                  adaptationMultiplier = Math.max(0.0, config.k1 - (currentFatigue - 1.5) * config.k2);
                 }
                 musclesMap[muscleId].fitness = normalize(musclesMap[muscleId].fitness + muscleLoad * 0.5 * adaptationMultiplier);
                 
