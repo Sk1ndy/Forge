@@ -16,19 +16,23 @@ CREATE TABLE IF NOT EXISTS public.workout_sessions (
 ALTER TABLE public.workout_sessions ENABLE ROW LEVEL SECURITY;
 
 -- Policies for workout_sessions
+DROP POLICY IF EXISTS "Users can insert their own sessions" ON public.workout_sessions;
 CREATE POLICY "Users can insert their own sessions" 
     ON public.workout_sessions FOR INSERT 
     WITH CHECK (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Users can view their own sessions" ON public.workout_sessions;
 CREATE POLICY "Users can view their own sessions" 
     ON public.workout_sessions FOR SELECT 
     USING (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Users can update their own sessions" ON public.workout_sessions;
 CREATE POLICY "Users can update their own sessions" 
     ON public.workout_sessions FOR UPDATE 
     USING (auth.uid() = user_id)
     WITH CHECK (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Users can delete their own sessions" ON public.workout_sessions;
 CREATE POLICY "Users can delete their own sessions" 
     ON public.workout_sessions FOR DELETE 
     USING (auth.uid() = user_id);
@@ -63,19 +67,23 @@ ALTER TABLE public.exercise_logs ENABLE ROW LEVEL SECURITY;
 
 ALTER TABLE public.exercise_logs ADD COLUMN user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE;
 
+DROP POLICY IF EXISTS "Users can insert their own logs" ON public.exercise_logs;
 CREATE POLICY "Users can insert their own logs" 
     ON public.exercise_logs FOR INSERT 
     WITH CHECK (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Users can view their own logs" ON public.exercise_logs;
 CREATE POLICY "Users can view their own logs" 
     ON public.exercise_logs FOR SELECT 
     USING (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Users can update their own logs" ON public.exercise_logs;
 CREATE POLICY "Users can update their own logs" 
     ON public.exercise_logs FOR UPDATE 
     USING (auth.uid() = user_id)
     WITH CHECK (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Users can delete their own logs" ON public.exercise_logs;
 CREATE POLICY "Users can delete their own logs" 
     ON public.exercise_logs FOR DELETE 
     USING (auth.uid() = user_id);
@@ -102,8 +110,13 @@ CREATE TABLE IF NOT EXISTS public.users (
 );
 
 ALTER TABLE public.users ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Users can view their own profile" ON public.users;
 CREATE POLICY "Users can view their own profile" ON public.users FOR SELECT USING (auth.uid() = id);
+
+DROP POLICY IF EXISTS "Users can insert their own profile" ON public.users;
 CREATE POLICY "Users can insert their own profile" ON public.users FOR INSERT WITH CHECK (auth.uid() = id);
+
+DROP POLICY IF EXISTS "Users can update their own profile" ON public.users;
 CREATE POLICY "Users can update their own profile" ON public.users FOR UPDATE USING (auth.uid() = id) WITH CHECK (auth.uid() = id);
 
 -- 4. Table: blueprints
@@ -117,10 +130,16 @@ CREATE TABLE IF NOT EXISTS public.blueprints (
 );
 
 ALTER TABLE public.blueprints ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Users can view their own non-deleted blueprints" ON public.blueprints;
 CREATE POLICY "Users can view their own non-deleted blueprints" ON public.blueprints FOR SELECT USING (auth.uid() = user_id AND deleted_at IS NULL);
+
+DROP POLICY IF EXISTS "Users can insert their own blueprints" ON public.blueprints;
 CREATE POLICY "Users can insert their own blueprints" ON public.blueprints FOR INSERT WITH CHECK (auth.uid() = user_id);
+
+DROP POLICY IF EXISTS "Users can update their own blueprints" ON public.blueprints;
 CREATE POLICY "Users can update their own blueprints" ON public.blueprints FOR UPDATE USING (auth.uid() = user_id) WITH CHECK (auth.uid() = user_id);
 -- For soft deletes, users update deleted_at. Real deletes are possible but soft delete is preferred.
+DROP POLICY IF EXISTS "Users can delete their own blueprints" ON public.blueprints;
 CREATE POLICY "Users can delete their own blueprints" ON public.blueprints FOR DELETE USING (auth.uid() = user_id);
 
 -- Add total_tonnage to workout_sessions
