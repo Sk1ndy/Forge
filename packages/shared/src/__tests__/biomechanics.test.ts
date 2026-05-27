@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { calculateSetImpact } from '../biomechanics';
+import { calculateSetImpact } from "../engine/biomechanics/impact";
 import { Exercise, PlannedSet, UserProfile } from '../types';
 
 const mockProfile: UserProfile = {
