@@ -34,4 +34,5 @@ export interface SimulationResult {
   progressiveOverload: { [muscleId: string]: { weekOverWeekGrowthPct: number } };
   injuryPredictions: string[]; // Alertes si un muscle est en DANGER (rouge) > 3 semaines
   monotonyAlerts: string[]; // Alertes de faible variance de l'intensité inter-jours
+  tensors?: Record<string, number[]>; // Normalized ML tensors [0,1]
 }

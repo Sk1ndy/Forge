@@ -4,6 +4,7 @@ import { createInitialState, createLightSnapshot, aggregateMuscle, MusclesMap } 
 import { applyExponentialDecay, getProgressionMultiplier, normalize } from '../biomechanics/physiology';
 import { calculateSetImpact } from '../biomechanics/impact';
 import { calculateInjuryPredictions } from '../algorithms/injury';
+import { applyDiminishingReturns } from '../algorithms/junk-volume';
 import { generateBiomechanicsConfig } from '../config';
 
 const DAYS_OF_WEEK = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche'];
@@ -30,7 +31,6 @@ export function* executeSimulationGenerator(
   const weeklyEffectiveSetsRaw: Record<string, number> = {};
   let axialSncLoad = 0;
 
-  const muscleDangerWeeks: { [muscleId: string]: number } = {};
   const injuryPredictions: string[] = [];
   const weeklySystemicInol: { [week: number]: number[] } = {};
   
@@ -55,7 +55,6 @@ export function* executeSimulationGenerator(
 
   for (let week = 1; week <= totalWeeks; week++) {
     weeklySystemicInol[week] = [];
-    const weekHitRed = new Set<string>();
 
     Object.keys(musclesMap).forEach(id => {
       musclesMap[id].sets = 0;
@@ -68,30 +67,44 @@ export function* executeSimulationGenerator(
 
     for (const day of DAYS_OF_WEEK) {
       let dailySystemicLoad = 0;
+      
+      // Structure to hold raw daily accumulation before diminishing returns
+      const dailyRawAccumulator: Record<string, { 
+        metabolic: number; 
+        damage: number; 
+        joint: number; 
+        inol: number;
+        contributions: Record<string, number>;
+        setsContributions: Record<string, number>;
+      }> = {};
 
       Object.keys(musclesMap).forEach(id => {
-        // True Banister Exponential Decay
-        musclesMap[id].fatigue = applyExponentialDecay(musclesMap[id].fatigue, config.tauFatigue, 1);
-        musclesMap[id].fitness = applyExponentialDecay(musclesMap[id].fitness, config.tauFitness, 1);
+        dailyRawAccumulator[id] = { metabolic: 0, damage: 0, joint: 0, inol: 0, contributions: {}, setsContributions: {} };
+        // Bi-Phasic Exponential Decay
+        // Accelerated flush during deload by dividing the time constant (tau)
+        const currentTauMetabolic = isDeload ? config.tauMetabolic / 1.5 : config.tauMetabolic;
+        const currentTauDamage = isDeload ? config.tauDamage / 1.5 : config.tauDamage;
+        const currentTauFitness = isDeload ? config.tauFitness * 1.1 : config.tauFitness; // retain fitness better during deload
         
-        // Joint stress takes ~1.5x longer to heal than muscle fatigue
-        musclesMap[id].jointStress = applyExponentialDecay((musclesMap[id].jointStress || 0), config.tauFatigue * 1.5, 1);
-
-        if (isDeload) {
-          // Accelerated flush during deload
-          musclesMap[id].fatigue = normalize(musclesMap[id].fatigue * 0.85);
-          musclesMap[id].jointStress = normalize((musclesMap[id].jointStress || 0) * 0.90);
-        }
+        musclesMap[id].fatigueMetabolic = applyExponentialDecay(musclesMap[id].fatigueMetabolic, currentTauMetabolic, 1);
+        musclesMap[id].fatigueDamage = applyExponentialDecay(musclesMap[id].fatigueDamage, currentTauDamage, 1);
+        musclesMap[id].fatigue = normalize(musclesMap[id].fatigueMetabolic + musclesMap[id].fatigueDamage);
+        
+        musclesMap[id].fitness = applyExponentialDecay(musclesMap[id].fitness, currentTauFitness, 1);
+        
+        // Joint stress takes ~1.5x longer to heal than muscle damage
+        const currentTauJoint = isDeload ? (config.tauDamage * 1.5) / 1.5 : config.tauDamage * 1.5;
+        musclesMap[id].jointStress = applyExponentialDecay((musclesMap[id].jointStress || 0), currentTauJoint, 1);
 
         if (musclesMap[id].contributions) {
           Object.keys(musclesMap[id].contributions).forEach(exNom => {
-            musclesMap[id].contributions[exNom] = applyExponentialDecay(musclesMap[id].contributions[exNom], config.tauFatigue, 1);
+            musclesMap[id].contributions[exNom] = applyExponentialDecay(musclesMap[id].contributions[exNom], currentTauDamage, 1);
           });
         }
       });
 
-      sncFatigue = applyExponentialDecay(sncFatigue, config.tauFatigue, 1);
-      if (isDeload) sncFatigue = normalize(sncFatigue * 0.70);
+      const currentTauSnc = isDeload ? (config.tauMetabolic * 1.5) / 1.5 : config.tauMetabolic * 1.5;
+      sncFatigue = applyExponentialDecay(sncFatigue, currentTauSnc, 1);
 
       if (toggledDays[day] !== false) {
         const plannedExercises = blueprint[day as keyof typeof blueprint] || [];
@@ -128,8 +141,9 @@ export function* executeSimulationGenerator(
                   return;
               }
             }
-
-            const impact = calculateSetImpact(validSet, exercise, profile, config);
+            
+            const currentFatigueForGovernor = musclesMap[exercise.muscle_primaire]?.fatigue || 0;
+            const impact = calculateSetImpact(validSet, exercise, profile, config, currentFatigueForGovernor);
             const overloadMultiplier = getProgressionMultiplier(week, isDeload, !!logMatch);
 
             const finalInol = impact.inol * overloadMultiplier;
@@ -149,26 +163,32 @@ export function* executeSimulationGenerator(
                 const muscleLoad = finalInol * coeff;
                 setSystemicLoad += muscleLoad;
                 
-                musclesMap[muscleId].fatigue = normalize(musclesMap[muscleId].fatigue + muscleLoad);
-                musclesMap[muscleId].inol = normalize((musclesMap[muscleId].inol || 0) + muscleLoad);
-                musclesMap[muscleId].weeklyInol[week] = (musclesMap[muscleId].weeklyInol[week] || 0) + muscleLoad;
+                // Split impact : 70% Metabolic (fast decay), 30% Damage (slow decay)
+                const isHeavyOrFailure = validSet.rpe >= 9 || validSet.reps <= 5;
+                const damageRatio = isHeavyOrFailure ? 0.4 : 0.3; // More damage if heavy or failure
+                const metabolicRatio = 1 - damageRatio;
+
+                dailyRawAccumulator[muscleId].metabolic += muscleLoad * metabolicRatio;
+                dailyRawAccumulator[muscleId].damage += muscleLoad * damageRatio;
+                dailyRawAccumulator[muscleId].inol += muscleLoad;
                 
                 let adaptationMultiplier = config.k1;
                 const currentFatigue = musclesMap[muscleId].fatigue;
                 if (currentFatigue > 1.5) {
                   adaptationMultiplier = Math.max(0.0, config.k1 - (currentFatigue - 1.5) * config.k2);
                 }
+                // Fitness is linear (volume drives fitness), we might cap it later but keep it here for now
                 musclesMap[muscleId].fitness = normalize(musclesMap[muscleId].fitness + muscleLoad * 0.5 * adaptationMultiplier);
                 
                 musclesMap[muscleId].sets = normalize(musclesMap[muscleId].sets + validSet.series * coeff);
-                musclesMap[muscleId].contributions[exercise.nom] = normalize((musclesMap[muscleId].contributions[exercise.nom] || 0) + muscleLoad);
-                musclesMap[muscleId].setsContributions[exercise.nom] = normalize((musclesMap[muscleId].setsContributions[exercise.nom] || 0) + validSet.series * coeff);
+                dailyRawAccumulator[muscleId].contributions[exercise.nom] = (dailyRawAccumulator[muscleId].contributions[exercise.nom] || 0) + muscleLoad;
+                dailyRawAccumulator[muscleId].setsContributions[exercise.nom] = (dailyRawAccumulator[muscleId].setsContributions[exercise.nom] || 0) + validSet.series * coeff;
 
                 let jointStressIncrement = muscleLoad * 0.5;
                 if (validSet.reps <= 5 && validSet.rpe >= 9) {
                   jointStressIncrement += muscleLoad * 1.5;
                 }
-                musclesMap[muscleId].jointStress = normalize((musclesMap[muscleId].jointStress || 0) + jointStressIncrement);
+                dailyRawAccumulator[muscleId].joint += jointStressIncrement;
                 
                 if (week === totalWeeks) {
                   weeklyEffectiveSetsRaw[muscleId] = (weeklyEffectiveSetsRaw[muscleId] || 0) + validSet.series;
@@ -189,12 +209,34 @@ export function* executeSimulationGenerator(
         });
       }
 
+      // Apply Junk Volume Diminishing Returns at the end of the day
+      Object.entries(dailyRawAccumulator).forEach(([muscleId, raw]) => {
+        if (raw.inol > 0) {
+          const effectiveTotalInol = applyDiminishingReturns(raw.inol);
+          const attenuation = effectiveTotalInol / raw.inol; // e.g. 0.8 => 80% effective
+
+          musclesMap[muscleId].fatigueMetabolic = normalize(musclesMap[muscleId].fatigueMetabolic + raw.metabolic * attenuation);
+          musclesMap[muscleId].fatigueDamage = normalize(musclesMap[muscleId].fatigueDamage + raw.damage * attenuation);
+          musclesMap[muscleId].fatigue = normalize(musclesMap[muscleId].fatigueMetabolic + musclesMap[muscleId].fatigueDamage);
+          musclesMap[muscleId].jointStress = normalize((musclesMap[muscleId].jointStress || 0) + raw.joint * attenuation);
+          
+          musclesMap[muscleId].inol = normalize((musclesMap[muscleId].inol || 0) + effectiveTotalInol);
+          musclesMap[muscleId].weeklyInol[week] = (musclesMap[muscleId].weeklyInol[week] || 0) + effectiveTotalInol;
+
+          Object.entries(raw.contributions).forEach(([exNom, val]) => {
+            musclesMap[muscleId].contributions[exNom] = normalize((musclesMap[muscleId].contributions[exNom] || 0) + val * attenuation);
+          });
+          Object.entries(raw.setsContributions).forEach(([exNom, val]) => {
+            musclesMap[muscleId].setsContributions[exNom] = normalize((musclesMap[muscleId].setsContributions[exNom] || 0) + val); // Keep raw sets for UI
+          });
+        }
+      });
+
       weeklySystemicInol[week].push(dailySystemicLoad);
 
       Object.keys(musclesMap).forEach(id => {
         const f = musclesMap[id].fatigue;
         musclesMap[id].fatigueHistory.push(f);
-        if (f > 2.5) weekHitRed.add(id);
 
         if (week === totalWeeks) {
           if (!peakFatigue[id] || f > peakFatigue[id].value) {
@@ -214,7 +256,7 @@ export function* executeSimulationGenerator(
       }
     } // day loop
 
-    calculateInjuryPredictions(musclesMap, weekHitRed, muscleDangerWeeks, injuryPredictions);
+    calculateInjuryPredictions(musclesMap, week, injuryPredictions);
 
     yield; // Rendre la main (Yield) après chaque semaine
   } // week loop

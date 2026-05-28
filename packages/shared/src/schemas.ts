@@ -33,6 +33,7 @@ export const UserProfileSchema = z.object({
   isBeginner:    z.boolean().optional(),
   age:           z.number().int().min(14).max(100).optional(),
   sleepHours:    z.number().min(0).max(24).optional(),
+  dailyVFC:      z.number().min(0).max(200).optional(), // Variabilité de la Fréquence Cardiaque (en ms)
   caloricStatus: z.enum(['deficit', 'maintenance', 'surplus']).optional(),
   stressLevel:   z.enum(['low', 'moderate', 'high']).optional(),
 });

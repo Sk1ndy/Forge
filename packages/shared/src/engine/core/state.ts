@@ -3,7 +3,9 @@ import { MUSCLE_DETAILS, PARENT_CHILD_WEIGHTS } from '../../constants';
 import { normalize } from '../biomechanics/physiology';
 
 export interface MuscleState {
-  fatigue: number;
+  fatigue: number; // Total fatigue = metabolic + damage
+  fatigueMetabolic: number;
+  fatigueDamage: number;
   inol: number;
   fitness: number;
   sets: number;
@@ -20,7 +22,7 @@ export type MusclesMap = Record<string, MuscleState>;
 export function createInitialState(): MusclesMap {
   const map: MusclesMap = {};
   Object.keys(MUSCLE_DETAILS).forEach(id => {
-    map[id] = { fatigue: 0, inol: 0, fitness: 0, sets: 0, jointStress: 0, contributions: {}, setsContributions: {}, fatigueHistory: [], uniqueSets: new Set<string>(), weeklyInol: {} };
+    map[id] = { fatigue: 0, fatigueMetabolic: 0, fatigueDamage: 0, inol: 0, fitness: 0, sets: 0, jointStress: 0, contributions: {}, setsContributions: {}, fatigueHistory: [], uniqueSets: new Set<string>(), weeklyInol: {} };
   });
   return map;
 }
@@ -48,10 +50,11 @@ export function aggregateMuscle(
   parentKey: MuscleId, 
   childKeys: MuscleId[]
 ) {
-  const parent = targetMuscles[parentKey] || { fatigue: 0, inol: 0, fitness: 0, sets: 0, jointStress: 0, contributions: {}, setsContributions: {}, fatigueHistory: [], uniqueSets: new Set<string>(), weeklyInol: {} };
+  const parent = targetMuscles[parentKey] || { fatigue: 0, fatigueMetabolic: 0, fatigueDamage: 0, inol: 0, fitness: 0, sets: 0, jointStress: 0, contributions: {}, setsContributions: {}, fatigueHistory: [], uniqueSets: new Set<string>(), weeklyInol: {} };
   const weights = PARENT_CHILD_WEIGHTS[parentKey] || {};
   
-  let totalFatigue = parent.fatigue;
+  let totalFatigueMetabolic = parent.fatigueMetabolic;
+  let totalFatigueDamage = parent.fatigueDamage;
   let totalInol = parent.inol || 0;
   let totalJointStress = parent.jointStress;
   let totalDailyInol = dailyInol[parentKey] || 0;
@@ -66,7 +69,8 @@ export function aggregateMuscle(
     const child = targetMuscles[childKey];
     if (child) {
       const coeff = weights[childKey] ?? 1.0;
-      totalFatigue = normalize(totalFatigue + child.fatigue * coeff);
+      totalFatigueMetabolic = normalize(totalFatigueMetabolic + child.fatigueMetabolic * coeff);
+      totalFatigueDamage = normalize(totalFatigueDamage + child.fatigueDamage * coeff);
       totalInol = normalize(totalInol + (child.inol || 0) * coeff);
       totalJointStress = normalize(totalJointStress + child.jointStress * coeff);
       totalDailyInol = normalize(totalDailyInol + (dailyInol[childKey] || 0) * coeff);
@@ -90,8 +94,11 @@ export function aggregateMuscle(
   });
 
   dailyInol[parentKey] = totalDailyInol;
+  const totalFatigue = normalize(totalFatigueMetabolic + totalFatigueDamage);
   targetMuscles[parentKey] = {
     fatigue: totalFatigue,
+    fatigueMetabolic: totalFatigueMetabolic,
+    fatigueDamage: totalFatigueDamage,
     inol: totalInol,
     fitness: normalize(totalFatigue * 0.5),
     sets: combinedUniqueSets.size,

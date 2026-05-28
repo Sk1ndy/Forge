@@ -4,8 +4,11 @@ export interface BiomechanicsConfig {
   /** Decay time constant for fitness (in days). Usually longer than fatigue (e.g. 45 days) */
   tauFitness: number;
   
-  /** Decay time constant for fatigue (in days). Usually shorter than fitness (e.g. 15 days) */
-  tauFatigue: number;
+  /** Decay time constant for metabolic fatigue (in days). Dissipates quickly (< 24h). */
+  tauMetabolic: number;
+
+  /** Decay time constant for structural damage (in days). Dissipates slowly (48-72h+). */
+  tauDamage: number;
   
   /** Multiplier for fitness impact on performance */
   k1: number;
@@ -30,6 +33,7 @@ export function generateBiomechanicsConfig(profile: UserProfile): BiomechanicsCo
   const userSleep = profile.sleepHours ?? 8;
   const userCaloric = profile.caloricStatus ?? 'maintenance';
   const userStress = profile.stressLevel ?? 'moderate';
+  const userVFC = profile.dailyVFC; // En ms. Typiquement > 60 est très bon pour la recup, < 40 est mauvais, dépend de la baseline individuelle.
 
   // 1. Calculate Recovery Rate (Baseline 1.0)
   let recoveryRate = 1.0;
@@ -41,14 +45,21 @@ export function generateBiomechanicsConfig(profile: UserProfile): BiomechanicsCo
   if (userStress === 'high') recoveryRate *= 0.80;
   else if (userStress === 'low') recoveryRate *= 1.05;
 
-  // 2. Determine Time Constants (Tau)
-  // Faster recovery = shorter tauFatigue, but also slightly shorter tauFitness
-  // A standard Banister model uses TauFitness = 45, TauFatigue = 15
-  const baseTauFitness = 45;
-  const baseTauFatigue = 15;
+  // Modulateur Biométrique : Montre connectée (VFC)
+  if (userVFC !== undefined) {
+    if (userVFC < 35) recoveryRate *= 0.85; // Baisse sévère de récupération si VFC très basse
+    else if (userVFC > 65) recoveryRate *= 1.10; // Boost si VFC excellente
+  }
 
-  // If recovery is slow (rate < 1), fatigue takes longer to dissipate (larger tauFatigue)
-  const tauFatigue = baseTauFatigue / recoveryRate;
+  // 2. Determine Time Constants (Tau)
+  // Faster recovery = shorter taus
+  const baseTauFitness = 45;
+  const baseTauMetabolic = 1.0; // ~24h
+  const baseTauDamage = 3.0; // ~72h
+
+  // If recovery is slow (rate < 1), fatigue takes longer to dissipate
+  const tauMetabolic = baseTauMetabolic / recoveryRate;
+  const tauDamage = baseTauDamage / recoveryRate;
   
   // Fitness retention is also affected but to a lesser degree
   const tauFitness = baseTauFitness * Math.sqrt(recoveryRate);
@@ -61,7 +72,8 @@ export function generateBiomechanicsConfig(profile: UserProfile): BiomechanicsCo
 
   return {
     tauFitness,
-    tauFatigue,
+    tauMetabolic,
+    tauDamage,
     k1: 1.0, // Base fitness weight
     k2: 2.0, // Fatigue usually has a 2x immediate impact compared to fitness
     recoveryRate,

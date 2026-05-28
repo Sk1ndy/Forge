@@ -14,3 +14,14 @@ export function calculateJunkVolumeAlerts(
   });
   return alerts;
 }
+
+/**
+ * Applique la loi des rendements décroissants (Junk Volume).
+ * Utilise une fonction asymptotique : f(x) = x / (1 + x / K)
+ * où K est le volume maximum utile (ex: 2.5 INOL).
+ */
+export function applyDiminishingReturns(rawLoad: number): number {
+  if (rawLoad <= 0) return 0;
+  const K = 2.5; // Plafond théorique d'efficacité par jour
+  return rawLoad / (1 + rawLoad / K);
+}

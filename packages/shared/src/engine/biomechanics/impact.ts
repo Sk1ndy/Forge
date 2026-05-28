@@ -24,7 +24,8 @@ export function calculateSetImpact(
   set: PlannedSet,
   exercise: Exercise,
   profile: UserProfile,
-  config: BiomechanicsConfig
+  config: BiomechanicsConfig,
+  currentMuscleFatigue: number = 0
 ): { inol: number; sncPoints: number } {
   if (!set.active || set.series <= 0 || set.reps <= 0) {
     return { inol: 0, sncPoints: 0 };
@@ -66,7 +67,14 @@ export function calculateSetImpact(
   const rpeStressFactor = Math.pow(1.35, safeRpe - 10);
   
   // CNS Resilience injected from ML-ready config
-  const sncPoints = (weightRatio * sncTierMultiplier * rpeStressFactor * safeSeries) / config.cnsResilience;
+  let sncPoints = (weightRatio * sncTierMultiplier * rpeStressFactor * safeSeries) / config.cnsResilience;
+  
+  // GOUVERNEUR CENTRAL : Si le muscle principal est déjà détruit (Fatigue > 2.0),
+  // le corps bride le recrutement des fibres et le système nerveux central doit 
+  // forcer exponentiellement plus pour générer la même force.
+  if (currentMuscleFatigue > 2.0) {
+    sncPoints *= 1.0 + (currentMuscleFatigue - 2.0) * 0.5; // +50% de coût SNC par point de fatigue au-dessus de 2.0
+  }
   
   return { inol: totalInol, sncPoints };
 }

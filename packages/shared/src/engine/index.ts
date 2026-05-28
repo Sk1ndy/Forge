@@ -7,6 +7,7 @@ import { calculateGlobalWorkCapacity } from './formatters/cns';
 import { calculateJunkVolumeAlerts } from './algorithms/junk-volume';
 import { calculateProgressiveOverload } from './algorithms/progressive-overload';
 import { calculateMonotonyAlerts } from './algorithms/monotony';
+import { normalizeFatigueHistoryToTensors } from './formatters/tensors';
 
 export const emptySimulationResult: SimulationResult = {
   muscles: {},
@@ -38,6 +39,7 @@ function finalizeSimulationResult(loopResult: any, totalWeeks: number, deloadWee
   const progressiveOverload = calculateProgressiveOverload(loopResult.targetMuscles, totalWeeks);
   const junkVolumeAlerts = calculateJunkVolumeAlerts(loopResult.dailyInol, finalMuscles);
   const monotonyAlerts = calculateMonotonyAlerts(loopResult.weeklySystemicInol, deloadWeeks);
+  const tensors = normalizeFatigueHistoryToTensors(loopResult.targetMuscles);
 
   const MAJOR_GROUPS: MuscleId[] = [
     'chest', 'upperChest', 'lowerChest', 'upperBack', 'lowerBack', 'rhomboids', 'trapezius', 'upperTrapezius', 'lowerTrapezius',
@@ -139,7 +141,8 @@ function finalizeSimulationResult(loopResult: any, totalWeeks: number, deloadWee
     weeklyTraumas,
     progressiveOverload,
     injuryPredictions: loopResult.injuryPredictions,
-    monotonyAlerts
+    monotonyAlerts,
+    tensors
   };
 }
 
