@@ -18,6 +18,7 @@ import {
   useSortable,
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
+import { AnimatePresence } from 'framer-motion';
 
 interface SequencerProps {
   blueprint: WeeklyBlueprint;
@@ -339,31 +340,33 @@ export default function Sequencer({
                 strategy={verticalListSortingStrategy}
               >
                 <div className="flex flex-col gap-2.5 pb-2">
-                  {currentExercises.map((plannedEx, index) => {
-                    const exerciseDef = exercises.find(ex => ex.id === plannedEx.exerciseId);
-                    return (
-                      <SortableExerciseWrapper
-                        key={plannedEx.id}
-                        plannedEx={plannedEx}
-                        exerciseDef={exerciseDef}
-                        index={index}
-                        currentDay={currentDay}
-                        onUpdateExercise={onUpdateExercise}
-                        onDeleteExercise={onDeleteExercise}
-                        simulation={simulation}
-                        onHoverEnter={() => onHoverExerciseChange?.(exerciseDef || null)}
-                        onHoverLeave={() => onHoverExerciseChange?.(null)}
-                        isSelected={selectedExercise?.id === exerciseDef?.id}
-                        onSelect={() => {
-                          if (selectedExercise?.id === exerciseDef?.id) {
-                            onSelectExercise?.(null);
-                          } else {
-                            onSelectExercise?.(exerciseDef || null);
-                          }
-                        }}
-                      />
-                    );
-                  })}
+                  <AnimatePresence initial={false}>
+                    {currentExercises.map((plannedEx, index) => {
+                      const exerciseDef = exercises.find(ex => ex.id === plannedEx.exerciseId);
+                      return (
+                        <SortableExerciseWrapper
+                          key={plannedEx.id}
+                          plannedEx={plannedEx}
+                          exerciseDef={exerciseDef}
+                          index={index}
+                          currentDay={currentDay}
+                          onUpdateExercise={onUpdateExercise}
+                          onDeleteExercise={onDeleteExercise}
+                          simulation={simulation}
+                          onHoverEnter={() => onHoverExerciseChange?.(exerciseDef || null)}
+                          onHoverLeave={() => onHoverExerciseChange?.(null)}
+                          isSelected={selectedExercise?.id === exerciseDef?.id}
+                          onSelect={() => {
+                            if (selectedExercise?.id === exerciseDef?.id) {
+                              onSelectExercise?.(null);
+                            } else {
+                              onSelectExercise?.(exerciseDef || null);
+                            }
+                          }}
+                        />
+                      );
+                    })}
+                  </AnimatePresence>
                 </div>
               </SortableContext>
             </DndContext>

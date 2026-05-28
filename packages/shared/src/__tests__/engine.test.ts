@@ -74,12 +74,23 @@ describe('Engine: Phase 2 (Mesocycle Algorithms)', () => {
     expect(deloadResult.muscles.chest!.remainingCapacity).toBeGreaterThan(normalResult.muscles.chest!.remainingCapacity);
   });
 
-  it('Injury Prediction: detects DANGER state sustained for >= 3 weeks', () => {
-    // 4 weeks of heavy RPE 10 every day will certainly trigger injury prediction
-    const result = runMesocycleSimulation(heavyBlueprint, mockProfile, {}, undefined, mockLibrary, 4, []);
+  it('Injury Prediction (ACWR): détecte un pic de charge (ACWR > 1.5)', () => {
+    // Weeks 1, 2, 3 have very low volume via sessionLogs
+    const lowLogs: any[] = [];
+    for (let w = 1; w <= 3; w++) {
+      ['Lundi', 'Mardi', 'Mercredi'].forEach(day => {
+        lowLogs.push({
+          id: `log_w${w}_${day}`, exercise_id: 'bench_press', day: day, week: w,
+          set_index: 0, actual_reps: 5, actual_weight: 20, actual_rpe: 5, is_completed: true
+        });
+      });
+    }
+    
+    // Week 4 will use heavyBlueprint (3 days of 10 sets of heavy bench press)
+    const result = runMesocycleSimulation(heavyBlueprint, mockProfile, {}, undefined, mockLibrary, 4, [], lowLogs);
     
     expect(result.injuryPredictions.length).toBeGreaterThan(0);
-    expect(result.injuryPredictions[0]).toContain('Pectoraux');
+    expect(result.injuryPredictions[0]).toContain('Pic de charge');
   });
 
   it('Monotony: detects robotic flat intensity across a week', () => {

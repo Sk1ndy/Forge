@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
+import dynamic from 'next/dynamic';
 import {
   LineChart, Line, XAxis, YAxis, ReferenceLine,
   Tooltip, ResponsiveContainer, CartesianGrid,
@@ -8,6 +9,10 @@ import {
 import { SimulationResult, WeeklyBlueprint, MuscleId } from '@/lib/calculations';
 import { MuscleStatus } from '@forge/shared';
 import { getMuscleGroupName } from '@/lib/muscleLabels';
+
+const MesocycleHeatmap = dynamic(() => import('./MesocycleHeatmap'), { ssr: false, loading: () => <div className="h-64 bg-zinc-900/50 animate-pulse rounded-xl" /> });
+import PaywallOverlay from '@/components/ui/PaywallOverlay';
+import { useSubscription } from '@/hooks/useSubscription';
 
 // ─── Props ───────────────────────────────────────────────────────────────────
 interface WeekDashboardProps {
@@ -207,6 +212,8 @@ const ChartTooltip = ({ active, payload, label }: { active?: boolean; payload?: 
 
 // ─── Component ────────────────────────────────────────────────────────────────
 export default function WeekDashboard({ simulation, blueprint, toggledDays, chartRef }: WeekDashboardProps) {
+  const { isPro } = useSubscription();
+
   const { score: programmeScore, grade: gradeLetter, critique } = useMemo(() => calculateProgramScore(simulation, blueprint, toggledDays), [simulation, blueprint, toggledDays]);
   const grade = useMemo(() => getGradeInfo(gradeLetter), [gradeLetter]);
   const prescriptions = useMemo(() => generatePrescriptions(simulation), [simulation]);
@@ -509,74 +516,87 @@ export default function WeekDashboard({ simulation, blueprint, toggledDays, char
         </div>
       </div>
 
-      {/* ── ROW 4 : Heatmap 7J × 7 Muscles ─────────────────────────────────── */}
-      <div className={`${cardBase} shrink-0`}>
-        <h5 className="text-[10px] font-bold text-orange-400 uppercase tracking-wider mb-3">🔥 Heatmap Temporelle d&apos;Intensité (INOL)</h5>
-        <div className="grid grid-cols-[auto_1fr] gap-3">
-          {/* Labels muscles */}
-          <div className="flex flex-col gap-[2px] pr-3 border-r border-zinc-800">
-            {/* Header row spacer */}
-            <div className="h-4"></div>
-            {GRAND_GROUPS.map(({ id, label }) => (
-              <div key={id} className="h-6 flex items-center text-[9px] text-zinc-400 font-medium whitespace-nowrap">
-                {label}
+      {/* ── SECTION PAYWALL (Fonctionnalités PRO) ───────────────────────────── */}
+      <PaywallOverlay featureName="l'Analyse Avancée & Prédictions">
+        <div className="flex flex-col gap-4">
+          {/* ── ROW 4 : Heatmap 7J × 7 Muscles ─────────────────────────────────── */}
+          <div className={`${cardBase} shrink-0`}>
+            <h5 className="text-[10px] font-bold text-orange-400 uppercase tracking-wider mb-3">🔥 Heatmap Temporelle d&apos;Intensité (INOL)</h5>
+            <div className="grid grid-cols-[auto_1fr] gap-3">
+              {/* Labels muscles */}
+              <div className="flex flex-col gap-[2px] pr-3 border-r border-zinc-800">
+                {/* Header row spacer */}
+                <div className="h-4"></div>
+                {GRAND_GROUPS.map(({ id, label }) => (
+                  <div key={id} className="h-6 flex items-center text-[9px] text-zinc-400 font-medium whitespace-nowrap">
+                    {label}
+                  </div>
+                ))}
               </div>
-            ))}
+              {/* Grid jours */}
+              <div className="flex flex-col gap-[2px]">
+                {/* Header jours */}
+                <div className="grid grid-cols-7 gap-[2px]">
+                  {DAY_LABELS.map(day => (
+                    <div key={day} className="h-4 flex items-center justify-center text-[9px] text-zinc-500 font-bold uppercase">
+                      {day}
+                    </div>
+                  ))}
+                </div>
+                {/* Cells */}
+                {GRAND_GROUPS.map(({ id }) => {
+                  // MOCK DATA IF NOT PRO
+                  let history = simulation.muscles[id]?.fatigueHistory ?? [0,0,0,0,0,0,0];
+                  if (!isPro) {
+                    history = [Math.random() * 2, Math.random() * 3, Math.random(), Math.random() * 2.5, Math.random(), Math.random() * 1.5, Math.random() * 2];
+                  }
+
+                  return (
+                    <div key={id} className="grid grid-cols-7 gap-[2px]">
+                      {history.map((val, i) => {
+                        let bg = '#18181b'; // zinc-900
+                        let opacity = 0.3;
+                        if (val > 2.5) { bg = '#ef4444'; opacity = 0.9; }
+                        else if (val > 1.5) { bg = '#f59e0b'; opacity = 0.8; }
+                        else if (val > 0.5) { bg = '#10b981'; opacity = 0.7; }
+                        else if (val > 0.1) { bg = '#3b82f6'; opacity = 0.5; }
+                        return (
+                          <div 
+                            key={i} 
+                            className="h-6 rounded-md flex items-center justify-center transition-opacity hover:opacity-100"
+                            style={{ backgroundColor: bg, opacity }}
+                            title={`INOL: ${val.toFixed(2)}`}
+                          >
+                            {val > 0.1 && <span className="text-[8px] font-mono text-white/90" style={{ mixBlendMode: 'overlay' }}>{val.toFixed(1)}</span>}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
           </div>
-          {/* Grid jours */}
-          <div className="flex flex-col gap-[2px]">
-            {/* Header jours */}
-            <div className="grid grid-cols-7 gap-[2px]">
-              {DAY_LABELS.map(day => (
-                <div key={day} className="h-4 flex items-center justify-center text-[9px] text-zinc-500 font-bold uppercase">
-                  {day}
+
+          {/* ── ROW 4.5 : Mesocycle Heatmap ────────────────────────────────────────── */}
+          <MesocycleHeatmap simulation={isPro ? simulation : { ...simulation, isMock: true } as any} />
+
+          {/* ── ROW 5 : Prescriptions ──────────────────────────────────────────── */}
+          <div className={`${cardBase} shrink-0`} style={{ borderColor: 'rgba(139,92,246,0.2)', background: 'linear-gradient(135deg, rgba(9,9,11,0.9) 0%, rgba(139,92,246,0.04) 100%)' }}>
+            <h5 className="text-[10px] font-bold text-violet-400 uppercase tracking-wider flex items-center gap-2 mb-3">
+              <span>🎯</span> Prescriptions Intelligentes — Semaine Prochaine
+            </h5>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+              {(isPro ? prescriptions : ['Ajuster le volume sur le dos...', 'Augmenter la fréquence des pectoraux...', 'Intégrer une semaine de deload...']).map((p, i) => (
+                <div key={i} className="bg-zinc-900/60 border border-zinc-800/60 rounded-xl p-3 flex items-start gap-2.5">
+                  <span className="text-violet-500 font-black text-sm shrink-0 mt-px">{i + 1}</span>
+                  <p className="text-[11px] text-zinc-300 leading-relaxed">{p}</p>
                 </div>
               ))}
             </div>
-            {/* Cells */}
-            {GRAND_GROUPS.map(({ id }) => {
-              const history = simulation.muscles[id]?.fatigueHistory ?? [0,0,0,0,0,0,0];
-              return (
-                <div key={id} className="grid grid-cols-7 gap-[2px]">
-                  {history.map((val, i) => {
-                    let bg = '#18181b'; // zinc-900
-                    let opacity = 0.3;
-                    if (val > 2.5) { bg = '#ef4444'; opacity = 0.9; }
-                    else if (val > 1.5) { bg = '#f59e0b'; opacity = 0.8; }
-                    else if (val > 0.5) { bg = '#10b981'; opacity = 0.7; }
-                    else if (val > 0.1) { bg = '#3b82f6'; opacity = 0.5; }
-                    return (
-                      <div 
-                        key={i} 
-                        className="h-6 rounded-md flex items-center justify-center transition-opacity hover:opacity-100"
-                        style={{ backgroundColor: bg, opacity }}
-                        title={`INOL: ${val.toFixed(2)}`}
-                      >
-                        {val > 0.1 && <span className="text-[8px] font-mono text-white/90" style={{ mixBlendMode: 'overlay' }}>{val.toFixed(1)}</span>}
-                      </div>
-                    );
-                  })}
-                </div>
-              );
-            })}
           </div>
         </div>
-      </div>
-
-      {/* ── ROW 5 : Prescriptions ──────────────────────────────────────────── */}
-      <div className={`${cardBase} shrink-0`} style={{ borderColor: 'rgba(139,92,246,0.2)', background: 'linear-gradient(135deg, rgba(9,9,11,0.9) 0%, rgba(139,92,246,0.04) 100%)' }}>
-        <h5 className="text-[10px] font-bold text-violet-400 uppercase tracking-wider flex items-center gap-2 mb-3">
-          <span>🎯</span> Prescriptions Intelligentes — Semaine Prochaine
-        </h5>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-          {prescriptions.map((p, i) => (
-            <div key={i} className="bg-zinc-900/60 border border-zinc-800/60 rounded-xl p-3 flex items-start gap-2.5">
-              <span className="text-violet-500 font-black text-sm shrink-0 mt-px">{i + 1}</span>
-              <p className="text-[11px] text-zinc-300 leading-relaxed">{p}</p>
-            </div>
-          ))}
-        </div>
-      </div>
+      </PaywallOverlay>
     </div>
   );
 }

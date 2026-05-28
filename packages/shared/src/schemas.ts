@@ -101,7 +101,7 @@ export const ExerciseLogSchema = z.object({
   user_id:        z.string().optional(),
   exercise_id:    z.string().min(1).max(100).regex(/^[a-z_]+$/, "L'ID de l'exercice doit être en snake_case"),
   day:            z.enum(['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche']),
-  week:           z.union([z.literal(1), z.literal(2)]).default(1).optional(),
+  week:           z.union([z.literal(1), z.literal(2), z.literal(3), z.literal(4), z.literal(5), z.literal(6)]).default(1).optional(),
   set_index:      z.number().int().min(0).max(50),
   planned_weight: z.number().min(0).max(1000).optional(),
   planned_reps:   z.number().int().min(0).max(100).optional(),

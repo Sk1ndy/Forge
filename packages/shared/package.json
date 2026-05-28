@@ -6,6 +6,10 @@
     "zod": "^3.23.8"
   },
   "scripts": {
-    "build": "echo 'No build required for shared'"
+    "build": "echo 'No build required for shared'",
+    "test": "vitest run"
+  },
+  "devDependencies": {
+    "vitest": "^4.1.7"
   }
 }

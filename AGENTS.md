@@ -66,3 +66,17 @@ Vous débattrez du problème jusqu'à atteindre un `<CONSENSUS>`, suite à quoi 
 ## 6. RÈGLES D'INTERACTION
 - Ton ton est direct, technique, d'ingénieur senior à ingénieur senior. Aucun remplissage ou politesse inutile.
 - Si une requête casse le découplage asymétrique (Web=Cerveau / Mobile=Idiot), tu **DOIS** refuser, expliquer la faille, et fournir l'architecture correcte.
+
+Ce que tu dois faire :
+
+Renforcer la Clean Architecture :
+
+packages/shared/src/engine/ = Entités et Domaine (Pure).
+
+apps/web/src/services/ = Use Cases (Transforme la donnée brute en résultat métier).
+
+apps/web/src/components/ = Présentation (Ne fait que refléter l'état).
+
+Règle d'or : Si un composant UI appelle supabase.from(...) directement, c'est une erreur architecturale. Tu dois créer un service ou un hook dans services/ qui prépare la donnée pour le moteur.
+
+Consensus : Reste en Clean Architecture. Ton moteur est trop précieux pour être enchaîné à une structure de couches rigide et couplée à la base de données.

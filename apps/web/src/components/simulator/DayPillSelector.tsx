@@ -1,6 +1,8 @@
 'use client';
 import React, { useRef, useEffect } from 'react';
 import { WeeklyBlueprint, SimulationResult } from '@/lib/calculations';
+import { m as motion } from 'framer-motion';
+import { cn } from '@/lib/utils';
 
 const DAYS = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche'];
 const DAY_SHORT = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'];
@@ -73,49 +75,60 @@ export default function DayPillSelector({
             ref={isSelected ? selectedRef : undefined}
             onClick={() => onSelectDay(day)}
             style={{ scrollSnapAlign: 'start' }}
-            className={`
-              relative flex flex-col items-center gap-1 px-3 py-2 rounded-xl border text-center
-              transition-all duration-200 shrink-0 cursor-pointer
-              ${isSelected
-                ? 'border-emerald-500/60 bg-emerald-950/20 shadow-[0_0_12px_rgba(16,185,129,0.15)]'
-                : isActive
-                ? 'border-zinc-800 bg-zinc-900/30 hover:border-zinc-700 hover:bg-zinc-900/50'
-                : 'border-zinc-900 bg-zinc-950/20 opacity-40'
-              }
-            `}
+            className={cn(
+              "relative flex flex-col items-center gap-1 px-3 py-2 rounded-xl border text-center transition-colors duration-200 shrink-0 cursor-pointer focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-950 overflow-hidden",
+              isSelected ? "border-emerald-500/60" : isActive ? "border-zinc-800 bg-zinc-900/30 hover:border-zinc-700 hover:bg-zinc-900/50" : "border-zinc-900 bg-zinc-950/20 opacity-40"
+            )}
           >
-            {/* Day short name */}
-            <span
-              className={`text-[10px] font-black uppercase tracking-wider leading-none ${
-                isSelected ? 'text-emerald-400' : 'text-zinc-400'
-              }`}
-            >
-              {DAY_SHORT[i]}
-            </span>
-
-            {/* Exercise count badge or rest */}
-            {hasExercises ? (
+            {isSelected && (
+              <motion.div
+                layoutId="activeDayIndicator"
+                className="absolute inset-0 bg-emerald-950/20 shadow-[0_0_12px_rgba(16,185,129,0.15)]"
+                transition={{ type: "spring", stiffness: 400, damping: 30 }}
+                style={{ zIndex: 0 }}
+              />
+            )}
+            
+            <div className="relative z-10 flex flex-col items-center">
+              {/* Day short name */}
               <span
-                className={`text-[11px] font-black leading-none ${
-                  isSelected ? 'text-white' : 'text-zinc-300'
-                }`}
+                className={cn(
+                  "text-[10px] font-black uppercase tracking-wider leading-none",
+                  isSelected ? "text-emerald-400" : "text-zinc-400"
+                )}
               >
-                {active.length}
-                <span className={`text-[8px] font-normal ml-0.5 ${isSelected ? 'text-zinc-400' : 'text-zinc-600'}`}>exo</span>
+                {DAY_SHORT[i]}
               </span>
-            ) : (
-              <span className="text-[9px] text-zinc-700 font-medium leading-none">—</span>
-            )}
 
-            {/* Sets count */}
-            {totalSets > 0 && (
-              <span className={`text-[8px] font-bold leading-none ${isSelected ? 'text-emerald-500/70' : 'text-zinc-600'}`}>
-                {totalSets}s
-              </span>
-            )}
+              {/* Exercise count badge or rest */}
+              {hasExercises ? (
+                <span
+                  className={cn(
+                    "text-[11px] font-black leading-none mt-1",
+                    isSelected ? "text-white" : "text-zinc-300"
+                  )}
+                >
+                  {active.length}
+                  <span className={cn("text-[8px] font-normal ml-0.5", isSelected ? "text-zinc-400" : "text-zinc-600")}>exo</span>
+                </span>
+              ) : (
+                <span className="text-[9px] text-zinc-700 font-medium leading-none mt-1">—</span>
+              )}
 
-            {/* Status dot */}
-            <div className={`w-1 h-1 rounded-full ${dotColor} ${isSelected && hasExercises ? 'shadow-[0_0_4px_rgba(16,185,129,0.8)]' : ''}`} />
+              {/* Sets count */}
+              {totalSets > 0 && (
+                <span className={cn("text-[8px] font-bold leading-none mt-1", isSelected ? "text-emerald-500/70" : "text-zinc-600")}>
+                  {totalSets}s
+                </span>
+              )}
+
+              {/* Status dot */}
+              <div className={cn(
+                "w-1 h-1 rounded-full mt-1",
+                dotColor,
+                isSelected && hasExercises && "shadow-[0_0_4px_rgba(16,185,129,0.8)]"
+              )} />
+            </div>
           </button>
         );
       })}

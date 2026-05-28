@@ -192,11 +192,35 @@ export async function loadSavedBlueprints(): Promise<{ id: string; name: string;
           .order('updated_at', { ascending: false });
 
         if (!error && data) {
-          const mapped = data.map((d: { id: string; nom: string; state: unknown }) => ({
-            id: d.id,
-            name: d.nom,
-            blueprint: d.state as WeeklyBlueprint
-          }));
+          const mapped = data.map((d: { id: string; nom: string; state: unknown }) => {
+            const parsedBlueprint = d.state as any;
+            if (parsedBlueprint) {
+              Object.keys(parsedBlueprint).forEach(day => {
+                if (Array.isArray(parsedBlueprint[day])) {
+                  parsedBlueprint[day] = parsedBlueprint[day].map((ex: any) => {
+                    if (typeof ex.sets === 'number') {
+                      return {
+                        ...ex,
+                        sets: Array(ex.sets).fill(null).map(() => ({
+                          series: 3,
+                          reps: 8,
+                          poids: 0,
+                          rpe: 8,
+                          active: true
+                        }))
+                      };
+                    }
+                    return ex;
+                  });
+                }
+              });
+            }
+            return {
+              id: d.id,
+              name: d.nom,
+              blueprint: parsedBlueprint as WeeklyBlueprint
+            };
+          });
           setCachedData(STORAGE_KEYS.BLUEPRINTS, mapped);
           return mapped;
         }
@@ -292,8 +316,31 @@ export function loadCurrentWorkPlan(): { blueprint: WeeklyBlueprint; toggledDays
     const toggledLocal = localStorage.getItem(STORAGE_KEYS.TOGGLED_DAYS);
     
     try {
+      const parsedBlueprint = blueprintLocal ? JSON.parse(blueprintLocal) : DEFAULT_BLUEPRINT;
+      
+      // Migration: Convertir les anciens PlannedExercise (sets: number) en nouveau format (sets: PlannedSet[])
+      Object.keys(parsedBlueprint).forEach(day => {
+        if (Array.isArray(parsedBlueprint[day])) {
+          parsedBlueprint[day] = parsedBlueprint[day].map((ex: any) => {
+            if (typeof ex.sets === 'number') {
+              return {
+                ...ex,
+                sets: Array(ex.sets).fill(null).map(() => ({
+                  series: 3,
+                  reps: 8,
+                  poids: 0,
+                  rpe: 8,
+                  active: true
+                }))
+              };
+            }
+            return ex;
+          });
+        }
+      });
+
       return {
-        blueprint: blueprintLocal ? JSON.parse(blueprintLocal) : DEFAULT_BLUEPRINT,
+        blueprint: parsedBlueprint,
         toggledDays: toggledLocal ? JSON.parse(toggledLocal) : DEFAULT_TOGGLED_DAYS
       };
     } catch {

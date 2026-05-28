@@ -6,12 +6,12 @@ import {
   UserProfile,
   WeeklyBlueprint,
   runWeeklySimulation,
-  runWeeklySimulationAsync,
   emptySimulationResult,
   PlannedExercise,
   Exercise,
   SimulationResult
 } from '@/lib/calculations';
+import { runSimulationViaWorker } from '@/lib/engineWorkerClient';
 import {
   loadUserProfile,
   saveUserProfile,
@@ -39,65 +39,81 @@ import dynamic from 'next/dynamic';
 
 const PDFDownloadButton = dynamic(() => import('@/components/simulator/PDFDownloadButton'), { ssr: false });
 const SocialExportButton = dynamic(() => import('@/components/simulator/SocialExportButton'), { ssr: false });
+const StoryExportModal = dynamic(() => import('@/components/simulator/StoryExportModal'), { ssr: false });
 import SocialExportPoster from '@/components/simulator/SocialExportPoster';
+import InjuryWarningToast from '@/components/ui/InjuryWarningToast';
+import { useSubscription } from '@/hooks/useSubscription';
+
+import { useAppInit } from '@/hooks/useAppInit';
+import { useSimulation } from '@/hooks/useSimulation';
+import { useSimulatorStore } from '@/store/useSimulatorStore';
+import { useUIStore } from '@/store/useUIStore';
+import { LazyMotion, domAnimation } from 'framer-motion';
 
 export default function Home() {
-  const [profile, setProfile] = useState<UserProfile>({
-    pdc: 75,
-    prs: { squat: 100, bench: 80, deadlift: 120, ohp: 50 },
-    maxSnc: 15.0,
-    age: 28,
-    sleepHours: 8,
-    caloricStatus: 'maintenance',
-    stressLevel: 'moderate'
-  });
+  // 1. Stores Zustand
+  const profile = useSimulatorStore(state => state.profile);
+  const setProfile = useSimulatorStore(state => state.setProfile);
+  const blueprint = useSimulatorStore(state => state.blueprint);
+  const setBlueprint = useSimulatorStore(state => state.setBlueprint);
+  const toggledDays = useSimulatorStore(state => state.toggledDays);
+  const setToggledDays = useSimulatorStore(state => state.setToggledDays);
+  const exercises = useSimulatorStore(state => state.exercises);
+  const savedBlueprints = useSimulatorStore(state => state.savedBlueprints);
+  const setSavedBlueprints = useSimulatorStore(state => state.setSavedBlueprints);
+  
+  const weeklySimulationResult = useSimulatorStore(state => state.weeklySimulationResult);
+  const dailySimulationResult = useSimulatorStore(state => state.dailySimulationResult);
+  const mainSimulationForCompare = useSimulatorStore(state => state.mainSimulationForCompare);
+  const compareSimulationResult = useSimulatorStore(state => state.compareSimulationResult);
 
-  const [blueprint, setBlueprint] = useState<WeeklyBlueprint>({
-    Lundi: [],
-    Mardi: [],
-    Mercredi: [],
-    Jeudi: [],
-    Vendredi: [],
-    Samedi: [],
-    Dimanche: []
-  });
+  const viewMode = useUIStore(state => state.viewMode);
+  const setViewMode = useUIStore(state => state.setViewMode);
+  const selectedDay = useUIStore(state => state.selectedDay);
+  const setSelectedDay = useUIStore(state => state.setSelectedDay);
+  const selectedMuscle = useUIStore(state => state.selectedMuscle);
+  const setSelectedMuscle = useUIStore(state => state.setSelectedMuscle);
+  const libraryOpen = useUIStore(state => state.libraryOpen);
+  const setLibraryOpen = useUIStore(state => state.setLibraryOpen);
+  
+  const isCalibrageOpen = useUIStore(state => state.isCalibrageOpen);
+  const setIsCalibrageOpen = useUIStore(state => state.setIsCalibrageOpen);
+  const isBlueprintsModalOpen = useUIStore(state => state.isBlueprintsModalOpen);
+  const setIsBlueprintsModalOpen = useUIStore(state => state.setIsBlueprintsModalOpen);
+  const isComparing = useUIStore(state => state.isComparing);
+  const setIsComparing = useUIStore(state => state.setIsComparing);
+  const isStoryModalOpen = useUIStore(state => state.isStoryModalOpen);
+  const setIsStoryModalOpen = useUIStore(state => state.setIsStoryModalOpen);
+  
+  const compareBlueprint = useUIStore(state => state.compareBlueprint);
+  const setCompareBlueprint = useUIStore(state => state.setCompareBlueprint);
+  const compareBlueprintName = useUIStore(state => state.compareBlueprintName);
+  const setCompareBlueprintName = useUIStore(state => state.setCompareBlueprintName);
+  const activeBlueprintId = useUIStore(state => state.activeBlueprintId);
+  const setActiveBlueprintId = useUIStore(state => state.setActiveBlueprintId);
+  const currentBlueprintName = useUIStore(state => state.currentBlueprintName);
+  const setCurrentBlueprintName = useUIStore(state => state.setCurrentBlueprintName);
+  
+  const supabaseUser = useUIStore(state => state.supabaseUser);
+  const isLoadingExercises = useUIStore(state => state.isLoadingExercises);
+  const hoveredExercise = useUIStore(state => state.hoveredExercise);
+  const setHoveredExercise = useUIStore(state => state.setHoveredExercise);
+  const selectedExercise = useUIStore(state => state.selectedExercise);
+  const setSelectedExercise = useUIStore(state => state.setSelectedExercise);
 
-  const [toggledDays, setToggledDays] = useState<{ [day: string]: boolean }>({
-    Lundi: true,
-    Mardi: true,
-    Mercredi: true,
-    Jeudi: true,
-    Vendredi: true,
-    Samedi: true,
-    Dimanche: true
-  });
-
-  const [savedBlueprints, setSavedBlueprints] = useState<{ id: string; name: string; blueprint: WeeklyBlueprint }[]>([]);
-  const [isCalibrageOpen, setIsCalibrageOpen] = useState(false);
-  const [isBlueprintsModalOpen, setIsBlueprintsModalOpen] = useState(false);
-  const [libraryOpen, setLibraryOpen] = useState(true);
-  const [viewMode, setViewMode] = useState<'day' | 'week'>('day');
-  const [supabaseUser, setSupabaseUser] = useState<unknown>(null);
-  const [activeBlueprintId, setActiveBlueprintId] = useState<string | null>(null);
-  const [currentBlueprintName, setCurrentBlueprintName] = useState<string>('Blueprint de travail');
-  const [selectedDay, setSelectedDay] = useState<string>('Dimanche');
-  const [selectedMuscle, setSelectedMuscle] = useState<string>('all');
-  const [exercises, setExercises] = useState<Exercise[]>([]);
-  const [isLoadingExercises, setIsLoadingExercises] = useState(true);
-  const [hoveredExercise, setHoveredExercise] = useState<Exercise | null>(null);
-  const [selectedExercise, setSelectedExercise] = useState<Exercise | null>(null);
+  // 2. Custom Hooks
+  useAppInit();
+  useSimulation();
 
   const { toast, confirm, prompt } = useToast();
-
-  // Comparaison A/B
-  const [isComparing, setIsComparing] = useState(false);
-  const [compareBlueprint, setCompareBlueprint] = useState<WeeklyBlueprint | null>(null);
-  const [compareBlueprintName, setCompareBlueprintName] = useState<string | null>(null);
-  const [isCompareModalOpen, setIsCompareModalOpen] = useState(false);
 
   const avatarRef = React.useRef<HTMLDivElement>(null);
   const [avatarImageStr, setAvatarImageStr] = useState<string | null>(null);
   const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
+  const [isCompareModalOpen, setIsCompareModalOpen] = useState(false);
+
+  // Vérification de l'abonnement
+  const { isPro, isLoading: isSubLoading } = useSubscription();
 
   const handlePreparePdf = async () => {
     if (!avatarRef.current) return;
@@ -119,92 +135,10 @@ export default function Home() {
   }, [hoveredExercise, selectedExercise]);
 
   const supabase = createClient();
-
-  // 1. Initialisation : Chargement des données locales/Supabase
-  useEffect(() => {
-    async function initData() {
-      // Vérifier si l'utilisateur est connecté
-      try {
-        const { data: { user } } = await supabase.auth.getUser();
-        setSupabaseUser(user);
-      } catch (err) {
-        console.warn("Supabase auth check failed, operating in local mode.", err);
-      }
-
-      // Charger le profil
-      const userProfile = await loadUserProfile();
-      setProfile(userProfile);
-
-      // Charger le plan de travail actuel
-      const savedPlan = loadCurrentWorkPlan();
-      setBlueprint(savedPlan.blueprint);
-      setToggledDays(savedPlan.toggledDays);
-
-      // Charger l'historique des blueprints
-      const history = await loadSavedBlueprints();
-      setSavedBlueprints(history);
-
-      // Charger les exercices dynamiques
-      const loadedExercises = await loadExercises();
-      setExercises(loadedExercises);
-      setIsLoadingExercises(false);
-    }
-    initData();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  // 2. Sauvegarde automatique de la session de travail actuelle
-  useEffect(() => {
-    saveCurrentWorkPlan(blueprint, toggledDays);
-  }, [blueprint, toggledDays]);
-
-  // 3. Calculs des simulations asynchrones (Non-blocking UI)
-  const [weeklySimulationResult, setWeeklySimulationResult] = useState<SimulationResult>(emptySimulationResult);
-  useEffect(() => {
-    let active = true;
-    runWeeklySimulationAsync(blueprint, profile, toggledDays, undefined, exercises)
-      .then(res => { if (active) setWeeklySimulationResult(res); });
-    return () => { active = false; };
-  }, [blueprint, profile, toggledDays, exercises]);
-
-  const [dailySimulationResult, setDailySimulationResult] = useState<SimulationResult>(emptySimulationResult);
-  useEffect(() => {
-    let active = true;
-    runWeeklySimulationAsync(blueprint, profile, toggledDays, selectedDay, exercises)
-      .then(res => { if (active) setDailySimulationResult(res); });
-    return () => { active = false; };
-  }, [blueprint, profile, toggledDays, selectedDay, exercises]);
-
   const simulationResult = viewMode === 'week' ? weeklySimulationResult : dailySimulationResult;
-
-  // Comparaison A/B : On simule avec tous les jours actifs pour que la comparaison de volume soit équitable
   const fullyActiveDays = useMemo(() => ({
     Lundi: true, Mardi: true, Mercredi: true, Jeudi: true, Vendredi: true, Samedi: true, Dimanche: true
   }), []);
-
-  const [compareSimulationResult, setCompareSimulationResult] = useState<SimulationResult | null>(null);
-  useEffect(() => {
-    if (!compareBlueprint) {
-      setCompareSimulationResult(null);
-      return;
-    }
-    let active = true;
-    runWeeklySimulationAsync(compareBlueprint, profile, fullyActiveDays, undefined, exercises)
-      .then(res => { if (active) setCompareSimulationResult(res); });
-    return () => { active = false; };
-  }, [compareBlueprint, profile, fullyActiveDays, exercises]);
-
-  const [mainSimulationForCompare, setMainSimulationForCompare] = useState<SimulationResult>(emptySimulationResult);
-  useEffect(() => {
-    if (!isComparing) {
-      setMainSimulationForCompare(weeklySimulationResult);
-      return;
-    }
-    let active = true;
-    runWeeklySimulationAsync(blueprint, profile, fullyActiveDays, undefined, exercises)
-      .then(res => { if (active) setMainSimulationForCompare(res); });
-    return () => { active = false; };
-  }, [isComparing, blueprint, profile, fullyActiveDays, exercises, weeklySimulationResult]);
 
   // 4. Ajouter un exercice au séquenceur
   const handleAddExercise = useCallback((exerciseId: string, day: string) => {
@@ -247,7 +181,7 @@ export default function Home() {
       ...prev,
       [day]: [...(prev[day as keyof typeof prev] || []), newPlannedEx]
     }));
-  }, [exercises, simulationResult]);
+  }, [exercises, simulationResult, setBlueprint]);
 
   // Mises à jour d'état robustes (évite les stale closures de blueprint)
   const handleUpdateExercise = useCallback((day: string, index: number, updatedEx: PlannedExercise) => {
@@ -259,7 +193,7 @@ export default function Home() {
         [day]: updatedDayExercises
       };
     });
-  }, []);
+  }, [setBlueprint]);
 
   const handleReorderExercises = useCallback((day: string, startIndex: number, endIndex: number) => {
     setBlueprint(prev => {
@@ -271,7 +205,7 @@ export default function Home() {
         [day]: updatedDayExercises
       };
     });
-  }, []);
+  }, [setBlueprint]);
 
   const handleDeleteExercise = useCallback((day: string, index: number) => {
     setBlueprint(prev => {
@@ -281,18 +215,18 @@ export default function Home() {
         [day]: updatedDayExercises
       };
     });
-  }, []);
+  }, [setBlueprint]);
 
   const handleClearDay = useCallback((day: string) => {
     setBlueprint(prev => ({
       ...prev,
       [day]: []
     }));
-  }, []);
+  }, [setBlueprint]);
 
   const handleLoadTemplate = useCallback((template: WeeklyBlueprint) => {
     setBlueprint(template);
-  }, []);
+  }, [setBlueprint]);
 
   // 5. Sauvegarder le profil
   const handleSaveProfile = async (newProfile: UserProfile) => {
@@ -302,6 +236,12 @@ export default function Home() {
 
   // 6. Sauvegarder le Blueprint dans la liste
   const handleSaveBlueprint = async () => {
+    // Paywall Limit Check (Free tier = max 2 blueprints)
+    if (!isPro && savedBlueprints.length >= 2 && !activeBlueprintId) {
+      toast('🔒 Forge PRO requis : Vous avez atteint la limite de 2 programmes sur le compte gratuit.', 'error', 5000);
+      return;
+    }
+
     prompt(
       "Entrez un nom pour votre Blueprint hebdomadaire :",
       activeBlueprintId ? currentBlueprintName : "Mon Programme Force",
@@ -338,6 +278,12 @@ export default function Home() {
 
   // 8. Créer un nouveau Blueprint vierge
   const handleNewBlueprint = () => {
+    // Paywall Limit Check
+    if (!isPro && savedBlueprints.length >= 2 && !activeBlueprintId) {
+      toast('🔒 Forge PRO requis : Vous avez atteint la limite de 2 programmes sur le compte gratuit.', 'error', 5000);
+      return;
+    }
+
     confirm(
       "Réinitialiser le séquenceur actuel pour créer un nouveau programme ?",
       () => {
@@ -399,6 +345,7 @@ export default function Home() {
   };
 
   return (
+    <LazyMotion features={domAnimation}>
     <main className="h-screen bg-zinc-950 text-zinc-100 flex flex-col md:flex-row overflow-hidden font-sans">
 
       {/* Onboarding Spotlight — first visit only */}
@@ -825,5 +772,6 @@ export default function Home() {
         highlightedMuscles={highlightedMuscles}
       />
     </main>
+      </LazyMotion>
   );
 }
