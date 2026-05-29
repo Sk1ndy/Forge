@@ -1,0 +1,78 @@
+{
+  "scenarioId": "asymmetrical_bro_split",
+  "status": "PASS",
+  "input": {
+    "blueprint": {
+      "Lundi": [
+        {
+          "id": "1",
+          "exerciseId": "bench_press",
+          "active": true,
+          "sets": [
+            {
+              "series": 5,
+              "reps": 10,
+              "poids": 80,
+              "rpe": 8,
+              "active": true
+            }
+          ]
+        }
+      ],
+      "Mardi": [],
+      "Mercredi": [
+        {
+          "id": "2",
+          "exerciseId": "ohp",
+          "active": true,
+          "sets": [
+            {
+              "series": 5,
+              "reps": 10,
+              "poids": 50,
+              "rpe": 8,
+              "active": true
+            }
+          ]
+        }
+      ],
+      "Jeudi": [],
+      "Vendredi": [
+        {
+          "id": "3",
+          "exerciseId": "dips",
+          "active": true,
+          "sets": [
+            {
+              "series": 5,
+              "reps": 10,
+              "poids": 20,
+              "rpe": 8,
+              "active": true
+            }
+          ]
+        }
+      ],
+      "Samedi": [],
+      "Dimanche": []
+    }
+  },
+  "output": {
+    "sncScore": 0.27,
+    "readiness": 97.6,
+    "injuryRisk": "HIGH",
+    "metrics": {
+      "chronicSncStress": 10.57,
+      "globalWorkCapacity": 97.6,
+      "cnsFailure": false
+    }
+  },
+  "assertions": [
+    {
+      "key": "snapshot_match",
+      "expected": 1,
+      "actual": 1,
+      "delta": 0
+    }
+  ]
+}

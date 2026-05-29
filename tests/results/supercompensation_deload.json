@@ -1,0 +1,48 @@
+{
+  "scenarioId": "supercompensation_deload",
+  "status": "PASS",
+  "input": {
+    "blueprint": {
+      "Lundi": [
+        {
+          "id": "1",
+          "exerciseId": "squat",
+          "active": true,
+          "sets": [
+            {
+              "series": 4,
+              "reps": 8,
+              "poids": 100,
+              "rpe": 8,
+              "active": true
+            }
+          ]
+        }
+      ],
+      "Mardi": [],
+      "Mercredi": [],
+      "Jeudi": [],
+      "Vendredi": [],
+      "Samedi": [],
+      "Dimanche": []
+    }
+  },
+  "output": {
+    "sncScore": 0,
+    "readiness": 98.9,
+    "injuryRisk": "LOW",
+    "metrics": {
+      "chronicSncStress": 4.84,
+      "globalWorkCapacity": 98.9,
+      "cnsFailure": false
+    }
+  },
+  "assertions": [
+    {
+      "key": "snapshot_match",
+      "expected": 1,
+      "actual": 1,
+      "delta": 0
+    }
+  ]
+}

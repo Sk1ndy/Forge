@@ -13,6 +13,8 @@ export interface BiomechanicsConfig {
   /** Decay time constant for chronic systemic fatigue (Burnout). Dissipates very slowly (21+ days). */
   tauChronicSnc: number;
   
+  /** Le Plafond génétique maximal absolu atteignable (Myostatine, Âge, Récupération). */
+  geneticCeiling: number;
   /** Multiplier for fitness impact on performance */
   k1: number;
   
@@ -66,6 +68,9 @@ export function generateBiomechanicsConfig(profile: UserProfile): BiomechanicsCo
   const tauDamage = baseTauDamage / recoveryRate;
   const tauChronicSnc = baseTauChronicSnc / recoveryRate;
   
+  // Plafond génétique modulé par la qualité de la récupération et l'âge
+  const geneticCeiling = 1000.0 * Math.pow(recoveryRate, 1.5);
+  
   // Fitness retention is also affected but to a lesser degree
   const tauFitness = baseTauFitness * Math.sqrt(recoveryRate);
 
@@ -80,6 +85,7 @@ export function generateBiomechanicsConfig(profile: UserProfile): BiomechanicsCo
     tauMetabolic,
     tauDamage,
     tauChronicSnc,
+    geneticCeiling,
     k1: 1.0, // Base fitness weight
     k2: 2.0, // Fatigue usually has a 2x immediate impact compared to fitness
     recoveryRate,

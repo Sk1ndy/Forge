@@ -1,0 +1,166 @@
+{
+  "scenarioId": "Stress_Test_Max",
+  "status": "PASS",
+  "input": {
+    "profile": {
+      "pdc": 80,
+      "prs": {
+        "bench": 100,
+        "squat": 140,
+        "deadlift": 180,
+        "ohp": 60
+      },
+      "maxSnc": 15
+    },
+    "blueprint": {
+      "Lundi": [
+        {
+          "id": "1",
+          "exerciseId": "squat",
+          "sets": [
+            {
+              "series": 10,
+              "reps": 5,
+              "poids": 130,
+              "rpe": 10,
+              "active": true
+            }
+          ],
+          "active": true
+        }
+      ],
+      "Mardi": [
+        {
+          "id": "2",
+          "exerciseId": "bench_press",
+          "sets": [
+            {
+              "series": 10,
+              "reps": 5,
+              "poids": 95,
+              "rpe": 10,
+              "active": true
+            }
+          ],
+          "active": true
+        }
+      ],
+      "Mercredi": [
+        {
+          "id": "3",
+          "exerciseId": "deadlift",
+          "sets": [
+            {
+              "series": 10,
+              "reps": 5,
+              "poids": 170,
+              "rpe": 10,
+              "active": true
+            }
+          ],
+          "active": true
+        }
+      ],
+      "Jeudi": [
+        {
+          "id": "4",
+          "exerciseId": "squat",
+          "sets": [
+            {
+              "series": 10,
+              "reps": 5,
+              "poids": 130,
+              "rpe": 10,
+              "active": true
+            }
+          ],
+          "active": true
+        }
+      ],
+      "Vendredi": [
+        {
+          "id": "5",
+          "exerciseId": "bench_press",
+          "sets": [
+            {
+              "series": 10,
+              "reps": 5,
+              "poids": 95,
+              "rpe": 10,
+              "active": true
+            }
+          ],
+          "active": true
+        }
+      ],
+      "Samedi": [],
+      "Dimanche": []
+    }
+  },
+  "output": {
+    "sncScore": 17.82,
+    "readiness": 27.9,
+    "injuryRisk": "HIGH",
+    "metrics": {
+      "peakFatigue": {
+        "chest": {
+          "value": 1.81,
+          "day": 4
+        },
+        "upperBack": {
+          "value": 0.74,
+          "day": 2
+        },
+        "frontDeltoid": {
+          "value": 1.4,
+          "day": 4
+        },
+        "biceps": {
+          "value": 0,
+          "day": 0
+        },
+        "triceps": {
+          "value": 1.26,
+          "day": 4
+        },
+        "quadriceps": {
+          "value": 1.81,
+          "day": 3
+        },
+        "hamstring": {
+          "value": 1.55,
+          "day": 2
+        }
+      },
+      "weeklyEffectiveSets": {
+        "chest": 20,
+        "upperBack": 10,
+        "frontDeltoid": 20,
+        "biceps": 0,
+        "triceps": 20,
+        "quadriceps": 20,
+        "hamstring": 30
+      },
+      "pushPullRatio": {
+        "push": 100,
+        "pull": 0
+      },
+      "axialSncLoad": 9.6921,
+      "traumaAlerts": []
+    }
+  },
+  "assertions": [
+    {
+      "key": "sncScore > maxSnc",
+      "expected": 15,
+      "actual": 17.82,
+      "delta": 2.8200000000000003
+    },
+    {
+      "key": "cnsFailure",
+      "expected": 1,
+      "actual": 1,
+      "delta": 0
+    }
+  ]
+}

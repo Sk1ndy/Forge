@@ -1,0 +1,113 @@
+{
+  "scenarioId": "Volume_Ceiling_Test",
+  "status": "PASS",
+  "input": {
+    "profile": {
+      "pdc": 80,
+      "prs": {
+        "bench": 100,
+        "squat": 140,
+        "deadlift": 180,
+        "ohp": 60
+      },
+      "maxSnc": 15
+    },
+    "blueprint": {
+      "Lundi": [
+        {
+          "id": "1",
+          "exerciseId": "bench_press",
+          "sets": [
+            {
+              "series": 15,
+              "reps": 10,
+              "poids": 70,
+              "rpe": 8,
+              "active": true
+            },
+            {
+              "series": 10,
+              "reps": 10,
+              "poids": 70,
+              "rpe": 8,
+              "active": true
+            }
+          ],
+          "active": true
+        }
+      ],
+      "Mardi": [],
+      "Mercredi": [],
+      "Jeudi": [],
+      "Vendredi": [],
+      "Samedi": [],
+      "Dimanche": []
+    }
+  },
+  "output": {
+    "sncScore": 6.47,
+    "readiness": 71,
+    "injuryRisk": "LOW",
+    "metrics": {
+      "peakFatigue": {
+        "chest": {
+          "value": 1.88,
+          "day": 0
+        },
+        "upperBack": {
+          "value": 0,
+          "day": 0
+        },
+        "frontDeltoid": {
+          "value": 1.59,
+          "day": 0
+        },
+        "biceps": {
+          "value": 0,
+          "day": 0
+        },
+        "triceps": {
+          "value": 1.47,
+          "day": 0
+        },
+        "quadriceps": {
+          "value": 0,
+          "day": 0
+        },
+        "hamstring": {
+          "value": 0,
+          "day": 0
+        }
+      },
+      "weeklyEffectiveSets": {
+        "chest": 25,
+        "upperBack": 0,
+        "frontDeltoid": 25,
+        "biceps": 0,
+        "triceps": 25,
+        "quadriceps": 0,
+        "hamstring": 0
+      },
+      "pushPullRatio": {
+        "push": 100,
+        "pull": 0
+      },
+      "axialSncLoad": 0,
+      "traumaAlerts": []
+    }
+  },
+  "assertions": [
+    {
+      "key": "junkVolumeAlert Triggered",
+      "expected": 1,
+      "actual": 1,
+      "delta": 0
+    },
+    {
+      "key": "chest effective sets",
+      "expected": 25,
+      "actual": 25,
+      "delta": 0
+    }
+  ]
+}

@@ -1,0 +1,138 @@
+{
+  "scenarioId": "monotony_assembly_line",
+  "status": "PASS",
+  "input": {
+    "blueprint": {
+      "Lundi": [
+        {
+          "id": "1",
+          "exerciseId": "squat",
+          "active": true,
+          "sets": [
+            {
+              "series": 5,
+              "reps": 10,
+              "poids": 100,
+              "rpe": 8,
+              "active": true
+            }
+          ]
+        }
+      ],
+      "Mardi": [
+        {
+          "id": "2",
+          "exerciseId": "squat",
+          "active": true,
+          "sets": [
+            {
+              "series": 5,
+              "reps": 10,
+              "poids": 100,
+              "rpe": 8,
+              "active": true
+            }
+          ]
+        }
+      ],
+      "Mercredi": [
+        {
+          "id": "3",
+          "exerciseId": "squat",
+          "active": true,
+          "sets": [
+            {
+              "series": 5,
+              "reps": 10,
+              "poids": 100,
+              "rpe": 8,
+              "active": true
+            }
+          ]
+        }
+      ],
+      "Jeudi": [
+        {
+          "id": "4",
+          "exerciseId": "squat",
+          "active": true,
+          "sets": [
+            {
+              "series": 5,
+              "reps": 10,
+              "poids": 100,
+              "rpe": 8,
+              "active": true
+            }
+          ]
+        }
+      ],
+      "Vendredi": [
+        {
+          "id": "5",
+          "exerciseId": "squat",
+          "active": true,
+          "sets": [
+            {
+              "series": 5,
+              "reps": 10,
+              "poids": 100,
+              "rpe": 8,
+              "active": true
+            }
+          ]
+        }
+      ],
+      "Samedi": [
+        {
+          "id": "6",
+          "exerciseId": "squat",
+          "active": true,
+          "sets": [
+            {
+              "series": 5,
+              "reps": 10,
+              "poids": 100,
+              "rpe": 8,
+              "active": true
+            }
+          ]
+        }
+      ],
+      "Dimanche": [
+        {
+          "id": "7",
+          "exerciseId": "squat",
+          "active": true,
+          "sets": [
+            {
+              "series": 5,
+              "reps": 10,
+              "poids": 100,
+              "rpe": 8,
+              "active": true
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "output": {
+    "sncScore": 9.73,
+    "readiness": 37.7,
+    "injuryRisk": "HIGH",
+    "metrics": {
+      "chronicSncStress": 51.52,
+      "globalWorkCapacity": 37.7,
+      "cnsFailure": false
+    }
+  },
+  "assertions": [
+    {
+      "key": "snapshot_match",
+      "expected": 1,
+      "actual": 1,
+      "delta": 0
+    }
+  ]
+}

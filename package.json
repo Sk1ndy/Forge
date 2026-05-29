@@ -11,6 +11,7 @@
     "@vitejs/plugin-react": "^6.0.2",
     "expo": "~56.0.4",
     "expo-router": "~56.2.6",
+    "husky": "^9.1.7",
     "jsdom": "^29.1.1",
     "vitest": "^4.1.7"
   },
@@ -19,6 +20,7 @@
     "build": "npm run build --workspace=apps/web --workspace=@forge/shared",
     "lint": "npm run lint --workspaces",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "prepare": "husky"
   }
 }

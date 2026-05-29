@@ -1,0 +1,108 @@
+{
+  "scenarioId": "never_skip_leg_day_extreme",
+  "status": "PASS",
+  "input": {
+    "blueprint": {
+      "Lundi": [
+        {
+          "id": "1",
+          "exerciseId": "squat",
+          "active": true,
+          "sets": [
+            {
+              "series": 5,
+              "reps": 10,
+              "poids": 100,
+              "rpe": 8,
+              "active": true
+            }
+          ]
+        }
+      ],
+      "Mardi": [
+        {
+          "id": "2",
+          "exerciseId": "squat",
+          "active": true,
+          "sets": [
+            {
+              "series": 5,
+              "reps": 10,
+              "poids": 100,
+              "rpe": 8,
+              "active": true
+            }
+          ]
+        }
+      ],
+      "Mercredi": [
+        {
+          "id": "3",
+          "exerciseId": "leg_press",
+          "active": true,
+          "sets": [
+            {
+              "series": 5,
+              "reps": 10,
+              "poids": 200,
+              "rpe": 8,
+              "active": true
+            }
+          ]
+        }
+      ],
+      "Jeudi": [
+        {
+          "id": "4",
+          "exerciseId": "leg_extension",
+          "active": true,
+          "sets": [
+            {
+              "series": 5,
+              "reps": 15,
+              "poids": 60,
+              "rpe": 9,
+              "active": true
+            }
+          ]
+        }
+      ],
+      "Vendredi": [
+        {
+          "id": "5",
+          "exerciseId": "lunges",
+          "active": true,
+          "sets": [
+            {
+              "series": 5,
+              "reps": 12,
+              "poids": 40,
+              "rpe": 8,
+              "active": true
+            }
+          ]
+        }
+      ],
+      "Samedi": [],
+      "Dimanche": []
+    }
+  },
+  "output": {
+    "sncScore": 0.33,
+    "readiness": 81,
+    "injuryRisk": "HIGH",
+    "metrics": {
+      "chronicSncStress": 29.59,
+      "globalWorkCapacity": 81,
+      "cnsFailure": false
+    }
+  },
+  "assertions": [
+    {
+      "key": "snapshot_match",
+      "expected": 1,
+      "actual": 1,
+      "delta": 0
+    }
+  ]
+}

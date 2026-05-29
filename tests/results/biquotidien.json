@@ -1,0 +1,62 @@
+{
+  "scenarioId": "biquotidien",
+  "status": "PASS",
+  "input": {
+    "blueprint": {
+      "Lundi": [
+        {
+          "id": "1",
+          "exerciseId": "squat",
+          "active": true,
+          "sets": [
+            {
+              "series": 4,
+              "reps": 8,
+              "poids": 100,
+              "rpe": 8,
+              "active": true
+            }
+          ]
+        },
+        {
+          "id": "2",
+          "exerciseId": "leg_press",
+          "active": true,
+          "sets": [
+            {
+              "series": 4,
+              "reps": 12,
+              "poids": 150,
+              "rpe": 8,
+              "active": true
+            }
+          ]
+        }
+      ],
+      "Mardi": [],
+      "Mercredi": [],
+      "Jeudi": [],
+      "Vendredi": [],
+      "Samedi": [],
+      "Dimanche": []
+    }
+  },
+  "output": {
+    "sncScore": 0.01,
+    "readiness": 97.7,
+    "injuryRisk": "LOW",
+    "metrics": {
+      "chronicSncStress": 3.61,
+      "globalWorkCapacity": 97.7,
+      "cnsFailure": false
+    }
+  },
+  "assertions": [
+    {
+      "key": "snapshot_match",
+      "expected": 1,
+      "actual": 1,
+      "delta": 0
+    }
+  ]
+}

@@ -1,0 +1,34 @@
+{
+  "scenarioId": "Invalid_Input_Recovery",
+  "status": "FAIL",
+  "input": {
+    "profile": {
+      "pdc": -10,
+      "prs": {
+        "bench": 100,
+        "squat": 140,
+        "deadlift": 180,
+        "ohp": 60
+      },
+      "maxSnc": 15
+    },
+    "blueprint": {
+      "Lundi": [],
+      "Mardi": [],
+      "Mercredi": [],
+      "Jeudi": [],
+      "Vendredi": [],
+      "Samedi": [],
+      "Dimanche": []
+    }
+  },
+  "output": null,
+  "assertions": [
+    {
+      "key": "status == FAIL",
+      "expected": 0,
+      "actual": 0,
+      "delta": 0
+    }
+  ]
+}

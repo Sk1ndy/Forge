@@ -1,0 +1,78 @@
+{
+  "scenarioId": "undulating_periodization",
+  "status": "PASS",
+  "input": {
+    "blueprint": {
+      "Lundi": [
+        {
+          "id": "1",
+          "exerciseId": "squat",
+          "active": true,
+          "sets": [
+            {
+              "series": 4,
+              "reps": 5,
+              "poids": 120,
+              "rpe": 9.5,
+              "active": true
+            }
+          ]
+        }
+      ],
+      "Mardi": [],
+      "Mercredi": [
+        {
+          "id": "2",
+          "exerciseId": "squat",
+          "active": true,
+          "sets": [
+            {
+              "series": 4,
+              "reps": 12,
+              "poids": 70,
+              "rpe": 6,
+              "active": true
+            }
+          ]
+        }
+      ],
+      "Jeudi": [],
+      "Vendredi": [
+        {
+          "id": "3",
+          "exerciseId": "squat",
+          "active": true,
+          "sets": [
+            {
+              "series": 4,
+              "reps": 8,
+              "poids": 95,
+              "rpe": 8,
+              "active": true
+            }
+          ]
+        }
+      ],
+      "Samedi": [],
+      "Dimanche": []
+    }
+  },
+  "output": {
+    "sncScore": 0.41,
+    "readiness": 87.1,
+    "injuryRisk": "HIGH",
+    "metrics": {
+      "chronicSncStress": 19.4,
+      "globalWorkCapacity": 87.1,
+      "cnsFailure": false
+    }
+  },
+  "assertions": [
+    {
+      "key": "snapshot_match",
+      "expected": 1,
+      "actual": 1,
+      "delta": 0
+    }
+  ]
+}

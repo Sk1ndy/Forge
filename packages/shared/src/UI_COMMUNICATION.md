@@ -29,4 +29,17 @@ Le moteur ne retournera plus **aucune chaîne de caractères en français** pour
 - Il utilisera l'index numérique `0-6` ou l'ISO (ex: lundi = 0).
 - Dans `SimulationResult.weeklyMacro.peakFatigue[id].day`, tu recevras un `Number` (0 à 6) au lieu d'une string. À toi de le formater avec `date-fns` ou un tableau localisé.
 
-Merci d'appliquer ces modifications dans `apps/web/` une fois que mon refactoring backend sera pushé.
+## Nouveaux Contrats de Données (Features Biologiques) :
+
+### 5. `SimulationResult.chronicSncStress` (Jauge de Burnout)
+- **Concept** : Le moteur calcule désormais la fatigue systémique chronique (accumulation sur des semaines).
+- **Ton action** : Créer une Jauge de "Catabolisme / Burnout" sur le Dashboard. 
+  - Si `chronicSncStress > 3.0` : Alerte rouge vif (Fonte musculaire en cours par catabolisme du cortisol). L'UI doit conseiller un Deload absolu.
+
+### 6. `SimulationResult.progressiveOverload` (Gains Hypertrophiques & Verhulst)
+- **Concept** : Le moteur intègre la loi de croissance logistique (Verhulst) freinée par un plafond génétique calculé dynamiquement.
+- **Ton action** : Afficher la croissance sous forme de graphiques ou de pourcentages. 
+  - Utilise `progressiveOverload[muscleId].weekOverWeekGrowthPct`.
+  - Si le pourcentage tend vers `0` malgré un bon volume d'entraînement, affiche un indicateur "Plafond Génétique Approché" (la Myostatine sature le développement).
+
+Merci d'appliquer ces modifications dans `apps/web/` pour garantir que l'interface reflète l'exactitude scientifique du moteur.

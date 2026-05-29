@@ -1,0 +1,134 @@
+{
+  "scenarioId": "beginner_full_body",
+  "status": "PASS",
+  "input": {
+    "blueprint": {
+      "Lundi": [
+        {
+          "id": "1",
+          "exerciseId": "squat",
+          "active": true,
+          "sets": [
+            {
+              "series": 3,
+              "reps": 10,
+              "poids": 60,
+              "rpe": 7,
+              "active": true
+            }
+          ]
+        },
+        {
+          "id": "2",
+          "exerciseId": "bench_press",
+          "active": true,
+          "sets": [
+            {
+              "series": 3,
+              "reps": 10,
+              "poids": 50,
+              "rpe": 7,
+              "active": true
+            }
+          ]
+        }
+      ],
+      "Mardi": [],
+      "Mercredi": [
+        {
+          "id": "3",
+          "exerciseId": "deadlift",
+          "active": true,
+          "sets": [
+            {
+              "series": 3,
+              "reps": 8,
+              "poids": 80,
+              "rpe": 7,
+              "active": true
+            }
+          ]
+        },
+        {
+          "id": "4",
+          "exerciseId": "pull_ups",
+          "active": true,
+          "sets": [
+            {
+              "series": 3,
+              "reps": 8,
+              "poids": 0,
+              "rpe": 7,
+              "active": true
+            }
+          ]
+        }
+      ],
+      "Jeudi": [],
+      "Vendredi": [
+        {
+          "id": "5",
+          "exerciseId": "squat",
+          "active": true,
+          "sets": [
+            {
+              "series": 3,
+              "reps": 10,
+              "poids": 65,
+              "rpe": 8,
+              "active": true
+            }
+          ]
+        },
+        {
+          "id": "6",
+          "exerciseId": "ohp",
+          "active": true,
+          "sets": [
+            {
+              "series": 3,
+              "reps": 10,
+              "poids": 30,
+              "rpe": 7,
+              "active": true
+            }
+          ]
+        }
+      ],
+      "Samedi": [],
+      "Dimanche": []
+    },
+    "profile": {
+      "pdc": 80,
+      "prs": {
+        "squat": 140,
+        "bench": 100,
+        "deadlift": 180,
+        "ohp": 60
+      },
+      "maxSnc": 15,
+      "isBeginner": false,
+      "age": 25,
+      "sleepHours": 8
+    },
+    "totalWeeks": 4
+  },
+  "output": {
+    "sncScore": 0.31,
+    "readiness": 92.6,
+    "injuryRisk": "LOW",
+    "metrics": {
+      "chronicSncStress": 12.17,
+      "globalWorkCapacity": 92.6,
+      "cnsFailure": false
+    }
+  },
+  "assertions": [
+    {
+      "key": "snapshot_match",
+      "expected": 1,
+      "actual": 1,
+      "delta": 0
+    }
+  ]
+}

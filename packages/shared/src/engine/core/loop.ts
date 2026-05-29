@@ -8,11 +8,12 @@ import { applyDiminishingReturns } from '../algorithms/junk-volume';
 import { generateBiomechanicsConfig } from '../config';
 
 const DAYS_OF_WEEK = [0, 1, 2, 3, 4, 5, 6];
+const DAY_NAMES = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche'] as const;
 
 export function* executeSimulationGenerator(
   blueprint: WeeklyBlueprint,
   profile: UserProfile,
-  toggledDays: { [day: string]: boolean },
+  toggledDays: { [day: string]: boolean | undefined; [day: number]: boolean | undefined },
   selectedDay: string | undefined,
   exerciseLibrary: Exercise[],
   totalWeeks: number,
@@ -82,11 +83,24 @@ export function* executeSimulationGenerator(
 
       Object.keys(musclesMap).forEach(id => {
         dailyRawAccumulator[id] = { metabolic: 0, damage: 0, joint: 0, inol: 0, contributions: {}, setsContributions: {} };
-        // Bi-Phasic Exponential Decay
+        // 1. Récupération du taux de rétention local
+        const retention = MUSCLE_FATIGUE_DECAY[id as keyof typeof MUSCLE_FATIGUE_DECAY] || 0.5;
+        // 2. Conversion du taux de rétention en modificateur de temps de demi-vie
+        const localTauMultiplier = Math.log(0.5) / Math.log(retention);
+
+        // Bi-Phasic Exponential Decay (Modulé par la récupération locale)
+        const baseTauMetabolic = config.tauMetabolic * localTauMultiplier;
+        const baseTauDamage = config.tauDamage * localTauMultiplier;
+
         // Accelerated flush during deload by dividing the time constant (tau)
-        const currentTauMetabolic = isDeload ? config.tauMetabolic / 1.5 : config.tauMetabolic;
-        const currentTauDamage = isDeload ? config.tauDamage / 1.5 : config.tauDamage;
-        const currentTauFitness = isDeload ? config.tauFitness * 1.1 : config.tauFitness; // retain fitness better during deload
+        const currentTauMetabolic = isDeload ? baseTauMetabolic / 1.5 : baseTauMetabolic;
+        const currentTauDamage = isDeload ? baseTauDamage / 1.5 : baseTauDamage;
+        let currentTauFitness = isDeload ? config.tauFitness * 1.1 : config.tauFitness; // retain fitness better during deload
+        
+        // Catabolisme du Cortisol : Perte accélérée de la masse musculaire si le SNC est en Burnout
+        if (chronicSncStress > 3.0) {
+          currentTauFitness = currentTauFitness * Math.max(0.3, 1.0 - (chronicSncStress - 3.0) * 0.15);
+        }
         
         musclesMap[id].fatigueMetabolic = applyExponentialDecay(musclesMap[id].fatigueMetabolic, currentTauMetabolic, 1);
         musclesMap[id].fatigueDamage = applyExponentialDecay(musclesMap[id].fatigueDamage, currentTauDamage, 1);
@@ -95,7 +109,7 @@ export function* executeSimulationGenerator(
         musclesMap[id].fitness = applyExponentialDecay(musclesMap[id].fitness, currentTauFitness, 1);
         
         // Joint stress takes ~4x longer to heal than muscle damage (tendons heal very slowly)
-        const currentTauJoint = isDeload ? (config.tauDamage * 4.0) / 1.5 : config.tauDamage * 4.0;
+        const currentTauJoint = isDeload ? (baseTauDamage * 4.0) / 1.5 : baseTauDamage * 4.0;
         musclesMap[id].jointStress = applyExponentialDecay((musclesMap[id].jointStress || 0), currentTauJoint, 1);
 
         if (musclesMap[id].contributions) {
@@ -108,8 +122,9 @@ export function* executeSimulationGenerator(
       sncFatigue = applyExponentialDecay(sncFatigue, config.tauMetabolic, 1);
       chronicSncStress = applyExponentialDecay(chronicSncStress, config.tauChronicSnc, 1);
 
-      if (toggledDays[day] !== false) {
-        const plannedExercises = blueprint[day as keyof typeof blueprint] || [];
+      const dayName = DAY_NAMES[day];
+      if (toggledDays[dayName] !== false && toggledDays[day] !== false) {
+        const plannedExercises = (blueprint[dayName as keyof typeof blueprint] || blueprint[day as unknown as keyof typeof blueprint]) || [];
         plannedExercises.forEach(plannedEx => {
           if (!plannedEx.active) return;
 
@@ -167,9 +182,11 @@ export function* executeSimulationGenerator(
                 const muscleLoad = finalInol * coeff;
                 setSystemicLoad += muscleLoad;
                 
-                // Split impact : 70% Metabolic (fast decay), 30% Damage (slow decay)
-                const isHeavyOrFailure = validSet.rpe >= 9 || validSet.reps <= 5;
-                const damageRatio = isHeavyOrFailure ? 0.4 : 0.3; // More damage if heavy or failure
+                // RBE (Repeated Bout Effect) : Moins de dommages structurels si l'athlète est avancé
+                const fitnessRatio = musclesMap[muscleId].fitness / config.geneticCeiling;
+                let baseDamageRatio = Math.max(0.1, 0.4 - fitnessRatio * 0.3); // Débutant: ~0.4. Élite: ~0.1
+                if (validSet.rpe >= 9 || validSet.reps <= 5) baseDamageRatio += 0.1; // Heavy/Failure adds damage
+                const damageRatio = Math.min(1.0, baseDamageRatio);
                 const metabolicRatio = 1 - damageRatio;
 
                 dailyRawAccumulator[muscleId].metabolic += muscleLoad * metabolicRatio;
@@ -182,9 +199,13 @@ export function* executeSimulationGenerator(
                   adaptationMultiplier = Math.max(0.0, config.k1 - (currentFatigue - 1.5) * config.k2);
                 }
                 
-                // Modèle de croissance logistique (Équation de Verhulst)
-                const rawGain = muscleLoad * 0.5 * adaptationMultiplier;
-                const adjustedGain = applyLogisticCeilingEffect(rawGain, musclesMap[muscleId].fitness, 1000.0);
+                // Burnout Penalty (Catabolisme) : Si le SNC est épuisé, le gain est bloqué
+                let burnoutPenalty = 1.0;
+                if (chronicSncStress > 3.0) burnoutPenalty = Math.max(0, 1.0 - (chronicSncStress - 3.0) * 0.2);
+                
+                // Modèle de croissance logistique (Équation de Verhulst) avec Plafond Dynamique
+                const rawGain = muscleLoad * 0.5 * adaptationMultiplier * burnoutPenalty;
+                const adjustedGain = applyLogisticCeilingEffect(rawGain, musclesMap[muscleId].fitness, config.geneticCeiling);
                 musclesMap[muscleId].fitness = normalize(musclesMap[muscleId].fitness + Math.max(0, adjustedGain));
                 
                 musclesMap[muscleId].sets = normalize(musclesMap[muscleId].sets + validSet.series * coeff);
@@ -225,7 +246,7 @@ export function* executeSimulationGenerator(
           musclesMap[muscleId].fatigueMetabolic = normalize(musclesMap[muscleId].fatigueMetabolic + raw.metabolic * attenuation);
           musclesMap[muscleId].fatigueDamage = normalize(musclesMap[muscleId].fatigueDamage + raw.damage * attenuation);
           musclesMap[muscleId].fatigue = normalize(musclesMap[muscleId].fatigueMetabolic + musclesMap[muscleId].fatigueDamage);
-          musclesMap[muscleId].jointStress = normalize((musclesMap[muscleId].jointStress || 0) + raw.joint * attenuation);
+          musclesMap[muscleId].jointStress = normalize((musclesMap[muscleId].jointStress || 0) + raw.joint); // BUG FIX: Joint stress takes RAW impact
           
           musclesMap[muscleId].inol = normalize((musclesMap[muscleId].inol || 0) + effectiveTotalInol);
           musclesMap[muscleId].weeklyInol[week] = (musclesMap[muscleId].weeklyInol[week] || 0) + effectiveTotalInol;

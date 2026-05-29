@@ -1,0 +1,104 @@
+{
+  "scenarioId": "Recovery_Test",
+  "status": "PASS",
+  "input": {
+    "profile": {
+      "pdc": 80,
+      "prs": {
+        "bench": 100,
+        "squat": 140,
+        "deadlift": 180,
+        "ohp": 60
+      },
+      "maxSnc": 15
+    },
+    "blueprint": {
+      "Lundi": [
+        {
+          "id": "1",
+          "exerciseId": "squat",
+          "sets": [
+            {
+              "series": 5,
+              "reps": 5,
+              "poids": 120,
+              "rpe": 9,
+              "active": true
+            }
+          ],
+          "active": true
+        }
+      ],
+      "Mardi": [],
+      "Mercredi": [],
+      "Jeudi": [],
+      "Vendredi": [],
+      "Samedi": [],
+      "Dimanche": []
+    },
+    "deloadWeeks": [
+      3,
+      4
+    ]
+  },
+  "output": {
+    "sncScore": 0.01,
+    "readiness": 99.8,
+    "injuryRisk": "LOW",
+    "metrics": {
+      "peakFatigue": {
+        "chest": {
+          "value": 0,
+          "day": 0
+        },
+        "upperBack": {
+          "value": 0,
+          "day": 0
+        },
+        "frontDeltoid": {
+          "value": 0,
+          "day": 0
+        },
+        "biceps": {
+          "value": 0,
+          "day": 0
+        },
+        "triceps": {
+          "value": 0,
+          "day": 0
+        },
+        "quadriceps": {
+          "value": 1,
+          "day": 0
+        },
+        "hamstring": {
+          "value": 0.22,
+          "day": 0
+        }
+      },
+      "weeklyEffectiveSets": {
+        "chest": 0,
+        "upperBack": 0,
+        "frontDeltoid": 0,
+        "biceps": 0,
+        "triceps": 0,
+        "quadriceps": 5,
+        "hamstring": 5
+      },
+      "pushPullRatio": {
+        "push": 50,
+        "pull": 50
+      },
+      "axialSncLoad": 1.05,
+      "traumaAlerts": []
+    }
+  },
+  "assertions": [
+    {
+      "key": "readiness > 50",
+      "expected": 50,
+      "actual": 99.8,
+      "delta": 49.8
+    }
+  ]
+}

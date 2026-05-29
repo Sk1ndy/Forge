@@ -1,0 +1,62 @@
+{
+  "scenarioId": "rapid_recovery",
+  "status": "PASS",
+  "input": {
+    "blueprint": {
+      "Lundi": [
+        {
+          "id": "1",
+          "exerciseId": "iso_calves",
+          "active": true,
+          "sets": [
+            {
+              "series": 5,
+              "reps": 10,
+              "poids": 50,
+              "rpe": 8,
+              "active": true
+            }
+          ]
+        },
+        {
+          "id": "2",
+          "exerciseId": "iso_lower_back",
+          "active": true,
+          "sets": [
+            {
+              "series": 5,
+              "reps": 10,
+              "poids": 50,
+              "rpe": 8,
+              "active": true
+            }
+          ]
+        }
+      ],
+      "Mardi": [],
+      "Mercredi": [],
+      "Jeudi": [],
+      "Vendredi": [],
+      "Samedi": [],
+      "Dimanche": []
+    }
+  },
+  "output": {
+    "sncScore": 0,
+    "readiness": 99.1,
+    "injuryRisk": "LOW",
+    "metrics": {
+      "chronicSncStress": 0.13,
+      "globalWorkCapacity": 99.1,
+      "cnsFailure": false
+    }
+  },
+  "assertions": [
+    {
+      "key": "snapshot_match",
+      "expected": 1,
+      "actual": 1,
+      "delta": 0
+    }
+  ]
+}

@@ -1,0 +1,249 @@
+{
+  "scenarioId": "advanced_ppl_high_volume",
+  "status": "PASS",
+  "input": {
+    "blueprint": {
+      "Lundi": [
+        {
+          "id": "1",
+          "exerciseId": "bench_press",
+          "active": true,
+          "sets": [
+            {
+              "series": 4,
+              "reps": 8,
+              "poids": 90,
+              "rpe": 8.5,
+              "active": true
+            }
+          ]
+        },
+        {
+          "id": "2",
+          "exerciseId": "incline_db_press",
+          "active": true,
+          "sets": [
+            {
+              "series": 3,
+              "reps": 10,
+              "poids": 35,
+              "rpe": 8,
+              "active": true
+            }
+          ]
+        },
+        {
+          "id": "3",
+          "exerciseId": "triceps_pushdown",
+          "active": true,
+          "sets": [
+            {
+              "series": 4,
+              "reps": 12,
+              "poids": 25,
+              "rpe": 9,
+              "active": true
+            }
+          ]
+        }
+      ],
+      "Mardi": [
+        {
+          "id": "4",
+          "exerciseId": "pull_ups",
+          "active": true,
+          "sets": [
+            {
+              "series": 4,
+              "reps": 8,
+              "poids": 10,
+              "rpe": 8,
+              "active": true
+            }
+          ]
+        },
+        {
+          "id": "5",
+          "exerciseId": "barbell_row",
+          "active": true,
+          "sets": [
+            {
+              "series": 4,
+              "reps": 10,
+              "poids": 70,
+              "rpe": 8,
+              "active": true
+            }
+          ]
+        },
+        {
+          "id": "6",
+          "exerciseId": "biceps_curl",
+          "active": true,
+          "sets": [
+            {
+              "series": 3,
+              "reps": 12,
+              "poids": 15,
+              "rpe": 9,
+              "active": true
+            }
+          ]
+        }
+      ],
+      "Mercredi": [
+        {
+          "id": "7",
+          "exerciseId": "squat",
+          "active": true,
+          "sets": [
+            {
+              "series": 4,
+              "reps": 8,
+              "poids": 120,
+              "rpe": 8.5,
+              "active": true
+            }
+          ]
+        },
+        {
+          "id": "8",
+          "exerciseId": "leg_press",
+          "active": true,
+          "sets": [
+            {
+              "series": 3,
+              "reps": 12,
+              "poids": 200,
+              "rpe": 8,
+              "active": true
+            }
+          ]
+        }
+      ],
+      "Jeudi": [
+        {
+          "id": "9",
+          "exerciseId": "ohp",
+          "active": true,
+          "sets": [
+            {
+              "series": 4,
+              "reps": 8,
+              "poids": 55,
+              "rpe": 8.5,
+              "active": true
+            }
+          ]
+        },
+        {
+          "id": "10",
+          "exerciseId": "dips",
+          "active": true,
+          "sets": [
+            {
+              "series": 3,
+              "reps": 10,
+              "poids": 20,
+              "rpe": 8,
+              "active": true
+            }
+          ]
+        }
+      ],
+      "Vendredi": [
+        {
+          "id": "11",
+          "exerciseId": "deadlift",
+          "active": true,
+          "sets": [
+            {
+              "series": 3,
+              "reps": 5,
+              "poids": 160,
+              "rpe": 9,
+              "active": true
+            }
+          ]
+        },
+        {
+          "id": "12",
+          "exerciseId": "lat_pulldown",
+          "active": true,
+          "sets": [
+            {
+              "series": 3,
+              "reps": 10,
+              "poids": 60,
+              "rpe": 8,
+              "active": true
+            }
+          ]
+        }
+      ],
+      "Samedi": [
+        {
+          "id": "13",
+          "exerciseId": "romanian_deadlift",
+          "active": true,
+          "sets": [
+            {
+              "series": 3,
+              "reps": 8,
+              "poids": 120,
+              "rpe": 8,
+              "active": true
+            }
+          ]
+        },
+        {
+          "id": "14",
+          "exerciseId": "leg_curl",
+          "active": true,
+          "sets": [
+            {
+              "series": 3,
+              "reps": 12,
+              "poids": 50,
+              "rpe": 9,
+              "active": true
+            }
+          ]
+        }
+      ],
+      "Dimanche": []
+    },
+    "profile": {
+      "pdc": 80,
+      "prs": {
+        "squat": 140,
+        "bench": 100,
+        "deadlift": 180,
+        "ohp": 60
+      },
+      "maxSnc": 15,
+      "isBeginner": false,
+      "age": 25,
+      "sleepHours": 8
+    },
+    "totalWeeks": 4
+  },
+  "output": {
+    "sncScore": 2.29,
+    "readiness": 76,
+    "injuryRisk": "HIGH",
+    "metrics": {
+      "chronicSncStress": 53.5,
+      "globalWorkCapacity": 76,
+      "cnsFailure": false
+    }
+  },
+  "assertions": [
+    {
+      "key": "snapshot_match",
+      "expected": 1,
+      "actual": 1,
+      "delta": 0
+    }
+  ]
+}

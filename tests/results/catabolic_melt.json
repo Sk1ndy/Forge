@@ -1,0 +1,123 @@
+{
+  "scenarioId": "catabolic_melt",
+  "status": "PASS",
+  "input": {
+    "blueprint": {
+      "Lundi": [
+        {
+          "id": "1",
+          "exerciseId": "deadlift",
+          "active": true,
+          "sets": [
+            {
+              "series": 10,
+              "reps": 5,
+              "poids": 160,
+              "rpe": 10,
+              "active": true
+            }
+          ]
+        }
+      ],
+      "Mardi": [
+        {
+          "id": "2",
+          "exerciseId": "squat",
+          "active": true,
+          "sets": [
+            {
+              "series": 10,
+              "reps": 5,
+              "poids": 130,
+              "rpe": 10,
+              "active": true
+            }
+          ]
+        }
+      ],
+      "Mercredi": [
+        {
+          "id": "3",
+          "exerciseId": "bench_press",
+          "active": true,
+          "sets": [
+            {
+              "series": 10,
+              "reps": 5,
+              "poids": 90,
+              "rpe": 10,
+              "active": true
+            }
+          ]
+        }
+      ],
+      "Jeudi": [
+        {
+          "id": "4",
+          "exerciseId": "deadlift",
+          "active": true,
+          "sets": [
+            {
+              "series": 10,
+              "reps": 5,
+              "poids": 160,
+              "rpe": 10,
+              "active": true
+            }
+          ]
+        }
+      ],
+      "Vendredi": [
+        {
+          "id": "5",
+          "exerciseId": "squat",
+          "active": true,
+          "sets": [
+            {
+              "series": 10,
+              "reps": 5,
+              "poids": 130,
+              "rpe": 10,
+              "active": true
+            }
+          ]
+        }
+      ],
+      "Samedi": [
+        {
+          "id": "6",
+          "exerciseId": "bench_press",
+          "active": true,
+          "sets": [
+            {
+              "series": 10,
+              "reps": 5,
+              "poids": 90,
+              "rpe": 10,
+              "active": true
+            }
+          ]
+        }
+      ],
+      "Dimanche": []
+    }
+  },
+  "output": {
+    "sncScore": 7.31,
+    "readiness": 42.7,
+    "injuryRisk": "HIGH",
+    "metrics": {
+      "chronicSncStress": 333.34,
+      "globalWorkCapacity": 42.7,
+      "cnsFailure": false
+    }
+  },
+  "assertions": [
+    {
+      "key": "snapshot_match",
+      "expected": 1,
+      "actual": 1,
+      "delta": 0
+    }
+  ]
+}

@@ -1,0 +1,2442 @@
+{
+  "scenarioId": "junk_volume",
+  "status": "PASS",
+  "input": {
+    "blueprint5": {
+      "Lundi": [
+        {
+          "id": "1",
+          "exerciseId": "bench_press",
+          "active": true,
+          "sets": [
+            {
+              "series": 5,
+              "reps": 10,
+              "poids": 80,
+              "rpe": 8,
+              "active": true
+            }
+          ]
+        }
+      ],
+      "Mardi": [],
+      "Mercredi": [],
+      "Jeudi": [],
+      "Vendredi": [],
+      "Samedi": [],
+      "Dimanche": []
+    },
+    "blueprint30": {
+      "Lundi": [
+        {
+          "id": "1",
+          "exerciseId": "bench_press",
+          "active": true,
+          "sets": [
+            {
+              "series": 30,
+              "reps": 10,
+              "poids": 80,
+              "rpe": 8,
+              "active": true
+            }
+          ]
+        }
+      ],
+      "Mardi": [],
+      "Mercredi": [],
+      "Jeudi": [],
+      "Vendredi": [],
+      "Samedi": [],
+      "Dimanche": []
+    }
+  },
+  "output": {
+    "sncScore": 0,
+    "readiness": 100,
+    "injuryRisk": "LOW",
+    "metrics": {
+      "chronicSncStress": 0,
+      "globalWorkCapacity": 100,
+      "cnsFailure": false,
+      "res5": {
+        "muscles": {
+          "abs": {
+            "name": "Abdominaux",
+            "inol": 0,
+            "sets": 0,
+            "color": "grey",
+            "statusLabel": "REST",
+            "contributors": [],
+            "remainingCapacity": 1,
+            "jointStress": 0,
+            "readiness": 0,
+            "fatigueHistory": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ]
+          },
+          "biceps": {
+            "name": "Biceps",
+            "inol": 0,
+            "sets": 0,
+            "color": "grey",
+            "statusLabel": "REST",
+            "contributors": [],
+            "remainingCapacity": 1,
+            "jointStress": 0,
+            "readiness": 0,
+            "fatigueHistory": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ]
+          },
+          "calves": {
+            "name": "Mollets",
+            "inol": 0,
+            "sets": 0,
+            "color": "grey",
+            "statusLabel": "REST",
+            "contributors": [],
+            "remainingCapacity": 1,
+            "jointStress": 0,
+            "readiness": 0,
+            "fatigueHistory": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ]
+          },
+          "chest": {
+            "name": "Pectoraux",
+            "inol": 1.03,
+            "sets": 5,
+            "color": "grey",
+            "statusLabel": "REST",
+            "contributors": [
+              {
+                "nom": "Développé Couché",
+                "value": 0.1394,
+                "percentage": 100
+              }
+            ],
+            "remainingCapacity": 0.9771,
+            "jointStress": 0.53,
+            "readiness": -0.03,
+            "fatigueHistory": [
+              1.03,
+              0.52,
+              0.29,
+              0.18,
+              0.12,
+              0.08,
+              0.06
+            ]
+          },
+          "deltoids": {
+            "name": "Deltoïdes Latéraux",
+            "inol": 0,
+            "sets": 0,
+            "color": "grey",
+            "statusLabel": "REST",
+            "contributors": [],
+            "remainingCapacity": 1,
+            "jointStress": 0,
+            "readiness": 0,
+            "fatigueHistory": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ]
+          },
+          "feet": {
+            "name": "Pieds",
+            "inol": 0,
+            "sets": 0,
+            "color": "grey",
+            "statusLabel": "REST",
+            "contributors": [],
+            "remainingCapacity": 1,
+            "jointStress": 0,
+            "readiness": 0,
+            "fatigueHistory": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ]
+          },
+          "forearm": {
+            "name": "Avant-bras",
+            "inol": 0,
+            "sets": 0,
+            "color": "grey",
+            "statusLabel": "REST",
+            "contributors": [],
+            "remainingCapacity": 1,
+            "jointStress": 0,
+            "readiness": 0,
+            "fatigueHistory": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ]
+          },
+          "gluteal": {
+            "name": "Fessiers",
+            "inol": 0,
+            "sets": 0,
+            "color": "grey",
+            "statusLabel": "REST",
+            "contributors": [],
+            "remainingCapacity": 1,
+            "jointStress": 0,
+            "readiness": 0,
+            "fatigueHistory": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ]
+          },
+          "hamstring": {
+            "name": "Ischio-jambiers",
+            "inol": 0,
+            "sets": 0,
+            "color": "grey",
+            "statusLabel": "REST",
+            "contributors": [],
+            "remainingCapacity": 1,
+            "jointStress": 0,
+            "readiness": 0,
+            "fatigueHistory": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ]
+          },
+          "hands": {
+            "name": "Mains",
+            "inol": 0,
+            "sets": 0,
+            "color": "grey",
+            "statusLabel": "REST",
+            "contributors": [],
+            "remainingCapacity": 1,
+            "jointStress": 0,
+            "readiness": 0,
+            "fatigueHistory": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ]
+          },
+          "head": {
+            "name": "Tête",
+            "inol": 0,
+            "sets": 0,
+            "color": "grey",
+            "statusLabel": "REST",
+            "contributors": [],
+            "remainingCapacity": 1,
+            "jointStress": 0,
+            "readiness": 0,
+            "fatigueHistory": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ]
+          },
+          "knees": {
+            "name": "Genoux",
+            "inol": 0,
+            "sets": 0,
+            "color": "grey",
+            "statusLabel": "REST",
+            "contributors": [],
+            "remainingCapacity": 1,
+            "jointStress": 0,
+            "readiness": 0,
+            "fatigueHistory": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ]
+          },
+          "lowerBack": {
+            "name": "Lombaires",
+            "inol": 0,
+            "sets": 0,
+            "color": "grey",
+            "statusLabel": "REST",
+            "contributors": [],
+            "remainingCapacity": 1,
+            "jointStress": 0,
+            "readiness": 0,
+            "fatigueHistory": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ]
+          },
+          "obliques": {
+            "name": "Obliques",
+            "inol": 0,
+            "sets": 0,
+            "color": "grey",
+            "statusLabel": "REST",
+            "contributors": [],
+            "remainingCapacity": 1,
+            "jointStress": 0,
+            "readiness": 0,
+            "fatigueHistory": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ]
+          },
+          "quadriceps": {
+            "name": "Quadriceps",
+            "inol": 0,
+            "sets": 0,
+            "color": "grey",
+            "statusLabel": "REST",
+            "contributors": [],
+            "remainingCapacity": 1,
+            "jointStress": 0,
+            "readiness": 0,
+            "fatigueHistory": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ]
+          },
+          "tibialis": {
+            "name": "Jambier Antérieur",
+            "inol": 0,
+            "sets": 0,
+            "color": "grey",
+            "statusLabel": "REST",
+            "contributors": [],
+            "remainingCapacity": 1,
+            "jointStress": 0,
+            "readiness": 0,
+            "fatigueHistory": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ]
+          },
+          "trapezius": {
+            "name": "Trapèzes",
+            "inol": 0,
+            "sets": 0,
+            "color": "grey",
+            "statusLabel": "REST",
+            "contributors": [],
+            "remainingCapacity": 1,
+            "jointStress": 0,
+            "readiness": 0,
+            "fatigueHistory": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ]
+          },
+          "triceps": {
+            "name": "Triceps",
+            "inol": 0.65,
+            "sets": 2.5,
+            "color": "grey",
+            "statusLabel": "REST",
+            "contributors": [
+              {
+                "nom": "Développé Couché",
+                "value": 0.0878,
+                "percentage": 100
+              }
+            ],
+            "remainingCapacity": 0.9856,
+            "jointStress": 0.27,
+            "readiness": 0.35,
+            "fatigueHistory": [
+              0.65,
+              0.33,
+              0.19,
+              0.11,
+              0.08,
+              0.05,
+              0.04
+            ]
+          },
+          "upperBack": {
+            "name": "Grand Dorsal / Haut du Dos",
+            "inol": 0,
+            "sets": 0,
+            "color": "grey",
+            "statusLabel": "REST",
+            "contributors": [],
+            "remainingCapacity": 1,
+            "jointStress": 0,
+            "readiness": 0,
+            "fatigueHistory": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ]
+          },
+          "rotatorCuff": {
+            "name": "Coiffe des Rotateurs",
+            "inol": 0,
+            "sets": 0,
+            "color": "grey",
+            "statusLabel": "REST",
+            "contributors": [],
+            "remainingCapacity": 1,
+            "jointStress": 0,
+            "readiness": 0,
+            "fatigueHistory": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ]
+          },
+          "serratus": {
+            "name": "Dentelé Antérieur",
+            "inol": 0,
+            "sets": 0,
+            "color": "grey",
+            "statusLabel": "REST",
+            "contributors": [],
+            "remainingCapacity": 1,
+            "jointStress": 0,
+            "readiness": 0,
+            "fatigueHistory": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ]
+          },
+          "rhomboids": {
+            "name": "Rhomboïdes",
+            "inol": 0,
+            "sets": 0,
+            "color": "grey",
+            "statusLabel": "REST",
+            "contributors": [],
+            "remainingCapacity": 1,
+            "jointStress": 0,
+            "readiness": 0,
+            "fatigueHistory": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ]
+          },
+          "ankles": {
+            "name": "Chevilles",
+            "inol": 0,
+            "sets": 0,
+            "color": "grey",
+            "statusLabel": "REST",
+            "contributors": [],
+            "remainingCapacity": 1,
+            "jointStress": 0,
+            "readiness": 0,
+            "fatigueHistory": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ]
+          },
+          "adductors": {
+            "name": "Adducteurs",
+            "inol": 0,
+            "sets": 0,
+            "color": "grey",
+            "statusLabel": "REST",
+            "contributors": [],
+            "remainingCapacity": 1,
+            "jointStress": 0,
+            "readiness": 0,
+            "fatigueHistory": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ]
+          },
+          "neck": {
+            "name": "Cou",
+            "inol": 0,
+            "sets": 0,
+            "color": "grey",
+            "statusLabel": "REST",
+            "contributors": [],
+            "remainingCapacity": 1,
+            "jointStress": 0,
+            "readiness": 0,
+            "fatigueHistory": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ]
+          },
+          "hipFlexors": {
+            "name": "Fléchisseurs de Hanche",
+            "inol": 0,
+            "sets": 0,
+            "color": "grey",
+            "statusLabel": "REST",
+            "contributors": [],
+            "remainingCapacity": 1,
+            "jointStress": 0,
+            "readiness": 0,
+            "fatigueHistory": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ]
+          },
+          "upperChest": {
+            "name": "Pectoraux Supérieurs",
+            "inol": 0,
+            "sets": 0,
+            "color": "grey",
+            "statusLabel": "REST",
+            "contributors": [],
+            "remainingCapacity": 1,
+            "jointStress": 0,
+            "readiness": 0,
+            "fatigueHistory": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ]
+          },
+          "lowerChest": {
+            "name": "Pectoraux Inférieurs",
+            "inol": 0,
+            "sets": 0,
+            "color": "grey",
+            "statusLabel": "REST",
+            "contributors": [],
+            "remainingCapacity": 1,
+            "jointStress": 0,
+            "readiness": 0,
+            "fatigueHistory": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ]
+          },
+          "innerQuad": {
+            "name": "Quadriceps Interne",
+            "inol": 0,
+            "sets": 0,
+            "color": "grey",
+            "statusLabel": "REST",
+            "contributors": [],
+            "remainingCapacity": 1,
+            "jointStress": 0,
+            "readiness": 0,
+            "fatigueHistory": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ]
+          },
+          "outerQuad": {
+            "name": "Quadriceps Externe",
+            "inol": 0,
+            "sets": 0,
+            "color": "grey",
+            "statusLabel": "REST",
+            "contributors": [],
+            "remainingCapacity": 1,
+            "jointStress": 0,
+            "readiness": 0,
+            "fatigueHistory": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ]
+          },
+          "upperAbs": {
+            "name": "Abdominaux Supérieurs",
+            "inol": 0,
+            "sets": 0,
+            "color": "grey",
+            "statusLabel": "REST",
+            "contributors": [],
+            "remainingCapacity": 1,
+            "jointStress": 0,
+            "readiness": 0,
+            "fatigueHistory": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ]
+          },
+          "lowerAbs": {
+            "name": "Abdominaux Inférieurs",
+            "inol": 0,
+            "sets": 0,
+            "color": "grey",
+            "statusLabel": "REST",
+            "contributors": [],
+            "remainingCapacity": 1,
+            "jointStress": 0,
+            "readiness": 0,
+            "fatigueHistory": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ]
+          },
+          "frontDeltoid": {
+            "name": "Deltoïde Antérieur",
+            "inol": 0.74,
+            "sets": 5,
+            "color": "grey",
+            "statusLabel": "REST",
+            "contributors": [
+              {
+                "nom": "Développé Couché",
+                "value": 0.0229,
+                "percentage": 100
+              }
+            ],
+            "remainingCapacity": 0.9963,
+            "jointStress": 0.22,
+            "readiness": 0,
+            "fatigueHistory": [
+              0.74,
+              0.24,
+              0.11,
+              0.05,
+              0.03,
+              0.02,
+              0.01
+            ]
+          },
+          "rearDeltoid": {
+            "name": "Deltoïde Postérieur",
+            "inol": 0,
+            "sets": 0,
+            "color": "grey",
+            "statusLabel": "REST",
+            "contributors": [],
+            "remainingCapacity": 1,
+            "jointStress": 0,
+            "readiness": 0,
+            "fatigueHistory": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ]
+          },
+          "upperTrapezius": {
+            "name": "Trapèze Supérieur",
+            "inol": 0,
+            "sets": 0,
+            "color": "grey",
+            "statusLabel": "REST",
+            "contributors": [],
+            "remainingCapacity": 1,
+            "jointStress": 0,
+            "readiness": 0,
+            "fatigueHistory": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ]
+          },
+          "lowerTrapezius": {
+            "name": "Trapèze Inférieur",
+            "inol": 0,
+            "sets": 0,
+            "color": "grey",
+            "statusLabel": "REST",
+            "contributors": [],
+            "remainingCapacity": 1,
+            "jointStress": 0,
+            "readiness": 0,
+            "fatigueHistory": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ]
+          }
+        },
+        "sncScore": 0,
+        "sncPercentage": 0,
+        "cnsFailure": false,
+        "chronicSncStress": 1.03,
+        "junkVolumeAlerts": [],
+        "globalWorkCapacity": 99.8,
+        "systemicReadiness": 99.8,
+        "topSurcharged": [],
+        "topNeglected": [
+          {
+            "name": "Biceps",
+            "inol": 0,
+            "sets": 0,
+            "color": "grey",
+            "statusLabel": "REST",
+            "contributors": [],
+            "remainingCapacity": 1,
+            "jointStress": 0,
+            "readiness": 0,
+            "fatigueHistory": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ]
+          },
+          {
+            "name": "Deltoïdes Latéraux",
+            "inol": 0,
+            "sets": 0,
+            "color": "grey",
+            "statusLabel": "REST",
+            "contributors": [],
+            "remainingCapacity": 1,
+            "jointStress": 0,
+            "readiness": 0,
+            "fatigueHistory": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ]
+          },
+          {
+            "name": "Fessiers",
+            "inol": 0,
+            "sets": 0,
+            "color": "grey",
+            "statusLabel": "REST",
+            "contributors": [],
+            "remainingCapacity": 1,
+            "jointStress": 0,
+            "readiness": 0,
+            "fatigueHistory": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ]
+          }
+        ],
+        "pushPullLegsRatio": {
+          "push": 100,
+          "pull": 0,
+          "legs": 0
+        },
+        "weeklyMacro": {
+          "peakFatigue": {
+            "chest": {
+              "value": 1.03,
+              "day": 0
+            },
+            "upperBack": {
+              "value": 0,
+              "day": 0
+            },
+            "frontDeltoid": {
+              "value": 0.74,
+              "day": 0
+            },
+            "biceps": {
+              "value": 0,
+              "day": 0
+            },
+            "triceps": {
+              "value": 0.65,
+              "day": 0
+            },
+            "quadriceps": {
+              "value": 0,
+              "day": 0
+            },
+            "hamstring": {
+              "value": 0,
+              "day": 0
+            }
+          },
+          "weeklyEffectiveSets": {
+            "chest": 5,
+            "upperBack": 0,
+            "frontDeltoid": 5,
+            "biceps": 0,
+            "triceps": 5,
+            "quadriceps": 0,
+            "hamstring": 0
+          },
+          "pushPullRatio": {
+            "push": 100,
+            "pull": 0
+          },
+          "axialSncLoad": 0,
+          "traumaAlerts": []
+        },
+        "weeklyTraumas": [],
+        "progressiveOverload": {},
+        "injuryPredictions": [],
+        "monotonyAlerts": [],
+        "tensors": {
+          "abs": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "biceps": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "calves": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "chest": [
+            1,
+            0.4784,
+            0.2446,
+            0.1287,
+            0.0645,
+            0.0255,
+            0
+          ],
+          "deltoids": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "feet": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "forearm": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "gluteal": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "hamstring": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "hands": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "head": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "knees": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "lowerBack": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "obliques": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "quadriceps": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "tibialis": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "trapezius": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "triceps": [
+            1,
+            0.4784,
+            0.2444,
+            0.1286,
+            0.0644,
+            0.0253,
+            0
+          ],
+          "upperBack": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "rotatorCuff": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "serratus": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "rhomboids": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "ankles": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "adductors": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "neck": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "hipFlexors": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "upperChest": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "lowerChest": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "innerQuad": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "outerQuad": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "upperAbs": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "lowerAbs": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "frontDeltoid": [
+            1,
+            0.3214,
+            0.1334,
+            0.062,
+            0.0279,
+            0.01,
+            0
+          ],
+          "rearDeltoid": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "upperTrapezius": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "lowerTrapezius": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      },
+      "res30": {
+        "muscles": {
+          "abs": {
+            "name": "Abdominaux",
+            "inol": 0,
+            "sets": 0,
+            "color": "grey",
+            "statusLabel": "REST",
+            "contributors": [],
+            "remainingCapacity": 1,
+            "jointStress": 0,
+            "readiness": 0,
+            "fatigueHistory": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ]
+          },
+          "biceps": {
+            "name": "Biceps",
+            "inol": 0,
+            "sets": 0,
+            "color": "grey",
+            "statusLabel": "REST",
+            "contributors": [],
+            "remainingCapacity": 1,
+            "jointStress": 0,
+            "readiness": 0,
+            "fatigueHistory": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ]
+          },
+          "calves": {
+            "name": "Mollets",
+            "inol": 0,
+            "sets": 0,
+            "color": "grey",
+            "statusLabel": "REST",
+            "contributors": [],
+            "remainingCapacity": 1,
+            "jointStress": 0,
+            "readiness": 0,
+            "fatigueHistory": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ]
+          },
+          "chest": {
+            "name": "Pectoraux",
+            "inol": 0,
+            "sets": 0,
+            "color": "grey",
+            "statusLabel": "REST",
+            "contributors": [],
+            "remainingCapacity": 1,
+            "jointStress": 0,
+            "readiness": 0,
+            "fatigueHistory": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ]
+          },
+          "deltoids": {
+            "name": "Deltoïdes Latéraux",
+            "inol": 0,
+            "sets": 0,
+            "color": "grey",
+            "statusLabel": "REST",
+            "contributors": [],
+            "remainingCapacity": 1,
+            "jointStress": 0,
+            "readiness": 0,
+            "fatigueHistory": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ]
+          },
+          "feet": {
+            "name": "Pieds",
+            "inol": 0,
+            "sets": 0,
+            "color": "grey",
+            "statusLabel": "REST",
+            "contributors": [],
+            "remainingCapacity": 1,
+            "jointStress": 0,
+            "readiness": 0,
+            "fatigueHistory": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ]
+          },
+          "forearm": {
+            "name": "Avant-bras",
+            "inol": 0,
+            "sets": 0,
+            "color": "grey",
+            "statusLabel": "REST",
+            "contributors": [],
+            "remainingCapacity": 1,
+            "jointStress": 0,
+            "readiness": 0,
+            "fatigueHistory": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ]
+          },
+          "gluteal": {
+            "name": "Fessiers",
+            "inol": 0,
+            "sets": 0,
+            "color": "grey",
+            "statusLabel": "REST",
+            "contributors": [],
+            "remainingCapacity": 1,
+            "jointStress": 0,
+            "readiness": 0,
+            "fatigueHistory": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ]
+          },
+          "hamstring": {
+            "name": "Ischio-jambiers",
+            "inol": 0,
+            "sets": 0,
+            "color": "grey",
+            "statusLabel": "REST",
+            "contributors": [],
+            "remainingCapacity": 1,
+            "jointStress": 0,
+            "readiness": 0,
+            "fatigueHistory": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ]
+          },
+          "hands": {
+            "name": "Mains",
+            "inol": 0,
+            "sets": 0,
+            "color": "grey",
+            "statusLabel": "REST",
+            "contributors": [],
+            "remainingCapacity": 1,
+            "jointStress": 0,
+            "readiness": 0,
+            "fatigueHistory": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ]
+          },
+          "head": {
+            "name": "Tête",
+            "inol": 0,
+            "sets": 0,
+            "color": "grey",
+            "statusLabel": "REST",
+            "contributors": [],
+            "remainingCapacity": 1,
+            "jointStress": 0,
+            "readiness": 0,
+            "fatigueHistory": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ]
+          },
+          "knees": {
+            "name": "Genoux",
+            "inol": 0,
+            "sets": 0,
+            "color": "grey",
+            "statusLabel": "REST",
+            "contributors": [],
+            "remainingCapacity": 1,
+            "jointStress": 0,
+            "readiness": 0,
+            "fatigueHistory": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ]
+          },
+          "lowerBack": {
+            "name": "Lombaires",
+            "inol": 0,
+            "sets": 0,
+            "color": "grey",
+            "statusLabel": "REST",
+            "contributors": [],
+            "remainingCapacity": 1,
+            "jointStress": 0,
+            "readiness": 0,
+            "fatigueHistory": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ]
+          },
+          "obliques": {
+            "name": "Obliques",
+            "inol": 0,
+            "sets": 0,
+            "color": "grey",
+            "statusLabel": "REST",
+            "contributors": [],
+            "remainingCapacity": 1,
+            "jointStress": 0,
+            "readiness": 0,
+            "fatigueHistory": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ]
+          },
+          "quadriceps": {
+            "name": "Quadriceps",
+            "inol": 0,
+            "sets": 0,
+            "color": "grey",
+            "statusLabel": "REST",
+            "contributors": [],
+            "remainingCapacity": 1,
+            "jointStress": 0,
+            "readiness": 0,
+            "fatigueHistory": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ]
+          },
+          "tibialis": {
+            "name": "Jambier Antérieur",
+            "inol": 0,
+            "sets": 0,
+            "color": "grey",
+            "statusLabel": "REST",
+            "contributors": [],
+            "remainingCapacity": 1,
+            "jointStress": 0,
+            "readiness": 0,
+            "fatigueHistory": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ]
+          },
+          "trapezius": {
+            "name": "Trapèzes",
+            "inol": 0,
+            "sets": 0,
+            "color": "grey",
+            "statusLabel": "REST",
+            "contributors": [],
+            "remainingCapacity": 1,
+            "jointStress": 0,
+            "readiness": 0,
+            "fatigueHistory": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ]
+          },
+          "triceps": {
+            "name": "Triceps",
+            "inol": 0,
+            "sets": 0,
+            "color": "grey",
+            "statusLabel": "REST",
+            "contributors": [],
+            "remainingCapacity": 1,
+            "jointStress": 0,
+            "readiness": 0,
+            "fatigueHistory": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ]
+          },
+          "upperBack": {
+            "name": "Grand Dorsal / Haut du Dos",
+            "inol": 0,
+            "sets": 0,
+            "color": "grey",
+            "statusLabel": "REST",
+            "contributors": [],
+            "remainingCapacity": 1,
+            "jointStress": 0,
+            "readiness": 0,
+            "fatigueHistory": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ]
+          },
+          "rotatorCuff": {
+            "name": "Coiffe des Rotateurs",
+            "inol": 0,
+            "sets": 0,
+            "color": "grey",
+            "statusLabel": "REST",
+            "contributors": [],
+            "remainingCapacity": 1,
+            "jointStress": 0,
+            "readiness": 0,
+            "fatigueHistory": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ]
+          },
+          "serratus": {
+            "name": "Dentelé Antérieur",
+            "inol": 0,
+            "sets": 0,
+            "color": "grey",
+            "statusLabel": "REST",
+            "contributors": [],
+            "remainingCapacity": 1,
+            "jointStress": 0,
+            "readiness": 0,
+            "fatigueHistory": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ]
+          },
+          "rhomboids": {
+            "name": "Rhomboïdes",
+            "inol": 0,
+            "sets": 0,
+            "color": "grey",
+            "statusLabel": "REST",
+            "contributors": [],
+            "remainingCapacity": 1,
+            "jointStress": 0,
+            "readiness": 0,
+            "fatigueHistory": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ]
+          },
+          "ankles": {
+            "name": "Chevilles",
+            "inol": 0,
+            "sets": 0,
+            "color": "grey",
+            "statusLabel": "REST",
+            "contributors": [],
+            "remainingCapacity": 1,
+            "jointStress": 0,
+            "readiness": 0,
+            "fatigueHistory": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ]
+          },
+          "adductors": {
+            "name": "Adducteurs",
+            "inol": 0,
+            "sets": 0,
+            "color": "grey",
+            "statusLabel": "REST",
+            "contributors": [],
+            "remainingCapacity": 1,
+            "jointStress": 0,
+            "readiness": 0,
+            "fatigueHistory": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ]
+          },
+          "neck": {
+            "name": "Cou",
+            "inol": 0,
+            "sets": 0,
+            "color": "grey",
+            "statusLabel": "REST",
+            "contributors": [],
+            "remainingCapacity": 1,
+            "jointStress": 0,
+            "readiness": 0,
+            "fatigueHistory": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ]
+          },
+          "hipFlexors": {
+            "name": "Fléchisseurs de Hanche",
+            "inol": 0,
+            "sets": 0,
+            "color": "grey",
+            "statusLabel": "REST",
+            "contributors": [],
+            "remainingCapacity": 1,
+            "jointStress": 0,
+            "readiness": 0,
+            "fatigueHistory": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ]
+          },
+          "upperChest": {
+            "name": "Pectoraux Supérieurs",
+            "inol": 0,
+            "sets": 0,
+            "color": "grey",
+            "statusLabel": "REST",
+            "contributors": [],
+            "remainingCapacity": 1,
+            "jointStress": 0,
+            "readiness": 0,
+            "fatigueHistory": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ]
+          },
+          "lowerChest": {
+            "name": "Pectoraux Inférieurs",
+            "inol": 0,
+            "sets": 0,
+            "color": "grey",
+            "statusLabel": "REST",
+            "contributors": [],
+            "remainingCapacity": 1,
+            "jointStress": 0,
+            "readiness": 0,
+            "fatigueHistory": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ]
+          },
+          "innerQuad": {
+            "name": "Quadriceps Interne",
+            "inol": 0,
+            "sets": 0,
+            "color": "grey",
+            "statusLabel": "REST",
+            "contributors": [],
+            "remainingCapacity": 1,
+            "jointStress": 0,
+            "readiness": 0,
+            "fatigueHistory": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ]
+          },
+          "outerQuad": {
+            "name": "Quadriceps Externe",
+            "inol": 0,
+            "sets": 0,
+            "color": "grey",
+            "statusLabel": "REST",
+            "contributors": [],
+            "remainingCapacity": 1,
+            "jointStress": 0,
+            "readiness": 0,
+            "fatigueHistory": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ]
+          },
+          "upperAbs": {
+            "name": "Abdominaux Supérieurs",
+            "inol": 0,
+            "sets": 0,
+            "color": "grey",
+            "statusLabel": "REST",
+            "contributors": [],
+            "remainingCapacity": 1,
+            "jointStress": 0,
+            "readiness": 0,
+            "fatigueHistory": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ]
+          },
+          "lowerAbs": {
+            "name": "Abdominaux Inférieurs",
+            "inol": 0,
+            "sets": 0,
+            "color": "grey",
+            "statusLabel": "REST",
+            "contributors": [],
+            "remainingCapacity": 1,
+            "jointStress": 0,
+            "readiness": 0,
+            "fatigueHistory": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ]
+          },
+          "frontDeltoid": {
+            "name": "Deltoïde Antérieur",
+            "inol": 0,
+            "sets": 0,
+            "color": "grey",
+            "statusLabel": "REST",
+            "contributors": [],
+            "remainingCapacity": 1,
+            "jointStress": 0,
+            "readiness": 0,
+            "fatigueHistory": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ]
+          },
+          "rearDeltoid": {
+            "name": "Deltoïde Postérieur",
+            "inol": 0,
+            "sets": 0,
+            "color": "grey",
+            "statusLabel": "REST",
+            "contributors": [],
+            "remainingCapacity": 1,
+            "jointStress": 0,
+            "readiness": 0,
+            "fatigueHistory": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ]
+          },
+          "upperTrapezius": {
+            "name": "Trapèze Supérieur",
+            "inol": 0,
+            "sets": 0,
+            "color": "grey",
+            "statusLabel": "REST",
+            "contributors": [],
+            "remainingCapacity": 1,
+            "jointStress": 0,
+            "readiness": 0,
+            "fatigueHistory": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ]
+          },
+          "lowerTrapezius": {
+            "name": "Trapèze Inférieur",
+            "inol": 0,
+            "sets": 0,
+            "color": "grey",
+            "statusLabel": "REST",
+            "contributors": [],
+            "remainingCapacity": 1,
+            "jointStress": 0,
+            "readiness": 0,
+            "fatigueHistory": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ]
+          }
+        },
+        "sncScore": 0,
+        "sncPercentage": 0,
+        "cnsFailure": false,
+        "chronicSncStress": 0,
+        "junkVolumeAlerts": [],
+        "globalWorkCapacity": 100,
+        "systemicReadiness": 100,
+        "topSurcharged": [],
+        "topNeglected": [
+          {
+            "name": "Biceps",
+            "inol": 0,
+            "sets": 0,
+            "color": "grey",
+            "statusLabel": "REST",
+            "contributors": [],
+            "remainingCapacity": 1,
+            "jointStress": 0,
+            "readiness": 0,
+            "fatigueHistory": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ]
+          },
+          {
+            "name": "Pectoraux",
+            "inol": 0,
+            "sets": 0,
+            "color": "grey",
+            "statusLabel": "REST",
+            "contributors": [],
+            "remainingCapacity": 1,
+            "jointStress": 0,
+            "readiness": 0,
+            "fatigueHistory": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ]
+          },
+          {
+            "name": "Deltoïdes Latéraux",
+            "inol": 0,
+            "sets": 0,
+            "color": "grey",
+            "statusLabel": "REST",
+            "contributors": [],
+            "remainingCapacity": 1,
+            "jointStress": 0,
+            "readiness": 0,
+            "fatigueHistory": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ]
+          }
+        ],
+        "pushPullLegsRatio": {
+          "push": 100,
+          "pull": 0,
+          "legs": 0
+        },
+        "weeklyMacro": {
+          "peakFatigue": {
+            "chest": {
+              "value": 0,
+              "day": 0
+            },
+            "upperBack": {
+              "value": 0,
+              "day": 0
+            },
+            "frontDeltoid": {
+              "value": 0,
+              "day": 0
+            },
+            "biceps": {
+              "value": 0,
+              "day": 0
+            },
+            "triceps": {
+              "value": 0,
+              "day": 0
+            },
+            "quadriceps": {
+              "value": 0,
+              "day": 0
+            },
+            "hamstring": {
+              "value": 0,
+              "day": 0
+            }
+          },
+          "weeklyEffectiveSets": {
+            "chest": 0,
+            "upperBack": 0,
+            "frontDeltoid": 0,
+            "biceps": 0,
+            "triceps": 0,
+            "quadriceps": 0,
+            "hamstring": 0
+          },
+          "pushPullRatio": {
+            "push": 100,
+            "pull": 0
+          },
+          "axialSncLoad": 0,
+          "traumaAlerts": []
+        },
+        "weeklyTraumas": [],
+        "progressiveOverload": {},
+        "injuryPredictions": [],
+        "monotonyAlerts": [],
+        "tensors": {
+          "abs": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "biceps": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "calves": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "chest": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "deltoids": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "feet": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "forearm": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "gluteal": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "hamstring": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "hands": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "head": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "knees": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "lowerBack": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "obliques": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "quadriceps": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "tibialis": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "trapezius": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "triceps": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "upperBack": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "rotatorCuff": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "serratus": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "rhomboids": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "ankles": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "adductors": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "neck": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "hipFlexors": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "upperChest": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "lowerChest": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "innerQuad": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "outerQuad": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "upperAbs": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "lowerAbs": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "frontDeltoid": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "rearDeltoid": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "upperTrapezius": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "lowerTrapezius": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      }
+    }
+  },
+  "assertions": [
+    {
+      "key": "snapshot_match",
+      "expected": 1,
+      "actual": 1,
+      "delta": 0
+    }
+  ]
+}
