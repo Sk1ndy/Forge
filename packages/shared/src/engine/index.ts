@@ -8,12 +8,29 @@ import { calculateJunkVolumeAlerts } from './algorithms/junk-volume';
 import { calculateProgressiveOverload } from './algorithms/progressive-overload';
 import { calculateMonotonyAlerts } from './algorithms/monotony';
 import { normalizeFatigueHistoryToTensors } from './formatters/tensors';
+import { MusclesMap } from './core/state';
+
+export interface LoopSimulationResult {
+  targetMuscles: MusclesMap;
+  targetSnc: number;
+  snapshotChronicSnc: number;
+  dailyInol: Record<string, number>;
+  injuryPredictions: { muscleId: string; acwr: number; code: string }[];
+  weeklySystemicInol: Record<number, number[]>;
+  weeklyEffectiveSetsRaw: Record<string, number>;
+  peakFatigue: Record<string, { value: number; day: number }>;
+  axialSncLoad: number;
+  pushSets: number;
+  pullSets: number;
+  legsSets: number;
+}
 
 export const emptySimulationResult: SimulationResult = {
   muscles: {},
   sncScore: 0,
   sncPercentage: 0,
   cnsFailure: false,
+  chronicSncStress: 0,
   junkVolumeAlerts: [],
   globalWorkCapacity: 100,
   systemicReadiness: 100,
@@ -33,7 +50,7 @@ export const emptySimulationResult: SimulationResult = {
   monotonyAlerts: []
 };
 
-function finalizeSimulationResult(loopResult: any, totalWeeks: number, deloadWeeks: number[], maxSnc: number): SimulationResult {
+function finalizeSimulationResult(loopResult: LoopSimulationResult, totalWeeks: number, deloadWeeks: number[], maxSnc: number): SimulationResult {
   const finalMuscles = formatMuscleStatus(loopResult.targetMuscles);
   const { sncPercentage, globalWorkCapacity, cnsFailure } = calculateGlobalWorkCapacity(loopResult.targetSnc, maxSnc, loopResult.targetMuscles);
   const progressiveOverload = calculateProgressiveOverload(loopResult.targetMuscles, totalWeeks);
@@ -90,13 +107,13 @@ function finalizeSimulationResult(loopResult: any, totalWeeks: number, deloadWee
   };
 
   const GRAND_GROUP_IDS: MuscleId[] = ['chest', 'upperBack', 'frontDeltoid', 'biceps', 'triceps', 'quadriceps', 'hamstring'];
-  const filteredPeakFatigue: Record<string, { value: number; day: string }> = {};
+  const filteredPeakFatigue: Record<string, { value: number; day: number }> = {};
   GRAND_GROUP_IDS.forEach(id => {
     const history = finalMuscles[id as MuscleId]?.fatigueHistory;
     if (history && history.length > 0) {
       const maxVal = Math.max(...history);
       const dayIndex = history.indexOf(maxVal) % 7; 
-      filteredPeakFatigue[id] = { value: parseFloat(maxVal.toFixed(4)), day: ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche'][dayIndex] };
+      filteredPeakFatigue[id] = { value: parseFloat(maxVal.toFixed(4)), day: dayIndex };
     }
   });
 
@@ -105,7 +122,7 @@ function finalizeSimulationResult(loopResult: any, totalWeeks: number, deloadWee
 
   const traumaAlerts: string[] = [];
   Object.entries(filteredPeakFatigue).forEach(([id, { value, day: peakDay }]) => {
-    if (value > 2.5) traumaAlerts.push(`${MUSCLE_DETAILS[id as MuscleId] ?? id} — pic critique ${peakDay} (fatigue ${value.toFixed(2)})`);
+    if (value > 2.5) traumaAlerts.push(`${MUSCLE_DETAILS[id as MuscleId] ?? id} — pic critique jour ${peakDay} (fatigue ${value.toFixed(2)})`);
   });
 
   const weeklyTraumas: WeeklyTrauma[] = [];
@@ -131,6 +148,7 @@ function finalizeSimulationResult(loopResult: any, totalWeeks: number, deloadWee
     sncScore: parseFloat(loopResult.targetSnc.toFixed(2)),
     sncPercentage,
     cnsFailure,
+    chronicSncStress: parseFloat((loopResult.snapshotChronicSnc || 0).toFixed(2)),
     junkVolumeAlerts,
     globalWorkCapacity,
     systemicReadiness: globalWorkCapacity,
@@ -165,7 +183,7 @@ export function runMesocycleSimulation(
     blueprint, profile, toggledDays, selectedDay, exerciseLibrary, totalWeeks, deloadWeeks, sessionLogs
   );
   
-  let loopResult: any;
+  let loopResult: LoopSimulationResult;
   let resultObj = generator.next();
   while (!resultObj.done) {
     resultObj = generator.next();
@@ -196,7 +214,7 @@ export async function runMesocycleSimulationAsync(
     blueprint, profile, toggledDays, selectedDay, exerciseLibrary, totalWeeks, deloadWeeks, sessionLogs
   );
   
-  let loopResult: any;
+  let loopResult: LoopSimulationResult;
   let resultObj = generator.next();
   while (!resultObj.done) {
     // Yield to the event loop

@@ -22,9 +22,18 @@ export function calculateACWR(acuteLoad: number, chronicLoad: number): number {
   return normalize(acuteLoad / chronicLoad);
 }
 
+/**
+ * Modèle de croissance logistique (Équation de Verhulst)
+ * Transforme le gain linéaire brut en gain ajusté selon la proximité avec le plafond génétique.
+ */
+export function applyLogisticCeilingEffect(rawGain: number, currentFitness: number, maxCeiling: number): number {
+  if (currentFitness >= maxCeiling) return 0;
+  return normalize(rawGain * (1 - (currentFitness / maxCeiling)));
+}
+
 export function getProgressionMultiplier(week: number, isDeload: boolean, isLogged: boolean): number {
   if (isLogged) return 1.0;
   if (isDeload) return 0.70;
-  if (week > 1) return Math.pow(1.025, week - 1);
+  if (week > 1) return Math.min(1.15, Math.pow(1.025, week - 1));
   return 1.0;
 }

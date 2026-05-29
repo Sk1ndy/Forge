@@ -8,6 +8,11 @@ export function estimate1RM(weight: number, reps: number, rpe: number): number {
   const rir = Math.max(0, 10 - rpe);
   const effectiveReps = reps + rir;
   
+  if (effectiveReps > 15) {
+    // Wathan exponential formula is the most robust model for high reps endurance sets
+    // 1RM = 100 * W / (48.8 + 53.8 * exp(-0.075 * R))
+    return (100 * weight) / (48.8 + 53.8 * Math.exp(-0.075 * effectiveReps));
+  }
   // Epley Formula: 1RM = weight * (1 + reps / 30)
   return weight * (1 + effectiveReps / 30);
 }
@@ -53,7 +58,7 @@ export function calculateSetImpact(
 
   // True Prilepin/Hristov INOL formula: sets * reps / (100 - intensity)
   // Example: 3 sets of 5 at 80% = 15 / 20 = 0.75 INOL
-  const baseInol = (safeSeries * safeReps) / (100 - intensity);
+  const baseInol = Math.min(3.0, (safeSeries * safeReps) / (100 - intensity));
   
   // Beginners get a multiplier to reflect lower adaptation capacity
   let totalInol = baseInol;

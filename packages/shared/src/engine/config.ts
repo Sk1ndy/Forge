@@ -10,6 +10,9 @@ export interface BiomechanicsConfig {
   /** Decay time constant for structural damage (in days). Dissipates slowly (48-72h+). */
   tauDamage: number;
   
+  /** Decay time constant for chronic systemic fatigue (Burnout). Dissipates very slowly (21+ days). */
+  tauChronicSnc: number;
+  
   /** Multiplier for fitness impact on performance */
   k1: number;
   
@@ -56,10 +59,12 @@ export function generateBiomechanicsConfig(profile: UserProfile): BiomechanicsCo
   const baseTauFitness = 45;
   const baseTauMetabolic = 1.0; // ~24h
   const baseTauDamage = 3.0; // ~72h
+  const baseTauChronicSnc = 21.0; // ~3 semaines
 
   // If recovery is slow (rate < 1), fatigue takes longer to dissipate
   const tauMetabolic = baseTauMetabolic / recoveryRate;
   const tauDamage = baseTauDamage / recoveryRate;
+  const tauChronicSnc = baseTauChronicSnc / recoveryRate;
   
   // Fitness retention is also affected but to a lesser degree
   const tauFitness = baseTauFitness * Math.sqrt(recoveryRate);
@@ -74,6 +79,7 @@ export function generateBiomechanicsConfig(profile: UserProfile): BiomechanicsCo
     tauFitness,
     tauMetabolic,
     tauDamage,
+    tauChronicSnc,
     k1: 1.0, // Base fitness weight
     k2: 2.0, // Fatigue usually has a 2x immediate impact compared to fitness
     recoveryRate,

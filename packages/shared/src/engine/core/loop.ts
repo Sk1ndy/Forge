@@ -1,13 +1,13 @@
 import { WeeklyBlueprint, UserProfile, ExerciseLog, Exercise, PlannedSetSchema } from '../../types';
 import { DEFAULT_EXERCISE_TENSION_MATRICES, MUSCLE_FATIGUE_DECAY, FITNESS_RETENTION_RATE } from '../../constants';
 import { createInitialState, createLightSnapshot, aggregateMuscle, MusclesMap } from './state';
-import { applyExponentialDecay, getProgressionMultiplier, normalize } from '../biomechanics/physiology';
+import { applyExponentialDecay, normalize, getProgressionMultiplier, applyLogisticCeilingEffect } from '../biomechanics/physiology';
 import { calculateSetImpact } from '../biomechanics/impact';
 import { calculateInjuryPredictions } from '../algorithms/injury';
 import { applyDiminishingReturns } from '../algorithms/junk-volume';
 import { generateBiomechanicsConfig } from '../config';
 
-const DAYS_OF_WEEK = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche'];
+const DAYS_OF_WEEK = [0, 1, 2, 3, 4, 5, 6];
 
 export function* executeSimulationGenerator(
   blueprint: WeeklyBlueprint,
@@ -23,8 +23,10 @@ export function* executeSimulationGenerator(
   const musclesMap = createInitialState();
 
   let sncFatigue = 0;
+  let chronicSncStress = 0; // Mémoire long terme du SNC
   let snapshotMuscles = createLightSnapshot(musclesMap);
   let snapshotSnc = 0;
+  let snapshotChronicSnc = 0;
 
   const dailyInol: { [muscleId: string]: number } = {};
   const peakFatigue: Record<string, { value: number; day: string }> = {};
@@ -92,8 +94,8 @@ export function* executeSimulationGenerator(
         
         musclesMap[id].fitness = applyExponentialDecay(musclesMap[id].fitness, currentTauFitness, 1);
         
-        // Joint stress takes ~1.5x longer to heal than muscle damage
-        const currentTauJoint = isDeload ? (config.tauDamage * 1.5) / 1.5 : config.tauDamage * 1.5;
+        // Joint stress takes ~4x longer to heal than muscle damage (tendons heal very slowly)
+        const currentTauJoint = isDeload ? (config.tauDamage * 4.0) / 1.5 : config.tauDamage * 4.0;
         musclesMap[id].jointStress = applyExponentialDecay((musclesMap[id].jointStress || 0), currentTauJoint, 1);
 
         if (musclesMap[id].contributions) {
@@ -103,8 +105,8 @@ export function* executeSimulationGenerator(
         }
       });
 
-      const currentTauSnc = isDeload ? (config.tauMetabolic * 1.5) / 1.5 : config.tauMetabolic * 1.5;
-      sncFatigue = applyExponentialDecay(sncFatigue, currentTauSnc, 1);
+      sncFatigue = applyExponentialDecay(sncFatigue, config.tauMetabolic, 1);
+      chronicSncStress = applyExponentialDecay(chronicSncStress, config.tauChronicSnc, 1);
 
       if (toggledDays[day] !== false) {
         const plannedExercises = blueprint[day as keyof typeof blueprint] || [];
@@ -147,10 +149,12 @@ export function* executeSimulationGenerator(
             const overloadMultiplier = getProgressionMultiplier(week, isDeload, !!logMatch);
 
             const finalInol = impact.inol * overloadMultiplier;
-            const finalSnc = impact.sncPoints * overloadMultiplier;
+            const sncPoints = impact.sncPoints * overloadMultiplier;
+            
+            sncFatigue = normalize(sncFatigue + sncPoints * (1 / config.cnsResilience));
+            chronicSncStress = normalize(chronicSncStress + sncPoints * (1 / config.cnsResilience));
 
             const setIdBase = `${week}-${day}-${plannedEx.exerciseId}-${setIndex}`;
-            sncFatigue = normalize(sncFatigue + finalSnc);
 
             if (week === totalWeeks && exercise.tier_snc === 1 && exercise.equipment === 'poids_libre') {
               axialSncLoad = normalize(axialSncLoad + finalInol);
@@ -177,8 +181,11 @@ export function* executeSimulationGenerator(
                 if (currentFatigue > 1.5) {
                   adaptationMultiplier = Math.max(0.0, config.k1 - (currentFatigue - 1.5) * config.k2);
                 }
-                // Fitness is linear (volume drives fitness), we might cap it later but keep it here for now
-                musclesMap[muscleId].fitness = normalize(musclesMap[muscleId].fitness + muscleLoad * 0.5 * adaptationMultiplier);
+                
+                // Modèle de croissance logistique (Équation de Verhulst)
+                const rawGain = muscleLoad * 0.5 * adaptationMultiplier;
+                const adjustedGain = applyLogisticCeilingEffect(rawGain, musclesMap[muscleId].fitness, 1000.0);
+                musclesMap[muscleId].fitness = normalize(musclesMap[muscleId].fitness + Math.max(0, adjustedGain));
                 
                 musclesMap[muscleId].sets = normalize(musclesMap[muscleId].sets + validSet.series * coeff);
                 dailyRawAccumulator[muscleId].contributions[exercise.nom] = (dailyRawAccumulator[muscleId].contributions[exercise.nom] || 0) + muscleLoad;
@@ -194,7 +201,7 @@ export function* executeSimulationGenerator(
                   weeklyEffectiveSetsRaw[muscleId] = (weeklyEffectiveSetsRaw[muscleId] || 0) + validSet.series;
                 }
 
-                if (week === totalWeeks && selectedDay && day.toLowerCase() === selectedDay.toLowerCase()) {
+                if (week === totalWeeks && selectedDay && String(day) === String(selectedDay)) {
                   dailyInol[muscleId] = normalize((dailyInol[muscleId] || 0) + muscleLoad);
                 }
                 
@@ -246,12 +253,14 @@ export function* executeSimulationGenerator(
       });
 
       if (week === totalWeeks) {
-        if (selectedDay && day.toLowerCase() === selectedDay.toLowerCase()) {
+        if (selectedDay && String(day) === String(selectedDay)) {
           snapshotMuscles = createLightSnapshot(musclesMap);
           snapshotSnc = sncFatigue;
-        } else if (!selectedDay && day === 'Dimanche') {
+          snapshotChronicSnc = chronicSncStress;
+        } else if (!selectedDay && day === 6) {
           snapshotMuscles = createLightSnapshot(musclesMap);
           snapshotSnc = sncFatigue;
+          snapshotChronicSnc = chronicSncStress;
         }
       }
     } // day loop
@@ -273,8 +282,12 @@ export function* executeSimulationGenerator(
   aggregateMuscle(targetMuscles, dailyInol, totalWeeks, 'rearDeltoid', ['deltoids']);
 
   return {
+    finalMuscles: musclesMap,
     targetMuscles,
     targetSnc,
+    snapshotMuscles,
+    snapshotSnc,
+    snapshotChronicSnc,
     dailyInol,
     injuryPredictions,
     weeklySystemicInol,

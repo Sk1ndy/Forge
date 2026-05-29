@@ -7,7 +7,7 @@ import { calculateACWR } from '../biomechanics/physiology';
 export function calculateInjuryPredictions(
   musclesMap: MusclesMap, 
   currentWeek: number,
-  existingPredictions: string[]
+  existingPredictions: { muscleId: string; acwr: number; code: string }[]
 ): void {
   // ACWR needs at least 2 weeks of data to be somewhat meaningful, ideally 4.
   if (currentWeek < 2) return;
@@ -31,10 +31,16 @@ export function calculateInjuryPredictions(
     const acwr = calculateACWR(acuteLoad, chronicLoad);
 
     // ACWR Danger Zone > 1.5
-    if (acwr > 1.5 && acuteLoad > 1.0) { // Also ensure there is meaningful volume (acuteLoad > 1.0 INOL) to avoid false positives on tiny volumes
-      const msg = `Pic de charge (ACWR: ${acwr.toFixed(2)}) détecté sur : ${MUSCLE_DETAILS[id as MuscleId] || id}. Risque de blessure !`;
-      if (!existingPredictions.some(p => p.includes(MUSCLE_DETAILS[id as MuscleId] || id))) {
-        existingPredictions.push(msg);
+    if (acwr > 1.5 && acuteLoad > 1.0 && chronicLoad >= 0.5) { // Also ensure there is meaningful volume to avoid false positives on tiny volumes
+      if (!existingPredictions.some(p => p.muscleId === id && p.code === 'INJURY_RISK_ACWR')) {
+        existingPredictions.push({ muscleId: id, acwr: parseFloat(acwr.toFixed(2)), code: 'INJURY_RISK_ACWR' });
+      }
+    }
+
+    // Absolute Overtraining Zone > 2.0 (Even if ACWR is normal)
+    if (chronicLoad > 2.0) {
+      if (!existingPredictions.some(p => p.muscleId === id && p.code === 'INJURY_RISK_OVERTRAINING')) {
+        existingPredictions.push({ muscleId: id, acwr: parseFloat(acwr.toFixed(2)), code: 'INJURY_RISK_OVERTRAINING' });
       }
     }
   });
