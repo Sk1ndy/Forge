@@ -8,7 +8,10 @@ import { calculateJunkVolumeAlerts } from './algorithms/junk-volume';
 import { calculateProgressiveOverload } from './algorithms/progressive-overload';
 import { calculateMonotonyAlerts } from './algorithms/monotony';
 import { normalizeFatigueHistoryToTensors } from './formatters/tensors';
-import { MusclesMap } from './core/state';
+import { MusclesMap, EngineState } from './core/state';
+import { RawWearableData } from '../../schemas';
+import { TelemetryAdapter } from './adapters/TelemetryAdapter';
+import { adjustRecovery } from './biomechanics/adaptive';
 
 export interface LoopSimulationResult {
   targetMuscles: MusclesMap;

@@ -58,10 +58,10 @@ export function generateBiomechanicsConfig(profile: UserProfile): BiomechanicsCo
 
   // 2. Determine Time Constants (Tau)
   // Faster recovery = shorter taus
-  const baseTauFitness = 45;
-  const baseTauMetabolic = 1.0; // ~24h
-  const baseTauDamage = 3.0; // ~72h
-  const baseTauChronicSnc = 21.0; // ~3 semaines
+  const baseTauFitness = profile.biometricConstants?.baseTauFitness ?? 45;
+  const baseTauMetabolic = profile.biometricConstants?.baseTauMetabolic ?? 1.0; // ~24h
+  const baseTauDamage = profile.biometricConstants?.baseTauDamage ?? 3.0; // ~72h
+  const baseTauChronicSnc = profile.biometricConstants?.baseTauChronicSnc ?? 21.0; // ~3 semaines
 
   // If recovery is slow (rate < 1), fatigue takes longer to dissipate
   const tauMetabolic = baseTauMetabolic / recoveryRate;
@@ -86,9 +86,9 @@ export function generateBiomechanicsConfig(profile: UserProfile): BiomechanicsCo
     tauDamage,
     tauChronicSnc,
     geneticCeiling,
-    k1: 1.0, // Base fitness weight
-    k2: 2.0, // Fatigue usually has a 2x immediate impact compared to fitness
+    k1: profile.biometricConstants?.k1 ?? 1.0, // Base fitness weight
+    k2: profile.biometricConstants?.k2 ?? 2.0, // Fatigue usually has a 2x immediate impact compared to fitness
     recoveryRate,
-    cnsResilience
+    cnsResilience: profile.biometricConstants?.cnsResilience ?? cnsResilience
   };
 }

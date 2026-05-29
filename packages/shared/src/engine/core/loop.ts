@@ -1,6 +1,6 @@
 import { WeeklyBlueprint, UserProfile, ExerciseLog, Exercise, PlannedSetSchema } from '../../types';
 import { DEFAULT_EXERCISE_TENSION_MATRICES, MUSCLE_FATIGUE_DECAY, FITNESS_RETENTION_RATE } from '../../constants';
-import { createInitialState, createLightSnapshot, aggregateMuscle, MusclesMap } from './state';
+import { createInitialState, createLightSnapshot, aggregateMuscle, MusclesMap, EngineState } from './state';
 import { applyExponentialDecay, normalize, getProgressionMultiplier, applyLogisticCeilingEffect } from '../biomechanics/physiology';
 import { calculateSetImpact } from '../biomechanics/impact';
 import { calculateInjuryPredictions } from '../algorithms/injury';
@@ -18,13 +18,14 @@ export function* executeSimulationGenerator(
   exerciseLibrary: Exercise[],
   totalWeeks: number,
   deloadWeeks: number[],
-  sessionLogs: ExerciseLog[] | undefined
+  sessionLogs: ExerciseLog[] | undefined,
+  initialState?: EngineState
 ) {
   const config = generateBiomechanicsConfig(profile);
-  const musclesMap = createInitialState();
+  const musclesMap = initialState ? createLightSnapshot(initialState.muscles) : createInitialState();
 
-  let sncFatigue = 0;
-  let chronicSncStress = 0; // Mémoire long terme du SNC
+  let sncFatigue = initialState ? initialState.sncFatigue : 0;
+  let chronicSncStress = initialState ? initialState.chronicSncStress : 0; // Mémoire long terme du SNC
   let snapshotMuscles = createLightSnapshot(musclesMap);
   let snapshotSnc = 0;
   let snapshotChronicSnc = 0;
@@ -32,14 +33,16 @@ export function* executeSimulationGenerator(
   const dailyInol: { [muscleId: string]: number } = {};
   const peakFatigue: Record<string, { value: number; day: string }> = {};
   const weeklyEffectiveSetsRaw: Record<string, number> = {};
-  let axialSncLoad = 0;
+  let axialSncLoad = initialState ? initialState.axialSncLoad : 0;
 
   const injuryPredictions: string[] = [];
   const weeklySystemicInol: { [week: number]: number[] } = {};
   
-  let pushSets = 0;
-  let pullSets = 0;
-  let legsSets = 0;
+  let pushSets = initialState ? initialState.pushSets : 0;
+  let pullSets = initialState ? initialState.pullSets : 0;
+  let legsSets = initialState ? initialState.legsSets : 0;
+  
+  let globalDayIndex = initialState ? initialState.dayIndex : 0;
 
   Object.entries(blueprint).forEach(([day, dayExercises]) => {
     if (toggledDays[day] === false) return;
@@ -68,7 +71,10 @@ export function* executeSimulationGenerator(
 
     const isDeload = deloadWeeks.includes(week);
 
-    for (const day of DAYS_OF_WEEK) {
+    for (const dayIndex of DAYS_OF_WEEK) {
+      const day = DAY_NAMES[dayIndex];
+      globalDayIndex = (week - 1) * 7 + dayIndex;
+
       let dailySystemicLoad = 0;
       
       // Structure to hold raw daily accumulation before diminishing returns
@@ -278,7 +284,7 @@ export function* executeSimulationGenerator(
           snapshotMuscles = createLightSnapshot(musclesMap);
           snapshotSnc = sncFatigue;
           snapshotChronicSnc = chronicSncStress;
-        } else if (!selectedDay && day === 6) {
+        } else if (!selectedDay && dayIndex === 6) {
           snapshotMuscles = createLightSnapshot(musclesMap);
           snapshotSnc = sncFatigue;
           snapshotChronicSnc = chronicSncStress;

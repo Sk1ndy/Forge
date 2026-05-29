@@ -148,7 +148,51 @@ export const DEFAULT_EXERCISE_TENSION_MATRICES: Record<string, Partial<Record<Mu
   skull_crushers: { triceps: 1.0 },
   
   // Abs
-  hanging_leg_raise: { lowerAbs: 1.0, upperAbs: 0.5 }
+  hanging_leg_raise: { lowerAbs: 1.0, upperAbs: 0.5 },
+  ab_wheel_rollout: { abs: 1.0, lowerBack: 0.3, upperBack: 0.2 },
+  russian_twist: { obliques: 1.0, abs: 0.5 },
+  cable_crunch: { abs: 1.0 },
+
+  // --- NOUVEAUX EXERCICES AJOUTÉS ---
+  
+  // Pectoraux (Additions)
+  decline_bench_press: { lowerChest: 1.0, triceps: 0.5, frontDeltoid: 0.3 },
+  db_pullover: { chest: 0.8, upperBack: 0.8, triceps: 0.3 }, // Fait la jonction Pecs/Dorsaux
+  machine_fly: { chest: 1.0 },
+  push_ups: { chest: 1.0, frontDeltoid: 0.5, triceps: 0.6, abs: 0.2 },
+  weighted_dips: { lowerChest: 1.0, triceps: 0.8, frontDeltoid: 0.5 },
+
+  // Dos (Additions)
+  chin_ups: { upperBack: 0.8, biceps: 1.0, forearm: 0.4 }, // Prise supination
+  close_grip_pulldown: { upperBack: 1.0, biceps: 0.7, forearm: 0.3 },
+  db_shrugs: { upperTrapezius: 1.0, forearm: 0.5 },
+  barbell_shrugs: { upperTrapezius: 1.0, forearm: 0.6 },
+  machine_row: { upperBack: 1.0, biceps: 0.4, rearDeltoid: 0.3 },
+  good_mornings: { lowerBack: 1.0, hamstring: 0.8, gluteal: 0.5 },
+  back_extension: { lowerBack: 1.0, gluteal: 0.5, hamstring: 0.3 },
+
+  // Épaules (Additions)
+  seated_db_press: { frontDeltoid: 1.0, triceps: 0.4, upperChest: 0.1 },
+  front_raise: { frontDeltoid: 1.0 },
+  cable_lateral_raise: { deltoids: 1.0 },
+  upright_row: { deltoids: 0.8, upperTrapezius: 0.8, biceps: 0.3 },
+  machine_shoulder_press: { frontDeltoid: 1.0, triceps: 0.4 },
+
+  // Bras (Additions)
+  preacher_curl: { biceps: 1.0 },
+  cable_curl: { biceps: 1.0, forearm: 0.2 },
+  concentration_curl: { biceps: 1.0 },
+  overhead_triceps_extension: { triceps: 1.0 },
+  close_grip_bench_press: { triceps: 1.0, chest: 0.6, frontDeltoid: 0.4 },
+  french_press: { triceps: 1.0 },
+
+  // Jambes (Additions)
+  front_squat: { quadriceps: 1.0, gluteal: 0.4, lowerBack: 0.5, abs: 0.3 },
+  hack_squat: { quadriceps: 1.0, gluteal: 0.5 },
+  sumo_deadlift: { gluteal: 1.0, quadriceps: 0.8, lowerBack: 0.6, hamstring: 0.6, trapezius: 0.4 },
+  leg_press_45: { quadriceps: 1.0, gluteal: 0.5 },
+  seated_calf_raise: { calves: 1.0 },
+  standing_calf_raise: { calves: 1.0 }
 };
 
 // ─── 2. CINÉTIQUES DE RÉCUPÉRATION SPÉCIFIQUES AUX MUSCLES (Taux de rétention de fatigue par 24h) ───

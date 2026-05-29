@@ -23,7 +23,7 @@ export const UserPRsSchema = z.object({
   bench:    z.number({ invalid_type_error: "Le bench doit être un nombre" }).min(0).max(1000),
   deadlift: z.number({ invalid_type_error: "Le deadlift doit être un nombre" }).min(0).max(2000),
   ohp:      z.number({ invalid_type_error: "L'OHP doit être un nombre" }).min(0).max(500),
-});
+}).partial();
 export type UserPRs = z.infer<typeof UserPRsSchema>;
 
 export const UserProfileSchema = z.object({
@@ -36,8 +36,25 @@ export const UserProfileSchema = z.object({
   dailyVFC:      z.number().min(0).max(200).optional(), // Variabilité de la Fréquence Cardiaque (en ms)
   caloricStatus: z.enum(['deficit', 'maintenance', 'surplus']).optional(),
   stressLevel:   z.enum(['low', 'moderate', 'high']).optional(),
+  biometricConstants: z.any().optional() // UserBiometricConstants (circular ref bypass or lazy)
 });
 export type UserProfile = z.infer<typeof UserProfileSchema>;
+
+export const OnboardingPayloadSchema = z.object({
+  pdc: z.number().min(30).max(300),
+  gender: z.enum(['male', 'female']).default('male'),
+  experience_level: z.enum(['beginner', 'intermediate', 'advanced']),
+  known_prs: UserPRsSchema.optional(),
+  recent_lifts: z.array(z.object({
+    exo: z.enum([
+      'squat', 'bench', 'deadlift', 'ohp',
+      'leg_press', 'chest_press', 'lat_pulldown'
+    ]),
+    poids: z.number(),
+    reps: z.number()
+  })).optional()
+});
+export type OnboardingPayload = z.infer<typeof OnboardingPayloadSchema>;
 
 // ─── Exercises ──────────────────────────────────────────────────────────────
 export const ExerciseSchema = z.object({
@@ -124,3 +141,41 @@ export const WorkoutSessionSchema = z.object({
   total_tonnage: z.number().optional()
 });
 export type WorkoutSession = z.infer<typeof WorkoutSessionSchema>;
+
+// ─── Biometric Constants (Adaptive Engine) ───────────────────────────────────
+export const UserBiometricConstantsSchema = z.object({
+  baseTauMetabolic: z.number().min(0.1).max(5.0).default(1.0),
+  baseTauDamage: z.number().min(0.5).max(10.0).default(3.0),
+  baseTauChronicSnc: z.number().min(5.0).max(60.0).default(21.0),
+  baseTauFitness: z.number().min(10.0).max(120.0).default(45.0),
+  k1: z.number().default(1.0),
+  k2: z.number().default(2.0),
+  cnsResilience: z.number().min(0.1).max(3.0).default(1.0)
+});
+export type UserBiometricConstants = z.infer<typeof UserBiometricConstantsSchema>;
+
+// ─── Telemetry Data (Raw Wearables input) ────────────────────────────────────
+export const RawWearableDataSchema = z.object({
+  source: z.enum(['apple', 'garmin', 'whoop', 'manual']),
+  timestamp: z.string().datetime().optional(), // ISO string
+  
+  hrv_ms: z.number().min(0).max(300).optional(),           // Heart Rate Variability
+  resting_hr: z.number().min(30).max(150).optional(),      // Resting Heart Rate
+  
+  sleep_total_minutes: z.number().min(0).max(1440).optional(),
+  sleep_deep_minutes: z.number().min(0).max(720).optional(),
+  sleep_rem_minutes: z.number().min(0).max(720).optional(),
+  
+  readiness_score: z.number().min(0).max(100).optional(),  // e.g. Garmin Body Battery or Manual input
+  stress_score: z.number().min(0).max(100).optional()
+});
+export type RawWearableData = z.infer<typeof RawWearableDataSchema>;
+
+// ─── Normalized Stress Factors (For Engine Consumption) ──────────────────────
+export const StressFactorsSchema = z.object({
+  recoveryMultiplier: z.number().min(0.1).max(2.0), // 1.0 = normal, > 1.0 = super recup, < 1.0 = danger
+  cnsStressDelta: z.number(),                       // Acute CNS impact (positive adds stress, negative removes)
+  confidence: z.number().min(0).max(1.0),           // 0.0 to 1.0 depending on data quality
+  logs: z.array(z.string())                         // Traceability of adaptation
+});
+export type StressFactors = z.infer<typeof StressFactorsSchema>;

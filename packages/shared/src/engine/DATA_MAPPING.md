@@ -34,3 +34,24 @@ Le moteur de calcul (Core Engine) exporte un objet massif `SimulationResult`. L'
 | `junkVolumeAlerts` | `Array<Object>`| Fin de séance | Jaune | Physio | Liste des muscles sollicités inutilement (loi des rendements décroissants). |
 | `monotonyAlerts` | `Array<Object>`| Fin de cycle | Orange | Proxy | Détection d'une absence de variance des intensités (Monotonie de Foster). |
 | `tensors` | `Object` | Background | Invisible | Data | Tenseurs normalisés (0-1) de la fatigue pour l'exploitation Machine Learning. |
+
+---
+
+## 📥 Entrées de Données (Onboarding & Calibration)
+
+L'interface n'a plus l'obligation de fournir un profil parfait avec les 4 `1RM` stricts. Le Moteur accepte désormais un **`OnboardingPayload`** fragmenté qui passera par le **`ProfileCalibrator`** pour inférer les trous de manière scientifique.
+
+### `OnboardingPayload` (Le JSON envoyé par le Mobile)
+
+| Champ | Type | Statut | Description |
+| :--- | :--- | :--- | :--- |
+| `pdc` | `Number` | **Obligatoire** | Poids de corps en kg (minimum vital pour l'algorithme). |
+| `gender` | `Enum ('male', 'female')` | *Défaut: male* | Impacte les ratios statistiques de force. |
+| `experience_level` | `Enum ('beginner', 'intermediate', 'advanced')` | *Défaut: beginner* | Modifie l'estimation des PRs et la capacité SNC (`maxSnc`). |
+| `known_prs` | `Partial<UserPRs>` | **Optionnel** | Priorité 1 : Vérité Absolue. Si l'athlète connaît son Bench mais pas son Squat, envoyer `{ bench: 100 }`. |
+| `recent_lifts` | `Array<Lift>` | **Optionnel** | Priorité 2 : Estimation Epley + Matrice de conversion. Accepte `squat`, `bench`, `deadlift`, `ohp`, **`leg_press`**, **`chest_press`**, **`lat_pulldown`**. Si l'athlète ne connaît aucun 1RM mais a récemment fait 10 reps à 100kg à la Leg Press, envoyer `[{ exo: 'leg_press', poids: 100, reps: 10 }]`. Le moteur calculera le 1RM Squat théorique. |
+
+> **Processus en cascade (Waterfall) du Calibration Engine** : 
+> 1. Si un `known_prs` existe pour un muscle, il le verrouille.
+> 2. Sinon, s'il y a un `recent_lift` pour ce muscle (ou sa machine équivalente), il calcule le 1RM via Epley (`W * (1 + R/30)` bloqué à 10 reps max) et applique **une marge de sécurité de -10% (Sandbagging)**.
+> 3. S'il n'y a **aucune** donnée, il applique les standards globaux relatifs au Poids de Corps (Symmetric Strength) basés sur le sexe et le niveau, toujours avec un malus de sécurité de -10%.

@@ -19,6 +19,17 @@ export interface MuscleState {
 
 export type MusclesMap = Record<string, MuscleState>;
 
+export interface EngineState {
+  muscles: MusclesMap;
+  sncFatigue: number;
+  chronicSncStress: number;
+  dayIndex: number; // Index absolu depuis le début de la simulation
+  pushSets: number;
+  pullSets: number;
+  legsSets: number;
+  axialSncLoad: number;
+}
+
 export function createInitialState(): MusclesMap {
   const map: MusclesMap = {};
   Object.keys(MUSCLE_DETAILS).forEach(id => {
