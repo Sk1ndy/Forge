@@ -1,6 +1,12 @@
 # 🗄️ ENGINE DATA MAPPING (POUR LE FRONT-END)
 
+> [!IMPORTANT]
+> **SOURCE DE VÉRITÉ UNIQUE :** La spécification complète, exhaustive et illustrée pour l'intégration UI/UX (contenant tous les schémas d'entrées, de sorties, les dictionnaires de traduction i18n et les recommandations graphiques Tailwind) est disponible dans :
+> **[docs/UI_COMMUNICATION.md](file:///c:/Users/sk-y/Code/forge-simulator/docs/UI_COMMUNICATION.md)**
+
 Le moteur de calcul (Core Engine) exporte un objet massif `SimulationResult`. L'interface graphique (Web ou Mobile) ne doit faire **aucun calcul métier**, mais uniquement consommer et afficher ces métriques.
+
+---
 
 ## 🔴 Métriques du Système Nerveux Central (SNC)
 | Variable | Type | Fréquence | Criticité | Nature | Description |
@@ -9,6 +15,8 @@ Le moteur de calcul (Core Engine) exporte un objet massif `SimulationResult`. L'
 | `sncPercentage` | `Number (0-100)`| Real-Time | Progress Bar | Proxy | Taux d'épuisement aigu du SNC par rapport au maximum tolérable de l'athlète. |
 | `chronicSncStress` | `Number` | Weekly | Rouge vif (Burnout) | Physio | **NOUVEAU** : Accumulation long-terme du stress. Au-delà de `3.0`, déclenche le catabolisme musculaire. L'UI doit conseiller un Deload absolu. |
 | `cnsFailure` | `Boolean` | Bloquante | Critique | Proxy | Si `true`, l'interface doit bloquer toute séance lourde (risque de surentraînement aigu). |
+
+---
 
 ## 🟢 Métriques Musculaires (`muscles[muscleId]`)
 | Variable | Type | Fréquence | Criticité | Nature | Description |
@@ -19,11 +27,15 @@ Le moteur de calcul (Core Engine) exporte un objet massif `SimulationResult`. L'
 | `remainingCapacity`| `Number (0-1)` | Real-Time | Jauge Circulaire | Proxy | Pourcentage de volume (INOL) restant avant d'atteindre le seuil critique de 2.5. |
 | `jointStress` | `Number` | Weekly | Orange | Proxy | Accumulation de contraintes sur les tendons et les articulations (récupération locale asymétrique très lente). |
 
+---
+
 ## 📈 Métriques de Progression (Gains)
 | Variable | Type | Fréquence | Criticité | Nature | Description |
 | :--- | :--- | :--- | :--- | :--- | :--- |
 | `progressiveOverload` | `Object` | Fin de cycle | Graphique Ligne | Physio | **NOUVEAU** : Contient `weekOverWeekGrowthPct` par muscle. Indique la croissance hypertrophique simulée. |
 | `geneticCeiling` | `(Implicit)` | Fin de cycle | Jauge Plafond | Physio | **NOUVEAU** : Loi de croissance logistique (Verhulst). Si les gains s'effondrent vers 0 malgré un bon entraînement, le plafond génétique est atteint. |
+
+---
 
 ## 📊 Métriques Systémiques (Macros)
 | Variable | Type | Fréquence | Criticité | Nature | Description |
