@@ -408,7 +408,7 @@
             ],
             "remainingCapacity": 0.9957,
             "jointStress": 0.06,
-            "readiness": -0.01,
+            "readiness": 0.08,
             "fatigueHistory": [
               0.19,
               0.1,
@@ -454,7 +454,7 @@
             ],
             "remainingCapacity": 0.9835,
             "jointStress": 0.32,
-            "readiness": -0.02,
+            "readiness": 0.42,
             "fatigueHistory": [
               0.74,
               0.38,
@@ -1608,7 +1608,7 @@
             ],
             "remainingCapacity": 0.9938,
             "jointStress": 0.1,
-            "readiness": -0.01,
+            "readiness": 0.12,
             "fatigueHistory": [
               0.28,
               0.14,
@@ -1654,7 +1654,7 @@
             ],
             "remainingCapacity": 0.9835,
             "jointStress": 0.32,
-            "readiness": -0.02,
+            "readiness": 0.42,
             "fatigueHistory": [
               0.74,
               0.38,

@@ -66,6 +66,7 @@ export function aggregateMuscle(
   
   let totalFatigueMetabolic = parent.fatigueMetabolic;
   let totalFatigueDamage = parent.fatigueDamage;
+  let totalFitness = parent.fitness;
   let totalInol = parent.inol || 0;
   let totalJointStress = parent.jointStress;
   let totalDailyInol = dailyInol[parentKey] || 0;
@@ -82,6 +83,7 @@ export function aggregateMuscle(
       const coeff = weights[childKey] ?? 1.0;
       totalFatigueMetabolic = normalize(totalFatigueMetabolic + child.fatigueMetabolic * coeff);
       totalFatigueDamage = normalize(totalFatigueDamage + child.fatigueDamage * coeff);
+      totalFitness = normalize(totalFitness + child.fitness * coeff);
       totalInol = normalize(totalInol + (child.inol || 0) * coeff);
       totalJointStress = normalize(totalJointStress + child.jointStress * coeff);
       totalDailyInol = normalize(totalDailyInol + (dailyInol[childKey] || 0) * coeff);
@@ -92,6 +94,10 @@ export function aggregateMuscle(
 
       Object.entries(child.contributions || {}).forEach(([exNom, val]) => {
         combinedContributions[exNom] = normalize((combinedContributions[exNom] || 0) + val * coeff);
+      });
+      
+      Object.entries(child.setsContributions || {}).forEach(([exNom, val]) => {
+        combinedSetsContributions[exNom] = (combinedSetsContributions[exNom] || 0) + val;
       });
       
       if (child.uniqueSets) {
@@ -111,7 +117,7 @@ export function aggregateMuscle(
     fatigueMetabolic: totalFatigueMetabolic,
     fatigueDamage: totalFatigueDamage,
     inol: totalInol,
-    fitness: normalize(totalFatigue * 0.5),
+    fitness: totalFitness,
     sets: combinedUniqueSets.size,
     jointStress: totalJointStress,
     contributions: combinedContributions,
