@@ -8,7 +8,7 @@ function generateSeed() {
   sql += `-- Auto-generated from packages/shared/src/constants.ts\n`;
   sql += `-- =====================================================================================\n\n`;
 
-  sql += `INSERT INTO public.exercises (id, nom, tier_snc, muscle_primaire, muscles_secondaires, equipment, tension_matrix) VALUES\n`;
+  sql += `INSERT INTO public.exercises (id, nom, tier_snc, muscle_primaire, muscles_secondaires, equipment, ppl_category, tension_matrix) VALUES\n`;
 
   // We will build a complete list of exercises.
   // First, all 42 exercises from DEFAULT_EXERCISE_LIBRARY
@@ -27,7 +27,8 @@ function generateSeed() {
         tier_snc: 2, // default stub
         muscle_primaire: Object.keys(DEFAULT_EXERCISE_TENSION_MATRICES[matrixId] || {})[0] || 'unknown',
         muscles_secondaires: [],
-        equipment: 'unknown'
+        equipment: 'unknown',
+        ppl_category: 'unknown'
       } as any);
     }
   }
@@ -42,7 +43,7 @@ function generateSeed() {
     // Format JSONB
     const jsonStr = `'${JSON.stringify(tensionMatrix)}'`;
     
-    let line = `('${ex.id}', '${ex.nom.replace(/'/g, "''")}', ${ex.tier_snc}, '${ex.muscle_primaire}', ${arrayStr}, '${ex.equipment}', ${jsonStr}::jsonb)`;
+    let line = `('${ex.id}', '${ex.nom.replace(/'/g, "''")}', ${ex.tier_snc}, '${ex.muscle_primaire}', ${arrayStr}, '${ex.equipment}', '${ex.ppl_category || 'unknown'}', ${jsonStr}::jsonb)`;
     
     if (index === exercisesToInsert.length - 1) {
       return line + ';';
