@@ -48,6 +48,10 @@ const heavyBlueprint: WeeklyBlueprint = {
   Jeudi: [], Vendredi: [], Samedi: [], Dimanche: []
 };
 
+import { normalizeFatigueHistoryToTensors } from '../engine/formatters/tensors';
+import { normalize } from '../engine/biomechanics/physiology';
+import { MUSCLE_DETAILS } from '../constants';
+
 const normalBlueprint: WeeklyBlueprint = {
   Lundi: [{
     id: 'ex1',
@@ -247,6 +251,37 @@ describe('Engine: Phase 2 (Mesocycle Algorithms)', () => {
     expect(() => {
       runMesocycleSimulation(normalBlueprint, malformedProfile as any, {}, undefined, mockLibrary);
     }).toThrow();
+  });
+  it('Bug #14 precision: normalize must maintain 8 decimals precision', () => {
+    expect(normalize(0.12345678)).toBe(0.12345678);
+    expect(normalize(0.123456789)).toBe(0.12345679);
+  });
+
+  it('Bug #15 historical weekly sets: weeklyEffectiveSets is an average across all weeks', () => {
+    const result = runMesocycleSimulation(normalBlueprint, mockProfile, {}, undefined, mockLibrary, 4, []);
+    expect(result.weeklyMacro.weeklyEffectiveSets.chest).toBe(3);
+  });
+
+  it('Bug #16 decorative muscles removed: MUSCLE_DETAILS does not contain head or knees', () => {
+    expect((MUSCLE_DETAILS as any).head).toBeUndefined();
+    expect((MUSCLE_DETAILS as any).knees).toBeUndefined();
+  });
+
+  it('Bug #17 stack overflow: tensors and max calculation do not throw on huge history', () => {
+    const hugeHistory = Array(150000).fill(1.5);
+    const mockMap = { chest: { fatigueHistory: hugeHistory } } as any;
+    expect(() => normalizeFatigueHistoryToTensors(mockMap)).not.toThrow();
+  });
+
+  it('Bug #18 finalState missing: SimulationResult contains finalState for live tracking', () => {
+    const result = runMesocycleSimulation(normalBlueprint, mockProfile, {}, undefined, mockLibrary, 1, []);
+    expect(result.finalState).toBeDefined();
+    expect(result.finalState.chest).toBeDefined();
+  });
+
+  it('Bug #19 tonnage for ACWR: injury tracking uses tonnage over inol', () => {
+    const result = runMesocycleSimulation(normalBlueprint, mockProfile, {}, undefined, mockLibrary, 1, []);
+    expect(result.finalState.chest.weeklyTonnage[1]).toBe(2400); // 3 * 10 * 80kg = 2400kg
   });
 });
 

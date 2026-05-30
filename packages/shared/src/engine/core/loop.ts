@@ -80,12 +80,16 @@ export function* executeSimulationGenerator(
         joint: number; 
         inol: number;
         rawFitnessGain: number;
+        tonnage: number;
         contributions: Record<string, number>;
         setsContributions: Record<string, number>;
       }> = {};
 
       Object.keys(musclesMap).forEach(id => {
-        dailyRawAccumulator[id] = { metabolic: 0, damage: 0, joint: 0, inol: 0, rawFitnessGain: 0, contributions: {}, setsContributions: {} };
+        dailyRawAccumulator[id] = { metabolic: 0, damage: 0, joint: 0, inol: 0, rawFitnessGain: 0, tonnage: 0, contributions: {}, setsContributions: {} };
+      });
+
+      Object.keys(musclesMap).forEach(id => {
         // 1. Récupération du taux de rétention local
         const retention = MUSCLE_FATIGUE_DECAY[id as keyof typeof MUSCLE_FATIGUE_DECAY] || 0.5;
         // 2. Conversion du taux de rétention en modificateur de temps de demi-vie
@@ -244,9 +248,10 @@ export function* executeSimulationGenerator(
                 }
                 dailyRawAccumulator[muscleId].joint += jointStressIncrement;
                 
-                if (week === totalWeeks) {
-                  weeklyEffectiveSetsRaw[muscleId] = (weeklyEffectiveSetsRaw[muscleId] || 0) + validSet.series;
-                }
+                const setTonnage = (validSet.poids > 0 ? validSet.poids : (profile.pdc || 75)) * validSet.reps * validSet.series * coeff;
+                dailyRawAccumulator[muscleId].tonnage += setTonnage;
+                
+                weeklyEffectiveSetsRaw[muscleId] = (weeklyEffectiveSetsRaw[muscleId] || 0) + validSet.series;
 
                 if (week === totalWeeks && selectedDay && String(day) === String(selectedDay)) {
                   dailyInol[muscleId] = normalize((dailyInol[muscleId] || 0) + muscleLoad);
@@ -280,6 +285,8 @@ export function* executeSimulationGenerator(
           
           musclesMap[muscleId].inol = normalize((musclesMap[muscleId].inol || 0) + effectiveTotalInol);
           musclesMap[muscleId].weeklyInol[week] = (musclesMap[muscleId].weeklyInol[week] || 0) + effectiveTotalInol;
+          
+          musclesMap[muscleId].weeklyTonnage[week] = (musclesMap[muscleId].weeklyTonnage[week] || 0) + raw.tonnage;
 
           Object.entries(raw.contributions).forEach(([exNom, val]) => {
             musclesMap[muscleId].contributions[exNom] = normalize((musclesMap[muscleId].contributions[exNom] || 0) + val * attenuation);
@@ -350,6 +357,7 @@ export function* executeSimulationGenerator(
     axialSncLoad,
     pushSets,
     pullSets,
-    legsSets
+    legsSets,
+    finalState: targetMuscles
   };
 }

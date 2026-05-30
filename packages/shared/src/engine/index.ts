@@ -14,6 +14,7 @@ import { TelemetryAdapter } from './adapters/TelemetryAdapter';
 import { adjustRecovery } from './biomechanics/adaptive';
 
 export interface LoopSimulationResult {
+  finalState?: any;
   targetMuscles: MusclesMap;
   targetSnc: number;
   snapshotChronicSnc: number;
@@ -114,14 +115,14 @@ function finalizeSimulationResult(loopResult: LoopSimulationResult, totalWeeks: 
   GRAND_GROUP_IDS.forEach(id => {
     const history = finalMuscles[id as MuscleId]?.fatigueHistory;
     if (history && history.length > 0) {
-      const maxVal = Math.max(...history);
+      const maxVal = history.reduce((a, b) => Math.max(a, b), 0);
       const dayIndex = history.indexOf(maxVal) % 7; 
       filteredPeakFatigue[id] = { value: parseFloat(maxVal.toFixed(4)), day: dayIndex };
     }
   });
 
   const weeklyEffectiveSets: Record<string, number> = {};
-  GRAND_GROUP_IDS.forEach(id => { weeklyEffectiveSets[id] = Math.round(loopResult.weeklyEffectiveSetsRaw[id] ?? 0); });
+  GRAND_GROUP_IDS.forEach(id => { weeklyEffectiveSets[id] = Math.round((loopResult.weeklyEffectiveSetsRaw[id] ?? 0) / Math.max(1, totalWeeks)); });
 
   const traumaAlerts: string[] = [];
   Object.entries(filteredPeakFatigue).forEach(([id, { value, day: peakDay }]) => {
@@ -133,7 +134,7 @@ function finalizeSimulationResult(loopResult: LoopSimulationResult, totalWeeks: 
   MAJOR_GROUPS.forEach(id => {
     const muscle = finalMuscles[id as MuscleId];
     if (!muscle || !muscle.fatigueHistory || muscle.fatigueHistory.length === 0) return;
-    const peakInol = Math.max(...muscle.fatigueHistory);
+    const peakInol = muscle.fatigueHistory.reduce((a, b) => Math.max(a, b), 0);
     if (peakInol <= 2.5) return;
     const technicalName = MUSCLE_DETAILS[id as MuscleId] || id;
     if (seenTraumaIds.has(technicalName)) return;
@@ -163,7 +164,8 @@ function finalizeSimulationResult(loopResult: LoopSimulationResult, totalWeeks: 
     progressiveOverload,
     injuryPredictions: loopResult.injuryPredictions,
     monotonyAlerts,
-    tensors
+    tensors,
+    finalState: loopResult.finalState
   };
 }
 

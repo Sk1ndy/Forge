@@ -1,6 +1,6 @@
 import { BiomechanicsConfig } from '../config';
 
-export const normalize = (val: number) => Math.round(val * 10000) / 10000;
+export const normalize = (val: number) => Math.round(val * 100000000) / 100000000;
 
 /**
  * Banister Impulse-Response Model Decay

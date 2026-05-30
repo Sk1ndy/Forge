@@ -17,13 +17,13 @@ export function calculateInjuryPredictions(
     if (isSubMuscle) return;
 
     const muscle = musclesMap[id];
-    const acuteLoad = muscle.weeklyInol[currentWeek] || 0;
+    const acuteLoad = muscle.weeklyTonnage[currentWeek] || muscle.weeklyInol[currentWeek] || 0; // Fallback to INOL if tonnage is 0
     
     // Calculate Chronic Load (average of up to last 4 weeks)
     let chronicSum = 0;
     let weeksCounted = 0;
     for (let w = Math.max(1, currentWeek - 3); w <= currentWeek; w++) {
-      chronicSum += muscle.weeklyInol[w] || 0;
+      chronicSum += muscle.weeklyTonnage[w] || muscle.weeklyInol[w] || 0;
       weeksCounted++;
     }
     const chronicLoad = chronicSum / weeksCounted;

@@ -37,4 +37,5 @@ export interface SimulationResult {
   monotonyAlerts: { week: number; code: string }[]; // Alertes de faible variance de l'intensité inter-jours
   weeklySystemicInol?: Record<number, number[]>; // Array de 7 nombres (Lundi->Dimanche) pour chaque semaine
   tensors?: Record<string, number[]>; // Normalized ML tensors [0,1]
+  finalState?: any; // EngineState final pour la reprise
 }

@@ -15,6 +15,7 @@ export interface MuscleState {
   fatigueHistory: number[];
   uniqueSets: Set<string>;
   weeklyInol: { [week: number]: number };
+  weeklyTonnage: { [week: number]: number };
 }
 
 export type MusclesMap = Record<string, MuscleState>;
@@ -33,7 +34,7 @@ export interface EngineState {
 export function createInitialState(): MusclesMap {
   const map: MusclesMap = {};
   Object.keys(MUSCLE_DETAILS).forEach(id => {
-    map[id] = { fatigue: 0, fatigueMetabolic: 0, fatigueDamage: 0, inol: 0, fitness: 0, sets: 0, jointStress: 0, contributions: {}, setsContributions: {}, fatigueHistory: [], uniqueSets: new Set<string>(), weeklyInol: {} };
+    map[id] = { fatigue: 0, fatigueMetabolic: 0, fatigueDamage: 0, inol: 0, fitness: 0, sets: 0, jointStress: 0, contributions: {}, setsContributions: {}, fatigueHistory: [], uniqueSets: new Set<string>(), weeklyInol: {}, weeklyTonnage: {} };
   });
   return map;
 }
@@ -48,7 +49,8 @@ export function createLightSnapshot(source: MusclesMap): MusclesMap {
       setsContributions: { ...s.setsContributions },
       fatigueHistory: [...s.fatigueHistory],
       uniqueSets: new Set<string>(s.uniqueSets),
-      weeklyInol: { ...s.weeklyInol }
+      weeklyInol: { ...s.weeklyInol },
+      weeklyTonnage: { ...s.weeklyTonnage }
     };
   }
   return snapshot;
@@ -61,7 +63,7 @@ export function aggregateMuscle(
   parentKey: MuscleId, 
   childKeys: MuscleId[]
 ) {
-  const parent = targetMuscles[parentKey] || { fatigue: 0, fatigueMetabolic: 0, fatigueDamage: 0, inol: 0, fitness: 0, sets: 0, jointStress: 0, contributions: {}, setsContributions: {}, fatigueHistory: [], uniqueSets: new Set<string>(), weeklyInol: {} };
+  const parent = targetMuscles[parentKey] || { fatigue: 0, fatigueMetabolic: 0, fatigueDamage: 0, inol: 0, fitness: 0, sets: 0, jointStress: 0, contributions: {}, setsContributions: {}, fatigueHistory: [], uniqueSets: new Set<string>(), weeklyInol: {}, weeklyTonnage: {} };
   const weights = PARENT_CHILD_WEIGHTS[parentKey] || {};
   
   let totalFatigueMetabolic = parent.fatigueMetabolic;
@@ -76,6 +78,7 @@ export function aggregateMuscle(
   const combinedSetsContributions = { ...parent.setsContributions };
   const combinedUniqueSets = new Set<string>(parent.uniqueSets);
   const combinedWeeklyInol = { ...parent.weeklyInol };
+  const combinedWeeklyTonnage = { ...parent.weeklyTonnage };
 
   childKeys.forEach(childKey => {
     const child = targetMuscles[childKey];
@@ -107,6 +110,10 @@ export function aggregateMuscle(
       Object.entries(child.weeklyInol || {}).forEach(([w, val]) => {
         combinedWeeklyInol[Number(w)] = normalize((combinedWeeklyInol[Number(w)] || 0) + val * coeff);
       });
+      
+      Object.entries(child.weeklyTonnage || {}).forEach(([w, val]) => {
+        combinedWeeklyTonnage[Number(w)] = (combinedWeeklyTonnage[Number(w)] || 0) + val * coeff;
+      });
     }
   });
 
@@ -124,6 +131,7 @@ export function aggregateMuscle(
     setsContributions: combinedSetsContributions,
     fatigueHistory: totalFatigueHistory,
     uniqueSets: combinedUniqueSets,
-    weeklyInol: combinedWeeklyInol
+    weeklyInol: combinedWeeklyInol,
+    weeklyTonnage: combinedWeeklyTonnage
   };
 }

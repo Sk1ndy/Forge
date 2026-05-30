@@ -19,8 +19,8 @@ export function normalizeFatigueHistoryToTensors(musclesMap: MusclesMap): Normal
       return;
     }
 
-    const min = Math.min(...history);
-    const max = Math.max(...history);
+    const min = history.reduce((a, b) => Math.min(a, b), Infinity);
+    const max = history.reduce((a, b) => Math.max(a, b), -Infinity);
     const range = max - min;
 
     tensors[muscleId] = history.map(val => {

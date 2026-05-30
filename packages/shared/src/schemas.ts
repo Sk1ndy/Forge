@@ -3,8 +3,8 @@ import { z } from 'zod';
 // ─── Muscle and Basic Types ─────────────────────────────────────────────────
 export const MuscleIdSchema = z.enum([
   'abs', 'biceps', 'calves', 'chest', 'deltoids', 
-  'feet', 'forearm', 'gluteal', 'hamstring', 'hands', 
-  'head', 'knees', 'lowerBack', 'obliques', 'quadriceps', 
+  'forearm', 'gluteal', 'hamstring', 
+  'lowerBack', 'obliques', 'quadriceps', 
   'tibialis', 'trapezius', 'triceps', 'upperBack', 
   'rotatorCuff', 'serratus', 'rhomboids',
   'ankles', 'adductors', 'neck', 'hipFlexors', 
