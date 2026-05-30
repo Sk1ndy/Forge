@@ -63,5 +63,7 @@ export function generateCacheKey(
     profile.isBeginner ? '1' : '0',
     JSON.stringify(toggledDays),
     logsFingerprint,
+    JSON.stringify(profile.biometricConstants || {}),
+    JSON.stringify(profile.dailyVFC || {}),
   ].join('|');
 }

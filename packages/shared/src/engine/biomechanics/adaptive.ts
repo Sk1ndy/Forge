@@ -31,6 +31,8 @@ export function adjustRecovery(
   // Cap constraints to prevent math explosions (e.g., divide by zero or negative tau)
   newConfig.tauMetabolic = Math.max(0.1, Math.min(newConfig.tauMetabolic, 10.0));
   newConfig.tauDamage = Math.max(0.5, Math.min(newConfig.tauDamage, 30.0));
+  newConfig.tauChronicSnc = Math.max(7.0, Math.min(newConfig.tauChronicSnc, 45.0)); // Cap SNC recovery
+  newConfig.tauFitness = Math.max(14.0, Math.min(newConfig.tauFitness, 90.0)); // Cap fitness decay
 
   return {
     newConfig,

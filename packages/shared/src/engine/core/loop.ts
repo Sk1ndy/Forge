@@ -275,6 +275,9 @@ export function* executeSimulationGenerator(
       Object.keys(musclesMap).forEach(id => {
         const f = musclesMap[id].fatigue;
         musclesMap[id].fatigueHistory.push(f);
+        if (musclesMap[id].fatigueHistory.length > 60) {
+          musclesMap[id].fatigueHistory.shift();
+        }
 
         if (week === totalWeeks) {
           if (!peakFatigue[id] || f > peakFatigue[id].value) {
