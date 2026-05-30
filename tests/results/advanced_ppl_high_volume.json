@@ -3,7 +3,7 @@
   "status": "PASS",
   "input": {
     "blueprint": {
-      "Lundi": [
+      "mon": [
         {
           "id": "1",
           "exerciseId": "bench_press",
@@ -47,7 +47,7 @@
           ]
         }
       ],
-      "Mardi": [
+      "tue": [
         {
           "id": "4",
           "exerciseId": "pull_ups",
@@ -91,7 +91,7 @@
           ]
         }
       ],
-      "Mercredi": [
+      "wed": [
         {
           "id": "7",
           "exerciseId": "squat",
@@ -121,7 +121,7 @@
           ]
         }
       ],
-      "Jeudi": [
+      "thu": [
         {
           "id": "9",
           "exerciseId": "ohp",
@@ -151,7 +151,7 @@
           ]
         }
       ],
-      "Vendredi": [
+      "fri": [
         {
           "id": "11",
           "exerciseId": "deadlift",
@@ -181,7 +181,7 @@
           ]
         }
       ],
-      "Samedi": [
+      "sat": [
         {
           "id": "13",
           "exerciseId": "romanian_deadlift",
@@ -211,7 +211,7 @@
           ]
         }
       ],
-      "Dimanche": []
+      "sun": []
     },
     "profile": {
       "pdc": 80,

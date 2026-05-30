@@ -38,4 +38,7 @@ export interface SimulationResult {
   weeklySystemicInol?: Record<number, number[]>; // Array de 7 nombres (Lundi->Dimanche) pour chaque semaine
   tensors?: Record<string, number[]>; // Normalized ML tensors [0,1]
   finalState?: any; // EngineState final pour la reprise
+  stochasticBands?: {
+    systemicReadiness: { low: number; high: number };
+  };
 }

@@ -3,7 +3,7 @@
   "status": "PASS",
   "input": {
     "blueprint": {
-      "Lundi": [
+      "mon": [
         {
           "id": "1",
           "exerciseId": "squat",
@@ -33,8 +33,8 @@
           ]
         }
       ],
-      "Mardi": [],
-      "Mercredi": [
+      "tue": [],
+      "wed": [
         {
           "id": "3",
           "exerciseId": "deadlift",
@@ -64,8 +64,8 @@
           ]
         }
       ],
-      "Jeudi": [],
-      "Vendredi": [
+      "thu": [],
+      "fri": [
         {
           "id": "5",
           "exerciseId": "squat",
@@ -95,8 +95,8 @@
           ]
         }
       ],
-      "Samedi": [],
-      "Dimanche": []
+      "sat": [],
+      "sun": []
     },
     "profile": {
       "pdc": 80,
@@ -116,7 +116,7 @@
   "output": {
     "sncScore": 0.31,
     "readiness": 92.6,
-    "injuryRisk": "LOW",
+    "injuryRisk": "HIGH",
     "metrics": {
       "chronicSncStress": 12.17,
       "globalWorkCapacity": 92.6,

@@ -3,7 +3,7 @@
   "status": "PASS",
   "input": {
     "blueprint": {
-      "Lundi": [
+      "mon": [
         {
           "id": "1",
           "exerciseId": "bench_press",
@@ -19,8 +19,8 @@
           ]
         }
       ],
-      "Mardi": [],
-      "Mercredi": [
+      "tue": [],
+      "wed": [
         {
           "id": "2",
           "exerciseId": "ohp",
@@ -36,8 +36,8 @@
           ]
         }
       ],
-      "Jeudi": [],
-      "Vendredi": [
+      "thu": [],
+      "fri": [
         {
           "id": "3",
           "exerciseId": "dips",
@@ -53,8 +53,8 @@
           ]
         }
       ],
-      "Samedi": [],
-      "Dimanche": []
+      "sat": [],
+      "sun": []
     }
   },
   "output": {

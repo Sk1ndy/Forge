@@ -27,25 +27,25 @@ const mockLibrary: Exercise[] = [
 ];
 
 const heavyBlueprint: WeeklyBlueprint = {
-  Lundi: [{
+  mon: [{
     id: 'ex1',
     exerciseId: 'bench_press',
     active: true,
     sets: [{ active: true, series: 10, reps: 5, poids: 95, rpe: 10 }]
   }],
-  Mardi: [{
+  tue: [{
     id: 'ex2',
     exerciseId: 'bench_press',
     active: true,
     sets: [{ active: true, series: 10, reps: 5, poids: 95, rpe: 10 }]
   }],
-  Mercredi: [{
+  wed: [{
     id: 'ex3',
     exerciseId: 'bench_press',
     active: true,
     sets: [{ active: true, series: 10, reps: 5, poids: 95, rpe: 10 }]
   }],
-  Jeudi: [], Vendredi: [], Samedi: [], Dimanche: []
+  thu: [], fri: [], sat: [], sun: []
 };
 
 import { normalizeFatigueHistoryToTensors } from '../engine/formatters/tensors';
@@ -53,13 +53,13 @@ import { normalize } from '../engine/biomechanics/physiology';
 import { MUSCLE_DETAILS } from '../constants';
 
 const normalBlueprint: WeeklyBlueprint = {
-  Lundi: [{
+  mon: [{
     id: 'ex1',
     exerciseId: 'bench_press',
     active: true,
     sets: [{ active: true, series: 3, reps: 10, poids: 80, rpe: 8 }]
   }],
-  Mardi: [], Mercredi: [], Jeudi: [], Vendredi: [], Samedi: [], Dimanche: []
+  tue: [], wed: [], thu: [], fri: [], sat: [], sun: []
 };
 
 describe('Engine: Phase 2 (Mesocycle Algorithms)', () => {
@@ -79,7 +79,7 @@ describe('Engine: Phase 2 (Mesocycle Algorithms)', () => {
     // Weeks 1, 2, 3 have very low volume via sessionLogs
     const lowLogs: any[] = [];
     for (let w = 1; w <= 3; w++) {
-      ['Lundi', 'Mardi', 'Mercredi'].forEach(day => {
+      ['mon', 'tue', 'wed'].forEach(day => {
         lowLogs.push({
           id: `log_w${w}_${day}`, exercise_id: 'bench_press', day: day, week: w,
           set_index: 0, actual_reps: 5, actual_weight: 20, actual_rpe: 5, is_completed: true
@@ -95,10 +95,10 @@ describe('Engine: Phase 2 (Mesocycle Algorithms)', () => {
 
   it('Monotony: detects robotic flat intensity across a week', () => {
     const monotonousBlueprint: WeeklyBlueprint = {
-      Lundi: [{ id: 'ex', exerciseId: 'bench_press', active: true, sets: [{ active: true, series: 3, reps: 10, poids: 80, rpe: 8 }] }],
-      Mardi: [{ id: 'ex', exerciseId: 'bench_press', active: true, sets: [{ active: true, series: 3, reps: 10, poids: 80, rpe: 8 }] }],
-      Mercredi: [{ id: 'ex', exerciseId: 'bench_press', active: true, sets: [{ active: true, series: 3, reps: 10, poids: 80, rpe: 8 }] }],
-      Jeudi: [], Vendredi: [], Samedi: [], Dimanche: []
+      mon: [{ id: 'ex', exerciseId: 'bench_press', active: true, sets: [{ active: true, series: 3, reps: 10, poids: 80, rpe: 8 }] }],
+      tue: [{ id: 'ex', exerciseId: 'bench_press', active: true, sets: [{ active: true, series: 3, reps: 10, poids: 80, rpe: 8 }] }],
+      wed: [{ id: 'ex', exerciseId: 'bench_press', active: true, sets: [{ active: true, series: 3, reps: 10, poids: 80, rpe: 8 }] }],
+      thu: [], fri: [], sat: [], sun: []
     };
 
     const result = runMesocycleSimulation(monotonousBlueprint, mockProfile, {}, undefined, mockLibrary, 1, []);
@@ -107,7 +107,7 @@ describe('Engine: Phase 2 (Mesocycle Algorithms)', () => {
 
   it('Backward compatibility: empty blueprint does not crash', async () => {
     const emptyBlueprint: WeeklyBlueprint = {
-      Lundi: [], Mardi: [], Mercredi: [], Jeudi: [], Vendredi: [], Samedi: [], Dimanche: []
+      mon: [], tue: [], wed: [], thu: [], fri: [], sat: [], sun: []
     };
     
     const result = await runWeeklySimulationAsync(emptyBlueprint, mockProfile, {}, undefined, mockLibrary);
@@ -132,33 +132,33 @@ describe('Engine: Phase 2 (Mesocycle Algorithms)', () => {
   it('Bug #5 dynamic PPL: PPL ratio must dynamically reflect session logs completed sets, not static blueprint', () => {
     // 1. Create a blueprint with push (bench_press) and pull (pull_ups)
     const pplBlueprint: WeeklyBlueprint = {
-      Lundi: [{
+      mon: [{
         id: 'ex_push',
         exerciseId: 'bench_press',
         active: true,
         sets: [{ active: true, series: 3, reps: 10, poids: 80, rpe: 8 }] // 3 push series
       }],
-      Mardi: [{
+      tue: [{
         id: 'ex_pull',
         exerciseId: 'pull_ups',
         active: true,
         sets: [{ active: true, series: 3, reps: 10, poids: 0, rpe: 8 }] // 3 pull series
       }],
-      Mercredi: [], Jeudi: [], Vendredi: [], Samedi: [], Dimanche: []
+      wed: [], thu: [], fri: [], sat: [], sun: []
     };
 
-    // 2. Logs where the Lundi (Monday) push exercise is marked as NOT completed (skipped)
+    // 2. Logs where the mon (Monday) push exercise is marked as NOT completed (skipped)
     const logs: any[] = [
       {
         exercise_id: 'bench_press',
-        day: 'Lundi',
+        day: 'mon',
         week: 1,
         set_index: 0,
         is_completed: false
       },
       {
         exercise_id: 'pull_ups',
-        day: 'Mardi',
+        day: 'tue',
         week: 1,
         set_index: 0,
         is_completed: true,
@@ -197,8 +197,8 @@ describe('Engine: Phase 2 (Mesocycle Algorithms)', () => {
     };
 
     const singleExBlueprint: WeeklyBlueprint = {
-      Lundi: [{ id: 'ex', exerciseId: 'custom_curl', active: true, sets: [{ active: true, series: 3, reps: 10, poids: 20, rpe: 8 }] }],
-      Mardi: [], Mercredi: [], Jeudi: [], Vendredi: [], Samedi: [], Dimanche: []
+      mon: [{ id: 'ex', exerciseId: 'custom_curl', active: true, sets: [{ active: true, series: 3, reps: 10, poids: 20, rpe: 8 }] }],
+      tue: [], wed: [], thu: [], fri: [], sat: [], sun: []
     };
 
     const result = runMesocycleSimulation(singleExBlueprint, mockProfile, {}, undefined, [customExercise], 1, []);
@@ -211,8 +211,8 @@ describe('Engine: Phase 2 (Mesocycle Algorithms)', () => {
 
   it('Bug #10 deload volume reduction: reduces visible/simulated series count by 40% during deload week', () => {
     const blueprint: WeeklyBlueprint = {
-      Lundi: [{ id: 'ex', exerciseId: 'bench_press', active: true, sets: [{ active: true, series: 5, reps: 10, poids: 80, rpe: 8 }] }],
-      Mardi: [], Mercredi: [], Jeudi: [], Vendredi: [], Samedi: [], Dimanche: []
+      mon: [{ id: 'ex', exerciseId: 'bench_press', active: true, sets: [{ active: true, series: 5, reps: 10, poids: 80, rpe: 8 }] }],
+      tue: [], wed: [], thu: [], fri: [], sat: [], sun: []
     };
 
     const normalResult = runMesocycleSimulation(blueprint, mockProfile, {}, undefined, mockLibrary, 1, []);
@@ -225,8 +225,8 @@ describe('Engine: Phase 2 (Mesocycle Algorithms)', () => {
 
   it('Bug #12 telemetry adaptive recovery: severe sleep debt dynamic adaptation', () => {
     const blueprint: WeeklyBlueprint = {
-      Lundi: [{ id: 'ex', exerciseId: 'bench_press', active: true, sets: [{ active: true, series: 3, reps: 10, poids: 80, rpe: 8 }] }],
-      Mardi: [], Mercredi: [], Jeudi: [], Vendredi: [], Samedi: [], Dimanche: []
+      mon: [{ id: 'ex', exerciseId: 'bench_press', active: true, sets: [{ active: true, series: 3, reps: 10, poids: 80, rpe: 8 }] }],
+      tue: [], wed: [], thu: [], fri: [], sat: [], sun: []
     };
 
     const wearableData = {

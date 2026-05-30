@@ -3,7 +3,7 @@
   "status": "PASS",
   "input": {
     "blueprint": {
-      "Lundi": [
+      "mon": [
         {
           "id": "1",
           "exerciseId": "squat",
@@ -33,12 +33,12 @@
           ]
         }
       ],
-      "Mardi": [],
-      "Mercredi": [],
-      "Jeudi": [],
-      "Vendredi": [],
-      "Samedi": [],
-      "Dimanche": []
+      "tue": [],
+      "wed": [],
+      "thu": [],
+      "fri": [],
+      "sat": [],
+      "sun": []
     }
   },
   "output": {

@@ -10,7 +10,7 @@ import { TelemetryAdapter } from '../adapters/TelemetryAdapter';
 import { adjustRecovery } from '../biomechanics/adaptive';
 
 const DAYS_OF_WEEK = [0, 1, 2, 3, 4, 5, 6];
-const DAY_NAMES = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche'] as const;
+const DAY_NAMES = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'] as const;
 
 export function* executeSimulationGenerator(
   blueprint: WeeklyBlueprint,
@@ -235,7 +235,7 @@ export function* executeSimulationGenerator(
                 if (chronicSncStress > 3.0) burnoutPenalty = Math.max(0, 1.0 - (chronicSncStress - 3.0) * 0.2);
                 
                 // Gain brut accumulé pour la journée (le plafond et l'atténuation du junk volume s'appliqueront en fin de journée)
-                const rawGain = muscleLoad * 0.5 * adaptationMultiplier * burnoutPenalty;
+                const rawGain = muscleLoad * 1.2 * adaptationMultiplier * burnoutPenalty;
                 dailyRawAccumulator[muscleId].rawFitnessGain += rawGain;
                 
                 musclesMap[muscleId].sets = normalize(musclesMap[muscleId].sets + validSet.series * coeff);

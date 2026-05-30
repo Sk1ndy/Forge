@@ -179,28 +179,45 @@ export function runMesocycleSimulation(
   deloadWeeks: number[] = [],
   sessionLogs?: ExerciseLog[],
   blueprintId?: string,
-  wearableData?: RawWearableData
+  wearableData?: RawWearableData,
+  options?: { stochasticMode?: boolean }
 ): SimulationResult {
   // Input validation (Bug #13 Fix)
   UserProfileSchema.parse(profile);
   WeeklyBlueprintSchema.parse(blueprint);
 
   if (totalWeeks < 1) totalWeeks = 1;
-  const cacheKey = generateCacheKey(blueprint, profile, toggledDays, selectedDay, totalWeeks, deloadWeeks, sessionLogs, blueprintId, wearableData);
+  const cacheKey = generateCacheKey(blueprint, profile, toggledDays, selectedDay, totalWeeks, deloadWeeks, sessionLogs, blueprintId, wearableData) + (options?.stochasticMode ? '_stochastic' : '');
   if (simulationCache.has(cacheKey)) return simulationCache.get(cacheKey)!;
 
-  const generator = executeSimulationGenerator(
-    blueprint, profile, toggledDays, selectedDay, exerciseLibrary, totalWeeks, deloadWeeks, sessionLogs, undefined, wearableData
-  );
-  
-  let loopResult: LoopSimulationResult;
-  let resultObj = generator.next();
-  while (!resultObj.done) {
-    resultObj = generator.next();
-  }
-  loopResult = resultObj.value;
+  const runPass = (varianceMod: number) => {
+    const modProfile = { ...profile, maxSnc: (profile.maxSnc || 15.0) * varianceMod };
+    const generator = executeSimulationGenerator(
+      blueprint, modProfile, toggledDays, selectedDay, exerciseLibrary, totalWeeks, deloadWeeks, sessionLogs, undefined, wearableData
+    );
+    let loopResult: LoopSimulationResult;
+    let resultObj = generator.next();
+    while (!resultObj.done) resultObj = generator.next();
+    return resultObj.value;
+  };
 
-  const result = finalizeSimulationResult(loopResult, totalWeeks, deloadWeeks, profile.maxSnc || 15.0);
+  const expectedLoop = runPass(1.0);
+  const result = finalizeSimulationResult(expectedLoop, totalWeeks, deloadWeeks, profile.maxSnc || 15.0);
+
+  if (options?.stochasticMode) {
+    const worstLoop = runPass(0.9); // 10% less resilient
+    const bestLoop = runPass(1.1);  // 10% more resilient
+    const worstResult = finalizeSimulationResult(worstLoop, totalWeeks, deloadWeeks, profile.maxSnc || 15.0);
+    const bestResult = finalizeSimulationResult(bestLoop, totalWeeks, deloadWeeks, profile.maxSnc || 15.0);
+    
+    result.stochasticBands = {
+      systemicReadiness: {
+        low: parseFloat(Math.min(worstResult.systemicReadiness, result.systemicReadiness).toFixed(2)),
+        high: parseFloat(Math.max(bestResult.systemicReadiness, result.systemicReadiness).toFixed(2))
+      }
+    };
+  }
+
   simulationCache.set(cacheKey, result);
   return result;
 }
@@ -215,30 +232,48 @@ export async function runMesocycleSimulationAsync(
   deloadWeeks: number[] = [],
   sessionLogs?: ExerciseLog[],
   blueprintId?: string,
-  wearableData?: RawWearableData
+  wearableData?: RawWearableData,
+  options?: { stochasticMode?: boolean }
 ): Promise<SimulationResult> {
   // Input validation (Bug #13 Fix)
   UserProfileSchema.parse(profile);
   WeeklyBlueprintSchema.parse(blueprint);
 
   if (totalWeeks < 1) totalWeeks = 1;
-  const cacheKey = generateCacheKey(blueprint, profile, toggledDays, selectedDay, totalWeeks, deloadWeeks, sessionLogs, blueprintId, wearableData);
+  const cacheKey = generateCacheKey(blueprint, profile, toggledDays, selectedDay, totalWeeks, deloadWeeks, sessionLogs, blueprintId, wearableData) + (options?.stochasticMode ? '_stochastic' : '');
   if (simulationCache.has(cacheKey)) return simulationCache.get(cacheKey)!;
 
-  const generator = executeSimulationGenerator(
-    blueprint, profile, toggledDays, selectedDay, exerciseLibrary, totalWeeks, deloadWeeks, sessionLogs, undefined, wearableData
-  );
-  
-  let loopResult: LoopSimulationResult;
-  let resultObj = generator.next();
-  while (!resultObj.done) {
-    // Yield to the event loop
-    await new Promise(r => setTimeout(r, 16));
-    resultObj = generator.next();
-  }
-  loopResult = resultObj.value;
+  const runPassAsync = async (varianceMod: number) => {
+    const modProfile = { ...profile, maxSnc: (profile.maxSnc || 15.0) * varianceMod };
+    const generator = executeSimulationGenerator(
+      blueprint, modProfile, toggledDays, selectedDay, exerciseLibrary, totalWeeks, deloadWeeks, sessionLogs, undefined, wearableData
+    );
+    let loopResult: LoopSimulationResult;
+    let resultObj = generator.next();
+    while (!resultObj.done) {
+      await new Promise(r => setTimeout(r, 16));
+      resultObj = generator.next();
+    }
+    return resultObj.value;
+  };
 
-  const result = finalizeSimulationResult(loopResult, totalWeeks, deloadWeeks, profile.maxSnc || 15.0);
+  const expectedLoop = await runPassAsync(1.0);
+  const result = finalizeSimulationResult(expectedLoop, totalWeeks, deloadWeeks, profile.maxSnc || 15.0);
+
+  if (options?.stochasticMode) {
+    const worstLoop = await runPassAsync(0.9);
+    const bestLoop = await runPassAsync(1.1);
+    const worstResult = finalizeSimulationResult(worstLoop, totalWeeks, deloadWeeks, profile.maxSnc || 15.0);
+    const bestResult = finalizeSimulationResult(bestLoop, totalWeeks, deloadWeeks, profile.maxSnc || 15.0);
+    
+    result.stochasticBands = {
+      systemicReadiness: {
+        low: parseFloat(Math.min(worstResult.systemicReadiness, result.systemicReadiness).toFixed(2)),
+        high: parseFloat(Math.max(bestResult.systemicReadiness, result.systemicReadiness).toFixed(2))
+      }
+    };
+  }
+
   simulationCache.set(cacheKey, result);
   return result;
 }
