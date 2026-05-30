@@ -109,4 +109,20 @@ describe('Engine: Phase 2 (Mesocycle Algorithms)', () => {
     const result = await runWeeklySimulationAsync(emptyBlueprint, mockProfile, {}, undefined, mockLibrary);
     expect(result).toMatchSnapshot();
   });
+
+  it('Bug #4 memory leak: fatigueHistory must be capped at 60 days even on long simulations', () => {
+    // Run a 10-week simulation (10 * 7 = 70 days)
+    const result = runMesocycleSimulation(normalBlueprint, mockProfile, {}, undefined, mockLibrary, 10, []);
+    
+    // Every muscle state fatigueHistory should be exactly 60 in length (not 70)
+    let checkedAtLeastOne = false;
+    Object.entries(result.muscles).forEach(([id, muscle]) => {
+      if (muscle) {
+        expect(muscle.fatigueHistory.length).toBe(60);
+        checkedAtLeastOne = true;
+      }
+    });
+    expect(checkedAtLeastOne).toBe(true);
+  });
 });
+
