@@ -96,7 +96,7 @@
             ],
             "remainingCapacity": 0.9975,
             "jointStress": 0.13,
-            "readiness": 0.27,
+            "readiness": 0.21,
             "fatigueHistory": [
               0.5,
               0.17,
@@ -202,7 +202,7 @@
             ],
             "remainingCapacity": 0.9982,
             "jointStress": 0.09,
-            "readiness": 0.18,
+            "readiness": 0.15,
             "fatigueHistory": [
               0.36,
               0.12,
@@ -408,7 +408,7 @@
             ],
             "remainingCapacity": 0.9957,
             "jointStress": 0.06,
-            "readiness": 0.08,
+            "readiness": 0.07,
             "fatigueHistory": [
               0.19,
               0.1,
@@ -454,7 +454,7 @@
             ],
             "remainingCapacity": 0.9835,
             "jointStress": 0.32,
-            "readiness": 0.42,
+            "readiness": 0.28,
             "fatigueHistory": [
               0.74,
               0.38,
@@ -1296,7 +1296,7 @@
             ],
             "remainingCapacity": 0.9978,
             "jointStress": 0.11,
-            "readiness": 0.22,
+            "readiness": 0.18,
             "fatigueHistory": [
               0.43,
               0.14,
@@ -1402,7 +1402,7 @@
             ],
             "remainingCapacity": 0.999,
             "jointStress": 0.04,
-            "readiness": 0.09,
+            "readiness": 0.08,
             "fatigueHistory": [
               0.19,
               0.06,
@@ -1608,7 +1608,7 @@
             ],
             "remainingCapacity": 0.9938,
             "jointStress": 0.1,
-            "readiness": 0.12,
+            "readiness": 0.11,
             "fatigueHistory": [
               0.28,
               0.14,
@@ -1654,7 +1654,7 @@
             ],
             "remainingCapacity": 0.9835,
             "jointStress": 0.32,
-            "readiness": 0.42,
+            "readiness": 0.28,
             "fatigueHistory": [
               0.74,
               0.38,

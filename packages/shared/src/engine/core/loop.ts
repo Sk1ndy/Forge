@@ -83,12 +83,13 @@ export function* executeSimulationGenerator(
         damage: number; 
         joint: number; 
         inol: number;
+        rawFitnessGain: number;
         contributions: Record<string, number>;
         setsContributions: Record<string, number>;
       }> = {};
 
       Object.keys(musclesMap).forEach(id => {
-        dailyRawAccumulator[id] = { metabolic: 0, damage: 0, joint: 0, inol: 0, contributions: {}, setsContributions: {} };
+        dailyRawAccumulator[id] = { metabolic: 0, damage: 0, joint: 0, inol: 0, rawFitnessGain: 0, contributions: {}, setsContributions: {} };
         // 1. Récupération du taux de rétention local
         const retention = MUSCLE_FATIGUE_DECAY[id as keyof typeof MUSCLE_FATIGUE_DECAY] || 0.5;
         // 2. Conversion du taux de rétention en modificateur de temps de demi-vie
@@ -209,10 +210,9 @@ export function* executeSimulationGenerator(
                 let burnoutPenalty = 1.0;
                 if (chronicSncStress > 3.0) burnoutPenalty = Math.max(0, 1.0 - (chronicSncStress - 3.0) * 0.2);
                 
-                // Modèle de croissance logistique (Équation de Verhulst) avec Plafond Dynamique
+                // Gain brut accumulé pour la journée (le plafond et l'atténuation du junk volume s'appliqueront en fin de journée)
                 const rawGain = muscleLoad * 0.5 * adaptationMultiplier * burnoutPenalty;
-                const adjustedGain = applyLogisticCeilingEffect(rawGain, musclesMap[muscleId].fitness, config.geneticCeiling);
-                musclesMap[muscleId].fitness = normalize(musclesMap[muscleId].fitness + Math.max(0, adjustedGain));
+                dailyRawAccumulator[muscleId].rawFitnessGain += rawGain;
                 
                 musclesMap[muscleId].sets = normalize(musclesMap[muscleId].sets + validSet.series * coeff);
                 dailyRawAccumulator[muscleId].contributions[exercise.nom] = (dailyRawAccumulator[muscleId].contributions[exercise.nom] || 0) + muscleLoad;
@@ -253,6 +253,10 @@ export function* executeSimulationGenerator(
           musclesMap[muscleId].fatigueDamage = normalize(musclesMap[muscleId].fatigueDamage + raw.damage * attenuation);
           musclesMap[muscleId].fatigue = normalize(musclesMap[muscleId].fatigueMetabolic + musclesMap[muscleId].fatigueDamage);
           musclesMap[muscleId].jointStress = normalize((musclesMap[muscleId].jointStress || 0) + raw.joint); // BUG FIX: Joint stress takes RAW impact
+          
+          const effectiveRawGain = raw.rawFitnessGain * attenuation;
+          const adjustedGain = applyLogisticCeilingEffect(effectiveRawGain, musclesMap[muscleId].fitness, config.geneticCeiling);
+          musclesMap[muscleId].fitness = normalize(musclesMap[muscleId].fitness + Math.max(0, adjustedGain));
           
           musclesMap[muscleId].inol = normalize((musclesMap[muscleId].inol || 0) + effectiveTotalInol);
           musclesMap[muscleId].weeklyInol[week] = (musclesMap[muscleId].weeklyInol[week] || 0) + effectiveTotalInol;

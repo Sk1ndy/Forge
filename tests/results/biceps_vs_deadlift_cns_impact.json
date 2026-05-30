@@ -96,7 +96,7 @@
             ],
             "remainingCapacity": 0.9932,
             "jointStress": 0.63,
-            "readiness": 1.3,
+            "readiness": 0.58,
             "fatigueHistory": [
               1.36,
               0.45,
@@ -202,7 +202,7 @@
             ],
             "remainingCapacity": 0.9967,
             "jointStress": 0.19,
-            "readiness": 0.39,
+            "readiness": 0.28,
             "fatigueHistory": [
               0.66,
               0.22,
