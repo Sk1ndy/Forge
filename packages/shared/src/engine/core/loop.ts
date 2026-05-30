@@ -1,4 +1,4 @@
-import { WeeklyBlueprint, UserProfile, ExerciseLog, Exercise, PlannedSetSchema } from '../../types';
+import { WeeklyBlueprint, UserProfile, ExerciseLog, Exercise, PlannedSetSchema, RawWearableData } from '../../types';
 import { DEFAULT_EXERCISE_TENSION_MATRICES, MUSCLE_FATIGUE_DECAY, FITNESS_RETENTION_RATE } from '../../constants';
 import { createInitialState, createLightSnapshot, aggregateMuscle, MusclesMap, EngineState } from './state';
 import { applyExponentialDecay, normalize, getProgressionMultiplier, applyLogisticCeilingEffect } from '../biomechanics/physiology';
@@ -6,6 +6,8 @@ import { calculateSetImpact } from '../biomechanics/impact';
 import { calculateInjuryPredictions } from '../algorithms/injury';
 import { applyDiminishingReturns } from '../algorithms/junk-volume';
 import { generateBiomechanicsConfig } from '../config';
+import { TelemetryAdapter } from '../adapters/TelemetryAdapter';
+import { adjustRecovery } from '../biomechanics/adaptive';
 
 const DAYS_OF_WEEK = [0, 1, 2, 3, 4, 5, 6];
 const DAY_NAMES = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche'] as const;
@@ -19,7 +21,8 @@ export function* executeSimulationGenerator(
   totalWeeks: number,
   deloadWeeks: number[],
   sessionLogs: ExerciseLog[] | undefined,
-  initialState?: EngineState
+  initialState?: EngineState,
+  wearableData?: RawWearableData
 ) {
   const config = generateBiomechanicsConfig(profile);
   const musclesMap = initialState ? createLightSnapshot(initialState.muscles) : createInitialState();
@@ -61,6 +64,13 @@ export function* executeSimulationGenerator(
       const day = DAY_NAMES[dayIndex];
       globalDayIndex = (week - 1) * 7 + dayIndex;
 
+      let dailyConfig = config;
+      if (wearableData) {
+        const stressFactors = TelemetryAdapter.normalize(wearableData, profile);
+        const adaptation = adjustRecovery(config, stressFactors);
+        dailyConfig = adaptation.newConfig;
+      }
+
       let dailySystemicLoad = 0;
       
       // Structure to hold raw daily accumulation before diminishing returns
@@ -84,13 +94,13 @@ export function* executeSimulationGenerator(
         const localTauMultiplier = Math.log(0.5) / Math.log(safeRetention);
 
         // Bi-Phasic Exponential Decay (Modulé par la récupération locale)
-        const baseTauMetabolic = config.tauMetabolic * localTauMultiplier;
-        const baseTauDamage = config.tauDamage * localTauMultiplier;
+        const baseTauMetabolic = dailyConfig.tauMetabolic * localTauMultiplier;
+        const baseTauDamage = dailyConfig.tauDamage * localTauMultiplier;
 
         // Accelerated flush during deload by dividing the time constant (tau)
         const currentTauMetabolic = isDeload ? baseTauMetabolic / 1.5 : baseTauMetabolic;
         const currentTauDamage = isDeload ? baseTauDamage / 1.5 : baseTauDamage;
-        let currentTauFitness = isDeload ? config.tauFitness * 1.1 : config.tauFitness; // retain fitness better during deload
+        let currentTauFitness = isDeload ? dailyConfig.tauFitness * 1.1 : dailyConfig.tauFitness; // retain fitness better during deload
         
         // Catabolisme du Cortisol : Perte accélérée de la masse musculaire si le SNC est en Burnout
         if (chronicSncStress > 3.0) {
@@ -114,8 +124,8 @@ export function* executeSimulationGenerator(
         }
       });
 
-      sncFatigue = applyExponentialDecay(sncFatigue, config.tauMetabolic, 1);
-      chronicSncStress = applyExponentialDecay(chronicSncStress, config.tauChronicSnc, 1);
+      sncFatigue = applyExponentialDecay(sncFatigue, dailyConfig.tauMetabolic, 1);
+      chronicSncStress = applyExponentialDecay(chronicSncStress, dailyConfig.tauChronicSnc, 1);
 
       const dayName = DAY_NAMES[day];
       if (toggledDays[dayName] !== false && toggledDays[day] !== false) {
@@ -126,7 +136,16 @@ export function* executeSimulationGenerator(
           const exercise = exerciseLibrary.find(e => e.id === plannedEx.exerciseId);
           if (!exercise) return;
 
-          const tensionMatrix = exercise.tension_matrix || DEFAULT_EXERCISE_TENSION_MATRICES[plannedEx.exerciseId] || { [exercise.muscle_primaire]: 1.0 };
+          // Bug #9 Fix: Fallback construct using muscles_secondaires if tension_matrix and default matrices are absent
+          let tensionMatrix = exercise.tension_matrix || DEFAULT_EXERCISE_TENSION_MATRICES[plannedEx.exerciseId];
+          if (!tensionMatrix) {
+            tensionMatrix = { [exercise.muscle_primaire]: 1.0 };
+            if (exercise.muscles_secondaires && exercise.muscles_secondaires.length > 0) {
+              exercise.muscles_secondaires.forEach(secId => {
+                tensionMatrix![secId] = 0.4;
+              });
+            }
+          }
 
           plannedEx.sets.forEach((set, setIndex) => {
             const parsedSet = PlannedSetSchema.safeParse(set);
@@ -154,20 +173,28 @@ export function* executeSimulationGenerator(
               }
             }
 
+            // Bug #10 Fix: Reduce visible/completed sets during deload weeks for simulated exercises
+            if (isDeload && !logMatch) {
+              validSet = {
+                ...validSet,
+                series: Math.max(1, Math.round(validSet.series * 0.6))
+              };
+            }
+
             // Dynamic PPL tracking (Bug #5 Fix): Increment based on sets actually executed
             if (exercise.ppl_category === 'push') pushSets += validSet.series;
             else if (exercise.ppl_category === 'pull') pullSets += validSet.series;
             else if (exercise.ppl_category === 'legs') legsSets += validSet.series;
             
             const currentFatigueForGovernor = musclesMap[exercise.muscle_primaire]?.fatigue || 0;
-            const impact = calculateSetImpact(validSet, exercise, profile, config, currentFatigueForGovernor);
+            const impact = calculateSetImpact(validSet, exercise, profile, dailyConfig, currentFatigueForGovernor);
             const overloadMultiplier = getProgressionMultiplier(week, isDeload, !!logMatch);
 
             const finalInol = impact.inol * overloadMultiplier;
             const sncPoints = impact.sncPoints * overloadMultiplier;
             
-            sncFatigue = normalize(sncFatigue + sncPoints * (1 / config.cnsResilience));
-            chronicSncStress = normalize(chronicSncStress + sncPoints * (1 / config.cnsResilience));
+            sncFatigue = normalize(sncFatigue + sncPoints * (1 / dailyConfig.cnsResilience));
+            chronicSncStress = normalize(chronicSncStress + sncPoints * (1 / dailyConfig.cnsResilience));
 
             const setIdBase = `${week}-${day}-${plannedEx.exerciseId}-${setIndex}`;
 
@@ -183,7 +210,7 @@ export function* executeSimulationGenerator(
                 setSystemicLoad += muscleLoad;
                 
                 // RBE (Repeated Bout Effect) : Moins de dommages structurels si l'athlète est avancé
-                const fitnessRatio = musclesMap[muscleId].fitness / config.geneticCeiling;
+                const fitnessRatio = musclesMap[muscleId].fitness / dailyConfig.geneticCeiling;
                 let baseDamageRatio = Math.max(0.1, 0.4 - fitnessRatio * 0.3); // Débutant: ~0.4. Élite: ~0.1
                 if (validSet.rpe >= 9 || validSet.reps <= 5) baseDamageRatio += 0.1; // Heavy/Failure adds damage
                 const damageRatio = Math.min(1.0, baseDamageRatio);
@@ -193,10 +220,10 @@ export function* executeSimulationGenerator(
                 dailyRawAccumulator[muscleId].damage += muscleLoad * damageRatio;
                 dailyRawAccumulator[muscleId].inol += muscleLoad;
                 
-                let adaptationMultiplier = config.k1;
+                let adaptationMultiplier = dailyConfig.k1;
                 const currentFatigue = musclesMap[muscleId].fatigue;
                 if (currentFatigue > 1.5) {
-                  adaptationMultiplier = Math.max(0.0, config.k1 - (currentFatigue - 1.5) * config.k2);
+                  adaptationMultiplier = Math.max(0.0, dailyConfig.k1 - (currentFatigue - 1.5) * dailyConfig.k2);
                 }
                 
                 // Burnout Penalty (Catabolisme) : Si le SNC est épuisé, le gain est bloqué
@@ -248,7 +275,7 @@ export function* executeSimulationGenerator(
           musclesMap[muscleId].jointStress = normalize((musclesMap[muscleId].jointStress || 0) + raw.joint); // BUG FIX: Joint stress takes RAW impact
           
           const effectiveRawGain = raw.rawFitnessGain * attenuation;
-          const adjustedGain = applyLogisticCeilingEffect(effectiveRawGain, musclesMap[muscleId].fitness, config.geneticCeiling);
+          const adjustedGain = applyLogisticCeilingEffect(effectiveRawGain, musclesMap[muscleId].fitness, dailyConfig.geneticCeiling);
           musclesMap[muscleId].fitness = normalize(musclesMap[muscleId].fitness + Math.max(0, adjustedGain));
           
           musclesMap[muscleId].inol = normalize((musclesMap[muscleId].inol || 0) + effectiveTotalInol);

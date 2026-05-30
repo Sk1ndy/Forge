@@ -71,7 +71,7 @@ export type Exercise = z.infer<typeof ExerciseSchema>;
 
 // ─── Blueprints & Planning ──────────────────────────────────────────────────
 export const PlannedSetSchema = z.object({
-  series: z.number({ invalid_type_error: "Séries doit être un nombre" }).int().min(1, "Minimum 1 série").max(20, "Maximum 20 séries"),
+  series: z.number({ invalid_type_error: "Séries doit être un nombre" }).int().min(1, "Minimum 1 série").max(50, "Maximum 50 séries"),
   reps:   z.number({ invalid_type_error: "Reps doit être un nombre" }).int().min(1, "Minimum 1 rep").max(100, "Maximum 100 reps"),
   poids:  z.number({ invalid_type_error: "Le poids doit être un nombre" }).min(0, "Le poids ne peut être négatif").max(1000, "Poids irréaliste"),
   rpe:    z.number({ invalid_type_error: "Le RPE doit être un nombre" }).min(1, "RPE min 1").max(10, "RPE max 10"),

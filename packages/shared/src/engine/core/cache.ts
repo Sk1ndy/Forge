@@ -1,4 +1,4 @@
-import { WeeklyBlueprint, UserProfile, ExerciseLog, SimulationResult } from '../../types';
+import { WeeklyBlueprint, UserProfile, ExerciseLog, SimulationResult, RawWearableData } from '../../types';
 
 export class LRUCache<K, V> {
   private capacity: number;
@@ -43,6 +43,7 @@ export function generateCacheKey(
   deloadWeeks: number[],
   sessionLogs: ExerciseLog[] | undefined,
   blueprintId: string | undefined,
+  wearableData?: RawWearableData,
 ): string {
   const blueprintFingerprint = blueprintId ?? JSON.stringify(blueprint);
   const logsFingerprint = sessionLogs && sessionLogs.length > 0
@@ -65,5 +66,6 @@ export function generateCacheKey(
     logsFingerprint,
     JSON.stringify(profile.biometricConstants || {}),
     JSON.stringify(profile.dailyVFC || {}),
+    JSON.stringify(wearableData || {}),
   ].join('|');
 }

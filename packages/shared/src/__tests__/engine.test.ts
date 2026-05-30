@@ -180,6 +180,74 @@ describe('Engine: Phase 2 (Mesocycle Algorithms)', () => {
     expect(result.pushPullLegsRatio.push).toBe(0);
     expect(result.pushPullLegsRatio.pull).toBe(100);
   });
+
+  it('Bug #9 fallback muscles_secondaires: custom exercise without tension_matrix must fallback to secondary muscles at 40%', () => {
+    const customExercise: Exercise = {
+      id: 'custom_curl',
+      nom: 'Curl Custom',
+      tier_snc: 3,
+      muscle_primaire: 'biceps',
+      muscles_secondaires: ['forearm'],
+      equipment: 'poids_libre',
+      ppl_category: 'pull'
+    };
+
+    const singleExBlueprint: WeeklyBlueprint = {
+      Lundi: [{ id: 'ex', exerciseId: 'custom_curl', active: true, sets: [{ active: true, series: 3, reps: 10, poids: 20, rpe: 8 }] }],
+      Mardi: [], Mercredi: [], Jeudi: [], Vendredi: [], Samedi: [], Dimanche: []
+    };
+
+    const result = runMesocycleSimulation(singleExBlueprint, mockProfile, {}, undefined, [customExercise], 1, []);
+    
+    // Forearm (secondary muscle) must have accumulated some sets/inol because of fallback
+    expect(result.muscles.forearm).toBeDefined();
+    expect(result.muscles.forearm!.sets).toBeGreaterThan(0);
+    expect(result.muscles.forearm!.inol).toBeGreaterThan(0);
+  });
+
+  it('Bug #10 deload volume reduction: reduces visible/simulated series count by 40% during deload week', () => {
+    const blueprint: WeeklyBlueprint = {
+      Lundi: [{ id: 'ex', exerciseId: 'bench_press', active: true, sets: [{ active: true, series: 5, reps: 10, poids: 80, rpe: 8 }] }],
+      Mardi: [], Mercredi: [], Jeudi: [], Vendredi: [], Samedi: [], Dimanche: []
+    };
+
+    const normalResult = runMesocycleSimulation(blueprint, mockProfile, {}, undefined, mockLibrary, 1, []);
+    const deloadResult = runMesocycleSimulation(blueprint, mockProfile, {}, undefined, mockLibrary, 1, [1]); // Week 1 is deload
+
+    // For a deload week, 5 series is reduced by 40% -> 5 * 0.6 = 3 series
+    expect(normalResult.muscles.chest!.sets).toBe(5);
+    expect(deloadResult.muscles.chest!.sets).toBe(3);
+  });
+
+  it('Bug #12 telemetry adaptive recovery: severe sleep debt dynamic adaptation', () => {
+    const blueprint: WeeklyBlueprint = {
+      Lundi: [{ id: 'ex', exerciseId: 'bench_press', active: true, sets: [{ active: true, series: 3, reps: 10, poids: 80, rpe: 8 }] }],
+      Mardi: [], Mercredi: [], Jeudi: [], Vendredi: [], Samedi: [], Dimanche: []
+    };
+
+    const wearableData = {
+      source: 'garmin' as any,
+      sleep_total_minutes: 240, // 4 hours of sleep -> severe debt!
+      readiness_score: 35 // critical readiness
+    };
+
+    const normalResult = runMesocycleSimulation(blueprint, mockProfile, {}, undefined, mockLibrary, 1, []);
+    const adaptiveResult = runMesocycleSimulation(blueprint, mockProfile, {}, undefined, mockLibrary, 1, [], undefined, undefined, wearableData as any);
+
+    // Because of sleep debt, fatigue decays slower, causing higher fatigue/stress and lower readiness
+    expect(adaptiveResult.muscles.chest!.readiness).toBeLessThan(normalResult.muscles.chest!.readiness);
+  });
+
+  it('Bug #13 Zod validation: runMesocycleSimulation throws when input is malformed', () => {
+    const malformedProfile = {
+      ...mockProfile,
+      pdc: 10 // weight too low (Zod max/min validation error)
+    };
+
+    expect(() => {
+      runMesocycleSimulation(normalBlueprint, malformedProfile as any, {}, undefined, mockLibrary);
+    }).toThrow();
+  });
 });
 
 

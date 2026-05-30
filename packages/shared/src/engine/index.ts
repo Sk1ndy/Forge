@@ -9,7 +9,7 @@ import { calculateProgressiveOverload } from './algorithms/progressive-overload'
 import { calculateMonotonyAlerts } from './algorithms/monotony';
 import { normalizeFatigueHistoryToTensors } from './formatters/tensors';
 import { MusclesMap, EngineState } from './core/state';
-import { RawWearableData } from '../schemas';
+import { RawWearableData, WeeklyBlueprintSchema, UserProfileSchema } from '../schemas';
 import { TelemetryAdapter } from './adapters/TelemetryAdapter';
 import { adjustRecovery } from './biomechanics/adaptive';
 
@@ -176,14 +176,19 @@ export function runMesocycleSimulation(
   totalWeeks: number = 4,
   deloadWeeks: number[] = [],
   sessionLogs?: ExerciseLog[],
-  blueprintId?: string
+  blueprintId?: string,
+  wearableData?: RawWearableData
 ): SimulationResult {
+  // Input validation (Bug #13 Fix)
+  UserProfileSchema.parse(profile);
+  WeeklyBlueprintSchema.parse(blueprint);
+
   if (totalWeeks < 1) totalWeeks = 1;
-  const cacheKey = generateCacheKey(blueprint, profile, toggledDays, selectedDay, totalWeeks, deloadWeeks, sessionLogs, blueprintId);
+  const cacheKey = generateCacheKey(blueprint, profile, toggledDays, selectedDay, totalWeeks, deloadWeeks, sessionLogs, blueprintId, wearableData);
   if (simulationCache.has(cacheKey)) return simulationCache.get(cacheKey)!;
 
   const generator = executeSimulationGenerator(
-    blueprint, profile, toggledDays, selectedDay, exerciseLibrary, totalWeeks, deloadWeeks, sessionLogs
+    blueprint, profile, toggledDays, selectedDay, exerciseLibrary, totalWeeks, deloadWeeks, sessionLogs, undefined, wearableData
   );
   
   let loopResult: LoopSimulationResult;
@@ -207,14 +212,19 @@ export async function runMesocycleSimulationAsync(
   totalWeeks: number = 4,
   deloadWeeks: number[] = [],
   sessionLogs?: ExerciseLog[],
-  blueprintId?: string
+  blueprintId?: string,
+  wearableData?: RawWearableData
 ): Promise<SimulationResult> {
+  // Input validation (Bug #13 Fix)
+  UserProfileSchema.parse(profile);
+  WeeklyBlueprintSchema.parse(blueprint);
+
   if (totalWeeks < 1) totalWeeks = 1;
-  const cacheKey = generateCacheKey(blueprint, profile, toggledDays, selectedDay, totalWeeks, deloadWeeks, sessionLogs, blueprintId);
+  const cacheKey = generateCacheKey(blueprint, profile, toggledDays, selectedDay, totalWeeks, deloadWeeks, sessionLogs, blueprintId, wearableData);
   if (simulationCache.has(cacheKey)) return simulationCache.get(cacheKey)!;
 
   const generator = executeSimulationGenerator(
-    blueprint, profile, toggledDays, selectedDay, exerciseLibrary, totalWeeks, deloadWeeks, sessionLogs
+    blueprint, profile, toggledDays, selectedDay, exerciseLibrary, totalWeeks, deloadWeeks, sessionLogs, undefined, wearableData
   );
   
   let loopResult: LoopSimulationResult;
