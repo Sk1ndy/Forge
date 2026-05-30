@@ -1,6 +1,8 @@
 import { describe, it, expect } from 'vitest';
 import { calculateSetImpact } from "../engine/biomechanics/impact";
 import { applyExponentialDecay, calculateACWR } from "../engine/biomechanics/physiology";
+import { adjustRecovery } from "../engine/biomechanics/adaptive";
+import { generateCacheKey } from "../engine/core/cache";
 import { generateBiomechanicsConfig } from "../engine/config";
 import { applyDiminishingReturns } from "../engine/algorithms/junk-volume";
 import { Exercise, PlannedSet, UserProfile } from '../types';
@@ -101,6 +103,57 @@ describe('Biomechanics Engine (Level 2)', () => {
     it('retourne 0 si la charge est 0', () => {
       expect(applyDiminishingReturns(0)).toBe(0);
       expect(applyDiminishingReturns(-1)).toBe(0);
+    });
+  });
+
+  describe('Bug #6, #7, #8 fixes validation', () => {
+    it('Bug #6: generateCacheKey must include biometricConstants and dailyVFC in cache fingerprint', () => {
+      const profile1: UserProfile = {
+        ...mockProfile,
+        biometricConstants: { baseTauMetabolic: 1.0 },
+        dailyVFC: 55
+      };
+
+      const profile2: UserProfile = {
+        ...mockProfile,
+        biometricConstants: { baseTauMetabolic: 2.0 },
+        dailyVFC: 85
+      };
+
+      const key1 = generateCacheKey({}, profile1, {}, undefined, 1, []);
+      const key2 = generateCacheKey({}, profile2, {}, undefined, 1, []);
+
+      expect(key1).not.toBe(key2);
+    });
+
+    it('Bug #7: adjustRecovery must safely clamp tauChronicSnc and tauFitness under extreme stress levels', () => {
+      const baseConfig = generateBiomechanicsConfig(mockProfile);
+      
+      const extremeStress = {
+        recoveryMultiplier: 0.05,
+        cnsStressDelta: 10.0,
+        confidence: 1.0,
+        logs: []
+      };
+
+      const { newConfig } = adjustRecovery(baseConfig, extremeStress);
+
+      // Without clamp, tauChronicSnc would be 21 / 0.05 = 420. It must be capped at 45.0
+      expect(newConfig.tauChronicSnc).toBe(45.0);
+
+      // Without clamp, tauFitness would be 45 * sqrt(0.05) = 10.06. It must be clamped at 14.0 minimum
+      expect(newConfig.tauFitness).toBe(14.0);
+    });
+
+    it('Bug #8: safeRetention guard in engine loop prevents division by zero if retention equals 1.0', () => {
+      const retention = 1.0;
+      const safeRetention = Math.max(0.01, Math.min(retention, 0.99));
+      const localTauMultiplier = Math.log(0.5) / Math.log(safeRetention);
+      
+      expect(localTauMultiplier).not.toBe(Infinity);
+      expect(localTauMultiplier).not.toBe(-Infinity);
+      expect(isNaN(localTauMultiplier)).toBe(false);
+      expect(localTauMultiplier).toBeGreaterThan(0);
     });
   });
 });

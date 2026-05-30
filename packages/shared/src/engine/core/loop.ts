@@ -79,7 +79,9 @@ export function* executeSimulationGenerator(
         // 1. Récupération du taux de rétention local
         const retention = MUSCLE_FATIGUE_DECAY[id as keyof typeof MUSCLE_FATIGUE_DECAY] || 0.5;
         // 2. Conversion du taux de rétention en modificateur de temps de demi-vie
-        const localTauMultiplier = Math.log(0.5) / Math.log(retention);
+        // Clause de garde (Bug #8 Fix) : Éviter une division par zéro ou log négatif si la rétention vaut 1.0 ou est trop faible
+        const safeRetention = Math.max(0.01, Math.min(retention, 0.99));
+        const localTauMultiplier = Math.log(0.5) / Math.log(safeRetention);
 
         // Bi-Phasic Exponential Decay (Modulé par la récupération locale)
         const baseTauMetabolic = config.tauMetabolic * localTauMultiplier;
