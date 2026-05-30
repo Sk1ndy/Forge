@@ -1,0 +1,24 @@
+import { create } from 'zustand';
+import { persist, createJSONStorage } from 'zustand/middleware';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Session } from '@supabase/supabase-js';
+
+interface AuthState {
+  session: Session | null;
+  setSession: (session: Session | null) => void;
+  isAuthenticated: () => boolean;
+}
+
+export const useAuthStore = create<AuthState>()(
+  persist(
+    (set, get) => ({
+      session: null,
+      setSession: (session) => set({ session }),
+      isAuthenticated: () => !!get().session,
+    }),
+    {
+      name: 'forge-auth-storage',
+      storage: createJSONStorage(() => AsyncStorage),
+    }
+  )
+);

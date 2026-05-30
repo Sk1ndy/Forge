@@ -1,13 +1,13 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { supabase } from '../../src/lib/supabase';
+import { AuthService } from '../../src/services/auth.service';
 import * as Haptics from 'expo-haptics';
 
 export default function CockpitScreen() {
   const handleLogout = async () => {
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(() => {});
-    await supabase.auth.signOut();
+    await AuthService.logout();
   };
 
   return (

@@ -20,5 +20,6 @@ config.resolver.disableHierarchicalLookup = true;
 
 // Fix for wa-sqlite.wasm on Web
 config.resolver.assetExts.push('wasm');
+config.resolver.sourceExts.push('wasm');
 
 module.exports = config;

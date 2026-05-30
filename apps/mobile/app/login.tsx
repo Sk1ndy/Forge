@@ -14,9 +14,19 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
-import { supabase } from '../src/lib/supabase';
 import * as Haptics from 'expo-haptics';
 import { Ionicons } from '@expo/vector-icons';
+import { GoogleSignin } from '@react-native-google-signin/google-signin';
+
+import { AuthService } from '../src/services/auth.service';
+import { LoginSchema, RegisterSchema } from '../src/schemas/auth.schema';
+import { z } from 'zod';
+
+GoogleSignin.configure({
+  webClientId: process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID || '',
+  iosClientId: process.env.EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID || '',
+  scopes: ['profile', 'email'],
+});
 
 export default function LoginScreen() {
   const router = useRouter();
@@ -37,72 +47,62 @@ export default function LoginScreen() {
   const [regConfirmPassword, setRegConfirmPassword] = useState('');
   const [showRegPassword, setShowRegPassword] = useState(false);
 
-  // Déclencher un feedback tactile léger sur clic de bouton
   const triggerHaptic = (style: Haptics.ImpactFeedbackStyle = Haptics.ImpactFeedbackStyle.Light) => {
     Haptics.impactAsync(style).catch(() => {});
   };
 
-  // Connexion Email + Password
   const handleEmailLogin = async () => {
     triggerHaptic(Haptics.ImpactFeedbackStyle.Medium);
-    if (!email || !password) {
-      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error).catch(() => {});
-      alert("Veuillez remplir tous les champs.");
-      return;
-    }
     
-    setLoading(true);
     try {
-      const { error } = await supabase.auth.signInWithPassword({ email, password });
-      if (error) throw error;
+      // 1. Validation Zod stricte
+      const validData = LoginSchema.parse({ email, password });
+      
+      setLoading(true);
+      // 2. Appel du Use Case pur (Service)
+      await AuthService.loginWithEmail(validData);
       
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(() => {});
       setEmailModalVisible(false);
-      // Expo Router gèrera la redirection automatique grâce au state dans _layout.tsx
     } catch (e: any) {
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error).catch(() => {});
-      alert(e.message || "Erreur de connexion");
+      if (e instanceof z.ZodError) {
+        alert(e.errors[0].message);
+      } else {
+        alert(e.message || "Erreur de connexion");
+      }
     } finally {
       setLoading(false);
     }
   };
 
-  // Inscription
   const handleRegister = async () => {
     triggerHaptic(Haptics.ImpactFeedbackStyle.Medium);
-    if (!regFirstName || !regEmail || !regPassword || !regConfirmPassword) {
-      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error).catch(() => {});
-      alert("Veuillez remplir tous les champs.");
-      return;
-    }
-
-    if (regPassword !== regConfirmPassword) {
-      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error).catch(() => {});
-      alert("Les mots de passe ne correspondent pas.");
-      return;
-    }
-
-    setLoading(true);
+    
     try {
-      // Inscription Supabase
-      const { error } = await supabase.auth.signUp({
+      // 1. Validation Zod stricte
+      const validData = RegisterSchema.parse({
+        firstName: regFirstName,
         email: regEmail,
         password: regPassword,
-        options: {
-          data: {
-            first_name: regFirstName
-          }
-        }
+        confirmPassword: regConfirmPassword
       });
-      if (error) throw error;
+
+      setLoading(true);
+      // 2. Appel du Use Case pur (Service)
+      await AuthService.registerUser(validData);
 
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(() => {});
       alert("Inscription réussie ! Vous pouvez maintenant vous connecter.");
       setRegisterModalVisible(false);
-      setEmailModalVisible(true); // Redirige directement vers la modale email
+      setEmailModalVisible(true);
     } catch (e: any) {
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error).catch(() => {});
-      alert(e.message || "Erreur d'inscription");
+      if (e instanceof z.ZodError) {
+        alert(e.errors[0].message);
+      } else {
+        alert(e.message || "Erreur d'inscription");
+      }
     } finally {
       setLoading(false);
     }
@@ -110,19 +110,15 @@ export default function LoginScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      {/* Background Subtle Grid Effect */}
       <View style={styles.gridOverlay} pointerEvents="none" />
 
-      {/* Brand Section */}
       <View style={styles.brandContainer}>
         <Text style={styles.brandTitle}>FORGE</Text>
         <Text style={styles.brandSubtitle}>MOTEUR D&apos;OPTIMISATION BIOMÉCANIQUE</Text>
       </View>
 
-      {/* Action Stack Section */}
       <View style={styles.actionContainer}>
         
-        {/* Apple Sign In (Mocked / Native Auth redirection point) */}
         <TouchableOpacity
           activeOpacity={0.8}
           onPress={() => {
@@ -135,17 +131,35 @@ export default function LoginScreen() {
           <Text style={styles.appleButtonText}>Continuer avec Apple</Text>
         </TouchableOpacity>
 
-        {/* Google Sign In (Mocked / Native Auth redirection point) */}
         <TouchableOpacity
           activeOpacity={0.8}
-          onPress={() => {
-            triggerHaptic();
-            alert("Intégration Google Sign-In native requise pour la production.");
+          onPress={async () => {
+            triggerHaptic(Haptics.ImpactFeedbackStyle.Medium);
+            try {
+              setLoading(true);
+              await AuthService.loginWithGoogle();
+              Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(() => {});
+            } catch (error: any) {
+              console.error(error);
+              Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error).catch(() => {});
+              if (error.code !== 'SIGN_IN_CANCELLED' && error.code !== '12501') {
+                alert(error.message || "Erreur de connexion Google");
+              }
+            } finally {
+              setLoading(false);
+            }
           }}
+          disabled={loading}
           style={styles.googleButton}
         >
-          <Ionicons name="logo-google" size={18} color="white" style={styles.buttonIcon} />
-          <Text style={styles.googleButtonText}>Continuer avec Google</Text>
+          {loading ? (
+            <ActivityIndicator color="white" />
+          ) : (
+            <>
+              <Ionicons name="logo-google" size={18} color="white" style={styles.buttonIcon} />
+              <Text style={styles.googleButtonText}>Continuer avec Google</Text>
+            </>
+          )}
         </TouchableOpacity>
 
         {/* Link: Use Email */}
