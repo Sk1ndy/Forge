@@ -22605,7 +22605,7 @@ exports[`Forge Engine - Deterministic Test Scenarios > junk_volume 1`] = `
     "pushPullLegsRatio": {
       "legs": 0,
       "pull": 0,
-      "push": 100,
+      "push": 0,
     },
     "sncPercentage": 0,
     "sncScore": 0,
@@ -23032,8 +23032,8 @@ exports[`Forge Engine - Deterministic Test Scenarios > junk_volume 1`] = `
         },
       },
       "pushPullRatio": {
-        "pull": 0,
-        "push": 100,
+        "pull": 50,
+        "push": 50,
       },
       "traumaAlerts": [],
       "weeklyEffectiveSets": {

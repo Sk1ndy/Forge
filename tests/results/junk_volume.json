@@ -2047,7 +2047,7 @@
           }
         ],
         "pushPullLegsRatio": {
-          "push": 100,
+          "push": 0,
           "pull": 0,
           "legs": 0
         },
@@ -2092,8 +2092,8 @@
             "hamstring": 0
           },
           "pushPullRatio": {
-            "push": 100,
-            "pull": 0
+            "push": 50,
+            "pull": 50
           },
           "axialSncLoad": 0,
           "traumaAlerts": []

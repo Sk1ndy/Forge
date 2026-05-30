@@ -124,5 +124,62 @@ describe('Engine: Phase 2 (Mesocycle Algorithms)', () => {
     });
     expect(checkedAtLeastOne).toBe(true);
   });
+
+  it('Bug #5 dynamic PPL: PPL ratio must dynamically reflect session logs completed sets, not static blueprint', () => {
+    // 1. Create a blueprint with push (bench_press) and pull (pull_ups)
+    const pplBlueprint: WeeklyBlueprint = {
+      Lundi: [{
+        id: 'ex_push',
+        exerciseId: 'bench_press',
+        active: true,
+        sets: [{ active: true, series: 3, reps: 10, poids: 80, rpe: 8 }] // 3 push series
+      }],
+      Mardi: [{
+        id: 'ex_pull',
+        exerciseId: 'pull_ups',
+        active: true,
+        sets: [{ active: true, series: 3, reps: 10, poids: 0, rpe: 8 }] // 3 pull series
+      }],
+      Mercredi: [], Jeudi: [], Vendredi: [], Samedi: [], Dimanche: []
+    };
+
+    // 2. Logs where the Lundi (Monday) push exercise is marked as NOT completed (skipped)
+    const logs: any[] = [
+      {
+        exercise_id: 'bench_press',
+        day: 'Lundi',
+        week: 1,
+        set_index: 0,
+        is_completed: false
+      },
+      {
+        exercise_id: 'pull_ups',
+        day: 'Mardi',
+        week: 1,
+        set_index: 0,
+        is_completed: true,
+        actual_reps: 10,
+        actual_weight: 0,
+        actual_rpe: 8
+      }
+    ];
+
+    // Using DEFAULT_EXERCISE_LIBRARY which contains bench_press and pull_ups
+    const result = runMesocycleSimulation(
+      pplBlueprint,
+      mockProfile,
+      {},
+      undefined,
+      undefined, // uses DEFAULT_EXERCISE_LIBRARY
+      1,
+      [],
+      logs
+    );
+
+    // Expect the PPL ratio to be 100% pull and 0% push (since push sets were skipped in logs)
+    expect(result.pushPullLegsRatio.push).toBe(0);
+    expect(result.pushPullLegsRatio.pull).toBe(100);
+  });
 });
+
 

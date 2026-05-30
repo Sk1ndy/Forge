@@ -44,20 +44,6 @@ export function* executeSimulationGenerator(
   
   let globalDayIndex = initialState ? initialState.dayIndex : 0;
 
-  Object.entries(blueprint).forEach(([day, dayExercises]) => {
-    if (toggledDays[day] === false) return;
-    dayExercises.forEach(plannedEx => {
-      if (!plannedEx.active) return;
-      const exDef = exerciseLibrary.find(e => e.id === plannedEx.exerciseId);
-      if (!exDef) return;
-      plannedEx.sets.forEach(set => {
-        if (!set.active) return;
-        if (exDef.ppl_category === 'push') pushSets += set.series;
-        else if (exDef.ppl_category === 'pull') pullSets += set.series;
-        else if (exDef.ppl_category === 'legs') legsSets += set.series;
-      });
-    });
-  });
 
   for (let week = 1; week <= totalWeeks; week++) {
     weeklySystemicInol[week] = [];
@@ -165,6 +151,11 @@ export function* executeSimulationGenerator(
                   return;
               }
             }
+
+            // Dynamic PPL tracking (Bug #5 Fix): Increment based on sets actually executed
+            if (exercise.ppl_category === 'push') pushSets += validSet.series;
+            else if (exercise.ppl_category === 'pull') pullSets += validSet.series;
+            else if (exercise.ppl_category === 'legs') legsSets += validSet.series;
             
             const currentFatigueForGovernor = musclesMap[exercise.muscle_primaire]?.fatigue || 0;
             const impact = calculateSetImpact(validSet, exercise, profile, config, currentFatigueForGovernor);
