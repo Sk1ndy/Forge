@@ -53,7 +53,39 @@ export const DEFAULT_EXERCISE_LIBRARY: Exercise[] = [
   { id: 'skull_crushers', nom: 'Barre au Front (Skullcrushers)', tier_snc: 3, muscle_primaire: 'triceps', muscles_secondaires: [], equipment: 'poids_libre', ppl_category: 'push' },
   
   // Abs (Extra)
-  { id: 'hanging_leg_raise', nom: 'Relevé de Jambes Suspendu', tier_snc: 2, muscle_primaire: 'lowerAbs', muscles_secondaires: ['upperAbs'], equipment: 'pdc', ppl_category: 'core' }
+  { id: 'hanging_leg_raise', nom: 'Relevé de Jambes Suspendu', tier_snc: 2, muscle_primaire: 'lowerAbs', muscles_secondaires: ['upperAbs'], equipment: 'pdc', ppl_category: 'core' },
+  { id: 'ab_wheel_rollout', nom: 'Ab Wheel Rollout', tier_snc: 2, muscle_primaire: 'abs', muscles_secondaires: ['lowerBack', 'upperBack'], equipment: 'poids_libre', ppl_category: 'core' },
+  { id: 'russian_twist', nom: 'Russian Twist', tier_snc: 2, muscle_primaire: 'obliques', muscles_secondaires: ['abs'], equipment: 'poids_libre', ppl_category: 'core' },
+  { id: 'cable_crunch', nom: 'Cable Crunch', tier_snc: 2, muscle_primaire: 'abs', muscles_secondaires: [], equipment: 'machine', ppl_category: 'core' },
+  { id: 'decline_bench_press', nom: 'Decline Bench Press', tier_snc: 2, muscle_primaire: 'lowerChest', muscles_secondaires: ['triceps', 'frontDeltoid'], equipment: 'poids_libre', ppl_category: 'push' },
+  { id: 'db_pullover', nom: 'Db Pullover', tier_snc: 2, muscle_primaire: 'chest', muscles_secondaires: ['upperBack', 'triceps'], equipment: 'poids_libre', ppl_category: 'push' },
+  { id: 'machine_fly', nom: 'Machine Fly', tier_snc: 2, muscle_primaire: 'chest', muscles_secondaires: [], equipment: 'machine', ppl_category: 'push' },
+  { id: 'push_ups', nom: 'Push Ups', tier_snc: 2, muscle_primaire: 'chest', muscles_secondaires: ['frontDeltoid', 'triceps', 'abs'], equipment: 'pdc', ppl_category: 'push' },
+  { id: 'weighted_dips', nom: 'Weighted Dips', tier_snc: 2, muscle_primaire: 'lowerChest', muscles_secondaires: ['triceps', 'frontDeltoid'], equipment: 'pdc', ppl_category: 'push' },
+  { id: 'chin_ups', nom: 'Chin Ups', tier_snc: 2, muscle_primaire: 'upperBack', muscles_secondaires: ['biceps', 'forearm'], equipment: 'pdc', ppl_category: 'pull' },
+  { id: 'close_grip_pulldown', nom: 'Close Grip Pulldown', tier_snc: 2, muscle_primaire: 'upperBack', muscles_secondaires: ['biceps', 'forearm'], equipment: 'machine', ppl_category: 'pull' },
+  { id: 'db_shrugs', nom: 'Db Shrugs', tier_snc: 2, muscle_primaire: 'upperTrapezius', muscles_secondaires: ['forearm'], equipment: 'poids_libre', ppl_category: 'pull' },
+  { id: 'barbell_shrugs', nom: 'Barbell Shrugs', tier_snc: 2, muscle_primaire: 'upperTrapezius', muscles_secondaires: ['forearm'], equipment: 'poids_libre', ppl_category: 'pull' },
+  { id: 'machine_row', nom: 'Machine Row', tier_snc: 2, muscle_primaire: 'upperBack', muscles_secondaires: ['biceps', 'rearDeltoid'], equipment: 'machine', ppl_category: 'pull' },
+  { id: 'good_mornings', nom: 'Good Mornings', tier_snc: 2, muscle_primaire: 'lowerBack', muscles_secondaires: ['hamstring', 'gluteal'], equipment: 'poids_libre', ppl_category: 'legs' },
+  { id: 'back_extension', nom: 'Back Extension', tier_snc: 2, muscle_primaire: 'lowerBack', muscles_secondaires: ['gluteal', 'hamstring'], equipment: 'pdc', ppl_category: 'legs' },
+  { id: 'seated_db_press', nom: 'Seated Db Press', tier_snc: 2, muscle_primaire: 'frontDeltoid', muscles_secondaires: ['triceps', 'upperChest'], equipment: 'poids_libre', ppl_category: 'push' },
+  { id: 'front_raise', nom: 'Front Raise', tier_snc: 2, muscle_primaire: 'frontDeltoid', muscles_secondaires: [], equipment: 'poids_libre', ppl_category: 'push' },
+  { id: 'cable_lateral_raise', nom: 'Cable Lateral Raise', tier_snc: 2, muscle_primaire: 'deltoids', muscles_secondaires: [], equipment: 'machine', ppl_category: 'push' },
+  { id: 'upright_row', nom: 'Upright Row', tier_snc: 2, muscle_primaire: 'deltoids', muscles_secondaires: ['upperTrapezius', 'biceps'], equipment: 'poids_libre', ppl_category: 'pull' },
+  { id: 'machine_shoulder_press', nom: 'Machine Shoulder Press', tier_snc: 2, muscle_primaire: 'frontDeltoid', muscles_secondaires: ['triceps'], equipment: 'machine', ppl_category: 'push' },
+  { id: 'preacher_curl', nom: 'Preacher Curl', tier_snc: 2, muscle_primaire: 'biceps', muscles_secondaires: [], equipment: 'poids_libre', ppl_category: 'pull' },
+  { id: 'cable_curl', nom: 'Cable Curl', tier_snc: 2, muscle_primaire: 'biceps', muscles_secondaires: ['forearm'], equipment: 'machine', ppl_category: 'pull' },
+  { id: 'concentration_curl', nom: 'Concentration Curl', tier_snc: 2, muscle_primaire: 'biceps', muscles_secondaires: [], equipment: 'poids_libre', ppl_category: 'pull' },
+  { id: 'overhead_triceps_extension', nom: 'Overhead Triceps Extension', tier_snc: 2, muscle_primaire: 'triceps', muscles_secondaires: [], equipment: 'poids_libre', ppl_category: 'push' },
+  { id: 'close_grip_bench_press', nom: 'Close Grip Bench Press', tier_snc: 2, muscle_primaire: 'triceps', muscles_secondaires: ['chest', 'frontDeltoid'], equipment: 'poids_libre', ppl_category: 'push' },
+  { id: 'french_press', nom: 'French Press', tier_snc: 2, muscle_primaire: 'triceps', muscles_secondaires: [], equipment: 'poids_libre', ppl_category: 'push' },
+  { id: 'front_squat', nom: 'Front Squat', tier_snc: 2, muscle_primaire: 'quadriceps', muscles_secondaires: ['gluteal', 'lowerBack', 'abs'], equipment: 'poids_libre', ppl_category: 'legs' },
+  { id: 'hack_squat', nom: 'Hack Squat', tier_snc: 2, muscle_primaire: 'quadriceps', muscles_secondaires: ['gluteal'], equipment: 'machine', ppl_category: 'legs' },
+  { id: 'sumo_deadlift', nom: 'Sumo Deadlift', tier_snc: 2, muscle_primaire: 'gluteal', muscles_secondaires: ['quadriceps', 'lowerBack', 'hamstring', 'trapezius'], equipment: 'poids_libre', ppl_category: 'legs' },
+  { id: 'leg_press_45', nom: 'Leg Press 45', tier_snc: 2, muscle_primaire: 'quadriceps', muscles_secondaires: ['gluteal'], equipment: 'machine', ppl_category: 'legs' },
+  { id: 'seated_calf_raise', nom: 'Seated Calf Raise', tier_snc: 2, muscle_primaire: 'calves', muscles_secondaires: [], equipment: 'machine', ppl_category: 'legs' },
+  { id: 'standing_calf_raise', nom: 'Standing Calf Raise', tier_snc: 2, muscle_primaire: 'calves', muscles_secondaires: [], equipment: 'machine', ppl_category: 'legs' }
 ];
 
 export const MUSCLE_DETAILS: Record<MuscleId, string> = {

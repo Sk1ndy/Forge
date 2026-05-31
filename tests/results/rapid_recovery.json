@@ -42,7 +42,7 @@
     }
   },
   "output": {
-    "sncScore": 0,
+    "sncScore": 0.03,
     "readiness": 99.1,
     "injuryRisk": "LOW",
     "metrics": {

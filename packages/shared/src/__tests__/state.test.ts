@@ -1,6 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { aggregateMuscle } from '../engine/core/state';
-import { MusclesMap, MuscleState } from '../types';
+import { aggregateMuscle, MusclesMap, MuscleState } from '../engine/core/state';
 
 describe('State Engine: aggregateMuscle', () => {
   it('should correctly aggregate fitness, fatigue, and setsContributions from children', () => {
@@ -8,7 +7,7 @@ describe('State Engine: aggregateMuscle', () => {
     const emptyMuscle = (): MuscleState => ({
       fatigue: 0, fatigueMetabolic: 0, fatigueDamage: 0, inol: 0, fitness: 0,
       sets: 0, jointStress: 0, contributions: {}, setsContributions: {},
-      fatigueHistory: [], uniqueSets: new Set<string>(), weeklyInol: {}
+      fatigueHistory: [], fitnessHistory: [], uniqueSets: new Set<string>(), weeklyInol: {}, weeklyTonnage: {}
     });
 
     const targetMuscles: MusclesMap = {

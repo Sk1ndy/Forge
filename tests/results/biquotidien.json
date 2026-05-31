@@ -42,12 +42,12 @@
     }
   },
   "output": {
-    "sncScore": 0.01,
-    "readiness": 97.7,
+    "sncScore": 0.86,
+    "readiness": 94.7,
     "injuryRisk": "LOW",
     "metrics": {
       "chronicSncStress": 3.61,
-      "globalWorkCapacity": 97.7,
+      "globalWorkCapacity": 94.7,
       "cnsFailure": false
     }
   },

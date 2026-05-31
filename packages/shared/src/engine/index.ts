@@ -14,7 +14,7 @@ import { TelemetryAdapter } from './adapters/TelemetryAdapter';
 import { adjustRecovery } from './biomechanics/adaptive';
 
 export interface LoopSimulationResult {
-  finalState?: any;
+  finalState?: EngineState;
   targetMuscles: MusclesMap;
   targetSnc: number;
   snapshotChronicSnc: number;
@@ -51,7 +51,8 @@ export const emptySimulationResult: SimulationResult = {
   weeklyTraumas: [],
   progressiveOverload: {},
   injuryPredictions: [],
-  monotonyAlerts: []
+  monotonyAlerts: [],
+  globalAcwr: 1.0
 };
 
 function finalizeSimulationResult(loopResult: LoopSimulationResult, totalWeeks: number, deloadWeeks: number[], maxSnc: number): SimulationResult {
@@ -147,6 +148,11 @@ function finalizeSimulationResult(loopResult: LoopSimulationResult, totalWeeks: 
   });
   weeklyTraumas.sort((a, b) => b.peakInol - a.peakInol);
 
+  // ACWR global agrégé : max des ACWR des muscles en alerte, ou 1.0 si aucune alerte
+  const globalAcwr: number = loopResult.injuryPredictions.length > 0
+    ? parseFloat(Math.max(...loopResult.injuryPredictions.map(p => p.acwr)).toFixed(2))
+    : 1.0;
+
   return {
     muscles: finalMuscles,
     sncScore: parseFloat(loopResult.targetSnc.toFixed(2)),
@@ -164,6 +170,7 @@ function finalizeSimulationResult(loopResult: LoopSimulationResult, totalWeeks: 
     progressiveOverload,
     injuryPredictions: loopResult.injuryPredictions,
     monotonyAlerts,
+    globalAcwr,
     tensors,
     finalState: loopResult.finalState
   };
@@ -180,7 +187,8 @@ export function runMesocycleSimulation(
   sessionLogs?: ExerciseLog[],
   blueprintId?: string,
   wearableData?: RawWearableData,
-  options?: { stochasticMode?: boolean }
+  options?: { stochasticMode?: boolean },
+  initialState?: EngineState
 ): SimulationResult {
   // Input validation (Bug #13 Fix)
   UserProfileSchema.parse(profile);
@@ -193,9 +201,8 @@ export function runMesocycleSimulation(
   const runPass = (varianceMod: number) => {
     const modProfile = { ...profile, maxSnc: (profile.maxSnc || 15.0) * varianceMod };
     const generator = executeSimulationGenerator(
-      blueprint, modProfile, toggledDays, selectedDay, exerciseLibrary, totalWeeks, deloadWeeks, sessionLogs, undefined, wearableData
+      blueprint, modProfile, toggledDays, selectedDay, exerciseLibrary, totalWeeks, deloadWeeks, sessionLogs, initialState, wearableData
     );
-    let loopResult: LoopSimulationResult;
     let resultObj = generator.next();
     while (!resultObj.done) resultObj = generator.next();
     return resultObj.value;
@@ -233,7 +240,8 @@ export async function runMesocycleSimulationAsync(
   sessionLogs?: ExerciseLog[],
   blueprintId?: string,
   wearableData?: RawWearableData,
-  options?: { stochasticMode?: boolean }
+  options?: { stochasticMode?: boolean },
+  initialState?: EngineState
 ): Promise<SimulationResult> {
   // Input validation (Bug #13 Fix)
   UserProfileSchema.parse(profile);
@@ -246,9 +254,8 @@ export async function runMesocycleSimulationAsync(
   const runPassAsync = async (varianceMod: number) => {
     const modProfile = { ...profile, maxSnc: (profile.maxSnc || 15.0) * varianceMod };
     const generator = executeSimulationGenerator(
-      blueprint, modProfile, toggledDays, selectedDay, exerciseLibrary, totalWeeks, deloadWeeks, sessionLogs, undefined, wearableData
+      blueprint, modProfile, toggledDays, selectedDay, exerciseLibrary, totalWeeks, deloadWeeks, sessionLogs, initialState, wearableData
     );
-    let loopResult: LoopSimulationResult;
     let resultObj = generator.next();
     while (!resultObj.done) {
       await new Promise(r => setTimeout(r, 16));
@@ -280,3 +287,5 @@ export async function runMesocycleSimulationAsync(
 
 export const runWeeklySimulation = runMesocycleSimulation;
 export const runWeeklySimulationAsync = runMesocycleSimulationAsync;
+
+export { generateTrainingProgram } from './algorithms/program-generator';

@@ -370,16 +370,211 @@ export function useForgeSimulation(
 
 ---
 
-## 🏛️ 7. GUIDE VISUEL : PALETTE DE COULEURS PREMIUM (tailwindCSS)
+## 🗺️ 8. CONTRAT DashboardMetrics → SimulationResult
 
-Pour que l'expérience utilisateur soit à la hauteur de la complexité scientifique du moteur, respectez scrupuleusement ces codes graphiques (Dark Mode Premium exclusif) :
+> **AVERTISSEMENT CRITIQUE** : Le blueprint mobile définit un type `DashboardMetrics` avec des noms de champs qui ne correspondent PAS directement aux champs de `SimulationResult`. Ce tableau liste les transformations exactes requises.
 
-* **Fonds Généraux :** `bg-zinc-950` (propre, élégant, reposant pour les yeux).
-* **Cartes & Conteneurs :** `bg-zinc-900` avec des bordures subtiles `border-zinc-800`.
-* **Accents de Succès & Santé :** Émeraude (`text-emerald-400` / `bg-emerald-500/10`).
-* **Indicateurs de Fatigue Locale :**
-  - État `REST` (Gris) : `text-zinc-500` (Aucun stress récent).
-  - État `OPTIMAL` (Vert) : `text-emerald-500` (Zone hypertrophique idéale).
-  - État `OVERLOAD` (Orange) : `text-amber-500` (Surcharge en cours de récupération).
-  - État `DANGER` (Rouge clignotant) : `text-red-500` avec un effet de lueur pulsée :
-    `shadow-[0_0_15px_rgba(239,68,68,0.4)]` et l'animation Tailwind `animate-pulse`.
+| Champ Blueprint | Champ Moteur | Transformation requise | Tier requis |
+|---|---|---|---|
+| `cnsStatus: number` | `result.sncPercentage` | Direct (0 → 100) | Free+ |
+| `chronicStress: number` | `result.chronicSncStress` | Direct (0 → ~5) | Pro+ |
+| `monotonyIndex: number` | `result.monotonyAlerts[last]?.monotonyIndex \|\| 0` | Extraire du dernier objet alerte | Pro+ |
+| `acwrRatio: number` | `result.globalAcwr` | Direct (0.5 → 3.0) | Pro+ |
+| `muscleDamage[id]: number` | `1 - result.muscles[id]?.remainingCapacity` | Inverser `remainingCapacity` | Free+ |
+| `muscleReadiness[id]: number` | `result.muscles[id]?.readiness` | Direct | Free+ |
+| `injuryRisk[id]: boolean` | `result.injuryPredictions.some(p => p.muscleId === id)` | Filtrage | Pro+ |
+| `weeklyVolume[id]: number` | `result.weeklyMacro.weeklyEffectiveSets[id]` | Direct | Free+ |
+| `pushPullBalance: number` | `result.weeklyMacro.pushPullRatio.push - result.weeklyMacro.pushPullRatio.pull` | Delta (idéal: 0) | Free+ |
+| `axialLoad: number` | `result.weeklyMacro.axialSncLoad` | Direct | Pro+ |
+| `todaySessionId` | **N/A — vient de Supabase, pas du moteur** | Requête `workout_sessions` séparée | - |
+| `fitnessHistory[id]` | `result.muscles[id]?.fitnessHistory` | Direct (tableau de N flottants) | Elite |
+| `fatigueHistory[id]` | `result.muscles[id]?.fatigueHistory` | Direct (tableau de N flottants) | Elite |
+
+### Zones visuelles ACWR (`result.globalAcwr`)
+| Plage | Couleur | Label |
+|---|---|---|
+| `< 0.8` | `zinc-400` (gris) | Sous-charge — augmente le stimulus |
+| `0.8 – 1.3` | `emerald-500` (vert) | Zone optimale |
+| `1.3 – 1.5` | `amber-400` (orange) | Attention — surveiller la récupération |
+| `> 1.5` | `red-500` (rouge) | Danger — risque de blessure ACWR |
+
+### Zones visuelles Monotonie (`monotonyIndex`)
+| Plage | Couleur | Signification |
+|---|---|---|
+| `< 0.15` | `red-500` | Stimulus robotique — variabilité insuffisante |
+| `0.15 – 0.4` | `amber-400` | Variabilité faible — à surveiller |
+| `> 0.4` | `emerald-500` | Variabilité optimale |
+
+---
+
+## 📋 9. SCHÉMAS ZOD OFFICIELS — Ce que le Mobile DOIT utiliser
+
+> **AVERTISSEMENT** : Les schémas définis dans le blueprint mobile (`AnthropometricSchema`, `StrengthProfileSchema`, `LoggedSetSchema`, `PhysiologicalConstantsSchema`) sont des **RÉFÉRENCES UX**, pas des schémas d'implémentation. Le mobile **DOIT** utiliser les schémas suivants exportés depuis `@forge/shared`.
+
+### 9.1 — Onboarding → `OnboardingPayloadSchema`
+```typescript
+// Import depuis : @forge/shared
+import { OnboardingPayloadSchema, type OnboardingPayload } from '@forge/shared';
+
+// Structure réelle attendue par le moteur
+interface OnboardingPayload {
+  pdc: number;                       // Poids de corps (30–300 kg)
+  gender: 'male' | 'female';         // Défaut: 'male'
+  experience_level: 'beginner' | 'intermediate' | 'advanced';
+  known_prs?: {                      // PRs optionnels
+    squat?: number;
+    bench?: number;
+    deadlift?: number;
+    ohp?: number;
+  };
+  recent_lifts?: Array<{             // Lifts récents pour estimation 1RM
+    exo: 'squat' | 'bench' | 'deadlift' | 'ohp' | 'leg_press' | 'chest_press' | 'lat_pulldown';
+    poids: number;
+    reps: number;
+  }>;
+}
+```
+
+### 9.2 — Log de série → `ExerciseLogSchema`
+```typescript
+// Import depuis : @forge/shared
+import { ExerciseLogSchema, type ExerciseLog } from '@forge/shared';
+
+// Structure réelle pour logguer une série
+interface ExerciseLog {
+  exercise_id: string;               // snake_case, ex: 'squat_barre'
+  day: 'mon' | 'tue' | 'wed' | 'thu' | 'fri' | 'sat' | 'sun'; // ← JAMAIS 'Monday' etc.
+  week?: 1 | 2 | 3 | 4 | 5 | 6;
+  set_index: number;                 // 0-based
+  actual_weight?: number;            // kg, 0 = poids de corps
+  actual_reps?: number;
+  actual_rpe?: number;               // 1.0 – 10.0
+  is_completed?: boolean;            // false = série skippée
+  skipped_reason?: 'fatigue' | 'injury' | 'time' | 'form' | 'other' | null;
+}
+```
+
+### 9.3 — Profil utilisateur → `UserProfileSchema`
+```typescript
+// Import depuis : @forge/shared
+import { UserProfileSchema, type UserProfile } from '@forge/shared';
+
+// Champs que le moteur consomme réellement
+interface UserProfile {
+  pdc: number;
+  prs: { squat?: number; bench?: number; deadlift?: number; ohp?: number };
+  maxSnc: number;                    // Capacité SNC (1–100, défaut: 15.0)
+  isBeginner?: boolean;
+  age?: number;
+  sleepHours?: number;               // ← ALIMENTE LA SIMULATION
+  dailyVFC?: number;                 // ← ALIMENTE LA SIMULATION (HRV)
+  caloricStatus?: 'deficit' | 'maintenance' | 'surplus'; // ← ALIMENTE LA SIMULATION
+  stressLevel?: 'low' | 'moderate' | 'high'; // ← ALIMENTE LA SIMULATION
+  biometricConstants?: UserBiometricConstants;
+}
+```
+
+---
+
+## 🎯 10. ONBOARDING — Ce qui alimente RÉELLEMENT le moteur
+
+> **Règle d'or** : Ne collecter QUE ce que le moteur utilise. Chaque champ inutile = friction d'onboarding gaspillée.
+
+### ✅ Données à collecter (impactent directement la simulation)
+
+| Champ | Impact moteur | Écran suggéré |
+|---|---|---|
+| `pdc` (poids de corps) | Base de calcul de tous les PRs et charges | Onboarding étape 1 |
+| `gender` | Ratios de force male/female dans ProfileCalibrator (±30%) | Onboarding étape 1 |
+| `experience_level` | Volume de base, RPE cible, facteur de résilience SNC | Onboarding étape 1 |
+| `known_prs` | Calcul des charges recommandées | Onboarding étape 2 |
+| `caloricStatus` | Modificateur anabolique/catabolique (±20% sur les gains fitness) | Onboarding étape 2 |
+| `sleepHours` | Modificateur de récupération SNC (±15% sur tauMetabolic) | Onboarding étape 2 |
+| `stressLevel` | Modificateur de résilience SNC (±10% sur tauDamage) | Onboarding étape 2 |
+
+### ❌ Données décoratives (ignorées par le moteur — à minimiser ou retirer)
+
+| Champ | Statut | Recommandation |
+|---|---|---|
+| `heightCm` (taille) | ❌ Non consommé | À retirer — réduit la friction d'onboarding |
+| `femurRatio` | ❌ Non consommé | À retirer — trop technique pour l'onboarding |
+| `armRatio` | ❌ Non consommé | À retirer |
+| `weakPoints` | ❌ Non consommé par le moteur | À garder uniquement si sert au ProgramGenerator (roadmap) |
+| `strongPoints` | ❌ Non consommé | À retirer |
+| `weeklyFrequency` | ❌ Non consommé par le moteur | À utiliser uniquement pour sélectionner la structure PPL/FB dans ProgramGenerator |
+| `bodyFat` | ❌ Non consommé | À retirer |
+
+---
+
+## 🔥 11. USP #10 — Burnout Tracker (`chronicSncStress`)
+
+**Ce champ est déjà calculé et retourné par le moteur.** Zéro effort supplémentaire requis.
+
+```typescript
+// Accès depuis SimulationResult
+result.chronicSncStress // number (0.0 → ~5.0+)
+```
+
+### Seuils visuels
+| Plage | Couleur Forge | Label | Signification biomédicale |
+|---|---|---|---|
+| `0.0 – 1.0` | `emerald-500` vert | **Normal** | Stress nerveux résorbé — récupération optimale |
+| `1.0 – 2.0` | `amber-400` orange | **Vigilance** | Accumulation légère — surveiller le sommeil |
+| `2.0 – 3.0` | `red-400` rouge | **Fatigue Chronique** | Surentraînement installé — réduire le volume |
+| `> 3.0` | `red-600` rouge clignotant | **CATABOLISME ACTIF** | Le moteur pénalise les gains fitness activement |
+
+### Règles d'affichage
+- **Afficher uniquement quand `chronicSncStress > 1.0`** — ne pas alarmer inutilement les utilisateurs en bonne santé
+- Composant suggéré : jauge circulaire avec label "Stress Cortisol" + tooltip explicatif
+- Position sur le Dashboard (Screen C.1) : sous l'indicateur SNC, au-dessus des Top Muscles
+- **Tier requis : Pro+** (champ masqué pour les utilisateurs Free)
+
+### Triggers de Notifications Push associés
+```
+chronicSncStress > 3.0 → "Alerte burnout — ton SNC est en catabolisme. Planifie 2 jours de repos actif."
+chronicSncStress < 1.0 (après avoir été > 2.0) → "Tu as récupéré ! Ton stress cortisol est revenu à la normale."
+```
+
+---
+
+## 🔔 12. TRIGGERS DE NOTIFICATIONS PUSH
+
+> Ces événements sont détectables depuis `SimulationResult` après chaque simulation ou synchronisation.
+
+| Condition moteur | Message push | Fréquence max |
+|---|---|---|
+| `result.sncPercentage > 90` | "Ton SNC est rechargé à {X}%. Prêt à forger ?" | 1x/semaine |
+| `result.chronicSncStress > 3.0` | "Alerte burnout — planifie un repos actif cette semaine" | 1x/semaine |
+| `result.monotonyAlerts.length > 0` | "Ton programme manque de variabilité — change le stimulus" | 1x/semaine |
+| `result.injuryPredictions.length > 0` | "Risque ACWR détecté sur {muscle} — réduis le volume" | 1x/3 jours |
+| Séance prévue non enregistrée après 20h local | "Ta séance de {jour} t'attend — 5 min suffisent" | 1x/jour max |
+| `result.globalAcwr > 1.5` | "Surcharge détectée — considère une semaine de déload" | 1x/semaine |
+
+---
+
+## 🔮 13. FEATURE : Simulation "What-If" (`initialState`)
+
+Le moteur supporte maintenant la simulation chaînée pour les projections futures.
+
+```typescript
+// Etape 1 : Simulation de la semaine actuelle
+const currentResult = await runMesocycleSimulationAsync(
+  blueprint, profile, {}, undefined, undefined, 4, []
+);
+
+// Etape 2 : Projection "Et si je ratais 2 entraînements ?"
+const projectedResult = await runMesocycleSimulationAsync(
+  blueprint,
+  profile,
+  { mon: false, wed: false }, // jours toggles désactivés
+  undefined, undefined, 2, [],
+  undefined, undefined, undefined,
+  { stochasticMode: false },
+  currentResult.finalState    // ← Reprise depuis l'état final actuel
+);
+```
+
+### Use cases débloqués
+- **Screen E.1 (Banister Lab)** : projeter la fitness/fatigue sur N semaines futures
+- **"Que se passe-t-il si je dors mal cette semaine ?"** : passer `stressLevel: 'high'` dans le profil modifié
+- **"Et si je faisais un deload maintenant ?"** : `deloadWeeks: [1, 2]` + `initialState: currentResult.finalState`

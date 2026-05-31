@@ -20,11 +20,23 @@ export type MuscleStatusToken = z.infer<typeof MuscleStatusTokenSchema>;
 // ─── User Profile ───────────────────────────────────────────────────────────
 export const UserPRsSchema = z.object({
   squat:    z.number({ invalid_type_error: "Le squat doit être un nombre" }).min(0).max(1500),
-  bench:    z.number({ invalid_type_error: "Le bench doit être un nombre" }).min(0).max(1000),
+  bench:    z.number({ invalid_type_error: "Le bench doit être un nombre" }).min(0).max(2500),
   deadlift: z.number({ invalid_type_error: "Le deadlift doit être un nombre" }).min(0).max(2000),
   ohp:      z.number({ invalid_type_error: "L'OHP doit être un nombre" }).min(0).max(500),
 }).partial();
 export type UserPRs = z.infer<typeof UserPRsSchema>;
+
+export const UserBiometricConstantsSchema = z.object({
+  baseTauMetabolic: z.number().min(0.1).max(5.0).default(1.0),
+  baseTauDamage: z.number().min(0.5).max(10.0).default(3.0),
+  baseTauChronicSnc: z.number().min(5.0).max(60.0).default(21.0),
+  baseTauFitness: z.number().min(10.0).max(120.0).default(45.0),
+  k1: z.number().default(1.0),
+  k2: z.number().default(2.0),
+  cnsResilience: z.number().min(0.1).max(3.0).default(1.0)
+});
+export type UserBiometricConstants = z.infer<typeof UserBiometricConstantsSchema>;
+
 
 export const UserProfileSchema = z.object({
   pdc:           z.number({ required_error: "Le Poids de Corps est requis" }).min(30).max(300),
@@ -36,7 +48,7 @@ export const UserProfileSchema = z.object({
   dailyVFC:      z.number().min(0).max(200).optional(), // Variabilité de la Fréquence Cardiaque (en ms)
   caloricStatus: z.enum(['deficit', 'maintenance', 'surplus']).optional(),
   stressLevel:   z.enum(['low', 'moderate', 'high']).optional(),
-  biometricConstants: z.any().optional() // UserBiometricConstants (circular ref bypass or lazy)
+  biometricConstants: UserBiometricConstantsSchema.optional()
 });
 export type UserProfile = z.infer<typeof UserProfileSchema>;
 
@@ -73,7 +85,7 @@ export type Exercise = z.infer<typeof ExerciseSchema>;
 export const PlannedSetSchema = z.object({
   series: z.number({ invalid_type_error: "Séries doit être un nombre" }).int().min(1, "Minimum 1 série").max(50, "Maximum 50 séries"),
   reps:   z.number({ invalid_type_error: "Reps doit être un nombre" }).int().min(1, "Minimum 1 rep").max(100, "Maximum 100 reps"),
-  poids:  z.number({ invalid_type_error: "Le poids doit être un nombre" }).min(0, "Le poids ne peut être négatif").max(1000, "Poids irréaliste"),
+  poids:  z.number({ invalid_type_error: "Le poids doit être un nombre" }).min(0, "Le poids ne peut être négatif").max(2500, "Poids irréaliste"),
   rpe:    z.number({ invalid_type_error: "Le RPE doit être un nombre" }).min(1, "RPE min 1").max(10, "RPE max 10"),
   active: z.boolean()
 });
@@ -105,7 +117,7 @@ export const MuscleStatusSchema = z.object({
   jointStress:       z.number(),
   readiness:         z.number(),
   fatigueHistory:    z.array(z.number()).optional(),
-  uniqueSets:        z.custom<Set<string>>((val) => val instanceof Set).optional(),
+  fitnessHistory:    z.array(z.number()).optional(), // Courbe de fitness Banister [0..N jours]
 });
 export type MuscleStatus = z.infer<typeof MuscleStatusSchema>;
 
@@ -120,10 +132,10 @@ export const ExerciseLogSchema = z.object({
   day:            z.enum(['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun']),
   week:           z.union([z.literal(1), z.literal(2), z.literal(3), z.literal(4), z.literal(5), z.literal(6)]).default(1).optional(),
   set_index:      z.number().int().min(0).max(50),
-  planned_weight: z.number().min(0).max(1000).optional(),
+  planned_weight: z.number().min(0).max(2500).optional(),
   planned_reps:   z.number().int().min(0).max(100).optional(),
   planned_rpe:    z.number().min(1).max(10).optional(),
-  actual_weight:  z.number().min(0).max(1000).optional(),
+  actual_weight:  z.number().min(0).max(2500).optional(),
   actual_reps:    z.number().int().min(0).max(100).optional(),
   actual_rpe:     z.number().min(1).max(10).optional(),
   is_completed:   z.boolean().optional(),
@@ -142,18 +154,7 @@ export const WorkoutSessionSchema = z.object({
 });
 export type WorkoutSession = z.infer<typeof WorkoutSessionSchema>;
 
-// ─── Biometric Constants (Adaptive Engine) ───────────────────────────────────
-export const UserBiometricConstantsSchema = z.object({
-  baseTauMetabolic: z.number().min(0.1).max(5.0).default(1.0),
-  baseTauDamage: z.number().min(0.5).max(10.0).default(3.0),
-  baseTauChronicSnc: z.number().min(5.0).max(60.0).default(21.0),
-  baseTauFitness: z.number().min(10.0).max(120.0).default(45.0),
-  k1: z.number().default(1.0),
-  k2: z.number().default(2.0),
-  cnsResilience: z.number().min(0.1).max(3.0).default(1.0)
-});
-export type UserBiometricConstants = z.infer<typeof UserBiometricConstantsSchema>;
-
+// ─── Biometric Constants (Moved up) ──────────────────────────────────────────
 // ─── Telemetry Data (Raw Wearables input) ────────────────────────────────────
 export const RawWearableDataSchema = z.object({
   source: z.enum(['apple', 'garmin', 'whoop', 'manual']),

@@ -9,8 +9,8 @@ export function calculateInjuryPredictions(
   currentWeek: number,
   existingPredictions: { muscleId: string; acwr: number; code: string }[]
 ): void {
-  // ACWR needs at least 2 weeks of data to be somewhat meaningful, ideally 4.
-  if (currentWeek < 2) return;
+  // Clause de garde stricte (interception précoce, zéro effet de bord)
+  if (!musclesMap || !existingPredictions || currentWeek < 2) return;
 
   Object.keys(musclesMap).forEach(id => {
     const isSubMuscle = !['chest', 'quadriceps', 'abs', 'trapezius', 'upperBack', 'frontDeltoid', 'rearDeltoid', 'biceps', 'triceps', 'lowerBack', 'gluteal', 'hamstring', 'calves', 'forearm'].includes(id);

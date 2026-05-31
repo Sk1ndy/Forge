@@ -49,12 +49,12 @@
     "totalWeeks": 2
   },
   "output": {
-    "sncScore": 0.06,
-    "readiness": 96.5,
+    "sncScore": 4.71,
+    "readiness": 81,
     "injuryRisk": "HIGH",
     "metrics": {
       "chronicSncStress": 29.5,
-      "globalWorkCapacity": 96.5,
+      "globalWorkCapacity": 81,
       "cnsFailure": false
     }
   },

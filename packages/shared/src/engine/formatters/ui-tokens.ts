@@ -40,7 +40,8 @@ export function formatMuscleStatus(targetMuscles: MusclesMap): { [muscleId in Mu
       remainingCapacity: parseFloat(Math.max(0, 1 - (fatigueScore / 2.5)).toFixed(4)),
       jointStress: parseFloat((data.jointStress || 0).toFixed(2)),
       readiness: parseFloat((data.fitness - fatigueScore).toFixed(2)),
-      fatigueHistory: data.fatigueHistory.map(v => parseFloat(v.toFixed(2)))
+      fatigueHistory: data.fatigueHistory.map(v => parseFloat(v.toFixed(2))),
+      fitnessHistory: (data.fitnessHistory || []).map(v => parseFloat(v.toFixed(2)))
     };
   });
 

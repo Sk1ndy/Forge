@@ -34,11 +34,11 @@ export function* executeSimulationGenerator(
   let snapshotChronicSnc = 0;
 
   const dailyInol: { [muscleId: string]: number } = {};
-  const peakFatigue: Record<string, { value: number; day: string }> = {};
+  const peakFatigue: Record<string, { value: number; day: number }> = {};
   const weeklyEffectiveSetsRaw: Record<string, number> = {};
   let axialSncLoad = initialState ? initialState.axialSncLoad : 0;
 
-  const injuryPredictions: string[] = [];
+  const injuryPredictions: { muscleId: string; acwr: number; code: string }[] = [];
   const weeklySystemicInol: { [week: number]: number[] } = {};
   
   let pushSets = initialState ? initialState.pushSets : 0;
@@ -128,12 +128,13 @@ export function* executeSimulationGenerator(
         }
       });
 
-      sncFatigue = applyExponentialDecay(sncFatigue, dailyConfig.tauMetabolic, 1);
+      // Bug A-07 Fix: Acute SNC fatigue takes ~3-4 days to decay, not 1 day (tauMetabolic)
+      const tauSncAcute = dailyConfig.tauMetabolic * 3.5;
+      sncFatigue = applyExponentialDecay(sncFatigue, tauSncAcute, 1);
       chronicSncStress = applyExponentialDecay(chronicSncStress, dailyConfig.tauChronicSnc, 1);
 
-      const dayName = DAY_NAMES[day];
-      if (toggledDays[dayName] !== false && toggledDays[day] !== false) {
-        const plannedExercises = (blueprint[dayName as keyof typeof blueprint] || blueprint[day as unknown as keyof typeof blueprint]) || [];
+      if (toggledDays[day] !== false) {
+        const plannedExercises = blueprint[day as keyof typeof blueprint] || [];
         plannedExercises.forEach(plannedEx => {
           if (!plannedEx.active) return;
 
@@ -301,14 +302,19 @@ export function* executeSimulationGenerator(
 
       Object.keys(musclesMap).forEach(id => {
         const f = musclesMap[id].fatigue;
+        const fi = musclesMap[id].fitness;
         musclesMap[id].fatigueHistory.push(f);
         if (musclesMap[id].fatigueHistory.length > 60) {
           musclesMap[id].fatigueHistory.shift();
         }
+        musclesMap[id].fitnessHistory.push(fi);
+        if (musclesMap[id].fitnessHistory.length > 60) {
+          musclesMap[id].fitnessHistory.shift();
+        }
 
         if (week === totalWeeks) {
           if (!peakFatigue[id] || f > peakFatigue[id].value) {
-            peakFatigue[id] = { value: parseFloat(f.toFixed(4)), day };
+            peakFatigue[id] = { value: parseFloat(f.toFixed(4)), day: dayIndex };
           }
         }
       });
@@ -358,6 +364,15 @@ export function* executeSimulationGenerator(
     pushSets,
     pullSets,
     legsSets,
-    finalState: targetMuscles
+    finalState: {
+      muscles: targetMuscles,
+      sncFatigue: targetSnc,
+      chronicSncStress: snapshotChronicSnc,
+      dayIndex: globalDayIndex,
+      pushSets,
+      pullSets,
+      legsSets,
+      axialSncLoad
+    }
   };
 }

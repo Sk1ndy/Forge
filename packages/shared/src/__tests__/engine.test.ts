@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { runMesocycleSimulation, runWeeklySimulationAsync } from '../engine';
-import { UserProfile, WeeklyBlueprint, Exercise } from '../types';
+import { UserProfile, WeeklyBlueprint, Exercise, UserProfileSchema } from '../types';
 
 const mockProfile: UserProfile = {
   pdc: 80,
@@ -276,12 +276,140 @@ describe('Engine: Phase 2 (Mesocycle Algorithms)', () => {
   it('Bug #18 finalState missing: SimulationResult contains finalState for live tracking', () => {
     const result = runMesocycleSimulation(normalBlueprint, mockProfile, {}, undefined, mockLibrary, 1, []);
     expect(result.finalState).toBeDefined();
-    expect(result.finalState.chest).toBeDefined();
+    expect(result.finalState!.muscles.chest).toBeDefined();
   });
 
   it('Bug #19 tonnage for ACWR: injury tracking uses tonnage over inol', () => {
     const result = runMesocycleSimulation(normalBlueprint, mockProfile, {}, undefined, mockLibrary, 1, []);
-    expect(result.finalState.chest.weeklyTonnage[1]).toBe(2400); // 3 * 10 * 80kg = 2400kg
+    expect(result.finalState!.muscles.chest.weeklyTonnage[1]).toBe(2400); // 3 * 10 * 80kg = 2400kg
+  });
+
+  it('Bug A-03 type mismatch: peakFatigue.day returns a valid day index (number 0-6) instead of string', () => {
+    const result = runMesocycleSimulation(heavyBlueprint, mockProfile, {}, undefined, mockLibrary, 1, []);
+    
+    // On vérifie que peakFatigue a été généré dans weeklyMacro
+    expect(Object.keys(result.weeklyMacro.peakFatigue).length).toBeGreaterThan(0);
+    
+    // Le chest devrait avoir une fatigue maximale suite au heavyBlueprint
+    const chestPeak = result.weeklyMacro.peakFatigue['chest'];
+    expect(chestPeak).toBeDefined();
+    
+    // Vérification stricte du typage et des valeurs
+    expect(typeof chestPeak.value).toBe('number');
+    expect(typeof chestPeak.day).toBe('number');
+    
+    // Le dayIndex doit être compris entre 0 (Lundi) et 6 (Dimanche)
+    expect(chestPeak.day).toBeGreaterThanOrEqual(0);
+    expect(chestPeak.day).toBeLessThanOrEqual(6);
+  });
+
+  it('Bug A-04 & A-06: finalState has strict EngineState structure and serializes to JSON cleanly without Set issues', () => {
+    const result = runMesocycleSimulation(normalBlueprint, mockProfile, {}, undefined, mockLibrary, 1, []);
+    expect(result.finalState).toBeDefined();
+    expect(typeof result.finalState!.sncFatigue).toBe('number');
+    expect(typeof result.finalState!.chronicSncStress).toBe('number');
+    expect(typeof result.finalState!.dayIndex).toBe('number');
+    expect(typeof result.finalState!.axialSncLoad).toBe('number');
+    expect(result.finalState!.muscles).toBeDefined();
+    
+    // Verify JSON serialization doesn't crash
+    const serialized = JSON.stringify(result.finalState);
+    expect(serialized).toBeDefined();
+    const parsed = JSON.parse(serialized);
+    expect(parsed.sncFatigue).toBe(result.finalState!.sncFatigue);
+    expect(parsed.muscles.chest).toBeDefined();
+  });
+
+  it('Bug A-05: UserProfileSchema validates biometricConstants strictly', () => {
+
+    // 1. Valid profile with biometric constants should parse successfully
+    const validProfile = {
+      ...mockProfile,
+      biometricConstants: {
+        baseTauMetabolic: 1.2,
+        baseTauDamage: 3.5,
+        baseTauChronicSnc: 25.0,
+        baseTauFitness: 50.0,
+        cnsResilience: 1.1
+      }
+    };
+    expect(() => UserProfileSchema.parse(validProfile)).not.toThrow();
+
+    // 2. Profile with invalid biometric constants (out of bounds) should throw
+    const invalidProfileLow = {
+      ...mockProfile,
+      biometricConstants: {
+        baseTauMetabolic: 0.05 // min is 0.1
+      }
+    };
+    expect(() => UserProfileSchema.parse(invalidProfileLow)).toThrow();
+
+    const invalidProfileHigh = {
+      ...mockProfile,
+      biometricConstants: {
+        baseTauDamage: 12.0 // max is 10.0
+      }
+    };
+    expect(() => UserProfileSchema.parse(invalidProfileHigh)).toThrow();
+  });
+
+  it('Bug A-07: CNS acute fatigue decays slower (tauSncAcute = tauMetabolic * 3.5) over 3-4 days', () => {
+    const cnsBlueprint: WeeklyBlueprint = {
+      mon: [{
+        id: 'ex_cns',
+        exerciseId: 'bench_press',
+        active: true,
+        sets: [{ active: true, series: 12, reps: 5, poids: 110, rpe: 10 }] // 12 heavy sets to fatigue CNS
+      }],
+      tue: [], wed: [], thu: [], fri: [], sat: [], sun: []
+    };
+
+    const result = runMesocycleSimulation(cnsBlueprint, mockProfile, {}, undefined, mockLibrary, 1, []);
+    
+    // We expect the finalState (Sunday night) to still have non-trivial residual CNS fatigue (decayed slowly)
+    expect(result.finalState).toBeDefined();
+    expect(result.finalState!.sncFatigue).toBeGreaterThan(0.001);
+  });
+
+  it('Phase 1 Verification: fitnessHistory, monotonyIndex continuous reporting, globalAcwr and initialState propagation', () => {
+    // 1. Verify fitnessHistory is populated and capped at 60
+    const result = runMesocycleSimulation(normalBlueprint, mockProfile, {}, undefined, mockLibrary, 4, []);
+    expect(result.muscles.chest).toBeDefined();
+    expect(result.muscles.chest!.fitnessHistory).toBeDefined();
+    expect(result.muscles.chest!.fitnessHistory!.length).toBe(28); // 4 weeks = 28 days
+    expect(result.muscles.chest!.fitnessHistory![0]).toBeGreaterThanOrEqual(0);
+
+    // 2. Verify monotony continuous indexing (requires at least 3 active days)
+    const monotonyResult = runMesocycleSimulation(heavyBlueprint, mockProfile, {}, undefined, mockLibrary, 4, []);
+    expect(monotonyResult.monotonyAlerts.length).toBeGreaterThan(0);
+    monotonyResult.monotonyAlerts.forEach(alert => {
+      expect(typeof alert.week).toBe('number');
+      expect(typeof alert.monotonyIndex).toBe('number');
+      expect(['MONOTONY_CRITICAL', 'MONOTONY_OK']).toContain(alert.code);
+    });
+
+    // 3. Verify globalAcwr defaults to 1.0 or represents maximum acwr alert
+    expect(result.globalAcwr).toBeDefined();
+    expect(typeof result.globalAcwr).toBe('number');
+
+    // 4. Verify propagation of initialState
+    const initialMuscles = {
+      chest: { fatigue: 1.5, fatigueMetabolic: 0.5, fatigueDamage: 1.0, inol: 0, fitness: 1.0, sets: 0, jointStress: 0, contributions: {}, setsContributions: {}, fatigueHistory: [], fitnessHistory: [], uniqueSets: new Set<string>(), weeklyInol: {}, weeklyTonnage: {} }
+    };
+    const mockInitialState = {
+      muscles: initialMuscles,
+      sncFatigue: 1.0,
+      chronicSncStress: 0.5,
+      dayIndex: 0,
+      pushSets: 0,
+      pullSets: 0,
+      legsSets: 0,
+      axialSncLoad: 0
+    } as any;
+
+    const customInitResult = runMesocycleSimulation(normalBlueprint, mockProfile, {}, undefined, mockLibrary, 1, [], undefined, undefined, undefined, undefined, mockInitialState);
+    expect(customInitResult.finalState).toBeDefined();
+    expect(customInitResult.finalState!.sncFatigue).not.toBe(0);
   });
 });
 

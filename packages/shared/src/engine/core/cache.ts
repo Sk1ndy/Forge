@@ -47,7 +47,7 @@ export function generateCacheKey(
 ): string {
   const blueprintFingerprint = blueprintId ?? JSON.stringify(blueprint);
   const logsFingerprint = sessionLogs && sessionLogs.length > 0
-    ? `${sessionLogs.length}:${sessionLogs[sessionLogs.length - 1]?.created_at ?? ''}`
+    ? `${sessionLogs.length}:${sessionLogs.reduce((acc, log) => acc + (log.actual_weight || 0) + (log.actual_reps || 0) + (log.actual_rpe || 0), 0)}`
     : '0';
 
   return [

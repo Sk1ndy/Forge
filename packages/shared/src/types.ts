@@ -1,6 +1,7 @@
 // Re-export tous les types de base générés par Zod pour la rétrocompatibilité
 export * from './schemas';
 import { MuscleStatus, MuscleId } from './schemas';
+import { EngineState } from './engine/core/state';
 
 // ─── Simulation Outputs (Read-only) ─────────────────────────────────────────
 
@@ -34,10 +35,11 @@ export interface SimulationResult {
   weeklyTraumas: WeeklyTrauma[];
   progressiveOverload: { [muscleId: string]: { weekOverWeekGrowthPct: number } };
   injuryPredictions: { muscleId: string; acwr: number; code: string }[]; // Alertes si un muscle est en DANGER (rouge) > 3 semaines
-  monotonyAlerts: { week: number; code: string }[]; // Alertes de faible variance de l'intensité inter-jours
+  monotonyAlerts: { week: number; code: string; monotonyIndex: number }[]; // Alertes de faible variance + indice CV numérique
+  globalAcwr: number; // ACWR systémique agrégé (max des muscles en alerte, ou 1.0) — zones: <0.8 gris, 0.8-1.3 vert, 1.3-1.5 orange, >1.5 rouge
   weeklySystemicInol?: Record<number, number[]>; // Array de 7 nombres (Lundi->Dimanche) pour chaque semaine
   tensors?: Record<string, number[]>; // Normalized ML tensors [0,1]
-  finalState?: any; // EngineState final pour la reprise
+  finalState?: EngineState; // EngineState final pour la reprise (remplace any)
   stochasticBands?: {
     systemicReadiness: { low: number; high: number };
   };

@@ -5,7 +5,7 @@ import { adjustRecovery } from "../engine/biomechanics/adaptive";
 import { generateCacheKey } from "../engine/core/cache";
 import { generateBiomechanicsConfig } from "../engine/config";
 import { applyDiminishingReturns } from "../engine/algorithms/junk-volume";
-import { Exercise, PlannedSet, UserProfile } from '../types';
+import { Exercise, PlannedSet, UserProfile, ExerciseLog } from '../types';
 
 const mockProfile: UserProfile = {
   pdc: 80,
@@ -120,8 +120,8 @@ describe('Biomechanics Engine (Level 2)', () => {
         dailyVFC: 85
       };
 
-      const key1 = generateCacheKey({}, profile1, {}, undefined, 1, []);
-      const key2 = generateCacheKey({}, profile2, {}, undefined, 1, []);
+      const key1 = generateCacheKey({}, profile1, {}, undefined, 1, [], undefined, undefined);
+      const key2 = generateCacheKey({}, profile2, {}, undefined, 1, [], undefined, undefined);
 
       expect(key1).not.toBe(key2);
     });
@@ -154,6 +154,35 @@ describe('Biomechanics Engine (Level 2)', () => {
       expect(localTauMultiplier).not.toBe(-Infinity);
       expect(isNaN(localTauMultiplier)).toBe(false);
       expect(localTauMultiplier).toBeGreaterThan(0);
+    });
+
+    it('Bug A-08: generateCacheKey must produce different cache fingerprints when actual reps, weights, or rpes in session logs change, even with the same count', () => {
+      const log1: ExerciseLog = {
+        exercise_id: 'bench_press',
+        day: 'mon',
+        week: 1,
+        set_index: 0,
+        actual_weight: 100,
+        actual_reps: 5,
+        actual_rpe: 8,
+        is_completed: true
+      };
+
+      const log2: ExerciseLog = {
+        exercise_id: 'bench_press',
+        day: 'mon',
+        week: 1,
+        set_index: 0,
+        actual_weight: 105, // slightly different weight
+        actual_reps: 5,
+        actual_rpe: 8,
+        is_completed: true
+      };
+
+      const key1 = generateCacheKey({}, mockProfile, {}, undefined, 1, [], [log1], undefined);
+      const key2 = generateCacheKey({}, mockProfile, {}, undefined, 1, [], [log2], undefined);
+
+      expect(key1).not.toBe(key2);
     });
   });
 });

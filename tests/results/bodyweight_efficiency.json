@@ -52,12 +52,12 @@
     }
   },
   "output": {
-    "sncScore": 0,
-    "readiness": 99.8,
+    "sncScore": 0.13,
+    "readiness": 99.3,
     "injuryRisk": "LOW",
     "metrics": {
       "chronicSncStress": 0.56,
-      "globalWorkCapacity": 99.8,
+      "globalWorkCapacity": 99.3,
       "cnsFailure": false,
       "resPullups": {
         "muscles": {
@@ -72,6 +72,15 @@
             "jointStress": 0,
             "readiness": 0,
             "fatigueHistory": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "fitnessHistory": [
               0,
               0,
               0,
@@ -105,6 +114,15 @@
               0.02,
               0.01,
               0.01
+            ],
+            "fitnessHistory": [
+              0.6,
+              0.59,
+              0.58,
+              0.56,
+              0.55,
+              0.54,
+              0.53
             ]
           },
           "calves": {
@@ -118,6 +136,15 @@
             "jointStress": 0,
             "readiness": 0,
             "fatigueHistory": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "fitnessHistory": [
               0,
               0,
               0,
@@ -145,6 +172,15 @@
               0,
               0,
               0
+            ],
+            "fitnessHistory": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
             ]
           },
           "deltoids": {
@@ -158,6 +194,15 @@
             "jointStress": 0,
             "readiness": 0,
             "fatigueHistory": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "fitnessHistory": [
               0,
               0,
               0,
@@ -191,6 +236,15 @@
               0.01,
               0.01,
               0
+            ],
+            "fitnessHistory": [
+              0.43,
+              0.42,
+              0.41,
+              0.4,
+              0.39,
+              0.39,
+              0.38
             ]
           },
           "gluteal": {
@@ -204,6 +258,15 @@
             "jointStress": 0,
             "readiness": 0,
             "fatigueHistory": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "fitnessHistory": [
               0,
               0,
               0,
@@ -231,6 +294,15 @@
               0,
               0,
               0
+            ],
+            "fitnessHistory": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
             ]
           },
           "lowerBack": {
@@ -244,6 +316,15 @@
             "jointStress": 0,
             "readiness": 0,
             "fatigueHistory": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "fitnessHistory": [
               0,
               0,
               0,
@@ -271,6 +352,15 @@
               0,
               0,
               0
+            ],
+            "fitnessHistory": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
             ]
           },
           "quadriceps": {
@@ -291,6 +381,15 @@
               0,
               0,
               0
+            ],
+            "fitnessHistory": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
             ]
           },
           "tibialis": {
@@ -304,6 +403,15 @@
             "jointStress": 0,
             "readiness": 0,
             "fatigueHistory": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "fitnessHistory": [
               0,
               0,
               0,
@@ -337,6 +445,15 @@
               0.02,
               0.02,
               0.01
+            ],
+            "fitnessHistory": [
+              0.23,
+              0.23,
+              0.22,
+              0.22,
+              0.21,
+              0.21,
+              0.2
             ]
           },
           "triceps": {
@@ -350,6 +467,15 @@
             "jointStress": 0,
             "readiness": 0,
             "fatigueHistory": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "fitnessHistory": [
               0,
               0,
               0,
@@ -383,6 +509,15 @@
               0.09,
               0.06,
               0.04
+            ],
+            "fitnessHistory": [
+              0.89,
+              0.87,
+              0.85,
+              0.83,
+              0.81,
+              0.79,
+              0.78
             ]
           },
           "rotatorCuff": {
@@ -396,6 +531,15 @@
             "jointStress": 0,
             "readiness": 0,
             "fatigueHistory": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "fitnessHistory": [
               0,
               0,
               0,
@@ -423,6 +567,15 @@
               0,
               0,
               0
+            ],
+            "fitnessHistory": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
             ]
           },
           "rhomboids": {
@@ -436,6 +589,15 @@
             "jointStress": 0,
             "readiness": 0,
             "fatigueHistory": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "fitnessHistory": [
               0,
               0,
               0,
@@ -463,6 +625,15 @@
               0,
               0,
               0
+            ],
+            "fitnessHistory": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
             ]
           },
           "adductors": {
@@ -476,6 +647,15 @@
             "jointStress": 0,
             "readiness": 0,
             "fatigueHistory": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "fitnessHistory": [
               0,
               0,
               0,
@@ -503,6 +683,15 @@
               0,
               0,
               0
+            ],
+            "fitnessHistory": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
             ]
           },
           "hipFlexors": {
@@ -516,6 +705,15 @@
             "jointStress": 0,
             "readiness": 0,
             "fatigueHistory": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "fitnessHistory": [
               0,
               0,
               0,
@@ -543,6 +741,15 @@
               0,
               0,
               0
+            ],
+            "fitnessHistory": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
             ]
           },
           "lowerChest": {
@@ -556,6 +763,15 @@
             "jointStress": 0,
             "readiness": 0,
             "fatigueHistory": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "fitnessHistory": [
               0,
               0,
               0,
@@ -583,6 +799,15 @@
               0,
               0,
               0
+            ],
+            "fitnessHistory": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
             ]
           },
           "outerQuad": {
@@ -596,6 +821,15 @@
             "jointStress": 0,
             "readiness": 0,
             "fatigueHistory": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "fitnessHistory": [
               0,
               0,
               0,
@@ -623,6 +857,15 @@
               0,
               0,
               0
+            ],
+            "fitnessHistory": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
             ]
           },
           "lowerAbs": {
@@ -636,6 +879,15 @@
             "jointStress": 0,
             "readiness": 0,
             "fatigueHistory": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "fitnessHistory": [
               0,
               0,
               0,
@@ -663,6 +915,15 @@
               0,
               0,
               0
+            ],
+            "fitnessHistory": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
             ]
           },
           "rearDeltoid": {
@@ -676,6 +937,15 @@
             "jointStress": 0,
             "readiness": 0,
             "fatigueHistory": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "fitnessHistory": [
               0,
               0,
               0,
@@ -703,6 +973,15 @@
               0,
               0,
               0
+            ],
+            "fitnessHistory": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
             ]
           },
           "lowerTrapezius": {
@@ -723,16 +1002,25 @@
               0,
               0,
               0
+            ],
+            "fitnessHistory": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
             ]
           }
         },
-        "sncScore": 0,
-        "sncPercentage": 0,
+        "sncScore": 0.13,
+        "sncPercentage": 1,
         "cnsFailure": false,
         "chronicSncStress": 0.56,
         "junkVolumeAlerts": [],
-        "globalWorkCapacity": 99.8,
-        "systemicReadiness": 99.8,
+        "globalWorkCapacity": 99.3,
+        "systemicReadiness": 99.3,
         "topSurcharged": [],
         "topNeglected": [
           {
@@ -746,6 +1034,15 @@
             "jointStress": 0,
             "readiness": 0,
             "fatigueHistory": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "fitnessHistory": [
               0,
               0,
               0,
@@ -773,6 +1070,15 @@
               0,
               0,
               0
+            ],
+            "fitnessHistory": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
             ]
           },
           {
@@ -786,6 +1092,15 @@
             "jointStress": 0,
             "readiness": 0,
             "fatigueHistory": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "fitnessHistory": [
               0,
               0,
               0,
@@ -852,6 +1167,7 @@
         "progressiveOverload": {},
         "injuryPredictions": [],
         "monotonyAlerts": [],
+        "globalAcwr": 1,
         "tensors": {
           "abs": [
             0,
@@ -1143,830 +1459,1127 @@
           ]
         },
         "finalState": {
-          "abs": {
-            "fatigue": 0,
-            "fatigueMetabolic": 0,
-            "fatigueDamage": 0,
-            "inol": 0,
-            "fitness": 0,
-            "sets": 0,
-            "jointStress": 0,
-            "contributions": {},
-            "setsContributions": {},
-            "fatigueHistory": [
-              0,
-              0,
-              0,
-              0,
-              0,
-              0,
-              0
-            ],
-            "uniqueSets": {},
-            "weeklyInol": {
-              "1": 0
+          "muscles": {
+            "abs": {
+              "fatigue": 0,
+              "fatigueMetabolic": 0,
+              "fatigueDamage": 0,
+              "inol": 0,
+              "fitness": 0,
+              "sets": 0,
+              "jointStress": 0,
+              "contributions": {},
+              "setsContributions": {},
+              "fatigueHistory": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              "fitnessHistory": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              "uniqueSets": {},
+              "weeklyInol": {
+                "1": 0
+              },
+              "weeklyTonnage": {}
             },
-            "weeklyTonnage": {}
-          },
-          "biceps": {
-            "fatigue": 0.00624759,
-            "fatigueMetabolic": 0.00000899,
-            "fatigueDamage": 0.0062386,
-            "inol": 0.50319489,
-            "fitness": 0.52845928,
-            "sets": 1.8,
-            "jointStress": 0.13217011,
-            "contributions": {
-              "Tractions": 0.0155965
+            "biceps": {
+              "fatigue": 0.00624759,
+              "fatigueMetabolic": 0.00000899,
+              "fatigueDamage": 0.0062386,
+              "inol": 0.50319489,
+              "fitness": 0.52845928,
+              "sets": 1.8,
+              "jointStress": 0.13217011,
+              "contributions": {
+                "Tractions": 0.0155965
+              },
+              "setsContributions": {
+                "Tractions": 1.8
+              },
+              "fatigueHistory": [
+                0.50319489,
+                0.16596288,
+                0.07258353,
+                0.03708324,
+                0.02015055,
+                0.01118217,
+                0.00624759
+              ],
+              "fitnessHistory": [
+                0.60383387,
+                0.59056334,
+                0.57758445,
+                0.5648908,
+                0.55247612,
+                0.54033428,
+                0.52845928
+              ],
+              "uniqueSets": {},
+              "weeklyInol": {
+                "1": 0.5031948881789138
+              },
+              "weeklyTonnage": {
+                "1": 1440
+              }
             },
-            "setsContributions": {
-              "Tractions": 1.8
+            "calves": {
+              "fatigue": 0,
+              "fatigueMetabolic": 0,
+              "fatigueDamage": 0,
+              "inol": 0,
+              "fitness": 0,
+              "sets": 0,
+              "jointStress": 0,
+              "contributions": {},
+              "setsContributions": {},
+              "fatigueHistory": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              "fitnessHistory": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              "uniqueSets": {},
+              "weeklyInol": {
+                "1": 0
+              },
+              "weeklyTonnage": {}
             },
-            "fatigueHistory": [
-              0.50319489,
-              0.16596288,
-              0.07258353,
-              0.03708324,
-              0.02015055,
-              0.01118217,
-              0.00624759
-            ],
-            "uniqueSets": {},
-            "weeklyInol": {
-              "1": 0.5031948881789138
+            "chest": {
+              "fatigue": 0,
+              "fatigueMetabolic": 0,
+              "fatigueDamage": 0,
+              "inol": 0,
+              "fitness": 0,
+              "sets": 0,
+              "jointStress": 0,
+              "contributions": {},
+              "setsContributions": {},
+              "fatigueHistory": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              "fitnessHistory": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              "uniqueSets": {},
+              "weeklyInol": {
+                "1": 0
+              },
+              "weeklyTonnage": {}
             },
-            "weeklyTonnage": {
-              "1": 1440
+            "deltoids": {
+              "fatigue": 0,
+              "fatigueMetabolic": 0,
+              "fatigueDamage": 0,
+              "inol": 0,
+              "fitness": 0,
+              "sets": 0,
+              "jointStress": 0,
+              "contributions": {},
+              "setsContributions": {},
+              "fatigueHistory": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              "fitnessHistory": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              "uniqueSets": {},
+              "weeklyInol": {
+                "1": 0
+              },
+              "weeklyTonnage": {}
+            },
+            "forearm": {
+              "fatigue": 0.0044646,
+              "fatigueMetabolic": 0.00000642,
+              "fatigueDamage": 0.00445818,
+              "inol": 0.35958904,
+              "fitness": 0.37764328,
+              "sets": 1.2,
+              "jointStress": 0.08811341,
+              "contributions": {
+                "Tractions": 0.01114545
+              },
+              "setsContributions": {
+                "Tractions": 1.2
+              },
+              "fatigueHistory": [
+                0.35958904,
+                0.11859904,
+                0.05186905,
+                0.02650013,
+                0.01439982,
+                0.00799092,
+                0.0044646
+              ],
+              "fitnessHistory": [
+                0.43150685,
+                0.42202357,
+                0.4127487,
+                0.40367767,
+                0.39480599,
+                0.38612929,
+                0.37764328
+              ],
+              "uniqueSets": {},
+              "weeklyInol": {
+                "1": 0.35958904109589046
+              },
+              "weeklyTonnage": {
+                "1": 960
+              }
+            },
+            "gluteal": {
+              "fatigue": 0,
+              "fatigueMetabolic": 0,
+              "fatigueDamage": 0,
+              "inol": 0,
+              "fitness": 0,
+              "sets": 0,
+              "jointStress": 0,
+              "contributions": {},
+              "setsContributions": {},
+              "fatigueHistory": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              "fitnessHistory": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              "uniqueSets": {},
+              "weeklyInol": {
+                "1": 0
+              },
+              "weeklyTonnage": {}
+            },
+            "hamstring": {
+              "fatigue": 0,
+              "fatigueMetabolic": 0,
+              "fatigueDamage": 0,
+              "inol": 0,
+              "fitness": 0,
+              "sets": 0,
+              "jointStress": 0,
+              "contributions": {},
+              "setsContributions": {},
+              "fatigueHistory": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              "fitnessHistory": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              "uniqueSets": {},
+              "weeklyInol": {
+                "1": 0
+              },
+              "weeklyTonnage": {}
+            },
+            "lowerBack": {
+              "fatigue": 0,
+              "fatigueMetabolic": 0,
+              "fatigueDamage": 0,
+              "inol": 0,
+              "fitness": 0,
+              "sets": 0,
+              "jointStress": 0,
+              "contributions": {},
+              "setsContributions": {},
+              "fatigueHistory": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              "fitnessHistory": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              "uniqueSets": {},
+              "weeklyInol": {
+                "1": 0
+              },
+              "weeklyTonnage": {}
+            },
+            "obliques": {
+              "fatigue": 0,
+              "fatigueMetabolic": 0,
+              "fatigueDamage": 0,
+              "inol": 0,
+              "fitness": 0,
+              "sets": 0,
+              "jointStress": 0,
+              "contributions": {},
+              "setsContributions": {},
+              "fatigueHistory": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              "fitnessHistory": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              "uniqueSets": {},
+              "weeklyInol": {
+                "1": 0
+              },
+              "weeklyTonnage": {}
+            },
+            "quadriceps": {
+              "fatigue": 0,
+              "fatigueMetabolic": 0,
+              "fatigueDamage": 0,
+              "inol": 0,
+              "fitness": 0,
+              "sets": 0,
+              "jointStress": 0,
+              "contributions": {},
+              "setsContributions": {},
+              "fatigueHistory": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              "fitnessHistory": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              "uniqueSets": {},
+              "weeklyInol": {
+                "1": 0
+              },
+              "weeklyTonnage": {}
+            },
+            "tibialis": {
+              "fatigue": 0,
+              "fatigueMetabolic": 0,
+              "fatigueDamage": 0,
+              "inol": 0,
+              "fitness": 0,
+              "sets": 0,
+              "jointStress": 0,
+              "contributions": {},
+              "setsContributions": {},
+              "fatigueHistory": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              "fitnessHistory": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              "uniqueSets": {},
+              "weeklyInol": {
+                "1": 0
+              },
+              "weeklyTonnage": {}
+            },
+            "trapezius": {
+              "fatigue": 0.01077535,
+              "fatigueMetabolic": 0.00028812,
+              "fatigueDamage": 0.01048723,
+              "inol": 0.19372694,
+              "fitness": 0.20345358,
+              "sets": 3,
+              "jointStress": 0.06368572,
+              "contributions": {
+                "Tractions": 0.02621809
+              },
+              "setsContributions": {
+                "Tractions": 0.6
+              },
+              "fatigueHistory": [
+                0.19372693,
+                0.09828545,
+                0.05551594,
+                0.03429432,
+                0.02255528,
+                0.0154193,
+                0.01077535
+              ],
+              "fitnessHistory": [
+                0.23247232,
+                0.22736325,
+                0.22236646,
+                0.21747948,
+                0.21269991,
+                0.20802538,
+                0.20345358
+              ],
+              "uniqueSets": {},
+              "weeklyInol": {
+                "1": 0.19372694
+              },
+              "weeklyTonnage": {
+                "1": 480
+              }
+            },
+            "triceps": {
+              "fatigue": 0,
+              "fatigueMetabolic": 0,
+              "fatigueDamage": 0,
+              "inol": 0,
+              "fitness": 0,
+              "sets": 0,
+              "jointStress": 0,
+              "contributions": {},
+              "setsContributions": {},
+              "fatigueHistory": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              "fitnessHistory": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              "uniqueSets": {},
+              "weeklyInol": {
+                "1": 0
+              },
+              "weeklyTonnage": {}
+            },
+            "upperBack": {
+              "fatigue": 0.04112847,
+              "fatigueMetabolic": 0.00109973,
+              "fatigueDamage": 0.04002874,
+              "inol": 0.73943662,
+              "fitness": 0.77656224,
+              "sets": 3,
+              "jointStress": 0.3184286,
+              "contributions": {
+                "Tractions": 0.10007187
+              },
+              "setsContributions": {
+                "Tractions": 3
+              },
+              "fatigueHistory": [
+                0.73943662,
+                0.37514592,
+                0.21189889,
+                0.13089804,
+                0.0860913,
+                0.05885398,
+                0.04112847
+              ],
+              "fitnessHistory": [
+                0.88732394,
+                0.86782311,
+                0.84875085,
+                0.83009774,
+                0.81185458,
+                0.79401235,
+                0.77656224
+              ],
+              "uniqueSets": {},
+              "weeklyInol": {
+                "1": 0.73943662
+              },
+              "weeklyTonnage": {
+                "1": 2400
+              }
+            },
+            "rotatorCuff": {
+              "fatigue": 0,
+              "fatigueMetabolic": 0,
+              "fatigueDamage": 0,
+              "inol": 0,
+              "fitness": 0,
+              "sets": 0,
+              "jointStress": 0,
+              "contributions": {},
+              "setsContributions": {},
+              "fatigueHistory": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              "fitnessHistory": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              "uniqueSets": {},
+              "weeklyInol": {
+                "1": 0
+              },
+              "weeklyTonnage": {}
+            },
+            "serratus": {
+              "fatigue": 0,
+              "fatigueMetabolic": 0,
+              "fatigueDamage": 0,
+              "inol": 0,
+              "fitness": 0,
+              "sets": 0,
+              "jointStress": 0,
+              "contributions": {},
+              "setsContributions": {},
+              "fatigueHistory": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              "fitnessHistory": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              "uniqueSets": {},
+              "weeklyInol": {
+                "1": 0
+              },
+              "weeklyTonnage": {}
+            },
+            "rhomboids": {
+              "fatigue": 0,
+              "fatigueMetabolic": 0,
+              "fatigueDamage": 0,
+              "inol": 0,
+              "fitness": 0,
+              "sets": 0,
+              "jointStress": 0,
+              "contributions": {},
+              "setsContributions": {},
+              "fatigueHistory": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              "fitnessHistory": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              "uniqueSets": {},
+              "weeklyInol": {
+                "1": 0
+              },
+              "weeklyTonnage": {}
+            },
+            "ankles": {
+              "fatigue": 0,
+              "fatigueMetabolic": 0,
+              "fatigueDamage": 0,
+              "inol": 0,
+              "fitness": 0,
+              "sets": 0,
+              "jointStress": 0,
+              "contributions": {},
+              "setsContributions": {},
+              "fatigueHistory": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              "fitnessHistory": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              "uniqueSets": {},
+              "weeklyInol": {
+                "1": 0
+              },
+              "weeklyTonnage": {}
+            },
+            "adductors": {
+              "fatigue": 0,
+              "fatigueMetabolic": 0,
+              "fatigueDamage": 0,
+              "inol": 0,
+              "fitness": 0,
+              "sets": 0,
+              "jointStress": 0,
+              "contributions": {},
+              "setsContributions": {},
+              "fatigueHistory": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              "fitnessHistory": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              "uniqueSets": {},
+              "weeklyInol": {
+                "1": 0
+              },
+              "weeklyTonnage": {}
+            },
+            "neck": {
+              "fatigue": 0,
+              "fatigueMetabolic": 0,
+              "fatigueDamage": 0,
+              "inol": 0,
+              "fitness": 0,
+              "sets": 0,
+              "jointStress": 0,
+              "contributions": {},
+              "setsContributions": {},
+              "fatigueHistory": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              "fitnessHistory": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              "uniqueSets": {},
+              "weeklyInol": {
+                "1": 0
+              },
+              "weeklyTonnage": {}
+            },
+            "hipFlexors": {
+              "fatigue": 0,
+              "fatigueMetabolic": 0,
+              "fatigueDamage": 0,
+              "inol": 0,
+              "fitness": 0,
+              "sets": 0,
+              "jointStress": 0,
+              "contributions": {},
+              "setsContributions": {},
+              "fatigueHistory": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              "fitnessHistory": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              "uniqueSets": {},
+              "weeklyInol": {
+                "1": 0
+              },
+              "weeklyTonnage": {}
+            },
+            "upperChest": {
+              "fatigue": 0,
+              "fatigueMetabolic": 0,
+              "fatigueDamage": 0,
+              "inol": 0,
+              "fitness": 0,
+              "sets": 0,
+              "jointStress": 0,
+              "contributions": {},
+              "setsContributions": {},
+              "fatigueHistory": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              "fitnessHistory": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              "uniqueSets": {},
+              "weeklyInol": {
+                "1": 0
+              },
+              "weeklyTonnage": {}
+            },
+            "lowerChest": {
+              "fatigue": 0,
+              "fatigueMetabolic": 0,
+              "fatigueDamage": 0,
+              "inol": 0,
+              "fitness": 0,
+              "sets": 0,
+              "jointStress": 0,
+              "contributions": {},
+              "setsContributions": {},
+              "fatigueHistory": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              "fitnessHistory": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              "uniqueSets": {},
+              "weeklyInol": {
+                "1": 0
+              },
+              "weeklyTonnage": {}
+            },
+            "innerQuad": {
+              "fatigue": 0,
+              "fatigueMetabolic": 0,
+              "fatigueDamage": 0,
+              "inol": 0,
+              "fitness": 0,
+              "sets": 0,
+              "jointStress": 0,
+              "contributions": {},
+              "setsContributions": {},
+              "fatigueHistory": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              "fitnessHistory": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              "uniqueSets": {},
+              "weeklyInol": {
+                "1": 0
+              },
+              "weeklyTonnage": {}
+            },
+            "outerQuad": {
+              "fatigue": 0,
+              "fatigueMetabolic": 0,
+              "fatigueDamage": 0,
+              "inol": 0,
+              "fitness": 0,
+              "sets": 0,
+              "jointStress": 0,
+              "contributions": {},
+              "setsContributions": {},
+              "fatigueHistory": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              "fitnessHistory": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              "uniqueSets": {},
+              "weeklyInol": {
+                "1": 0
+              },
+              "weeklyTonnage": {}
+            },
+            "upperAbs": {
+              "fatigue": 0,
+              "fatigueMetabolic": 0,
+              "fatigueDamage": 0,
+              "inol": 0,
+              "fitness": 0,
+              "sets": 0,
+              "jointStress": 0,
+              "contributions": {},
+              "setsContributions": {},
+              "fatigueHistory": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              "fitnessHistory": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              "uniqueSets": {},
+              "weeklyInol": {
+                "1": 0
+              },
+              "weeklyTonnage": {}
+            },
+            "lowerAbs": {
+              "fatigue": 0,
+              "fatigueMetabolic": 0,
+              "fatigueDamage": 0,
+              "inol": 0,
+              "fitness": 0,
+              "sets": 0,
+              "jointStress": 0,
+              "contributions": {},
+              "setsContributions": {},
+              "fatigueHistory": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              "fitnessHistory": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              "uniqueSets": {},
+              "weeklyInol": {
+                "1": 0
+              },
+              "weeklyTonnage": {}
+            },
+            "frontDeltoid": {
+              "fatigue": 0,
+              "fatigueMetabolic": 0,
+              "fatigueDamage": 0,
+              "inol": 0,
+              "fitness": 0,
+              "sets": 0,
+              "jointStress": 0,
+              "contributions": {},
+              "setsContributions": {},
+              "fatigueHistory": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              "fitnessHistory": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              "uniqueSets": {},
+              "weeklyInol": {
+                "1": 0
+              },
+              "weeklyTonnage": {}
+            },
+            "rearDeltoid": {
+              "fatigue": 0,
+              "fatigueMetabolic": 0,
+              "fatigueDamage": 0,
+              "inol": 0,
+              "fitness": 0,
+              "sets": 0,
+              "jointStress": 0,
+              "contributions": {},
+              "setsContributions": {},
+              "fatigueHistory": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              "fitnessHistory": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              "uniqueSets": {},
+              "weeklyInol": {
+                "1": 0
+              },
+              "weeklyTonnage": {}
+            },
+            "upperTrapezius": {
+              "fatigue": 0,
+              "fatigueMetabolic": 0,
+              "fatigueDamage": 0,
+              "inol": 0,
+              "fitness": 0,
+              "sets": 0,
+              "jointStress": 0,
+              "contributions": {},
+              "setsContributions": {},
+              "fatigueHistory": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              "fitnessHistory": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              "uniqueSets": {},
+              "weeklyInol": {
+                "1": 0
+              },
+              "weeklyTonnage": {}
+            },
+            "lowerTrapezius": {
+              "fatigue": 0,
+              "fatigueMetabolic": 0,
+              "fatigueDamage": 0,
+              "inol": 0,
+              "fitness": 0,
+              "sets": 0,
+              "jointStress": 0,
+              "contributions": {},
+              "setsContributions": {},
+              "fatigueHistory": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              "fitnessHistory": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              "uniqueSets": {},
+              "weeklyInol": {
+                "1": 0
+              },
+              "weeklyTonnage": {}
             }
           },
-          "calves": {
-            "fatigue": 0,
-            "fatigueMetabolic": 0,
-            "fatigueDamage": 0,
-            "inol": 0,
-            "fitness": 0,
-            "sets": 0,
-            "jointStress": 0,
-            "contributions": {},
-            "setsContributions": {},
-            "fatigueHistory": [
-              0,
-              0,
-              0,
-              0,
-              0,
-              0,
-              0
-            ],
-            "uniqueSets": {},
-            "weeklyInol": {
-              "1": 0
-            },
-            "weeklyTonnage": {}
-          },
-          "chest": {
-            "fatigue": 0,
-            "fatigueMetabolic": 0,
-            "fatigueDamage": 0,
-            "inol": 0,
-            "fitness": 0,
-            "sets": 0,
-            "jointStress": 0,
-            "contributions": {},
-            "setsContributions": {},
-            "fatigueHistory": [
-              0,
-              0,
-              0,
-              0,
-              0,
-              0,
-              0
-            ],
-            "uniqueSets": {},
-            "weeklyInol": {
-              "1": 0
-            },
-            "weeklyTonnage": {}
-          },
-          "deltoids": {
-            "fatigue": 0,
-            "fatigueMetabolic": 0,
-            "fatigueDamage": 0,
-            "inol": 0,
-            "fitness": 0,
-            "sets": 0,
-            "jointStress": 0,
-            "contributions": {},
-            "setsContributions": {},
-            "fatigueHistory": [
-              0,
-              0,
-              0,
-              0,
-              0,
-              0,
-              0
-            ],
-            "uniqueSets": {},
-            "weeklyInol": {
-              "1": 0
-            },
-            "weeklyTonnage": {}
-          },
-          "forearm": {
-            "fatigue": 0.0044646,
-            "fatigueMetabolic": 0.00000642,
-            "fatigueDamage": 0.00445818,
-            "inol": 0.35958904,
-            "fitness": 0.37764328,
-            "sets": 1.2,
-            "jointStress": 0.08811341,
-            "contributions": {
-              "Tractions": 0.01114545
-            },
-            "setsContributions": {
-              "Tractions": 1.2
-            },
-            "fatigueHistory": [
-              0.35958904,
-              0.11859904,
-              0.05186905,
-              0.02650013,
-              0.01439982,
-              0.00799092,
-              0.0044646
-            ],
-            "uniqueSets": {},
-            "weeklyInol": {
-              "1": 0.35958904109589046
-            },
-            "weeklyTonnage": {
-              "1": 960
-            }
-          },
-          "gluteal": {
-            "fatigue": 0,
-            "fatigueMetabolic": 0,
-            "fatigueDamage": 0,
-            "inol": 0,
-            "fitness": 0,
-            "sets": 0,
-            "jointStress": 0,
-            "contributions": {},
-            "setsContributions": {},
-            "fatigueHistory": [
-              0,
-              0,
-              0,
-              0,
-              0,
-              0,
-              0
-            ],
-            "uniqueSets": {},
-            "weeklyInol": {
-              "1": 0
-            },
-            "weeklyTonnage": {}
-          },
-          "hamstring": {
-            "fatigue": 0,
-            "fatigueMetabolic": 0,
-            "fatigueDamage": 0,
-            "inol": 0,
-            "fitness": 0,
-            "sets": 0,
-            "jointStress": 0,
-            "contributions": {},
-            "setsContributions": {},
-            "fatigueHistory": [
-              0,
-              0,
-              0,
-              0,
-              0,
-              0,
-              0
-            ],
-            "uniqueSets": {},
-            "weeklyInol": {
-              "1": 0
-            },
-            "weeklyTonnage": {}
-          },
-          "lowerBack": {
-            "fatigue": 0,
-            "fatigueMetabolic": 0,
-            "fatigueDamage": 0,
-            "inol": 0,
-            "fitness": 0,
-            "sets": 0,
-            "jointStress": 0,
-            "contributions": {},
-            "setsContributions": {},
-            "fatigueHistory": [
-              0,
-              0,
-              0,
-              0,
-              0,
-              0,
-              0
-            ],
-            "uniqueSets": {},
-            "weeklyInol": {
-              "1": 0
-            },
-            "weeklyTonnage": {}
-          },
-          "obliques": {
-            "fatigue": 0,
-            "fatigueMetabolic": 0,
-            "fatigueDamage": 0,
-            "inol": 0,
-            "fitness": 0,
-            "sets": 0,
-            "jointStress": 0,
-            "contributions": {},
-            "setsContributions": {},
-            "fatigueHistory": [
-              0,
-              0,
-              0,
-              0,
-              0,
-              0,
-              0
-            ],
-            "uniqueSets": {},
-            "weeklyInol": {
-              "1": 0
-            },
-            "weeklyTonnage": {}
-          },
-          "quadriceps": {
-            "fatigue": 0,
-            "fatigueMetabolic": 0,
-            "fatigueDamage": 0,
-            "inol": 0,
-            "fitness": 0,
-            "sets": 0,
-            "jointStress": 0,
-            "contributions": {},
-            "setsContributions": {},
-            "fatigueHistory": [
-              0,
-              0,
-              0,
-              0,
-              0,
-              0,
-              0
-            ],
-            "uniqueSets": {},
-            "weeklyInol": {
-              "1": 0
-            },
-            "weeklyTonnage": {}
-          },
-          "tibialis": {
-            "fatigue": 0,
-            "fatigueMetabolic": 0,
-            "fatigueDamage": 0,
-            "inol": 0,
-            "fitness": 0,
-            "sets": 0,
-            "jointStress": 0,
-            "contributions": {},
-            "setsContributions": {},
-            "fatigueHistory": [
-              0,
-              0,
-              0,
-              0,
-              0,
-              0,
-              0
-            ],
-            "uniqueSets": {},
-            "weeklyInol": {
-              "1": 0
-            },
-            "weeklyTonnage": {}
-          },
-          "trapezius": {
-            "fatigue": 0.01077535,
-            "fatigueMetabolic": 0.00028812,
-            "fatigueDamage": 0.01048723,
-            "inol": 0.19372694,
-            "fitness": 0.20345358,
-            "sets": 3,
-            "jointStress": 0.06368572,
-            "contributions": {
-              "Tractions": 0.02621809
-            },
-            "setsContributions": {
-              "Tractions": 0.6
-            },
-            "fatigueHistory": [
-              0.19372693,
-              0.09828545,
-              0.05551594,
-              0.03429432,
-              0.02255528,
-              0.0154193,
-              0.01077535
-            ],
-            "uniqueSets": {},
-            "weeklyInol": {
-              "1": 0.19372694
-            },
-            "weeklyTonnage": {
-              "1": 480
-            }
-          },
-          "triceps": {
-            "fatigue": 0,
-            "fatigueMetabolic": 0,
-            "fatigueDamage": 0,
-            "inol": 0,
-            "fitness": 0,
-            "sets": 0,
-            "jointStress": 0,
-            "contributions": {},
-            "setsContributions": {},
-            "fatigueHistory": [
-              0,
-              0,
-              0,
-              0,
-              0,
-              0,
-              0
-            ],
-            "uniqueSets": {},
-            "weeklyInol": {
-              "1": 0
-            },
-            "weeklyTonnage": {}
-          },
-          "upperBack": {
-            "fatigue": 0.04112847,
-            "fatigueMetabolic": 0.00109973,
-            "fatigueDamage": 0.04002874,
-            "inol": 0.73943662,
-            "fitness": 0.77656224,
-            "sets": 3,
-            "jointStress": 0.3184286,
-            "contributions": {
-              "Tractions": 0.10007187
-            },
-            "setsContributions": {
-              "Tractions": 3
-            },
-            "fatigueHistory": [
-              0.73943662,
-              0.37514592,
-              0.21189889,
-              0.13089804,
-              0.0860913,
-              0.05885398,
-              0.04112847
-            ],
-            "uniqueSets": {},
-            "weeklyInol": {
-              "1": 0.73943662
-            },
-            "weeklyTonnage": {
-              "1": 2400
-            }
-          },
-          "rotatorCuff": {
-            "fatigue": 0,
-            "fatigueMetabolic": 0,
-            "fatigueDamage": 0,
-            "inol": 0,
-            "fitness": 0,
-            "sets": 0,
-            "jointStress": 0,
-            "contributions": {},
-            "setsContributions": {},
-            "fatigueHistory": [
-              0,
-              0,
-              0,
-              0,
-              0,
-              0,
-              0
-            ],
-            "uniqueSets": {},
-            "weeklyInol": {
-              "1": 0
-            },
-            "weeklyTonnage": {}
-          },
-          "serratus": {
-            "fatigue": 0,
-            "fatigueMetabolic": 0,
-            "fatigueDamage": 0,
-            "inol": 0,
-            "fitness": 0,
-            "sets": 0,
-            "jointStress": 0,
-            "contributions": {},
-            "setsContributions": {},
-            "fatigueHistory": [
-              0,
-              0,
-              0,
-              0,
-              0,
-              0,
-              0
-            ],
-            "uniqueSets": {},
-            "weeklyInol": {
-              "1": 0
-            },
-            "weeklyTonnage": {}
-          },
-          "rhomboids": {
-            "fatigue": 0,
-            "fatigueMetabolic": 0,
-            "fatigueDamage": 0,
-            "inol": 0,
-            "fitness": 0,
-            "sets": 0,
-            "jointStress": 0,
-            "contributions": {},
-            "setsContributions": {},
-            "fatigueHistory": [
-              0,
-              0,
-              0,
-              0,
-              0,
-              0,
-              0
-            ],
-            "uniqueSets": {},
-            "weeklyInol": {
-              "1": 0
-            },
-            "weeklyTonnage": {}
-          },
-          "ankles": {
-            "fatigue": 0,
-            "fatigueMetabolic": 0,
-            "fatigueDamage": 0,
-            "inol": 0,
-            "fitness": 0,
-            "sets": 0,
-            "jointStress": 0,
-            "contributions": {},
-            "setsContributions": {},
-            "fatigueHistory": [
-              0,
-              0,
-              0,
-              0,
-              0,
-              0,
-              0
-            ],
-            "uniqueSets": {},
-            "weeklyInol": {
-              "1": 0
-            },
-            "weeklyTonnage": {}
-          },
-          "adductors": {
-            "fatigue": 0,
-            "fatigueMetabolic": 0,
-            "fatigueDamage": 0,
-            "inol": 0,
-            "fitness": 0,
-            "sets": 0,
-            "jointStress": 0,
-            "contributions": {},
-            "setsContributions": {},
-            "fatigueHistory": [
-              0,
-              0,
-              0,
-              0,
-              0,
-              0,
-              0
-            ],
-            "uniqueSets": {},
-            "weeklyInol": {
-              "1": 0
-            },
-            "weeklyTonnage": {}
-          },
-          "neck": {
-            "fatigue": 0,
-            "fatigueMetabolic": 0,
-            "fatigueDamage": 0,
-            "inol": 0,
-            "fitness": 0,
-            "sets": 0,
-            "jointStress": 0,
-            "contributions": {},
-            "setsContributions": {},
-            "fatigueHistory": [
-              0,
-              0,
-              0,
-              0,
-              0,
-              0,
-              0
-            ],
-            "uniqueSets": {},
-            "weeklyInol": {
-              "1": 0
-            },
-            "weeklyTonnage": {}
-          },
-          "hipFlexors": {
-            "fatigue": 0,
-            "fatigueMetabolic": 0,
-            "fatigueDamage": 0,
-            "inol": 0,
-            "fitness": 0,
-            "sets": 0,
-            "jointStress": 0,
-            "contributions": {},
-            "setsContributions": {},
-            "fatigueHistory": [
-              0,
-              0,
-              0,
-              0,
-              0,
-              0,
-              0
-            ],
-            "uniqueSets": {},
-            "weeklyInol": {
-              "1": 0
-            },
-            "weeklyTonnage": {}
-          },
-          "upperChest": {
-            "fatigue": 0,
-            "fatigueMetabolic": 0,
-            "fatigueDamage": 0,
-            "inol": 0,
-            "fitness": 0,
-            "sets": 0,
-            "jointStress": 0,
-            "contributions": {},
-            "setsContributions": {},
-            "fatigueHistory": [
-              0,
-              0,
-              0,
-              0,
-              0,
-              0,
-              0
-            ],
-            "uniqueSets": {},
-            "weeklyInol": {
-              "1": 0
-            },
-            "weeklyTonnage": {}
-          },
-          "lowerChest": {
-            "fatigue": 0,
-            "fatigueMetabolic": 0,
-            "fatigueDamage": 0,
-            "inol": 0,
-            "fitness": 0,
-            "sets": 0,
-            "jointStress": 0,
-            "contributions": {},
-            "setsContributions": {},
-            "fatigueHistory": [
-              0,
-              0,
-              0,
-              0,
-              0,
-              0,
-              0
-            ],
-            "uniqueSets": {},
-            "weeklyInol": {
-              "1": 0
-            },
-            "weeklyTonnage": {}
-          },
-          "innerQuad": {
-            "fatigue": 0,
-            "fatigueMetabolic": 0,
-            "fatigueDamage": 0,
-            "inol": 0,
-            "fitness": 0,
-            "sets": 0,
-            "jointStress": 0,
-            "contributions": {},
-            "setsContributions": {},
-            "fatigueHistory": [
-              0,
-              0,
-              0,
-              0,
-              0,
-              0,
-              0
-            ],
-            "uniqueSets": {},
-            "weeklyInol": {
-              "1": 0
-            },
-            "weeklyTonnage": {}
-          },
-          "outerQuad": {
-            "fatigue": 0,
-            "fatigueMetabolic": 0,
-            "fatigueDamage": 0,
-            "inol": 0,
-            "fitness": 0,
-            "sets": 0,
-            "jointStress": 0,
-            "contributions": {},
-            "setsContributions": {},
-            "fatigueHistory": [
-              0,
-              0,
-              0,
-              0,
-              0,
-              0,
-              0
-            ],
-            "uniqueSets": {},
-            "weeklyInol": {
-              "1": 0
-            },
-            "weeklyTonnage": {}
-          },
-          "upperAbs": {
-            "fatigue": 0,
-            "fatigueMetabolic": 0,
-            "fatigueDamage": 0,
-            "inol": 0,
-            "fitness": 0,
-            "sets": 0,
-            "jointStress": 0,
-            "contributions": {},
-            "setsContributions": {},
-            "fatigueHistory": [
-              0,
-              0,
-              0,
-              0,
-              0,
-              0,
-              0
-            ],
-            "uniqueSets": {},
-            "weeklyInol": {
-              "1": 0
-            },
-            "weeklyTonnage": {}
-          },
-          "lowerAbs": {
-            "fatigue": 0,
-            "fatigueMetabolic": 0,
-            "fatigueDamage": 0,
-            "inol": 0,
-            "fitness": 0,
-            "sets": 0,
-            "jointStress": 0,
-            "contributions": {},
-            "setsContributions": {},
-            "fatigueHistory": [
-              0,
-              0,
-              0,
-              0,
-              0,
-              0,
-              0
-            ],
-            "uniqueSets": {},
-            "weeklyInol": {
-              "1": 0
-            },
-            "weeklyTonnage": {}
-          },
-          "frontDeltoid": {
-            "fatigue": 0,
-            "fatigueMetabolic": 0,
-            "fatigueDamage": 0,
-            "inol": 0,
-            "fitness": 0,
-            "sets": 0,
-            "jointStress": 0,
-            "contributions": {},
-            "setsContributions": {},
-            "fatigueHistory": [
-              0,
-              0,
-              0,
-              0,
-              0,
-              0,
-              0
-            ],
-            "uniqueSets": {},
-            "weeklyInol": {
-              "1": 0
-            },
-            "weeklyTonnage": {}
-          },
-          "rearDeltoid": {
-            "fatigue": 0,
-            "fatigueMetabolic": 0,
-            "fatigueDamage": 0,
-            "inol": 0,
-            "fitness": 0,
-            "sets": 0,
-            "jointStress": 0,
-            "contributions": {},
-            "setsContributions": {},
-            "fatigueHistory": [
-              0,
-              0,
-              0,
-              0,
-              0,
-              0,
-              0
-            ],
-            "uniqueSets": {},
-            "weeklyInol": {
-              "1": 0
-            },
-            "weeklyTonnage": {}
-          },
-          "upperTrapezius": {
-            "fatigue": 0,
-            "fatigueMetabolic": 0,
-            "fatigueDamage": 0,
-            "inol": 0,
-            "fitness": 0,
-            "sets": 0,
-            "jointStress": 0,
-            "contributions": {},
-            "setsContributions": {},
-            "fatigueHistory": [
-              0,
-              0,
-              0,
-              0,
-              0,
-              0,
-              0
-            ],
-            "uniqueSets": {},
-            "weeklyInol": {
-              "1": 0
-            },
-            "weeklyTonnage": {}
-          },
-          "lowerTrapezius": {
-            "fatigue": 0,
-            "fatigueMetabolic": 0,
-            "fatigueDamage": 0,
-            "inol": 0,
-            "fitness": 0,
-            "sets": 0,
-            "jointStress": 0,
-            "contributions": {},
-            "setsContributions": {},
-            "fatigueHistory": [
-              0,
-              0,
-              0,
-              0,
-              0,
-              0,
-              0
-            ],
-            "uniqueSets": {},
-            "weeklyInol": {
-              "1": 0
-            },
-            "weeklyTonnage": {}
-          }
+          "sncFatigue": 0.13340172,
+          "chronicSncStress": 0.55664985,
+          "dayIndex": 6,
+          "pushSets": 0,
+          "pullSets": 3,
+          "legsSets": 0,
+          "axialSncLoad": 0
         }
       },
       "resPulldown": {
@@ -1982,6 +2595,15 @@
             "jointStress": 0,
             "readiness": 0,
             "fatigueHistory": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "fitnessHistory": [
               0,
               0,
               0,
@@ -2015,6 +2637,15 @@
               0.02,
               0.01,
               0.01
+            ],
+            "fitnessHistory": [
+              0.52,
+              0.51,
+              0.5,
+              0.49,
+              0.48,
+              0.47,
+              0.46
             ]
           },
           "calves": {
@@ -2028,6 +2659,15 @@
             "jointStress": 0,
             "readiness": 0,
             "fatigueHistory": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "fitnessHistory": [
               0,
               0,
               0,
@@ -2055,6 +2695,15 @@
               0,
               0,
               0
+            ],
+            "fitnessHistory": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
             ]
           },
           "deltoids": {
@@ -2068,6 +2717,15 @@
             "jointStress": 0,
             "readiness": 0,
             "fatigueHistory": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "fitnessHistory": [
               0,
               0,
               0,
@@ -2101,6 +2759,15 @@
               0.01,
               0,
               0
+            ],
+            "fitnessHistory": [
+              0.23,
+              0.23,
+              0.22,
+              0.22,
+              0.21,
+              0.21,
+              0.2
             ]
           },
           "gluteal": {
@@ -2114,6 +2781,15 @@
             "jointStress": 0,
             "readiness": 0,
             "fatigueHistory": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "fitnessHistory": [
               0,
               0,
               0,
@@ -2141,6 +2817,15 @@
               0,
               0,
               0
+            ],
+            "fitnessHistory": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
             ]
           },
           "lowerBack": {
@@ -2154,6 +2839,15 @@
             "jointStress": 0,
             "readiness": 0,
             "fatigueHistory": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "fitnessHistory": [
               0,
               0,
               0,
@@ -2181,6 +2875,15 @@
               0,
               0,
               0
+            ],
+            "fitnessHistory": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
             ]
           },
           "quadriceps": {
@@ -2201,6 +2904,15 @@
               0,
               0,
               0
+            ],
+            "fitnessHistory": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
             ]
           },
           "tibialis": {
@@ -2214,6 +2926,15 @@
             "jointStress": 0,
             "readiness": 0,
             "fatigueHistory": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "fitnessHistory": [
               0,
               0,
               0,
@@ -2247,6 +2968,15 @@
               0.03,
               0.02,
               0.02
+            ],
+            "fitnessHistory": [
+              0.34,
+              0.33,
+              0.32,
+              0.31,
+              0.31,
+              0.3,
+              0.29
             ]
           },
           "triceps": {
@@ -2260,6 +2990,15 @@
             "jointStress": 0,
             "readiness": 0,
             "fatigueHistory": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "fitnessHistory": [
               0,
               0,
               0,
@@ -2293,6 +3032,15 @@
               0.09,
               0.06,
               0.04
+            ],
+            "fitnessHistory": [
+              0.89,
+              0.87,
+              0.85,
+              0.83,
+              0.81,
+              0.79,
+              0.78
             ]
           },
           "rotatorCuff": {
@@ -2306,6 +3054,15 @@
             "jointStress": 0,
             "readiness": 0,
             "fatigueHistory": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "fitnessHistory": [
               0,
               0,
               0,
@@ -2333,6 +3090,15 @@
               0,
               0,
               0
+            ],
+            "fitnessHistory": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
             ]
           },
           "rhomboids": {
@@ -2346,6 +3112,15 @@
             "jointStress": 0,
             "readiness": 0,
             "fatigueHistory": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "fitnessHistory": [
               0,
               0,
               0,
@@ -2373,6 +3148,15 @@
               0,
               0,
               0
+            ],
+            "fitnessHistory": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
             ]
           },
           "adductors": {
@@ -2386,6 +3170,15 @@
             "jointStress": 0,
             "readiness": 0,
             "fatigueHistory": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "fitnessHistory": [
               0,
               0,
               0,
@@ -2413,6 +3206,15 @@
               0,
               0,
               0
+            ],
+            "fitnessHistory": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
             ]
           },
           "hipFlexors": {
@@ -2426,6 +3228,15 @@
             "jointStress": 0,
             "readiness": 0,
             "fatigueHistory": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "fitnessHistory": [
               0,
               0,
               0,
@@ -2453,6 +3264,15 @@
               0,
               0,
               0
+            ],
+            "fitnessHistory": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
             ]
           },
           "lowerChest": {
@@ -2466,6 +3286,15 @@
             "jointStress": 0,
             "readiness": 0,
             "fatigueHistory": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "fitnessHistory": [
               0,
               0,
               0,
@@ -2493,6 +3322,15 @@
               0,
               0,
               0
+            ],
+            "fitnessHistory": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
             ]
           },
           "outerQuad": {
@@ -2506,6 +3344,15 @@
             "jointStress": 0,
             "readiness": 0,
             "fatigueHistory": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "fitnessHistory": [
               0,
               0,
               0,
@@ -2533,6 +3380,15 @@
               0,
               0,
               0
+            ],
+            "fitnessHistory": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
             ]
           },
           "lowerAbs": {
@@ -2546,6 +3402,15 @@
             "jointStress": 0,
             "readiness": 0,
             "fatigueHistory": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "fitnessHistory": [
               0,
               0,
               0,
@@ -2573,6 +3438,15 @@
               0,
               0,
               0
+            ],
+            "fitnessHistory": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
             ]
           },
           "rearDeltoid": {
@@ -2586,6 +3460,15 @@
             "jointStress": 0,
             "readiness": 0,
             "fatigueHistory": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "fitnessHistory": [
               0,
               0,
               0,
@@ -2613,6 +3496,15 @@
               0,
               0,
               0
+            ],
+            "fitnessHistory": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
             ]
           },
           "lowerTrapezius": {
@@ -2633,16 +3525,25 @@
               0,
               0,
               0
+            ],
+            "fitnessHistory": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
             ]
           }
         },
-        "sncScore": 0,
-        "sncPercentage": 0,
+        "sncScore": 0.11,
+        "sncPercentage": 1,
         "cnsFailure": false,
         "chronicSncStress": 0.46,
         "junkVolumeAlerts": [],
-        "globalWorkCapacity": 99.8,
-        "systemicReadiness": 99.8,
+        "globalWorkCapacity": 99.3,
+        "systemicReadiness": 99.3,
         "topSurcharged": [],
         "topNeglected": [
           {
@@ -2656,6 +3557,15 @@
             "jointStress": 0,
             "readiness": 0,
             "fatigueHistory": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "fitnessHistory": [
               0,
               0,
               0,
@@ -2683,6 +3593,15 @@
               0,
               0,
               0
+            ],
+            "fitnessHistory": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
             ]
           },
           {
@@ -2696,6 +3615,15 @@
             "jointStress": 0,
             "readiness": 0,
             "fatigueHistory": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "fitnessHistory": [
               0,
               0,
               0,
@@ -2762,6 +3690,7 @@
         "progressiveOverload": {},
         "injuryPredictions": [],
         "monotonyAlerts": [],
+        "globalAcwr": 1,
         "tensors": {
           "abs": [
             0,
@@ -3053,830 +3982,1127 @@
           ]
         },
         "finalState": {
-          "abs": {
-            "fatigue": 0,
-            "fatigueMetabolic": 0,
-            "fatigueDamage": 0,
-            "inol": 0,
-            "fitness": 0,
-            "sets": 0,
-            "jointStress": 0,
-            "contributions": {},
-            "setsContributions": {},
-            "fatigueHistory": [
-              0,
-              0,
-              0,
-              0,
-              0,
-              0,
-              0
-            ],
-            "uniqueSets": {},
-            "weeklyInol": {
-              "1": 0
+          "muscles": {
+            "abs": {
+              "fatigue": 0,
+              "fatigueMetabolic": 0,
+              "fatigueDamage": 0,
+              "inol": 0,
+              "fitness": 0,
+              "sets": 0,
+              "jointStress": 0,
+              "contributions": {},
+              "setsContributions": {},
+              "fatigueHistory": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              "fitnessHistory": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              "uniqueSets": {},
+              "weeklyInol": {
+                "1": 0
+              },
+              "weeklyTonnage": {}
             },
-            "weeklyTonnage": {}
-          },
-          "biceps": {
-            "fatigue": 0.00538704,
-            "fatigueMetabolic": 0.00000775,
-            "fatigueDamage": 0.00537929,
-            "inol": 0.4338843,
-            "fitness": 0.45566875,
-            "sets": 1.5,
-            "jointStress": 0.11014177,
-            "contributions": {
-              "Tirage Poitrine Poulie": 0.01344822
+            "biceps": {
+              "fatigue": 0.00538704,
+              "fatigueMetabolic": 0.00000775,
+              "fatigueDamage": 0.00537929,
+              "inol": 0.4338843,
+              "fitness": 0.45566875,
+              "sets": 1.5,
+              "jointStress": 0.11014177,
+              "contributions": {
+                "Tirage Poitrine Poulie": 0.01344822
+              },
+              "setsContributions": {
+                "Tirage Poitrine Poulie": 1.5
+              },
+              "fatigueHistory": [
+                0.4338843,
+                0.14310297,
+                0.0625858,
+                0.03197537,
+                0.017375,
+                0.00964194,
+                0.00538704
+              ],
+              "fitnessHistory": [
+                0.52066116,
+                0.50921852,
+                0.49802736,
+                0.48708215,
+                0.47637748,
+                0.46590807,
+                0.45566875
+              ],
+              "uniqueSets": {},
+              "weeklyInol": {
+                "1": 0.4338842975206612
+              },
+              "weeklyTonnage": {
+                "1": 900
+              }
             },
-            "setsContributions": {
-              "Tirage Poitrine Poulie": 1.5
+            "calves": {
+              "fatigue": 0,
+              "fatigueMetabolic": 0,
+              "fatigueDamage": 0,
+              "inol": 0,
+              "fitness": 0,
+              "sets": 0,
+              "jointStress": 0,
+              "contributions": {},
+              "setsContributions": {},
+              "fatigueHistory": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              "fitnessHistory": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              "uniqueSets": {},
+              "weeklyInol": {
+                "1": 0
+              },
+              "weeklyTonnage": {}
             },
-            "fatigueHistory": [
-              0.4338843,
-              0.14310297,
-              0.0625858,
-              0.03197537,
-              0.017375,
-              0.00964194,
-              0.00538704
-            ],
-            "uniqueSets": {},
-            "weeklyInol": {
-              "1": 0.4338842975206612
+            "chest": {
+              "fatigue": 0,
+              "fatigueMetabolic": 0,
+              "fatigueDamage": 0,
+              "inol": 0,
+              "fitness": 0,
+              "sets": 0,
+              "jointStress": 0,
+              "contributions": {},
+              "setsContributions": {},
+              "fatigueHistory": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              "fitnessHistory": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              "uniqueSets": {},
+              "weeklyInol": {
+                "1": 0
+              },
+              "weeklyTonnage": {}
             },
-            "weeklyTonnage": {
-              "1": 900
+            "deltoids": {
+              "fatigue": 0,
+              "fatigueMetabolic": 0,
+              "fatigueDamage": 0,
+              "inol": 0,
+              "fitness": 0,
+              "sets": 0,
+              "jointStress": 0,
+              "contributions": {},
+              "setsContributions": {},
+              "fatigueHistory": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              "fitnessHistory": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              "uniqueSets": {},
+              "weeklyInol": {
+                "1": 0
+              },
+              "weeklyTonnage": {}
+            },
+            "forearm": {
+              "fatigue": 0.00240528,
+              "fatigueMetabolic": 0.00000346,
+              "fatigueDamage": 0.00240182,
+              "inol": 0.19372694,
+              "fitness": 0.20345358,
+              "sets": 0.6,
+              "jointStress": 0.04405671,
+              "contributions": {
+                "Tirage Poitrine Poulie": 0.00600456
+              },
+              "setsContributions": {
+                "Tirage Poitrine Poulie": 0.6
+              },
+              "fatigueHistory": [
+                0.19372693,
+                0.06389468,
+                0.02794421,
+                0.01427682,
+                0.00775784,
+                0.00430507,
+                0.00240528
+              ],
+              "fitnessHistory": [
+                0.23247232,
+                0.22736325,
+                0.22236646,
+                0.21747948,
+                0.21269991,
+                0.20802538,
+                0.20345358
+              ],
+              "uniqueSets": {},
+              "weeklyInol": {
+                "1": 0.1937269372693727
+              },
+              "weeklyTonnage": {
+                "1": 360
+              }
+            },
+            "gluteal": {
+              "fatigue": 0,
+              "fatigueMetabolic": 0,
+              "fatigueDamage": 0,
+              "inol": 0,
+              "fitness": 0,
+              "sets": 0,
+              "jointStress": 0,
+              "contributions": {},
+              "setsContributions": {},
+              "fatigueHistory": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              "fitnessHistory": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              "uniqueSets": {},
+              "weeklyInol": {
+                "1": 0
+              },
+              "weeklyTonnage": {}
+            },
+            "hamstring": {
+              "fatigue": 0,
+              "fatigueMetabolic": 0,
+              "fatigueDamage": 0,
+              "inol": 0,
+              "fitness": 0,
+              "sets": 0,
+              "jointStress": 0,
+              "contributions": {},
+              "setsContributions": {},
+              "fatigueHistory": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              "fitnessHistory": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              "uniqueSets": {},
+              "weeklyInol": {
+                "1": 0
+              },
+              "weeklyTonnage": {}
+            },
+            "lowerBack": {
+              "fatigue": 0,
+              "fatigueMetabolic": 0,
+              "fatigueDamage": 0,
+              "inol": 0,
+              "fitness": 0,
+              "sets": 0,
+              "jointStress": 0,
+              "contributions": {},
+              "setsContributions": {},
+              "fatigueHistory": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              "fitnessHistory": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              "uniqueSets": {},
+              "weeklyInol": {
+                "1": 0
+              },
+              "weeklyTonnage": {}
+            },
+            "obliques": {
+              "fatigue": 0,
+              "fatigueMetabolic": 0,
+              "fatigueDamage": 0,
+              "inol": 0,
+              "fitness": 0,
+              "sets": 0,
+              "jointStress": 0,
+              "contributions": {},
+              "setsContributions": {},
+              "fatigueHistory": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              "fitnessHistory": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              "uniqueSets": {},
+              "weeklyInol": {
+                "1": 0
+              },
+              "weeklyTonnage": {}
+            },
+            "quadriceps": {
+              "fatigue": 0,
+              "fatigueMetabolic": 0,
+              "fatigueDamage": 0,
+              "inol": 0,
+              "fitness": 0,
+              "sets": 0,
+              "jointStress": 0,
+              "contributions": {},
+              "setsContributions": {},
+              "fatigueHistory": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              "fitnessHistory": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              "uniqueSets": {},
+              "weeklyInol": {
+                "1": 0
+              },
+              "weeklyTonnage": {}
+            },
+            "tibialis": {
+              "fatigue": 0,
+              "fatigueMetabolic": 0,
+              "fatigueDamage": 0,
+              "inol": 0,
+              "fitness": 0,
+              "sets": 0,
+              "jointStress": 0,
+              "contributions": {},
+              "setsContributions": {},
+              "fatigueHistory": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              "fitnessHistory": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              "uniqueSets": {},
+              "weeklyInol": {
+                "1": 0
+              },
+              "weeklyTonnage": {}
+            },
+            "trapezius": {
+              "fatigue": 0.01556015,
+              "fatigueMetabolic": 0.00041606,
+              "fatigueDamage": 0.01514409,
+              "inol": 0.27975133,
+              "fitness": 0.29379708,
+              "sets": 3,
+              "jointStress": 0.09552859,
+              "contributions": {
+                "Tirage Poitrine Poulie": 0.03786022
+              },
+              "setsContributions": {
+                "Tirage Poitrine Poulie": 0.9
+              },
+              "fatigueHistory": [
+                0.27975133,
+                0.14192909,
+                0.08016779,
+                0.04952271,
+                0.03257095,
+                0.02226625,
+                0.01556015
+              ],
+              "fitnessHistory": [
+                0.3357016,
+                0.32832384,
+                0.32110823,
+                0.31405119,
+                0.30714925,
+                0.30039899,
+                0.29379708
+              ],
+              "uniqueSets": {},
+              "weeklyInol": {
+                "1": 0.27975133
+              },
+              "weeklyTonnage": {
+                "1": 540
+              }
+            },
+            "triceps": {
+              "fatigue": 0,
+              "fatigueMetabolic": 0,
+              "fatigueDamage": 0,
+              "inol": 0,
+              "fitness": 0,
+              "sets": 0,
+              "jointStress": 0,
+              "contributions": {},
+              "setsContributions": {},
+              "fatigueHistory": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              "fitnessHistory": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              "uniqueSets": {},
+              "weeklyInol": {
+                "1": 0
+              },
+              "weeklyTonnage": {}
+            },
+            "upperBack": {
+              "fatigue": 0.04112847,
+              "fatigueMetabolic": 0.00109973,
+              "fatigueDamage": 0.04002874,
+              "inol": 0.73943662,
+              "fitness": 0.77656224,
+              "sets": 3,
+              "jointStress": 0.3184286,
+              "contributions": {
+                "Tirage Poitrine Poulie": 0.10007187
+              },
+              "setsContributions": {
+                "Tirage Poitrine Poulie": 3
+              },
+              "fatigueHistory": [
+                0.73943662,
+                0.37514592,
+                0.21189889,
+                0.13089804,
+                0.0860913,
+                0.05885398,
+                0.04112847
+              ],
+              "fitnessHistory": [
+                0.88732394,
+                0.86782311,
+                0.84875085,
+                0.83009774,
+                0.81185458,
+                0.79401235,
+                0.77656224
+              ],
+              "uniqueSets": {},
+              "weeklyInol": {
+                "1": 0.73943662
+              },
+              "weeklyTonnage": {
+                "1": 1800
+              }
+            },
+            "rotatorCuff": {
+              "fatigue": 0,
+              "fatigueMetabolic": 0,
+              "fatigueDamage": 0,
+              "inol": 0,
+              "fitness": 0,
+              "sets": 0,
+              "jointStress": 0,
+              "contributions": {},
+              "setsContributions": {},
+              "fatigueHistory": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              "fitnessHistory": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              "uniqueSets": {},
+              "weeklyInol": {
+                "1": 0
+              },
+              "weeklyTonnage": {}
+            },
+            "serratus": {
+              "fatigue": 0,
+              "fatigueMetabolic": 0,
+              "fatigueDamage": 0,
+              "inol": 0,
+              "fitness": 0,
+              "sets": 0,
+              "jointStress": 0,
+              "contributions": {},
+              "setsContributions": {},
+              "fatigueHistory": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              "fitnessHistory": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              "uniqueSets": {},
+              "weeklyInol": {
+                "1": 0
+              },
+              "weeklyTonnage": {}
+            },
+            "rhomboids": {
+              "fatigue": 0,
+              "fatigueMetabolic": 0,
+              "fatigueDamage": 0,
+              "inol": 0,
+              "fitness": 0,
+              "sets": 0,
+              "jointStress": 0,
+              "contributions": {},
+              "setsContributions": {},
+              "fatigueHistory": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              "fitnessHistory": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              "uniqueSets": {},
+              "weeklyInol": {
+                "1": 0
+              },
+              "weeklyTonnage": {}
+            },
+            "ankles": {
+              "fatigue": 0,
+              "fatigueMetabolic": 0,
+              "fatigueDamage": 0,
+              "inol": 0,
+              "fitness": 0,
+              "sets": 0,
+              "jointStress": 0,
+              "contributions": {},
+              "setsContributions": {},
+              "fatigueHistory": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              "fitnessHistory": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              "uniqueSets": {},
+              "weeklyInol": {
+                "1": 0
+              },
+              "weeklyTonnage": {}
+            },
+            "adductors": {
+              "fatigue": 0,
+              "fatigueMetabolic": 0,
+              "fatigueDamage": 0,
+              "inol": 0,
+              "fitness": 0,
+              "sets": 0,
+              "jointStress": 0,
+              "contributions": {},
+              "setsContributions": {},
+              "fatigueHistory": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              "fitnessHistory": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              "uniqueSets": {},
+              "weeklyInol": {
+                "1": 0
+              },
+              "weeklyTonnage": {}
+            },
+            "neck": {
+              "fatigue": 0,
+              "fatigueMetabolic": 0,
+              "fatigueDamage": 0,
+              "inol": 0,
+              "fitness": 0,
+              "sets": 0,
+              "jointStress": 0,
+              "contributions": {},
+              "setsContributions": {},
+              "fatigueHistory": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              "fitnessHistory": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              "uniqueSets": {},
+              "weeklyInol": {
+                "1": 0
+              },
+              "weeklyTonnage": {}
+            },
+            "hipFlexors": {
+              "fatigue": 0,
+              "fatigueMetabolic": 0,
+              "fatigueDamage": 0,
+              "inol": 0,
+              "fitness": 0,
+              "sets": 0,
+              "jointStress": 0,
+              "contributions": {},
+              "setsContributions": {},
+              "fatigueHistory": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              "fitnessHistory": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              "uniqueSets": {},
+              "weeklyInol": {
+                "1": 0
+              },
+              "weeklyTonnage": {}
+            },
+            "upperChest": {
+              "fatigue": 0,
+              "fatigueMetabolic": 0,
+              "fatigueDamage": 0,
+              "inol": 0,
+              "fitness": 0,
+              "sets": 0,
+              "jointStress": 0,
+              "contributions": {},
+              "setsContributions": {},
+              "fatigueHistory": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              "fitnessHistory": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              "uniqueSets": {},
+              "weeklyInol": {
+                "1": 0
+              },
+              "weeklyTonnage": {}
+            },
+            "lowerChest": {
+              "fatigue": 0,
+              "fatigueMetabolic": 0,
+              "fatigueDamage": 0,
+              "inol": 0,
+              "fitness": 0,
+              "sets": 0,
+              "jointStress": 0,
+              "contributions": {},
+              "setsContributions": {},
+              "fatigueHistory": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              "fitnessHistory": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              "uniqueSets": {},
+              "weeklyInol": {
+                "1": 0
+              },
+              "weeklyTonnage": {}
+            },
+            "innerQuad": {
+              "fatigue": 0,
+              "fatigueMetabolic": 0,
+              "fatigueDamage": 0,
+              "inol": 0,
+              "fitness": 0,
+              "sets": 0,
+              "jointStress": 0,
+              "contributions": {},
+              "setsContributions": {},
+              "fatigueHistory": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              "fitnessHistory": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              "uniqueSets": {},
+              "weeklyInol": {
+                "1": 0
+              },
+              "weeklyTonnage": {}
+            },
+            "outerQuad": {
+              "fatigue": 0,
+              "fatigueMetabolic": 0,
+              "fatigueDamage": 0,
+              "inol": 0,
+              "fitness": 0,
+              "sets": 0,
+              "jointStress": 0,
+              "contributions": {},
+              "setsContributions": {},
+              "fatigueHistory": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              "fitnessHistory": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              "uniqueSets": {},
+              "weeklyInol": {
+                "1": 0
+              },
+              "weeklyTonnage": {}
+            },
+            "upperAbs": {
+              "fatigue": 0,
+              "fatigueMetabolic": 0,
+              "fatigueDamage": 0,
+              "inol": 0,
+              "fitness": 0,
+              "sets": 0,
+              "jointStress": 0,
+              "contributions": {},
+              "setsContributions": {},
+              "fatigueHistory": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              "fitnessHistory": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              "uniqueSets": {},
+              "weeklyInol": {
+                "1": 0
+              },
+              "weeklyTonnage": {}
+            },
+            "lowerAbs": {
+              "fatigue": 0,
+              "fatigueMetabolic": 0,
+              "fatigueDamage": 0,
+              "inol": 0,
+              "fitness": 0,
+              "sets": 0,
+              "jointStress": 0,
+              "contributions": {},
+              "setsContributions": {},
+              "fatigueHistory": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              "fitnessHistory": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              "uniqueSets": {},
+              "weeklyInol": {
+                "1": 0
+              },
+              "weeklyTonnage": {}
+            },
+            "frontDeltoid": {
+              "fatigue": 0,
+              "fatigueMetabolic": 0,
+              "fatigueDamage": 0,
+              "inol": 0,
+              "fitness": 0,
+              "sets": 0,
+              "jointStress": 0,
+              "contributions": {},
+              "setsContributions": {},
+              "fatigueHistory": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              "fitnessHistory": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              "uniqueSets": {},
+              "weeklyInol": {
+                "1": 0
+              },
+              "weeklyTonnage": {}
+            },
+            "rearDeltoid": {
+              "fatigue": 0,
+              "fatigueMetabolic": 0,
+              "fatigueDamage": 0,
+              "inol": 0,
+              "fitness": 0,
+              "sets": 0,
+              "jointStress": 0,
+              "contributions": {},
+              "setsContributions": {},
+              "fatigueHistory": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              "fitnessHistory": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              "uniqueSets": {},
+              "weeklyInol": {
+                "1": 0
+              },
+              "weeklyTonnage": {}
+            },
+            "upperTrapezius": {
+              "fatigue": 0,
+              "fatigueMetabolic": 0,
+              "fatigueDamage": 0,
+              "inol": 0,
+              "fitness": 0,
+              "sets": 0,
+              "jointStress": 0,
+              "contributions": {},
+              "setsContributions": {},
+              "fatigueHistory": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              "fitnessHistory": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              "uniqueSets": {},
+              "weeklyInol": {
+                "1": 0
+              },
+              "weeklyTonnage": {}
+            },
+            "lowerTrapezius": {
+              "fatigue": 0,
+              "fatigueMetabolic": 0,
+              "fatigueDamage": 0,
+              "inol": 0,
+              "fitness": 0,
+              "sets": 0,
+              "jointStress": 0,
+              "contributions": {},
+              "setsContributions": {},
+              "fatigueHistory": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              "fitnessHistory": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              "uniqueSets": {},
+              "weeklyInol": {
+                "1": 0
+              },
+              "weeklyTonnage": {}
             }
           },
-          "calves": {
-            "fatigue": 0,
-            "fatigueMetabolic": 0,
-            "fatigueDamage": 0,
-            "inol": 0,
-            "fitness": 0,
-            "sets": 0,
-            "jointStress": 0,
-            "contributions": {},
-            "setsContributions": {},
-            "fatigueHistory": [
-              0,
-              0,
-              0,
-              0,
-              0,
-              0,
-              0
-            ],
-            "uniqueSets": {},
-            "weeklyInol": {
-              "1": 0
-            },
-            "weeklyTonnage": {}
-          },
-          "chest": {
-            "fatigue": 0,
-            "fatigueMetabolic": 0,
-            "fatigueDamage": 0,
-            "inol": 0,
-            "fitness": 0,
-            "sets": 0,
-            "jointStress": 0,
-            "contributions": {},
-            "setsContributions": {},
-            "fatigueHistory": [
-              0,
-              0,
-              0,
-              0,
-              0,
-              0,
-              0
-            ],
-            "uniqueSets": {},
-            "weeklyInol": {
-              "1": 0
-            },
-            "weeklyTonnage": {}
-          },
-          "deltoids": {
-            "fatigue": 0,
-            "fatigueMetabolic": 0,
-            "fatigueDamage": 0,
-            "inol": 0,
-            "fitness": 0,
-            "sets": 0,
-            "jointStress": 0,
-            "contributions": {},
-            "setsContributions": {},
-            "fatigueHistory": [
-              0,
-              0,
-              0,
-              0,
-              0,
-              0,
-              0
-            ],
-            "uniqueSets": {},
-            "weeklyInol": {
-              "1": 0
-            },
-            "weeklyTonnage": {}
-          },
-          "forearm": {
-            "fatigue": 0.00240528,
-            "fatigueMetabolic": 0.00000346,
-            "fatigueDamage": 0.00240182,
-            "inol": 0.19372694,
-            "fitness": 0.20345358,
-            "sets": 0.6,
-            "jointStress": 0.04405671,
-            "contributions": {
-              "Tirage Poitrine Poulie": 0.00600456
-            },
-            "setsContributions": {
-              "Tirage Poitrine Poulie": 0.6
-            },
-            "fatigueHistory": [
-              0.19372693,
-              0.06389468,
-              0.02794421,
-              0.01427682,
-              0.00775784,
-              0.00430507,
-              0.00240528
-            ],
-            "uniqueSets": {},
-            "weeklyInol": {
-              "1": 0.1937269372693727
-            },
-            "weeklyTonnage": {
-              "1": 360
-            }
-          },
-          "gluteal": {
-            "fatigue": 0,
-            "fatigueMetabolic": 0,
-            "fatigueDamage": 0,
-            "inol": 0,
-            "fitness": 0,
-            "sets": 0,
-            "jointStress": 0,
-            "contributions": {},
-            "setsContributions": {},
-            "fatigueHistory": [
-              0,
-              0,
-              0,
-              0,
-              0,
-              0,
-              0
-            ],
-            "uniqueSets": {},
-            "weeklyInol": {
-              "1": 0
-            },
-            "weeklyTonnage": {}
-          },
-          "hamstring": {
-            "fatigue": 0,
-            "fatigueMetabolic": 0,
-            "fatigueDamage": 0,
-            "inol": 0,
-            "fitness": 0,
-            "sets": 0,
-            "jointStress": 0,
-            "contributions": {},
-            "setsContributions": {},
-            "fatigueHistory": [
-              0,
-              0,
-              0,
-              0,
-              0,
-              0,
-              0
-            ],
-            "uniqueSets": {},
-            "weeklyInol": {
-              "1": 0
-            },
-            "weeklyTonnage": {}
-          },
-          "lowerBack": {
-            "fatigue": 0,
-            "fatigueMetabolic": 0,
-            "fatigueDamage": 0,
-            "inol": 0,
-            "fitness": 0,
-            "sets": 0,
-            "jointStress": 0,
-            "contributions": {},
-            "setsContributions": {},
-            "fatigueHistory": [
-              0,
-              0,
-              0,
-              0,
-              0,
-              0,
-              0
-            ],
-            "uniqueSets": {},
-            "weeklyInol": {
-              "1": 0
-            },
-            "weeklyTonnage": {}
-          },
-          "obliques": {
-            "fatigue": 0,
-            "fatigueMetabolic": 0,
-            "fatigueDamage": 0,
-            "inol": 0,
-            "fitness": 0,
-            "sets": 0,
-            "jointStress": 0,
-            "contributions": {},
-            "setsContributions": {},
-            "fatigueHistory": [
-              0,
-              0,
-              0,
-              0,
-              0,
-              0,
-              0
-            ],
-            "uniqueSets": {},
-            "weeklyInol": {
-              "1": 0
-            },
-            "weeklyTonnage": {}
-          },
-          "quadriceps": {
-            "fatigue": 0,
-            "fatigueMetabolic": 0,
-            "fatigueDamage": 0,
-            "inol": 0,
-            "fitness": 0,
-            "sets": 0,
-            "jointStress": 0,
-            "contributions": {},
-            "setsContributions": {},
-            "fatigueHistory": [
-              0,
-              0,
-              0,
-              0,
-              0,
-              0,
-              0
-            ],
-            "uniqueSets": {},
-            "weeklyInol": {
-              "1": 0
-            },
-            "weeklyTonnage": {}
-          },
-          "tibialis": {
-            "fatigue": 0,
-            "fatigueMetabolic": 0,
-            "fatigueDamage": 0,
-            "inol": 0,
-            "fitness": 0,
-            "sets": 0,
-            "jointStress": 0,
-            "contributions": {},
-            "setsContributions": {},
-            "fatigueHistory": [
-              0,
-              0,
-              0,
-              0,
-              0,
-              0,
-              0
-            ],
-            "uniqueSets": {},
-            "weeklyInol": {
-              "1": 0
-            },
-            "weeklyTonnage": {}
-          },
-          "trapezius": {
-            "fatigue": 0.01556015,
-            "fatigueMetabolic": 0.00041606,
-            "fatigueDamage": 0.01514409,
-            "inol": 0.27975133,
-            "fitness": 0.29379708,
-            "sets": 3,
-            "jointStress": 0.09552859,
-            "contributions": {
-              "Tirage Poitrine Poulie": 0.03786022
-            },
-            "setsContributions": {
-              "Tirage Poitrine Poulie": 0.9
-            },
-            "fatigueHistory": [
-              0.27975133,
-              0.14192909,
-              0.08016779,
-              0.04952271,
-              0.03257095,
-              0.02226625,
-              0.01556015
-            ],
-            "uniqueSets": {},
-            "weeklyInol": {
-              "1": 0.27975133
-            },
-            "weeklyTonnage": {
-              "1": 540
-            }
-          },
-          "triceps": {
-            "fatigue": 0,
-            "fatigueMetabolic": 0,
-            "fatigueDamage": 0,
-            "inol": 0,
-            "fitness": 0,
-            "sets": 0,
-            "jointStress": 0,
-            "contributions": {},
-            "setsContributions": {},
-            "fatigueHistory": [
-              0,
-              0,
-              0,
-              0,
-              0,
-              0,
-              0
-            ],
-            "uniqueSets": {},
-            "weeklyInol": {
-              "1": 0
-            },
-            "weeklyTonnage": {}
-          },
-          "upperBack": {
-            "fatigue": 0.04112847,
-            "fatigueMetabolic": 0.00109973,
-            "fatigueDamage": 0.04002874,
-            "inol": 0.73943662,
-            "fitness": 0.77656224,
-            "sets": 3,
-            "jointStress": 0.3184286,
-            "contributions": {
-              "Tirage Poitrine Poulie": 0.10007187
-            },
-            "setsContributions": {
-              "Tirage Poitrine Poulie": 3
-            },
-            "fatigueHistory": [
-              0.73943662,
-              0.37514592,
-              0.21189889,
-              0.13089804,
-              0.0860913,
-              0.05885398,
-              0.04112847
-            ],
-            "uniqueSets": {},
-            "weeklyInol": {
-              "1": 0.73943662
-            },
-            "weeklyTonnage": {
-              "1": 1800
-            }
-          },
-          "rotatorCuff": {
-            "fatigue": 0,
-            "fatigueMetabolic": 0,
-            "fatigueDamage": 0,
-            "inol": 0,
-            "fitness": 0,
-            "sets": 0,
-            "jointStress": 0,
-            "contributions": {},
-            "setsContributions": {},
-            "fatigueHistory": [
-              0,
-              0,
-              0,
-              0,
-              0,
-              0,
-              0
-            ],
-            "uniqueSets": {},
-            "weeklyInol": {
-              "1": 0
-            },
-            "weeklyTonnage": {}
-          },
-          "serratus": {
-            "fatigue": 0,
-            "fatigueMetabolic": 0,
-            "fatigueDamage": 0,
-            "inol": 0,
-            "fitness": 0,
-            "sets": 0,
-            "jointStress": 0,
-            "contributions": {},
-            "setsContributions": {},
-            "fatigueHistory": [
-              0,
-              0,
-              0,
-              0,
-              0,
-              0,
-              0
-            ],
-            "uniqueSets": {},
-            "weeklyInol": {
-              "1": 0
-            },
-            "weeklyTonnage": {}
-          },
-          "rhomboids": {
-            "fatigue": 0,
-            "fatigueMetabolic": 0,
-            "fatigueDamage": 0,
-            "inol": 0,
-            "fitness": 0,
-            "sets": 0,
-            "jointStress": 0,
-            "contributions": {},
-            "setsContributions": {},
-            "fatigueHistory": [
-              0,
-              0,
-              0,
-              0,
-              0,
-              0,
-              0
-            ],
-            "uniqueSets": {},
-            "weeklyInol": {
-              "1": 0
-            },
-            "weeklyTonnage": {}
-          },
-          "ankles": {
-            "fatigue": 0,
-            "fatigueMetabolic": 0,
-            "fatigueDamage": 0,
-            "inol": 0,
-            "fitness": 0,
-            "sets": 0,
-            "jointStress": 0,
-            "contributions": {},
-            "setsContributions": {},
-            "fatigueHistory": [
-              0,
-              0,
-              0,
-              0,
-              0,
-              0,
-              0
-            ],
-            "uniqueSets": {},
-            "weeklyInol": {
-              "1": 0
-            },
-            "weeklyTonnage": {}
-          },
-          "adductors": {
-            "fatigue": 0,
-            "fatigueMetabolic": 0,
-            "fatigueDamage": 0,
-            "inol": 0,
-            "fitness": 0,
-            "sets": 0,
-            "jointStress": 0,
-            "contributions": {},
-            "setsContributions": {},
-            "fatigueHistory": [
-              0,
-              0,
-              0,
-              0,
-              0,
-              0,
-              0
-            ],
-            "uniqueSets": {},
-            "weeklyInol": {
-              "1": 0
-            },
-            "weeklyTonnage": {}
-          },
-          "neck": {
-            "fatigue": 0,
-            "fatigueMetabolic": 0,
-            "fatigueDamage": 0,
-            "inol": 0,
-            "fitness": 0,
-            "sets": 0,
-            "jointStress": 0,
-            "contributions": {},
-            "setsContributions": {},
-            "fatigueHistory": [
-              0,
-              0,
-              0,
-              0,
-              0,
-              0,
-              0
-            ],
-            "uniqueSets": {},
-            "weeklyInol": {
-              "1": 0
-            },
-            "weeklyTonnage": {}
-          },
-          "hipFlexors": {
-            "fatigue": 0,
-            "fatigueMetabolic": 0,
-            "fatigueDamage": 0,
-            "inol": 0,
-            "fitness": 0,
-            "sets": 0,
-            "jointStress": 0,
-            "contributions": {},
-            "setsContributions": {},
-            "fatigueHistory": [
-              0,
-              0,
-              0,
-              0,
-              0,
-              0,
-              0
-            ],
-            "uniqueSets": {},
-            "weeklyInol": {
-              "1": 0
-            },
-            "weeklyTonnage": {}
-          },
-          "upperChest": {
-            "fatigue": 0,
-            "fatigueMetabolic": 0,
-            "fatigueDamage": 0,
-            "inol": 0,
-            "fitness": 0,
-            "sets": 0,
-            "jointStress": 0,
-            "contributions": {},
-            "setsContributions": {},
-            "fatigueHistory": [
-              0,
-              0,
-              0,
-              0,
-              0,
-              0,
-              0
-            ],
-            "uniqueSets": {},
-            "weeklyInol": {
-              "1": 0
-            },
-            "weeklyTonnage": {}
-          },
-          "lowerChest": {
-            "fatigue": 0,
-            "fatigueMetabolic": 0,
-            "fatigueDamage": 0,
-            "inol": 0,
-            "fitness": 0,
-            "sets": 0,
-            "jointStress": 0,
-            "contributions": {},
-            "setsContributions": {},
-            "fatigueHistory": [
-              0,
-              0,
-              0,
-              0,
-              0,
-              0,
-              0
-            ],
-            "uniqueSets": {},
-            "weeklyInol": {
-              "1": 0
-            },
-            "weeklyTonnage": {}
-          },
-          "innerQuad": {
-            "fatigue": 0,
-            "fatigueMetabolic": 0,
-            "fatigueDamage": 0,
-            "inol": 0,
-            "fitness": 0,
-            "sets": 0,
-            "jointStress": 0,
-            "contributions": {},
-            "setsContributions": {},
-            "fatigueHistory": [
-              0,
-              0,
-              0,
-              0,
-              0,
-              0,
-              0
-            ],
-            "uniqueSets": {},
-            "weeklyInol": {
-              "1": 0
-            },
-            "weeklyTonnage": {}
-          },
-          "outerQuad": {
-            "fatigue": 0,
-            "fatigueMetabolic": 0,
-            "fatigueDamage": 0,
-            "inol": 0,
-            "fitness": 0,
-            "sets": 0,
-            "jointStress": 0,
-            "contributions": {},
-            "setsContributions": {},
-            "fatigueHistory": [
-              0,
-              0,
-              0,
-              0,
-              0,
-              0,
-              0
-            ],
-            "uniqueSets": {},
-            "weeklyInol": {
-              "1": 0
-            },
-            "weeklyTonnage": {}
-          },
-          "upperAbs": {
-            "fatigue": 0,
-            "fatigueMetabolic": 0,
-            "fatigueDamage": 0,
-            "inol": 0,
-            "fitness": 0,
-            "sets": 0,
-            "jointStress": 0,
-            "contributions": {},
-            "setsContributions": {},
-            "fatigueHistory": [
-              0,
-              0,
-              0,
-              0,
-              0,
-              0,
-              0
-            ],
-            "uniqueSets": {},
-            "weeklyInol": {
-              "1": 0
-            },
-            "weeklyTonnage": {}
-          },
-          "lowerAbs": {
-            "fatigue": 0,
-            "fatigueMetabolic": 0,
-            "fatigueDamage": 0,
-            "inol": 0,
-            "fitness": 0,
-            "sets": 0,
-            "jointStress": 0,
-            "contributions": {},
-            "setsContributions": {},
-            "fatigueHistory": [
-              0,
-              0,
-              0,
-              0,
-              0,
-              0,
-              0
-            ],
-            "uniqueSets": {},
-            "weeklyInol": {
-              "1": 0
-            },
-            "weeklyTonnage": {}
-          },
-          "frontDeltoid": {
-            "fatigue": 0,
-            "fatigueMetabolic": 0,
-            "fatigueDamage": 0,
-            "inol": 0,
-            "fitness": 0,
-            "sets": 0,
-            "jointStress": 0,
-            "contributions": {},
-            "setsContributions": {},
-            "fatigueHistory": [
-              0,
-              0,
-              0,
-              0,
-              0,
-              0,
-              0
-            ],
-            "uniqueSets": {},
-            "weeklyInol": {
-              "1": 0
-            },
-            "weeklyTonnage": {}
-          },
-          "rearDeltoid": {
-            "fatigue": 0,
-            "fatigueMetabolic": 0,
-            "fatigueDamage": 0,
-            "inol": 0,
-            "fitness": 0,
-            "sets": 0,
-            "jointStress": 0,
-            "contributions": {},
-            "setsContributions": {},
-            "fatigueHistory": [
-              0,
-              0,
-              0,
-              0,
-              0,
-              0,
-              0
-            ],
-            "uniqueSets": {},
-            "weeklyInol": {
-              "1": 0
-            },
-            "weeklyTonnage": {}
-          },
-          "upperTrapezius": {
-            "fatigue": 0,
-            "fatigueMetabolic": 0,
-            "fatigueDamage": 0,
-            "inol": 0,
-            "fitness": 0,
-            "sets": 0,
-            "jointStress": 0,
-            "contributions": {},
-            "setsContributions": {},
-            "fatigueHistory": [
-              0,
-              0,
-              0,
-              0,
-              0,
-              0,
-              0
-            ],
-            "uniqueSets": {},
-            "weeklyInol": {
-              "1": 0
-            },
-            "weeklyTonnage": {}
-          },
-          "lowerTrapezius": {
-            "fatigue": 0,
-            "fatigueMetabolic": 0,
-            "fatigueDamage": 0,
-            "inol": 0,
-            "fitness": 0,
-            "sets": 0,
-            "jointStress": 0,
-            "contributions": {},
-            "setsContributions": {},
-            "fatigueHistory": [
-              0,
-              0,
-              0,
-              0,
-              0,
-              0,
-              0
-            ],
-            "uniqueSets": {},
-            "weeklyInol": {
-              "1": 0
-            },
-            "weeklyTonnage": {}
-          }
+          "sncFatigue": 0.11116809,
+          "chronicSncStress": 0.46387487,
+          "dayIndex": 6,
+          "pushSets": 0,
+          "pullSets": 3,
+          "legsSets": 0,
+          "axialSncLoad": 0
         }
       }
     }
