@@ -5,7 +5,7 @@ CREATE TYPE public.subscription_tier AS ENUM ('free', 'pro', 'elite');
 CREATE TYPE public.subscription_status AS ENUM ('active', 'cancelled', 'past_due', 'unpaid', 'trialing');
 
 CREATE TABLE public.subscriptions (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID NOT NULL REFERENCES public.users(id) ON DELETE CASCADE,
   tier public.subscription_tier NOT NULL DEFAULT 'free',
   status public.subscription_status NOT NULL DEFAULT 'active',

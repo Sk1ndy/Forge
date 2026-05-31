@@ -4,7 +4,7 @@
 CREATE TYPE public.referral_status AS ENUM ('pending', 'rewarded', 'rejected');
 
 CREATE TABLE public.referrals (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   referrer_id UUID NOT NULL REFERENCES public.users(id) ON DELETE CASCADE,
   referred_id UUID REFERENCES public.users(id) ON DELETE SET NULL, -- Rempli quand l'utilisateur s'inscrit
   referral_code TEXT NOT NULL UNIQUE,
