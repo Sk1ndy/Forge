@@ -187,7 +187,7 @@ export function runMesocycleSimulation(
   sessionLogs?: ExerciseLog[],
   blueprintId?: string,
   wearableData?: RawWearableData,
-  options?: { stochasticMode?: boolean },
+  options?: { stochasticMode?: boolean, subscriptionTier?: 'free' | 'pro' | 'elite' },
   initialState?: EngineState
 ): SimulationResult {
   // Input validation (Bug #13 Fix)
@@ -225,6 +225,19 @@ export function runMesocycleSimulation(
     };
   }
 
+  // Gating Premium (Axe E)
+  const tier = options?.subscriptionTier || 'elite';
+  if (tier === 'free') {
+    result.injuryPredictions = [];
+    result.monotonyAlerts = [];
+    result.chronicSncStress = 0;
+    delete result.stochasticBands;
+    delete result.tensors;
+  } else if (tier === 'pro') {
+    delete result.stochasticBands;
+    delete result.tensors;
+  }
+
   simulationCache.set(cacheKey, result);
   return result;
 }
@@ -240,7 +253,7 @@ export async function runMesocycleSimulationAsync(
   sessionLogs?: ExerciseLog[],
   blueprintId?: string,
   wearableData?: RawWearableData,
-  options?: { stochasticMode?: boolean },
+  options?: { stochasticMode?: boolean, subscriptionTier?: 'free' | 'pro' | 'elite' },
   initialState?: EngineState
 ): Promise<SimulationResult> {
   // Input validation (Bug #13 Fix)
@@ -279,6 +292,19 @@ export async function runMesocycleSimulationAsync(
         high: parseFloat(Math.max(bestResult.systemicReadiness, result.systemicReadiness).toFixed(2))
       }
     };
+  }
+
+  // Gating Premium (Axe E)
+  const tier = options?.subscriptionTier || 'elite';
+  if (tier === 'free') {
+    result.injuryPredictions = [];
+    result.monotonyAlerts = [];
+    result.chronicSncStress = 0;
+    delete result.stochasticBands;
+    delete result.tensors;
+  } else if (tier === 'pro') {
+    delete result.stochasticBands;
+    delete result.tensors;
   }
 
   simulationCache.set(cacheKey, result);
