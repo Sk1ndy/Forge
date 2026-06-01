@@ -1,638 +1,174 @@
 import React, { useState } from 'react';
-import {
-  View,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  StyleSheet,
-  Modal,
-  ActivityIndicator,
-  Pressable,
-  KeyboardAvoidingView,
-  Platform,
-  ScrollView
-} from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, ActivityIndicator, Platform, Image } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
-import * as Haptics from 'expo-haptics';
 import { Ionicons } from '@expo/vector-icons';
-import { GoogleSignin } from '@react-native-google-signin/google-signin';
+import Svg, { Defs, RadialGradient, Stop, Rect } from 'react-native-svg';
+import tw from '../src/styles/tailwind';
+import { GlassCard } from '../src/components/GlassCard';
+import { TacticalFlicker } from '../src/components/TacticalFlicker';
+import { HapticService } from '../src/services/HapticService';
+import { AuthService } from '../src/services/AuthService';
+import { LoginSchema } from '../src/schemas/auth.schema';
+import { CyberGrid } from '../src/components/CyberGrid';
 
-import { AuthService } from '../src/services/auth.service';
-import { LoginSchema, RegisterSchema } from '../src/schemas/auth.schema';
-import { z } from 'zod';
-
-GoogleSignin.configure({
-  webClientId: process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID || '',
-  iosClientId: process.env.EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID || '',
-  scopes: ['profile', 'email'],
-});
-
+/**
+ * LoginScreen - Laboratory secure authentication portal.
+ * Styled completely with twrnc Tailwind CSS, featuring high-fidelity skeletal spine backdrop.
+ */
 export default function LoginScreen() {
   const router = useRouter();
-  const [loading, setLoading] = useState(false);
   
-  // États des modales/tiroirs
-  const [emailModalVisible, setEmailModalVisible] = useState(false);
-  const [registerModalVisible, setRegisterModalVisible] = useState(false);
-  
-  // Formulaires
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
-  
-  const [regFirstName, setRegFirstName] = useState('');
-  const [regEmail, setRegEmail] = useState('');
-  const [regPassword, setRegPassword] = useState('');
-  const [regConfirmPassword, setRegConfirmPassword] = useState('');
-  const [showRegPassword, setShowRegPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
-  const triggerHaptic = (style: Haptics.ImpactFeedbackStyle = Haptics.ImpactFeedbackStyle.Light) => {
-    Haptics.impactAsync(style).catch(() => {});
-  };
-
-  const handleEmailLogin = async () => {
-    triggerHaptic(Haptics.ImpactFeedbackStyle.Medium);
+  const handleLogin = async () => {
+    // 1. Zod Validation
+    const validation = LoginSchema.safeParse({ email, password });
     
-    try {
-      // 1. Validation Zod stricte
-      const validData = LoginSchema.parse({ email, password });
-      
-      setLoading(true);
-      // 2. Appel du Use Case pur (Service)
-      await AuthService.loginWithEmail(validData);
-      
-      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(() => {});
-      setEmailModalVisible(false);
-    } catch (e: any) {
-      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error).catch(() => {});
-      if (e instanceof z.ZodError) {
-        alert(e.errors[0].message);
-      } else {
-        alert(e.message || "Erreur de connexion");
-      }
-    } finally {
-      setLoading(false);
+    if (!validation.success) {
+      await HapticService.warning();
+      const firstError = validation.error.issues[0]?.message || 'Saisie incorrecte.';
+      setErrorMsg(firstError);
+      return;
     }
-  };
 
-  const handleRegister = async () => {
-    triggerHaptic(Haptics.ImpactFeedbackStyle.Medium);
-    
-    try {
-      // 1. Validation Zod stricte
-      const validData = RegisterSchema.parse({
-        firstName: regFirstName,
-        email: regEmail,
-        password: regPassword,
-        confirmPassword: regConfirmPassword
-      });
+    setErrorMsg(null);
+    setLoading(true);
+    await HapticService.select();
 
-      setLoading(true);
-      // 2. Appel du Use Case pur (Service)
-      await AuthService.registerUser(validData);
+    // 2. Decoupled Authentication Service call
+    const result = await AuthService.login(validation.data);
 
-      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(() => {});
-      alert("Inscription réussie ! Vous pouvez maintenant vous connecter.");
-      setRegisterModalVisible(false);
-      setEmailModalVisible(true);
-    } catch (e: any) {
-      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error).catch(() => {});
-      if (e instanceof z.ZodError) {
-        alert(e.errors[0].message);
-      } else {
-        alert(e.message || "Erreur d'inscription");
-      }
-    } finally {
-      setLoading(false);
+    setLoading(false);
+
+    if (result.success) {
+      await HapticService.success();
+      router.replace('/');
+    } else {
+      await HapticService.warning();
+      setErrorMsg(result.error || 'Une erreur est survenue lors de la connexion.');
     }
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.gridOverlay} pointerEvents="none" />
+    <SafeAreaView style={tw`flex-1 bg-black relative`}>
+      {/* Background Skeletal Spine Scan */}
+      <Image
+        source={require('../assets/images/skeletal_spine.png')}
+        style={tw`absolute w-full h-[65%] top-[10%] opacity-40`}
+        resizeMode="contain"
+      />
+      
+      {/* SVG Radial Gradient Vignette Overlay (Apple Cinematic Light) */}
+      <Svg style={tw`absolute inset-0`} pointerEvents="none">
+        <Defs>
+          <RadialGradient
+            id="login-vignette"
+            cx="50%"
+            cy="45%"
+            rx="65%"
+            ry="65%"
+            fx="50%"
+            fy="45%"
+          >
+            <Stop offset="0%" stopColor="#000000" stopOpacity="0" />
+            <Stop offset="45%" stopColor="#000000" stopOpacity="0.3" />
+            <Stop offset="85%" stopColor="#000000" stopOpacity="0.85" />
+            <Stop offset="100%" stopColor="#000000" stopOpacity="0.98" />
+          </RadialGradient>
+        </Defs>
+        <Rect x="0" y="0" width="100%" height="100%" fill="url(#login-vignette)" />
+      </Svg>
 
-      <View style={styles.brandContainer}>
-        <Text style={styles.brandTitle}>FORGE</Text>
-        <Text style={styles.brandSubtitle}>MOTEUR D&apos;OPTIMISATION BIOMÉCANIQUE</Text>
-      </View>
-
-      <View style={styles.actionContainer}>
-        
+      <CyberGrid />
+      
+      {/* Header */}
+      <View style={tw`h-16 flex-row items-center px-4 border-b border-white/10 z-20`}>
         <TouchableOpacity
-          activeOpacity={0.8}
-          onPress={() => {
-            triggerHaptic();
-            alert("Intégration Apple Sign-In native requise pour la production.");
-          }}
-          style={styles.appleButton}
-        >
-          <Ionicons name="logo-apple" size={20} color="black" style={styles.buttonIcon} />
-          <Text style={styles.appleButtonText}>Continuer avec Apple</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          activeOpacity={0.8}
           onPress={async () => {
-            triggerHaptic(Haptics.ImpactFeedbackStyle.Medium);
-            try {
-              setLoading(true);
-              await AuthService.loginWithGoogle();
-              Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(() => {});
-            } catch (error: any) {
-              console.error(error);
-              Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error).catch(() => {});
-              if (error.code !== 'SIGN_IN_CANCELLED' && error.code !== '12501') {
-                alert(error.message || "Erreur de connexion Google");
-              }
-            } finally {
-              setLoading(false);
-            }
+            await HapticService.select();
+            router.back();
           }}
-          disabled={loading}
-          style={styles.googleButton}
+          style={tw`p-1.5 -ml-1.5 mr-3`}
         >
-          {loading ? (
-            <ActivityIndicator color="white" />
-          ) : (
-            <>
-              <Ionicons name="logo-google" size={18} color="white" style={styles.buttonIcon} />
-              <Text style={styles.googleButtonText}>Continuer avec Google</Text>
-            </>
+          <Ionicons name="chevron-back" size={24} color="white" />
+        </TouchableOpacity>
+        <TacticalFlicker style={tw`text-[14px] text-white tracking-[0.15em] font-bold`} fontType="sans">
+          MEMBER_AUTHENTICATION
+        </TacticalFlicker>
+      </View>
+
+      {/* Main Content */}
+      <View style={tw`flex-1 justify-center px-4 z-20`}>
+        <GlassCard style={tw`p-6 gap-5 bg-white/3 border border-white/8 rounded-2xl`}>
+          <TacticalFlicker style={tw`text-[10px] text-zinc-400 tracking-[0.15em] font-mono mb-2`} fontType="mono">
+            SECURE_LOGIN // FORGE_DB
+          </TacticalFlicker>
+
+          {/* Email */}
+          <View style={tw`gap-2`}>
+            <Text style={tw`text-[9px] text-zinc-400 tracking-[0.15em] font-mono`}>EMAIL CLINIQUE</Text>
+            <View style={tw`h-12 border border-white/10 rounded-lg bg-white/2 px-3 justify-center`}>
+              <TextInput
+                style={tw`color-white font-mono text-[13px]`}
+                placeholder="nom.prenom@laboratoire.com"
+                placeholderTextColor="rgba(255, 255, 255, 0.2)"
+                keyboardType="email-address"
+                autoCapitalize="none"
+                value={email}
+                onChangeText={setEmail}
+              />
+            </View>
+          </View>
+
+          {/* Password */}
+          <View style={tw`gap-2`}>
+            <Text style={tw`text-[9px] text-zinc-400 tracking-[0.15em] font-mono`}>MOT DE PASSE ENCRYPTÉ</Text>
+            <View style={tw`h-12 border border-white/10 rounded-lg bg-white/2 px-3 justify-center`}>
+              <TextInput
+                style={tw`color-white font-mono text-[13px]`}
+                placeholder="••••••••"
+                placeholderTextColor="rgba(255, 255, 255, 0.2)"
+                secureTextEntry
+                autoCapitalize="none"
+                value={password}
+                onChangeText={setPassword}
+              />
+            </View>
+          </View>
+
+          {errorMsg && (
+            <View style={tw`flex-row items-center gap-2 border border-red-500 rounded-lg p-3 bg-red-500/5`}>
+              <Ionicons name="alert-circle" size={16} color="#ef4444" />
+              <Text style={tw`color-[#ef4444] text-[11px] font-mono flex-1`}>{errorMsg}</Text>
+            </View>
           )}
-        </TouchableOpacity>
 
-        {/* Link: Use Email */}
-        <TouchableOpacity
-          onPress={() => {
-            triggerHaptic();
-            setEmailModalVisible(true);
-          }}
-          style={styles.linkWrapper}
-        >
-          <Text style={styles.emailLinkText}>Utiliser un email</Text>
-        </TouchableOpacity>
-
-        {/* Link: Register */}
-        <TouchableOpacity
-          onPress={() => {
-            triggerHaptic();
-            setRegisterModalVisible(true);
-          }}
-          style={styles.linkWrapper}
-        >
-          <Text style={styles.registerLinkText}>
-            Pas encore de compte ? <Text style={styles.underline}>S&apos;inscrire</Text>
-          </Text>
-        </TouchableOpacity>
-
+          {/* Login Action Button */}
+          <TouchableOpacity
+            activeOpacity={0.9}
+            onPress={handleLogin}
+            disabled={loading}
+            style={tw`h-13 bg-white rounded-lg items-center justify-center mt-2`}
+          >
+            {loading ? (
+              <ActivityIndicator size="small" color="#000000" />
+            ) : (
+              <Text style={tw`color-black font-bold text-[13px] tracking-[0.15em]`}>ACCÉDER AU TERMINAL</Text>
+            )}
+          </TouchableOpacity>
+        </GlassCard>
       </View>
 
-      {/* Dynamic Tactical Footer */}
-      <View style={styles.footer}>
-        <Text style={styles.footerText}>V.2.4.0-STABLE | ENCRYPTED CONNECTION</Text>
+      {/* Footer */}
+      <View style={tw`py-5 items-center z-20`}>
+        <Text style={tw`font-mono text-[8px] color-white/25 tracking-[0.2em]`}>
+          SECURE_CONNECTION // SHA-256 // END_TO_END
+        </Text>
       </View>
-
-      {/* ─── MODALE CONNEXION EMAIL (Stitch Spec) ─── */}
-      <Modal
-        animationType="slide"
-        transparent={true}
-        visible={emailModalVisible}
-        onRequestClose={() => setEmailModalVisible(false)}
-      >
-        <View style={styles.modalBackdrop}>
-          <Pressable style={styles.backdropPressable} onPress={() => setEmailModalVisible(false)} />
-          <KeyboardAvoidingView
-            behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-            style={styles.modalKeyboardAvoiding}
-          >
-            <View style={styles.modalContent}>
-              {/* Header */}
-              <View style={styles.modalHeader}>
-                <Text style={styles.modalTitle}>Connectez-vous avec votre email</Text>
-                <TouchableOpacity
-                  onPress={() => {
-                    triggerHaptic();
-                    setEmailModalVisible(false);
-                  }}
-                  style={styles.closeButton}
-                >
-                  <Ionicons name="close" size={24} color="#a1a1aa" />
-                </TouchableOpacity>
-              </View>
-
-              {/* Form */}
-              <ScrollView contentContainerStyle={styles.modalScrollContent} keyboardShouldPersistTaps="handled">
-                <View style={styles.inputContainer}>
-                  <Text style={styles.inputLabel}>EMAIL</Text>
-                  <TextInput
-                    style={styles.textInput}
-                    placeholder="votre@email.com"
-                    placeholderTextColor="#3f3f46"
-                    keyboardType="email-address"
-                    autoCapitalize="none"
-                    autoCorrect={false}
-                    value={email}
-                    onChangeText={setEmail}
-                  />
-                </View>
-
-                <View style={styles.inputContainer}>
-                  <Text style={styles.inputLabel}>MOT DE PASSE</Text>
-                  <View style={styles.passwordInputWrapper}>
-                    <TextInput
-                      style={styles.passwordInput}
-                      placeholder="••••••••"
-                      placeholderTextColor="#3f3f46"
-                      secureTextEntry={!showPassword}
-                      autoCapitalize="none"
-                      autoCorrect={false}
-                      value={password}
-                      onChangeText={setPassword}
-                    />
-                    <TouchableOpacity
-                      onPress={() => {
-                        triggerHaptic();
-                        setShowPassword(!showPassword);
-                      }}
-                      style={styles.visibilityButton}
-                    >
-                      <Ionicons
-                        name={showPassword ? 'eye-off-outline' : 'eye-outline'}
-                        size={20}
-                        color="#a1a1aa"
-                      />
-                    </TouchableOpacity>
-                  </View>
-                </View>
-
-                {/* Submit button */}
-                <TouchableOpacity
-                  activeOpacity={0.8}
-                  onPress={handleEmailLogin}
-                  disabled={loading}
-                  style={styles.submitButton}
-                >
-                  {loading ? (
-                    <ActivityIndicator color="black" />
-                  ) : (
-                    <Text style={styles.submitButtonText}>SE CONNECTER</Text>
-                  )}
-                </TouchableOpacity>
-
-                {/* Forgot Password */}
-                <TouchableOpacity
-                  onPress={() => {
-                    triggerHaptic();
-                    alert("Redirection vers la récupération de mot de passe...");
-                  }}
-                  style={styles.forgotPasswordWrapper}
-                >
-                  <Text style={styles.forgotPasswordText}>Mot de passe oublié ?</Text>
-                </TouchableOpacity>
-              </ScrollView>
-            </View>
-          </KeyboardAvoidingView>
-        </View>
-      </Modal>
-
-      {/* ─── MODALE INSCRIPTION (Stitch Spec) ─── */}
-      <Modal
-        animationType="slide"
-        transparent={true}
-        visible={registerModalVisible}
-        onRequestClose={() => setRegisterModalVisible(false)}
-      >
-        <View style={styles.modalBackdrop}>
-          <Pressable style={styles.backdropPressable} onPress={() => setRegisterModalVisible(false)} />
-          <KeyboardAvoidingView
-            behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-            style={styles.modalKeyboardAvoiding}
-          >
-            <View style={styles.modalContent}>
-              {/* Header */}
-              <View style={styles.modalHeader}>
-                <Text style={styles.modalTitle}>Créer votre compte</Text>
-                <TouchableOpacity
-                  onPress={() => {
-                    triggerHaptic();
-                    setRegisterModalVisible(false);
-                  }}
-                  style={styles.closeButton}
-                >
-                  <Ionicons name="close" size={24} color="#a1a1aa" />
-                </TouchableOpacity>
-              </View>
-
-              {/* Form */}
-              <ScrollView contentContainerStyle={styles.modalScrollContent} keyboardShouldPersistTaps="handled">
-                <View style={styles.inputContainer}>
-                  <Text style={styles.inputLabel}>PRÉNOM</Text>
-                  <TextInput
-                    style={styles.textInput}
-                    placeholder="Votre prénom"
-                    placeholderTextColor="#3f3f46"
-                    value={regFirstName}
-                    onChangeText={setRegFirstName}
-                  />
-                </View>
-
-                <View style={styles.inputContainer}>
-                  <Text style={styles.inputLabel}>EMAIL</Text>
-                  <TextInput
-                    style={styles.textInput}
-                    placeholder="votre@email.com"
-                    placeholderTextColor="#3f3f46"
-                    keyboardType="email-address"
-                    autoCapitalize="none"
-                    autoCorrect={false}
-                    value={regEmail}
-                    onChangeText={setRegEmail}
-                  />
-                </View>
-
-                <View style={styles.inputContainer}>
-                  <Text style={styles.inputLabel}>MOT DE PASSE</Text>
-                  <View style={styles.passwordInputWrapper}>
-                    <TextInput
-                      style={styles.passwordInput}
-                      placeholder="••••••••"
-                      placeholderTextColor="#3f3f46"
-                      secureTextEntry={!showRegPassword}
-                      autoCapitalize="none"
-                      autoCorrect={false}
-                      value={regPassword}
-                      onChangeText={setRegPassword}
-                    />
-                    <TouchableOpacity
-                      onPress={() => {
-                        triggerHaptic();
-                        setShowRegPassword(!showRegPassword);
-                      }}
-                      style={styles.visibilityButton}
-                    >
-                      <Ionicons
-                        name={showRegPassword ? 'eye-off-outline' : 'eye-outline'}
-                        size={20}
-                        color="#a1a1aa"
-                      />
-                    </TouchableOpacity>
-                  </View>
-                </View>
-
-                <View style={styles.inputContainer}>
-                  <Text style={styles.inputLabel}>CONFIRMER LE MOT DE PASSE</Text>
-                  <TextInput
-                    style={styles.textInput}
-                    placeholder="••••••••"
-                    placeholderTextColor="#3f3f46"
-                    secureTextEntry={true}
-                    autoCapitalize="none"
-                    autoCorrect={false}
-                    value={regConfirmPassword}
-                    onChangeText={setRegConfirmPassword}
-                  />
-                </View>
-
-                {/* Submit button */}
-                <TouchableOpacity
-                  activeOpacity={0.8}
-                  onPress={handleRegister}
-                  disabled={loading}
-                  style={[styles.submitButton, { backgroundColor: '#ffffff', borderRadius: 9999 }]}
-                >
-                  {loading ? (
-                    <ActivityIndicator color="black" />
-                  ) : (
-                    <Text style={[styles.submitButtonText, { color: '#000000' }]}>CRÉER MON COMPTE</Text>
-                  )}
-                </TouchableOpacity>
-              </ScrollView>
-            </View>
-          </KeyboardAvoidingView>
-        </View>
-      </Modal>
-
     </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#000000',
-    justifyContent: 'space-between',
-    paddingHorizontal: 16
-  },
-  gridOverlay: {
-    ...StyleSheet.absoluteFillObject,
-    opacity: 0.05,
-    borderWidth: 0,
-    backgroundColor: 'transparent',
-    // Mock technique de grille (en React Native on utilise des bordures ou textures, mais simple couleur noire de base suffit pour le brutalisme)
-  },
-  brandContainer: {
-    alignItems: 'center',
-    marginTop: 80
-  },
-  brandTitle: {
-    fontSize: 72,
-    fontWeight: '900',
-    color: '#ffffff',
-    letterSpacing: -4,
-    lineHeight: 80
-  },
-  brandSubtitle: {
-    fontSize: 10,
-    color: '#a1a1aa',
-    letterSpacing: 2,
-    fontWeight: '700',
-    marginTop: 8,
-    textTransform: 'uppercase'
-  },
-  actionContainer: {
-    width: '100%',
-    maxWidth: 400,
-    alignSelf: 'center',
-    gap: 16,
-    marginBottom: 100
-  },
-  appleButton: {
-    width: '100%',
-    height: 56,
-    backgroundColor: '#ffffff',
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderRadius: 9999
-  },
-  buttonIcon: {
-    marginRight: 10
-  },
-  appleButtonText: {
-    color: '#000000',
-    fontSize: 16,
-    fontWeight: '600'
-  },
-  googleButton: {
-    width: '100%',
-    height: 56,
-    backgroundColor: 'rgba(24, 24, 27, 0.5)',
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.1)',
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderRadius: 9999
-  },
-  googleButtonText: {
-    color: '#ffffff',
-    fontSize: 16,
-    fontWeight: '600'
-  },
-  linkWrapper: {
-    alignItems: 'center',
-    paddingVertical: 6
-  },
-  emailLinkText: {
-    color: '#a1a1aa',
-    fontSize: 14,
-    textDecorationLine: 'underline',
-    fontWeight: '500'
-  },
-  registerLinkText: {
-    color: '#a1a1aa',
-    fontSize: 14,
-    fontWeight: '500'
-  },
-  underline: {
-    textDecorationLine: 'underline',
-    color: '#ffffff'
-  },
-  footer: {
-    position: 'absolute',
-    bottom: 24,
-    left: 0,
-    right: 0,
-    alignItems: 'center'
-  },
-  footerText: {
-    fontSize: 10,
-    color: '#71717a',
-    letterSpacing: 1.5,
-    fontWeight: '500'
-  },
-  
-  // Styles des Modales
-  modalBackdrop: {
-    flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.75)',
-    justifyContent: 'flex-end'
-  },
-  backdropPressable: {
-    flex: 1
-  },
-  modalKeyboardAvoiding: {
-    width: '100%'
-  },
-  modalContent: {
-    width: '100%',
-    backgroundColor: '#12131a',
-    borderTopLeftRadius: 16,
-    borderTopRightRadius: 16,
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.1)',
-    paddingBottom: Platform.OS === 'ios' ? 40 : 24
-  },
-  modalHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: 24,
-    paddingTop: 24,
-    paddingBottom: 16
-  },
-  modalTitle: {
-    fontSize: 22,
-    fontWeight: 'bold',
-    color: '#ffffff',
-    flex: 1,
-    marginRight: 10
-  },
-  closeButton: {
-    padding: 4
-  },
-  modalScrollContent: {
-    paddingHorizontal: 24,
-    paddingTop: 8,
-    gap: 16
-  },
-  inputContainer: {
-    gap: 8
-  },
-  inputLabel: {
-    fontSize: 10,
-    color: '#a1a1aa',
-    fontWeight: '700',
-    letterSpacing: 1.5
-  },
-  textInput: {
-    width: '100%',
-    height: 48,
-    backgroundColor: 'rgba(24, 24, 27, 0.4)',
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.2)',
-    borderRadius: 8,
-    paddingHorizontal: 16,
-    color: '#ffffff',
-    fontSize: 16
-  },
-  passwordInputWrapper: {
-    width: '100%',
-    height: 48,
-    backgroundColor: 'rgba(24, 24, 27, 0.4)',
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.2)',
-    borderRadius: 8,
-    flexDirection: 'row',
-    alignItems: 'center',
-    overflow: 'hidden'
-  },
-  passwordInput: {
-    flex: 1,
-    height: '100%',
-    paddingHorizontal: 16,
-    color: '#ffffff',
-    fontSize: 16
-  },
-  visibilityButton: {
-    paddingHorizontal: 16,
-    height: '100%',
-    justifyContent: 'center'
-  },
-  submitButton: {
-    width: '100%',
-    height: 48,
-    backgroundColor: '#ffffff',
-    borderRadius: 8,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginTop: 16
-  },
-  submitButtonText: {
-    color: '#000000',
-    fontSize: 14,
-    fontWeight: '700',
-    letterSpacing: 1.5
-  },
-  forgotPasswordWrapper: {
-    alignItems: 'center',
-    marginTop: 8
-  },
-  forgotPasswordText: {
-    color: '#a1a1aa',
-    fontSize: 14,
-    textDecorationLine: 'underline',
-    fontWeight: '500'
-  }
-});

@@ -1,0 +1,228 @@
+<!DOCTYPE html><html class="dark" lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Forge - Tactical HUD</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;600;700&amp;family=JetBrains+Mono:wght@500;700&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-primary": "#2f3131",
+                        "secondary-fixed": "#e2e1eb",
+                        "on-error": "#690005",
+                        "on-tertiary-fixed": "#410004",
+                        "tertiary-fixed-dim": "#ffb3ad",
+                        "on-surface": "#ffffff",
+                        "on-secondary": "#2f3037",
+                        "surface-container-highest": "#353535",
+                        "background": "#000000",
+                        "outline": "#8e9192",
+                        "surface-tint": "#c6c6c7",
+                        "tertiary-container": "#ffdad7",
+                        "inverse-on-surface": "#303030",
+                        "ghost-border": "rgba(255, 255, 255, 0.1)",
+                        "surface-container-lowest": "#0e0e0e",
+                        "secondary-fixed-dim": "#c6c6cf",
+                        "inverse-surface": "#e2e2e2",
+                        "error": "#ffb4ab",
+                        "primary-container": "#e2e2e2",
+                        "inverse-primary": "#5d5f5f",
+                        "secondary": "#c6c6cf",
+                        "glass-fill": "rgba(255, 255, 255, 0.05)",
+                        "on-error-container": "#ffdad6",
+                        "tertiary-fixed": "#ffdad7",
+                        "surface": "#000000",
+                        "outline-variant": "#444748",
+                        "surface-container": "#1f1f1f",
+                        "primary-fixed-dim": "#c6c6c7",
+                        "chirurgical-red": "#EF4444",
+                        "on-secondary-fixed-variant": "#45464e",
+                        "glass-border": "rgba(255, 255, 255, 0.15)",
+                        "on-primary-fixed": "#1a1c1c",
+                        "on-tertiary": "#68000a",
+                        "surface-container-high": "#2a2a2a",
+                        "on-tertiary-container": "#c22229",
+                        "surface-dim": "#131313",
+                        "surface-container-low": "#1b1b1b",
+                        "zinc-400": "rgba(255,255,255,0.6)",
+                        "error-container": "#93000a",
+                        "on-secondary-fixed": "#1a1b22",
+                        "on-tertiary-fixed-variant": "#930013",
+                        "on-primary-container": "#636565",
+                        "on-surface-variant": "#c4c7c8",
+                        "tertiary": "#ffffff",
+                        "on-secondary-container": "#b4b4bd",
+                        "surgical-white": "#FFFFFF",
+                        "surface-variant": "#353535",
+                        "on-primary-fixed-variant": "#454747",
+                        "primary-fixed": "#e2e2e2",
+                        "surface-bright": "#393939",
+                        "secondary-container": "#45464e",
+                        "on-background": "#ffffff",
+                        "primary": "#ffffff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0px",
+                        "lg": "2px",
+                        "xl": "2px",
+                        "full": "9999px",
+                        "squarcle": "0px"
+                    },
+                    "spacing": {
+                        "gutter": "12px",
+                        "unit": "4px",
+                        "margin-mobile": "20px",
+                        "reach-zone-padding": "32px"
+                    },
+                    "fontFamily": {
+                        "headline-lg": ["Geist", "sans-serif"],
+                        "telemetry-md": ["JetBrains Mono", "monospace"],
+                        "telemetry-lg": ["JetBrains Mono", "monospace"],
+                        "body-md": ["Geist", "sans-serif"],
+                        "headline-md": ["Geist", "sans-serif"],
+                        "label-caps": ["JetBrains Mono", "monospace"],
+                        "body-lg": ["Geist", "sans-serif"]
+                    },
+                    "fontSize": {
+                        "headline-lg": ["32px", {"lineHeight": "1.1", "letterSpacing": "-0.04em", "fontWeight": "700"}],
+                        "telemetry-md": ["14px", {"lineHeight": "1.2", "letterSpacing": "0em", "fontWeight": "500"}],
+                        "telemetry-lg": ["20px", {"lineHeight": "1", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "body-md": ["16px", {"lineHeight": "1.5", "letterSpacing": "0em", "fontWeight": "400"}],
+                        "headline-md": ["24px", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+                        "label-caps": ["10px", {"lineHeight": "1", "letterSpacing": "0.15em", "fontWeight": "700"}],
+                        "body-lg": ["18px", {"lineHeight": "1.5", "letterSpacing": "0em", "fontWeight": "400"}]
+                    },
+                    "animation": {
+                        "scan-line": "scanline 8s linear infinite",
+                        "data-flicker": "flicker 2s infinite",
+                        "fade-in": "fadeIn 1.2s ease-out forwards"
+                    },
+                    "keyframes": {
+                        scanline: {
+                            "0%": { top: "0%" },
+                            "100%": { top: "100%" }
+                        },
+                        flicker: {
+                            "0%, 100%": { opacity: "1" },
+                            "50%": { opacity: "0.7" }
+                        },
+                        fadeIn: {
+                            "0%": { opacity: "0" },
+                            "100%": { opacity: "1" }
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body {
+            background-color: #000000;
+            color: #ffffff;
+            cursor: crosshair;
+        }
+        
+        .hud-border {
+            border: 1px solid rgba(255, 255, 255, 0.15);
+        }
+
+        .vertical-text {
+            writing-mode: vertical-rl;
+            text-orientation: mixed;
+        }
+
+        .crosshair-h {
+            width: 100%;
+            height: 1px;
+            background: rgba(255,255,255,0.1);
+            position: absolute;
+            left: 0;
+            top: 50%;
+        }
+
+        .crosshair-v {
+            width: 1px;
+            height: 100%;
+            background: rgba(255,255,255,0.1);
+            position: absolute;
+            top: 0;
+            left: 50%;
+        }
+        
+        .scan-effect {
+            background: linear-gradient(to bottom, transparent 0%, rgba(255,255,255,0.05) 50%, transparent 100%);
+            height: 100px;
+            position: absolute;
+            width: 100%;
+            z-index: 5;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body class="h-screen w-full overflow-hidden flex flex-col relative selection:bg-white selection:text-black font-body-md">
+<!-- Background Skeletal Scan -->
+<div class="absolute inset-0 z-0 flex items-center justify-center overflow-hidden opacity-40">
+<div class="absolute inset-0 z-10 bg-[radial-gradient(circle,transparent_20%,black_80%)]"></div>
+<img alt="Muscular Anatomy Scan" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBRB5s7R_r8PLFF3qZhCCIBT6MVWZSdqhIqObrra23PJ2-WYJdzGgpniA8p1I9JuVFpzNgaXLdFtSMCyKlrgS7RujbA0bffjXxxBN5WZCm5k2RZxZb07hAyFNyqwU654gmhAy1CV351qvmpxYDk5H0-qnc3P_-55tNDPVI4JRyHWNHF9LIHh4O402WQQngosFoQr6QxsgJmo89aslloUUpmfl4j-m9zcUttZP9Ipz5cWfKBQHB-68l4ajVQCxRACbMDb1Uj0sGHLbs">
+</div>
+<!-- HUD Overlay Layers -->
+<div class="absolute inset-0 pointer-events-none z-10 overflow-hidden">
+<div class="crosshair-h"></div>
+<div class="crosshair-v"></div>
+<div class="scan-effect animate-scan-line"></div>
+<!-- Frame Corners -->
+<div class="absolute top-4 right-4 w-12 h-12 border-t-2 border-r-2 border-white"></div>
+<div class="absolute bottom-4 left-4 w-12 h-12 border-b-2 border-l-2 border-white"></div>
+<div class="absolute bottom-4 right-4 w-12 h-12 border-b-2 border-r-2 border-white"></div>
+</div>
+<!-- Top Telemetry Header -->
+<!-- Side Data Streams -->
+<!-- Central Branding -->
+<main class="flex-1 relative z-20 flex flex-col items-center justify-center px-margin-mobile pb-24">
+<div class="text-center animate-fade-in">
+<h1 class="font-headline-lg text-[48px] text-white tracking-[0.4em] mb-2 leading-none">FORGE</h1>
+<div class="w-full h-px bg-white/30 mb-6"></div><p class="font-label-caps text-white/60 text-[10px] tracking-[0.3em] mt-2">BIOMECHANICAL SIMULATION ENGINE</p>
+</div>
+<!-- Metadata Cluster -->
+</main>
+<!-- Fixed Glass Footer -->
+<footer class="relative z-30 w-full p-4 md:p-8 bg-black/40 backdrop-blur-md border-t border-white/10">
+<div class="max-w-md mx-auto flex flex-col items-center gap-6">
+<!-- Primary Action -->
+<button class="w-full h-14 bg-white text-black font-headline-md text-sm font-bold tracking-[0.2em] hover:bg-zinc-200 transition-all active:scale-[0.98] relative group rounded-full shadow-[0_0_20px_rgba(255,255,255,0.3)] backdrop-blur-sm" onclick="triggerHaptic()">
+                INITIATE EVALUATION
+                
+
+</button>
+<!-- Secondary Action -->
+<button class="text-white/60 font-label-caps text-[10px] tracking-[0.2em] hover:text-white transition-colors py-2 uppercase">Existing Member / Login</button></div>
+</footer>
+<!-- Bottom Corner Telemetry -->
+<div class="absolute bottom-margin-mobile left-margin-mobile z-40 pointer-events-none hidden md:block">
+<div class="font-label-caps text-zinc-400">UPLINK: SECURE</div>
+</div>
+<script>
+        function triggerHaptic() {
+            if (navigator.vibrate) {
+                navigator.vibrate([20, 10, 20]);
+            }
+            console.log("Evaluation Initiated");
+        }
+
+        // Random matrix-like text flickering
+        const telemetryElements = document.querySelectorAll('.animate-data-flicker');
+        setInterval(() => {
+            telemetryElements.forEach(el => {
+                if(Math.random() > 0.95) {
+                    const original = el.innerText;
+                    el.innerText = "OVERRIDE_0x" + Math.floor(Math.random()*1000).toString(16);
+                    setTimeout(() => el.innerText = original, 100);
+                }
+            });
+        }, 500);
+    </script>
+</body></html>
