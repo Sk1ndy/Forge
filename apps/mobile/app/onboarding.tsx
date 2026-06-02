@@ -6,6 +6,8 @@ import Svg, { Defs, RadialGradient, Stop, Rect, LinearGradient } from 'react-nat
 import tw from '../src/styles/tailwind';
 import { HapticService } from '../src/services/HapticService';
 
+import { useOnboardingStore } from '../src/stores/onboarding.store';
+
 const { height: SCREEN_HEIGHT } = Dimensions.get('window');
 
 /**
@@ -32,7 +34,8 @@ export default function OnboardingScreen() {
 
   const handleStartCalibration = async () => {
     await HapticService.select();
-    // In a single-screen setup, this initiates the main workout hub or authentication
+    // Mark onboarding as completed to allow access to the dashboard (Friction Zéro)
+    useOnboardingStore.getState().setCompleted(true);
     router.replace('/');
   };
 

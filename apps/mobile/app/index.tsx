@@ -76,10 +76,10 @@ export default function IndexRouter() {
           <TouchableOpacity
             activeOpacity={0.9}
             onPress={handleResetCalibration}
-            style={tw`flex-row h-12 w-full rounded-lg border border-red-500/20 bg-red-500/3 items-center justify-center`}
+            style={tw`flex-row h-12 w-full rounded-lg border border-zinc-800 bg-white/3 items-center justify-center`}
           >
-            <Ionicons name="refresh" size={16} color="#ef4444" style={tw`mr-1.5`} />
-            <Text style={tw`text-[#ef4444] font-bold text-[12px] tracking-wider`}>RÉINITIALISER LA CALIBRATION</Text>
+            <Ionicons name="refresh" size={16} color="#a1a1aa" style={tw`mr-1.5`} />
+            <Text style={[tw`text-zinc-400 font-bold text-[11px] tracking-wider`, { fontFamily: 'JetBrainsMono' }]}>RÉINITIALISER LA CALIBRATION</Text>
           </TouchableOpacity>
         </GlassCard>
       </View>

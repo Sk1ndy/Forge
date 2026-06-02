@@ -313,5 +313,3 @@ export async function runMesocycleSimulationAsync(
 
 export const runWeeklySimulation = runMesocycleSimulation;
 export const runWeeklySimulationAsync = runMesocycleSimulationAsync;
-
-export { generateTrainingProgram } from './algorithms/program-generator';
