@@ -61,10 +61,10 @@ Pour TOUTE demande impliquant du code ou de l'architecture, tu DOIS structurer t
 - **Architecture Service** : Les composants React/React Native ne doivent JAMAIS appeler la base de données directement ni héberger de logique métier complexe. Ils consomment des Hooks (Zustand/WatermelonDB) qui eux-mêmes appellent des Services d'analyse.
 - **UI/UX (Expert Monochrome Design System)** :
   - **Esthétique** : Minimalisme de laboratoire clinique, télémétrie aéronautique, haute densité de données.
-  - **Palette Strict Monochrome** : Fond Noir OLED / Zinc-950 (`#09090b`), Conteneurs de cartes en Zinc-900 (`#18181b`), Texte principal en Zinc-50 (`#fafafa`), métadonnées et bordures en Zinc-400 / Zinc-800 (`#a1a1aa` / `rgba(255,255,255,0.08)`).
-  - **Exclusion Radicale de la Couleur** : Pas de bleu, pas de vert, pas de jaune. Même pour les graphiques de progression.
-  - **Visualisation de Données** : Courbes de récupération, de fatigue et histogrammes en style filaire haute précision (lignes blanches ultra-fines, pointillés, niveaux de gris).
-  - **Alertes de Rupture & Seuils Critiques** : Pour marquer le danger (ex: CNS > 85% ou risque articulaire), utiliser des variations de textures, du texte en gras, ou des overlays d'opacité translucides plutôt que des indicateurs colorés afin de préserver l'identité monochrome.
+  - **Palette de Base Monochrome** : Fond Noir OLED / Zinc-950 (`#09090b`), Conteneurs de cartes en Zinc-900 (`#18181b`), Texte principal en Zinc-50 (`#fafafa`), métadonnées et bordures en Zinc-400 / Zinc-800 (`#a1a1aa` / `rgba(255,255,255,0.08)`).
+  - **Usage Tactique de la Couleur** : L'identité reste sobre, mais l'utilisation de couleurs fonctionnelles (rouge chirurgical `#ef4444` pour le danger/surcharge SNC, orange/jaune cliniques pour les seuils intermédiaires ou les muscles en tension) est recommandée lorsque cela apporte une clarté indispensable à la lecture des données ou des graphiques de progression.
+  - **Visualisation de Données** : Courbes de récupération, de fatigue et histogrammes exploitant le contraste monochrome complété par des accents colorés (rouge, orange, gris) pour identifier immédiatement les zones critiques, les surcharges ou les paliers de progression.
+  - **Alertes de Rupture & Seuils Critiques** : Utiliser le rouge chirurgical ou des variations de couleurs d'avertissement claires pour marquer le danger (ex: CNS > 85% ou risque articulaire élevé), rendant la télémétrie de sécurité immédiatement identifiable.
   - **Typographie** : Geist Sans pour l'interface et les titres, JetBrains Mono (monospace) pour tous les nombres, métriques, télémétries et historiques d'exercices.
   - **Friction Zéro** : Boutons tactiles larges, steppers de pouce, pas de saisie au clavier pendant l'entraînement.
 
