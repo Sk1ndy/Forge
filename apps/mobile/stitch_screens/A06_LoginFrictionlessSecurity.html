@@ -1,0 +1,317 @@
+<!DOCTYPE html><html class="dark" lang="en" style=""><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>VESSEL_OS | LOCKING THE SPARK</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;900&amp;family=Geist:wght@400;500;600;700;800;900&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "surface-bright": "#393939",
+                    "error": "#ffb4ab",
+                    "ghost-border": "rgba(255, 255, 255, 0.1)",
+                    "surface-container-lowest": "#0e0e0e",
+                    "on-tertiary-fixed-variant": "#930013",
+                    "background": "#000000",
+                    "on-primary-container": "#636565",
+                    "zinc-400": "#A1A1AA",
+                    "tertiary-fixed-dim": "#ffb3ad",
+                    "surface-dim": "#131313",
+                    "on-secondary-container": "#b4b4bd",
+                    "outline-variant": "#444748",
+                    "on-tertiary-fixed": "#410004",
+                    "surface-tint": "#c6c6c7",
+                    "on-background": "#e2e2e2",
+                    "error-container": "#93000a",
+                    "tertiary": "#ffffff",
+                    "on-primary": "#2f3131",
+                    "inverse-on-surface": "#303030",
+                    "chirurgical-red": "#EF4444",
+                    "on-secondary-fixed": "#1a1b22",
+                    "primary": "#ffffff",
+                    "on-secondary-fixed-variant": "#45464e",
+                    "secondary-container": "#45464e",
+                    "primary-container": "#e2e2e2",
+                    "on-secondary": "#2f3037",
+                    "on-primary-fixed": "#1a1c1c",
+                    "primary-fixed-dim": "#c6c6c7",
+                    "outline": "#8e9192",
+                    "primary-fixed": "#e2e2e2",
+                    "inverse-surface": "#e2e2e2",
+                    "tertiary-fixed": "#ffdad7",
+                    "tertiary-container": "#ffdad7",
+                    "on-tertiary-container": "#c22229",
+                    "on-error": "#690005",
+                    "secondary-fixed-dim": "#c6c6cf",
+                    "on-tertiary": "#68000a",
+                    "surface-container-high": "#2a2a2a",
+                    "surface": "#131313",
+                    "glass-border": "rgba(255, 255, 255, 0.08)",
+                    "on-primary-fixed-variant": "#454747",
+                    "on-error-container": "#ffdad6",
+                    "on-surface": "#e2e2e2",
+                    "inverse-primary": "#5d5f5f",
+                    "surgical-white": "#FFFFFF",
+                    "surface-container": "#1f1f1f",
+                    "surface-variant": "#353535",
+                    "glass-fill": "rgba(255, 255, 255, 0.03)",
+                    "secondary-fixed": "#e2e1eb",
+                    "on-surface-variant": "#c4c7c8",
+                    "surface-container-low": "#1b1b1b",
+                    "secondary": "#c6c6cf",
+                    "surface-container-highest": "#353535"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "2xl": "24px",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "gutter": "12px",
+                    "unit": "4px",
+                    "margin-mobile": "20px",
+                    "reach-zone-padding": "32px"
+            },
+            "fontFamily": {
+                    "headline-lg": ["Geist"],
+                    "telemetry-lg": ["JetBrains Mono"],
+                    "label-caps": ["JetBrains Mono"],
+                    "body-md": ["Geist"],
+                    "telemetry-md": ["JetBrains Mono"],
+                    "body-lg": ["Geist"],
+                    "headline-md": ["Geist"]
+            },
+            "fontSize": {
+                    "headline-lg": ["32px", {"lineHeight": "1.1", "letterSpacing": "-0.04em", "fontWeight": "700"}],
+                    "headline-lg-mobile": ["28px", {"lineHeight": "1.1", "letterSpacing": "-0.04em", "fontWeight": "700"}],
+                    "telemetry-lg": ["20px", {"lineHeight": "1", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "label-caps": ["12px", {"lineHeight": "1", "letterSpacing": "0.1em", "fontWeight": "700"}],
+                    "body-md": ["16px", {"lineHeight": "1.5", "letterSpacing": "0em", "fontWeight": "400"}],
+                    "telemetry-md": ["14px", {"lineHeight": "1.2", "letterSpacing": "0em", "fontWeight": "500"}],
+                    "body-lg": ["18px", {"lineHeight": "1.5", "letterSpacing": "0em", "fontWeight": "400"}],
+                    "headline-md": ["24px", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "600"}]
+            },
+            "animation": {
+                    "staggered-entrance": "staggered-entrance 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards",
+                    "breath": "breath 3s ease-in-out infinite"
+            },
+            "keyframes": {
+                    "staggered-entrance": {
+                        "0%": { opacity: 0, transform: "translateY(20px)" },
+                        "100%": { opacity: 1, transform: "translateY(0)" }
+                    },
+                    "breath": {
+                        "0%, 100%": { boxShadow: "0 0 10px rgba(255,255,255,0.2)" },
+                        "50%": { boxShadow: "0 0 20px rgba(255,255,255,0.6)" }
+                    }
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            display: inline-block;
+            line-height: 1;
+            text-transform: none;
+            letter-spacing: normal;
+            word-wrap: normal;
+            white-space: nowrap;
+            direction: ltr;
+        }
+        .kinetic-slider-track {
+            background: linear-gradient(90deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%);
+        }
+        .glass-input:focus {
+            border-color: rgba(255, 255, 255, 0.4) !important;
+            outline: none;
+        }
+        .haptic-light:active { transform: scale(0.97); transition: transform 200ms cubic-bezier(0.34, 1.56, 0.64, 1); }
+        .haptic-heavy:active { transform: scale(0.95); transition: transform 200ms cubic-bezier(0.34, 1.56, 0.64, 1); }
+        
+        .stagger-1 { animation-delay: 40ms; opacity: 0; }
+        .stagger-2 { animation-delay: 80ms; opacity: 0; }
+        .stagger-3 { animation-delay: 120ms; opacity: 0; }
+        .stagger-4 { animation-delay: 160ms; opacity: 0; }
+        .stagger-5 { animation-delay: 200ms; opacity: 0; }
+        .stagger-6 { animation-delay: 240ms; opacity: 0; }
+
+        body {
+            background-color: #000000;
+            color: #FFFFFF;
+            -webkit-font-smoothing: antialiased;
+            overflow-x: hidden;
+        }
+    </style>
+</head>
+<body class="bg-background min-h-screen flex flex-col font-body-md font-medium">
+<!-- TopAppBar -->
+<header class="fixed top-0 w-full z-50 flex justify-between items-center px-margin-mobile h-16 bg-black/50 backdrop-blur-xl border-b border-white/[0.08]">
+<div class="flex items-center gap-3">
+<img alt="Progressive Overload Logo" class="w-8 h-8 object-contain" src="https://lh3.googleusercontent.com/aida/AP1WRLtc4IbyjqRAV8DxOeqGL1gY1ftJXAXP_1mJ7LRrcTFIYAgURbcXWNtlwVIGYt8ZmwXj4upu9ZLs7VKiGV-KLCk8gj-rX55jk0VQphyyMYJjGOkWN_sbsqwjXglvlWZjSvMOBxks0-MsTPeVGoAan0-Q6lAY24mN9UbIKBMDym0VZ1Rv1aq5LXlnZtaQf-SIxaqjgrFQ0vVyBtWGGgnO6iccj-ZZH7C_JqI4fTZnoP-VHDiXOTPtRQRn6w">
+
+</div>
+<div class="flex items-center gap-2">
+
+
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="flex-grow flex flex-col px-margin-mobile pt-24 pb-48">
+<!-- Header Section -->
+<section class="mb-10 animate-staggered-entrance stagger-1">
+<h1 class="font-headline-lg-mobile text-headline-lg-mobile text-surgical-white mb-2 tracking-tighter">LOCKING THE SPARK</h1>
+<p class="font-body-md text-body-md text-zinc-400 max-w-[280px]">Secure your diagnostic data and initiate the elite protocol.</p>
+</section><section class="space-y-3 mb-10 animate-staggered-entrance stagger-6">
+
+<button class="haptic-light w-full h-14 flex items-center justify-center gap-3 bg-white/[0.03] backdrop-blur-xl border border-white/[0.08] border-t-white/[0.2] rounded-2xl text-surgical-white font-label-caps text-label-caps hover:bg-white/5 transition-colors shadow-sm">
+<span class="material-symbols-outlined">mail</span>
+                AUTHENTICATE VIA GOOGLE
+            </button>
+</section>
+<!-- Input Section -->
+<section class="space-y-4 mb-8">
+<div class="group animate-staggered-entrance stagger-2">
+<label class="block font-label-caps text-label-caps text-zinc-400 mb-2 ml-1">SUBJECT_NAME</label>
+<div class="relative">
+<input autocapitalize="words" class="glass-input w-full h-14 px-5 bg-white/[0.03] backdrop-blur-xl border border-white/[0.08] border-t-white/[0.2] rounded-2xl text-surgical-white font-telemetry-md transition-all duration-300 shadow-sm" placeholder="ENTER IDENTIFIER" type="text">
+</div>
+</div>
+<div class="group animate-staggered-entrance stagger-3">
+<label class="block font-label-caps text-label-caps text-zinc-400 mb-2 ml-1">ACCESS_NODE_EMAIL</label>
+<div class="relative">
+<input autocapitalize="none" autocorrect="off" class="glass-input w-full h-14 px-5 bg-white/[0.03] backdrop-blur-xl border border-white/[0.08] border-t-white/[0.2] rounded-2xl text-surgical-white font-telemetry-md transition-all duration-300 shadow-sm" placeholder="COORDINATES@VESSEL.OS" type="email">
+</div>
+</div>
+<div class="group animate-staggered-entrance stagger-4">
+<label class="block font-label-caps text-label-caps text-zinc-400 mb-2 ml-1">CRYPTOGRAPHIC_KEY</label>
+<div class="relative flex items-center">
+<input class="glass-input w-full h-14 pl-5 pr-12 bg-white/[0.03] backdrop-blur-xl border border-white/[0.08] border-t-white/[0.2] rounded-2xl text-surgical-white font-telemetry-md transition-all duration-300 shadow-sm" id="crypto-key-input" placeholder="••••••••••••" type="password">
+<button class="absolute right-4 text-zinc-400 hover:text-white transition-colors" onclick="const i = document.getElementById('crypto-key-input'); i.type = i.type === 'password' ? 'text' : 'password'; this.textContent = i.type === 'password' ? 'visibility' : 'visibility_off';">
+<span class="material-symbols-outlined text-xl">visibility</span>
+</button>
+</div>
+</div>
+</section>
+<!-- SSO Section -->
+</main>
+<!-- Reach-Zone Interaction Area -->
+<div class="fixed bottom-0 left-0 w-full px-margin-mobile pb-12 pt-8 bg-gradient-to-t from-black via-black/90 to-transparent">
+<!-- Slide to Lock Kinetic Slider -->
+<div class="relative w-full h-20 kinetic-slider-track rounded-full border border-white/[0.08] bg-white/[0.03] backdrop-blur-xl border-t-white/[0.2] p-2 flex items-center overflow-hidden animate-breath" id="slider-root">
+<div class="absolute left-0 top-0 h-full bg-surgical-white/10 w-0 transition-all duration-75" id="slider-bg-progress"></div>
+<div class="relative z-10 w-16 h-16 bg-surgical-white rounded-full flex items-center justify-center cursor-pointer shadow-xl haptic-heavy touch-none" id="slider-handle"><span class="material-symbols-outlined text-background group-[.loading]:hidden" data-icon="lock">lock</span>
+<div class="hidden group-[.loading]:block w-6 h-6 border-2 border-background/30 border-t-background rounded-full animate-spin"></div></div>
+<div class="absolute inset-0 flex items-center justify-center pointer-events-none">
+<span class="font-label-caps text-label-caps text-zinc-400 tracking-widest opacity-60">SLIDE TO LOCK SPARK</span>
+</div>
+</div>
+<!-- Footer Metadata -->
+<footer class="mt-8 flex justify-between items-center">
+<div class="flex flex-col">
+<span class="font-label-caps text-[10px] text-zinc-400">ENCRYPTION</span>
+
+</div>
+<div class="flex flex-col items-end">
+<span class="font-label-caps text-[10px] text-zinc-400">DATA_INTEGRITY</span>
+<div class="flex items-center gap-2">
+
+<div class="w-2 h-2 rounded-full bg-surgical-white animate-pulse"></div>
+</div>
+</div>
+</footer>
+</div>
+<script>
+        // Kinetic Slider Logic
+        const handle = document.getElementById('slider-handle');
+        const track = document.getElementById('slider-root');
+        const progress = document.getElementById('slider-bg-progress');
+        let isDragging = false;
+        let startX = 0;
+        let currentX = 0;
+
+        const onStart = (e) => {
+            isDragging = true;
+            startX = (e.touches ? e.touches[0].clientX : e.clientX) - currentX;
+            handle.style.transition = 'none';
+            progress.style.transition = 'none';
+        };
+
+        const onMove = (e) => {
+            if (!isDragging) return;
+            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            const maxDrag = track.offsetWidth - handle.offsetWidth - 16;
+            let x = clientX - startX;
+            
+            x = Math.max(0, Math.min(x, maxDrag));
+            currentX = x;
+            
+            handle.style.transform = `translateX(${x}px)`;
+            progress.style.width = `${x + handle.offsetWidth}px`;
+
+            // Visual feedback on completion
+            if (x >= maxDrag * 0.95) {
+                handle.style.backgroundColor = '#EF4444'; // Red feedback
+            } else {
+                handle.style.backgroundColor = '#FFFFFF';
+            }
+        };
+
+        const onEnd = () => {
+            if (!isDragging) return;
+            isDragging = false;
+            const maxDrag = track.offsetWidth - handle.offsetWidth - 16;
+
+            if (currentX >= maxDrag * 0.9) {
+                // Success State
+                currentX = maxDrag;
+                handle.style.transform = `translateX(${maxDrag}px)`;
+                progress.style.width = `100%`;
+                
+                // Simulated Haptic & Success Redirect
+                handle.classList.add('scale-90');
+                setTimeout(() => {
+                    document.body.style.opacity = '0.5';
+                    console.log("SPARK LOCKED: INITIATING PROTOCOL");
+                }, 200);
+            } else {
+                // Reset
+                currentX = 0;
+                handle.style.transition = 'transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), background-color 0.2s';
+                progress.style.transition = 'width 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)';
+                handle.style.transform = `translateX(0px)`;
+                handle.style.backgroundColor = '#FFFFFF';
+                progress.style.width = `0px`;
+            }
+        };
+
+        handle.addEventListener('mousedown', onStart);
+        handle.addEventListener('touchstart', onStart);
+        window.addEventListener('mousemove', onMove);
+        window.addEventListener('touchmove', onMove);
+        window.addEventListener('mouseup', onEnd);
+        window.addEventListener('touchend', onEnd);
+
+        // Input Focus Visuals
+        const inputs = document.querySelectorAll('input');
+        inputs.forEach(input => {
+            input.addEventListener('focus', () => {
+                input.parentElement.previousElementSibling.classList.replace('text-zinc-400', 'text-surgical-white');
+            });
+            input.addEventListener('blur', () => {
+                input.parentElement.previousElementSibling.classList.replace('text-surgical-white', 'text-zinc-400');
+            });
+        });
+    </script>
+
+
+
+
+</body></html>

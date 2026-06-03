@@ -1,0 +1,213 @@
+<!DOCTYPE html><html class="dark" lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>THE BANISTER LAB | Forge Engine</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&amp;family=Geist:wght@400;600;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<style>
+        body {
+            background-color: #000000;
+            color: #e2e2e2;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(20px);
+        }
+        .chart-grid-line {
+            stroke: #1f1f1f;
+            stroke-width: 1;
+        }
+        .curve-fitness {
+            stroke: #ffffff;
+            stroke-width: 2;
+            fill: none;
+        }
+        .curve-fatigue {
+            stroke: #EF4444;
+            stroke-width: 2;
+            fill: none;
+        }
+        .curve-performance {
+            stroke: #ffffff;
+            stroke-width: 2;
+            stroke-dasharray: 4 4;
+            fill: none;
+        }
+        .active-scale {
+            background: #ffffff;
+            color: #000000;
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "on-primary": "#2f3131",
+                      "primary": "#ffffff",
+                      "surgical-white": "#FFFFFF",
+                      "surface": "#131313",
+                      "background": "#131313",
+                      "glass-border": "rgba(255, 255, 255, 0.08)",
+                      "glass-fill": "rgba(255, 255, 255, 0.03)",
+                      "zinc-400": "#A1A1AA",
+                      "ghost-border": "rgba(255, 255, 255, 0.1)",
+                      "chirurgical-red": "#EF4444"
+              },
+              "spacing": {
+                      "unit": "4px",
+                      "reach-zone-padding": "32px",
+                      "margin-mobile": "20px"
+              },
+              "fontFamily": {
+                      "telemetry-md": ["JetBrains Mono"],
+                      "label-caps": ["JetBrains Mono"],
+                      "headline-md": ["Geist Sans"],
+                      "body-md": ["Geist Sans"]
+              },
+              "fontSize": {
+                      "telemetry-md": ["14px", {"lineHeight": "1.2", "fontWeight": "500"}],
+                      "label-caps": ["12px", {"lineHeight": "1", "letterSpacing": "0.1em", "fontWeight": "700"}],
+                      "telemetry-lg": ["20px", {"lineHeight": "1", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                      "headline-md": ["24px", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "600"}]
+              }
+            },
+          }
+        }
+      </script>
+</head>
+<body class="font-body-md bg-black">
+<!-- TopAppBar -->
+<header class="fixed top-0 w-full z-50 bg-background border-b border-ghost-border flex items-center justify-between px-margin-mobile h-16">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary" data-icon="analytics">analytics</span>
+<div class="flex flex-col">
+<h1 class="font-headline-md text-headline-md font-bold tracking-tighter text-primary">BANISTER LAB</h1>
+<span class="font-label-caps text-[10px] tracking-widest text-zinc-400">ANALYSIS // ENGINE.V3</span>
+</div>
+</div>
+<button class="hover:opacity-80 transition-opacity active:scale-95 transition-transform">
+<span class="material-symbols-outlined text-zinc-400" data-icon="settings_input_component">settings_input_component</span>
+</button>
+</header>
+<main class="pt-24 pb-32 px-margin-mobile space-y-8">
+<!-- Primary Telemetry Grid -->
+<div class="grid grid-cols-3 gap-3">
+<div class="glass-card p-4 rounded-lg flex flex-col items-start gap-1">
+<span class="font-label-caps text-label-caps text-zinc-400 uppercase">ACWR</span>
+<span class="font-telemetry-md text-[24px] text-white">1.14</span>
+</div>
+<div class="glass-card p-4 rounded-lg flex flex-col items-start gap-1">
+<span class="font-label-caps text-label-caps text-zinc-400 uppercase">Freshness</span>
+<span class="font-telemetry-md text-[24px] text-white">+12%</span>
+</div>
+<div class="glass-card p-4 rounded-lg flex flex-col items-start gap-1">
+<span class="font-label-caps text-label-caps text-zinc-400 uppercase">Overload</span>
+<span class="font-telemetry-md text-[24px] text-chirurgical-red">HIGH</span>
+</div>
+</div>
+<!-- The Banister Lab Chart -->
+<div class="relative w-full aspect-[4/5] bg-black border border-ghost-border rounded-xl overflow-hidden">
+<!-- Legend (Glass Box) -->
+<div class="absolute top-4 left-4 z-10 glass-card px-3 py-2 rounded flex flex-col gap-2">
+<div class="flex items-center gap-2">
+<div class="w-3 h-[2px] bg-white"></div>
+<span class="font-label-caps text-[10px] text-white">FITNESS</span>
+</div>
+<div class="flex items-center gap-2">
+<div class="w-3 h-[2px] bg-chirurgical-red"></div>
+<span class="font-label-caps text-[10px] text-white">FATIGUE (CNS)</span>
+</div>
+<div class="flex items-center gap-2">
+<div class="w-3 h-[2px] border-t border-dashed border-white"></div>
+<span class="font-label-caps text-[10px] text-white">PERFORMANCE</span>
+</div>
+</div>
+<!-- SVG Chart -->
+<svg class="w-full h-full" preserveAspectRatio="none" viewBox="0 0 400 500">
+<!-- Grid Lines -->
+<line class="chart-grid-line" x1="0" x2="400" y1="100" y2="100"></line>
+<line class="chart-grid-line" x1="0" x2="400" y1="200" y2="200"></line>
+<line class="chart-grid-line" x1="0" x2="400" y1="300" y2="300"></line>
+<line class="chart-grid-line" x1="0" x2="400" y1="400" y2="400"></line>
+<line class="chart-grid-line" x1="80" x2="80" y1="0" y2="500"></line>
+<line class="chart-grid-line" x1="160" x2="160" y1="0" y2="500"></line>
+<line class="chart-grid-line" x1="240" x2="240" y1="0" y2="500"></line>
+<line class="chart-grid-line" x1="320" x2="320" y1="0" y2="500"></line>
+<!-- Fitness Curve -->
+<path class="curve-fitness" d="M0,450 C50,420 100,430 150,380 S250,300 300,280 S350,220 400,200"></path>
+<!-- Fatigue Curve -->
+<path class="curve-fatigue" d="M0,480 C30,400 80,450 120,350 S180,420 220,300 S300,380 400,250"></path>
+<!-- Performance Curve -->
+<path class="curve-performance" d="M0,490 C60,480 120,470 180,460 S280,430 400,400"></path>
+</svg>
+<!-- Interaction Overlay -->
+<div class="absolute inset-0 flex items-center justify-center pointer-events-none opacity-20">
+<span class="font-label-caps text-zinc-400 text-[10px]">REAL-TIME TELEMETRY STREAMING...</span>
+</div>
+</div>
+<!-- Time-Scale Selector (Reach-Zone) -->
+<div class="flex justify-center pt-4">
+<div class="glass-card p-1 rounded-full flex items-center gap-1">
+<button class="px-6 py-2 rounded-full font-label-caps text-label-caps text-zinc-400 hover:text-white transition-colors">1M</button>
+<button class="px-6 py-2 rounded-full font-label-caps text-label-caps active-scale">3M</button>
+<button class="px-6 py-2 rounded-full font-label-caps text-label-caps text-zinc-400 hover:text-white transition-colors">6M</button>
+</div>
+</div>
+<!-- Data Integrity Badge -->
+<div class="flex items-center justify-center gap-2 py-4">
+<div class="w-1.5 h-1.5 rounded-full bg-chirurgical-red animate-pulse"></div>
+<span class="font-label-caps text-[10px] text-zinc-400">ENGINE SYNC: ACTIVE // LATENCY: 14MS</span>
+</div>
+</main>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 w-full z-50 border-t border-ghost-border bg-background/95 backdrop-blur-xl flex justify-around items-center pt-2 pb-reach-zone-padding px-margin-mobile">
+<a class="flex flex-col items-center gap-1 text-zinc-400 opacity-50 hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="bolt">bolt</span>
+<span class="font-label-caps text-label-caps uppercase">EXTRACT</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-zinc-400 opacity-50 hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="monitoring">monitoring</span>
+<span class="font-label-caps text-label-caps uppercase">VITAL</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-primary scale-90 transition-transform duration-150" href="#">
+<span class="material-symbols-outlined" data-icon="biotech">biotech</span>
+<span class="font-label-caps text-label-caps uppercase">LAB</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-zinc-400 opacity-50 hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="person">person</span>
+<span class="font-label-caps text-label-caps uppercase">PROFILE</span>
+</a>
+</nav>
+<script>
+        // Micro-interaction for the chart
+        const svg = document.querySelector('svg');
+        svg.addEventListener('mousemove', (e) => {
+            const rect = svg.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            // Technical flourish logic could go here to show crosshairs
+        });
+
+        // Simple scale toggle logic
+        const scaleButtons = document.querySelectorAll('.px-6.py-2');
+        scaleButtons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                scaleButtons.forEach(b => {
+                    b.classList.remove('active-scale');
+                    b.classList.add('text-zinc-400');
+                });
+                btn.classList.add('active-scale');
+                btn.classList.remove('text-zinc-400');
+            });
+        });
+    </script>
+</body></html>

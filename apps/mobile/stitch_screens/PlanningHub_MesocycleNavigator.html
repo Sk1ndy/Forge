@@ -1,0 +1,262 @@
+<!DOCTYPE html><html class="dark" lang="fr"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@100..900&amp;family=JetBrains+Mono:wght@100..800&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Geist+Sans:wght@100..900&amp;family=JetBrains+Mono:wght@100..900&amp;display=swap" rel="stylesheet">
+<style>
+        body {
+            background-color: #000000;
+            color: #e2e2e2;
+            font-family: 'Geist Sans', sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(20px);
+        }
+        .ghost-border {
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        .chart-container {
+            position: relative;
+            height: 240px;
+            width: 100%;
+        }
+        .vertical-marker {
+            width: 1px;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.1);
+            position: absolute;
+        }
+        .squarcle {
+            border-radius: 24px;
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "chirurgical-red": "#EF4444",
+                        "surface": "#131313",
+                        "surface-container-high": "#2a2a2a",
+                        "surface-container-lowest": "#0e0e0e",
+                        "background": "#131313",
+                        "glass-fill": "rgba(255, 255, 255, 0.03)",
+                        "surgical-white": "#FFFFFF",
+                        "ghost-border": "rgba(255, 255, 255, 0.1)",
+                        "zinc-400": "#A1A1AA",
+                    },
+                    fontFamily: {
+                        "headline-lg": ["Geist Sans"],
+                        "body-md": ["Geist Sans"],
+                        "headline-md": ["Geist Sans"],
+                        "telemetry-lg": ["JetBrains Mono"],
+                        "label-caps": ["JetBrains Mono"],
+                        "telemetry-md": ["JetBrains Mono"],
+                    },
+                    spacing: {
+                        "unit": "4px",
+                        "margin-mobile": "20px",
+                        "reach-zone-padding": "32px"
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-black overflow-x-hidden pb-32">
+<!-- TopAppBar -->
+<header class="fixed top-0 w-full z-50 bg-background/80 backdrop-blur-md border-b border-ghost-border flex justify-between items-center h-16 px-margin-mobile">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-surgical-white">analytics</span>
+<h1 class="font-label-caps text-label-caps text-zinc-400 tracking-widest uppercase">MESOCYCLE NAVIGATOR</h1>
+</div>
+<button class="active:scale-95 transition-transform hover:opacity-80">
+<span class="material-symbols-outlined text-zinc-400">settings</span>
+</button>
+</header>
+<main class="mt-20 px-margin-mobile space-y-8">
+<!-- Weekly Selector -->
+<section class="w-full">
+<div class="flex overflow-x-auto hide-scrollbar gap-4 py-2">
+<!-- Day Item -->
+<div class="flex flex-col items-center min-w-[56px] opacity-40">
+<span class="font-label-caps text-[10px] text-zinc-400 mb-1">MON</span>
+<span class="font-telemetry-lg text-telemetry-lg text-surgical-white">12</span>
+</div>
+<div class="flex flex-col items-center min-w-[56px] opacity-40">
+<span class="font-label-caps text-[10px] text-zinc-400 mb-1">TUE</span>
+<span class="font-telemetry-lg text-telemetry-lg text-surgical-white">13</span>
+</div>
+<!-- Active Day -->
+<div class="flex flex-col items-center min-w-[56px] relative">
+<span class="font-label-caps text-[10px] text-surgical-white mb-1">WED</span>
+<span class="font-telemetry-lg text-telemetry-lg text-surgical-white drop-shadow-[0_0_8px_rgba(255,255,255,0.5)]">14</span>
+<div class="absolute -bottom-2 w-full h-[3px] bg-surgical-white rounded-full"></div>
+</div>
+<div class="flex flex-col items-center min-w-[56px] opacity-40">
+<span class="font-label-caps text-[10px] text-zinc-400 mb-1">THU</span>
+<span class="font-telemetry-lg text-telemetry-lg text-surgical-white">15</span>
+</div>
+<div class="flex flex-col items-center min-w-[56px] opacity-40">
+<span class="font-label-caps text-[10px] text-zinc-400 mb-1">FRI</span>
+<span class="font-telemetry-lg text-telemetry-lg text-surgical-white">16</span>
+</div>
+<div class="flex flex-col items-center min-w-[56px] opacity-40">
+<span class="font-label-caps text-[10px] text-zinc-400 mb-1">SAT</span>
+<span class="font-telemetry-lg text-telemetry-lg text-surgical-white">17</span>
+</div>
+<div class="flex flex-col items-center min-w-[56px] opacity-40">
+<span class="font-label-caps text-[10px] text-zinc-400 mb-1">SUN</span>
+<span class="font-telemetry-lg text-telemetry-lg text-surgical-white">18</span>
+</div>
+</div>
+</section>
+<!-- Progressive Overload Chart -->
+<section class="space-y-4">
+<div class="flex justify-between items-end">
+<div>
+<h2 class="font-label-caps text-label-caps text-zinc-400">LOAD_TELEMETRY.v04</h2>
+<p class="font-headline-md text-headline-md text-surgical-white">12-WEEK EXTRACTION</p>
+</div>
+<div class="text-right">
+<span class="font-telemetry-md text-telemetry-md text-chirurgical-red">STATUS: OVERLOAD_PHASE</span>
+</div>
+</div>
+<div class="chart-container glass-card squarcle p-6 overflow-hidden">
+<div class="absolute inset-0 opacity-10 pointer-events-none" style="background-image: radial-gradient(#ffffff 1px, transparent 1px); background-size: 20px 20px;"></div>
+<!-- Chart SVG -->
+<svg class="w-full h-full overflow-visible" viewBox="0 0 400 150">
+<!-- Grid Lines -->
+<line stroke="rgba(255,255,255,0.05)" x1="0" x2="400" y1="120" y2="120"></line>
+<line stroke="rgba(255,255,255,0.05)" x1="0" x2="400" y1="80" y2="80"></line>
+<line stroke="rgba(255,255,255,0.05)" x1="0" x2="400" y1="40" y2="40"></line>
+<!-- Overload/Deload Vertical Markers -->
+<line stroke="rgba(255,255,255,0.2)" stroke-dasharray="4" x1="280" x2="280" y1="0" y2="150"></line>
+<text fill="rgba(255,255,255,0.4)" font-family="JetBrains Mono" font-size="8" x="285" y="20">DELOAD_WINDOW</text>
+<!-- Fatigue Line (Red Dashed) -->
+<path d="M0,140 Q50,130 100,100 T200,80 T300,90 T400,60" fill="none" stroke="#ef4444" stroke-dasharray="4" stroke-width="1.5"></path>
+<!-- Fitness/Load Line (White Solid) -->
+<path d="M0,130 Q50,110 100,90 T200,60 T300,50 T400,30" fill="none" stroke="white" stroke-width="2.5"></path>
+<!-- Data Points -->
+<circle cx="320" cy="48" fill="white" r="4"></circle>
+</svg>
+<!-- Labels -->
+<div class="absolute bottom-4 left-4 flex gap-4">
+<div class="flex items-center gap-2">
+<div class="w-3 h-0.5 bg-surgical-white"></div>
+<span class="font-label-caps text-[9px] text-zinc-400 uppercase">Fitness/Load</span>
+</div>
+<div class="flex items-center gap-2">
+<div class="w-3 h-0.5 border-t border-dashed border-chirurgical-red"></div>
+<span class="font-label-caps text-[9px] text-zinc-400 uppercase">Fatigue</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Daily Prescription -->
+<section class="space-y-4">
+<h3 class="font-label-caps text-label-caps text-zinc-400">DAILY_SESSIONS</h3>
+<div class="space-y-3">
+<!-- Session A -->
+<div class="glass-card squarcle p-5 flex flex-col gap-4">
+<div class="flex justify-between items-start">
+<div>
+<span class="font-label-caps text-[10px] text-zinc-400">SESSION_A</span>
+<h4 class="font-headline-md text-headline-md text-surgical-white">HYPERTROPHY_ALPHA</h4>
+<p class="font-body-md text-body-md text-zinc-400 mt-1">Primary Focus: Legs / Pull Mechanics</p>
+</div>
+<span class="material-symbols-outlined text-zinc-400">arrow_forward</span>
+</div>
+<div class="grid grid-cols-3 gap-2 border-t border-ghost-border pt-4">
+<div class="flex flex-col">
+<span class="font-label-caps text-[9px] text-zinc-400">EST_VOLUME</span>
+<span class="font-telemetry-md text-telemetry-md text-surgical-white">14.2t</span>
+</div>
+<div class="flex flex-col">
+<span class="font-label-caps text-[9px] text-zinc-400">INTENSITY</span>
+<span class="font-telemetry-md text-telemetry-md text-surgical-white">HIGH</span>
+</div>
+<div class="flex flex-col">
+<span class="font-label-caps text-[9px] text-zinc-400">TARGET_RPE</span>
+<span class="font-telemetry-md text-telemetry-md text-surgical-white">8.5</span>
+</div>
+</div>
+</div>
+<!-- Session B -->
+<div class="glass-card squarcle p-5 flex flex-col gap-4">
+<div class="flex justify-between items-start">
+<div>
+<span class="font-label-caps text-[10px] text-zinc-400">SESSION_B</span>
+<h4 class="font-headline-md text-headline-md text-zinc-400 italic">CNS_RECOVERY</h4>
+<p class="font-body-md text-body-md text-zinc-400 mt-1">Systemic Rest / Mobility Protocol</p>
+</div>
+<span class="material-symbols-outlined text-zinc-400 opacity-30">lock</span>
+</div>
+<div class="grid grid-cols-3 gap-2 border-t border-ghost-border pt-4 opacity-50">
+<div class="flex flex-col">
+<span class="font-label-caps text-[9px] text-zinc-400">EST_VOLUME</span>
+<span class="font-telemetry-md text-telemetry-md text-surgical-white">0.0t</span>
+</div>
+<div class="flex flex-col">
+<span class="font-label-caps text-[9px] text-zinc-400">INTENSITY</span>
+<span class="font-telemetry-md text-telemetry-md text-surgical-white">NULL</span>
+</div>
+<div class="flex flex-col">
+<span class="font-label-caps text-[9px] text-zinc-400">TARGET_RPE</span>
+<span class="font-telemetry-md text-telemetry-md text-surgical-white">2.0</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Technical Footer Quote/Log -->
+<div class="py-6 border-t border-ghost-border opacity-20">
+<p class="font-label-caps text-[10px] text-center">VESSEL_STATE: ADAPTIVE // EXTRACTION_RELIABILITY: 98.4%</p>
+</div>
+</main>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 left-0 w-full z-50 bg-surface-container-lowest/80 backdrop-blur-xl border-t border-ghost-border flex justify-around items-center h-reach-zone-padding pb-safe px-4">
+<div class="flex flex-col items-center justify-center text-zinc-400 opacity-50 transition-all active:scale-90">
+<span class="material-symbols-outlined">vibration</span>
+</div>
+<div class="flex flex-col items-center justify-center text-zinc-400 opacity-50 transition-all active:scale-90">
+<span class="material-symbols-outlined">fitness_center</span>
+</div>
+<!-- Active State: TELEMETRY (Query Stats) -->
+<div class="flex flex-col items-center justify-center text-surgical-white scale-110 transition-all active:scale-90">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">query_stats</span>
+</div>
+<div class="flex flex-col items-center justify-center text-zinc-400 opacity-50 transition-all active:scale-90">
+<span class="material-symbols-outlined">person</span>
+</div>
+</nav>
+<script>
+        // Simple micro-interaction for cards
+        document.querySelectorAll('.glass-card').forEach(card => {
+            card.addEventListener('touchstart', () => {
+                card.style.transform = 'scale(0.98)';
+                card.style.borderColor = 'rgba(255, 255, 255, 0.2)';
+            });
+            card.addEventListener('touchend', () => {
+                card.style.transform = 'scale(1)';
+                card.style.borderColor = 'rgba(255, 255, 255, 0.08)';
+            });
+        });
+    </script>
+</body></html>

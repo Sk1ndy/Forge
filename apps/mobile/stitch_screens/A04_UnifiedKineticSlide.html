@@ -1,0 +1,311 @@
+<!DOCTYPE html><html class="dark" lang="en" style=""><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0, viewport-fit=cover" name="viewport">
+<title>FORGE - THE BLUEPRINT</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&amp;family=Geist:wght@400;600;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "inverse-on-surface": "#303030",
+                        "outline-variant": "#444748",
+                        "on-surface-variant": "#c4c7c8",
+                        "secondary-container": "#45464e",
+                        "tertiary-fixed-dim": "#ffb3ad",
+                        "primary": "#ffffff",
+                        "surface-container-high": "#2a2a2a",
+                        "on-tertiary-fixed-variant": "#930013",
+                        "secondary-fixed": "#e2e1eb",
+                        "on-tertiary": "#68000a",
+                        "surface-bright": "#393939",
+                        "tertiary-container": "#ffdad7",
+                        "primary-container": "#e2e2e2",
+                        "outline": "#8e9192",
+                        "on-primary-fixed-variant": "#454747",
+                        "on-surface": "#e2e2e2",
+                        "error-container": "#93000a",
+                        "inverse-surface": "#e2e2e2",
+                        "error": "#ffb4ab",
+                        "secondary": "#c6c6cf",
+                        "chirurgical-red": "#EF4444",
+                        "on-background": "#e2e2e2",
+                        "on-primary-container": "#636565",
+                        "surface": "#131313",
+                        "zinc-400": "#A1A1AA",
+                        "surface-container-lowest": "#0e0e0e",
+                        "glass-fill": "rgba(255, 255, 255, 0.03)",
+                        "ghost-border": "rgba(255, 255, 255, 0.1)",
+                        "secondary-fixed-dim": "#c6c6cf",
+                        "on-secondary-fixed-variant": "#45464e",
+                        "on-secondary": "#2f3037",
+                        "surface-container-highest": "#353535",
+                        "on-secondary-container": "#b4b4bd",
+                        "surface-dim": "#131313",
+                        "surface-variant": "#353535",
+                        "surface-tint": "#c6c6c7",
+                        "on-secondary-fixed": "#1a1b22",
+                        "on-error": "#690005",
+                        "tertiary-fixed": "#ffdad7",
+                        "inverse-primary": "#5d5f5f",
+                        "surgical-white": "#FFFFFF",
+                        "on-primary": "#2f3131",
+                        "tertiary": "#ffffff",
+                        "primary-fixed": "#e2e2e2",
+                        "on-primary-fixed": "#1a1c1c",
+                        "glass-border": "rgba(255, 255, 255, 0.08)",
+                        "on-tertiary-container": "#c22229",
+                        "on-error-container": "#ffdad6",
+                        "background": "#131313",
+                        "on-tertiary-fixed": "#410004"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "margin-mobile": "20px",
+                        "unit": "4px",
+                        "reach-zone-padding": "32px",
+                        "gutter": "12px"
+                    },
+                    "fontFamily": {
+                        "telemetry-md": ["JetBrains Mono"],
+                        "body-md": ["Geist Sans", "sans-serif"],
+                        "telemetry-lg": ["JetBrains Mono"],
+                        "headline-md": ["Geist Sans", "sans-serif"],
+                        "label-caps": ["JetBrains Mono"],
+                        "headline-lg": ["Geist Sans", "sans-serif"],
+                        "body-lg": ["Geist Sans", "sans-serif"]
+                    },
+                    "fontSize": {
+                        "telemetry-md": ["14px", {"lineHeight": "1.2", "letterSpacing": "0em", "fontWeight": "500"}],
+                        "body-md": ["16px", {"lineHeight": "1.5", "letterSpacing": "0em", "fontWeight": "400"}],
+                        "telemetry-lg": ["20px", {"lineHeight": "1", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "headline-md": ["24px", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+                        "label-caps": ["12px", {"lineHeight": "1", "letterSpacing": "0.1em", "fontWeight": "700"}],
+                        "headline-lg": ["32px", {"lineHeight": "1.1", "letterSpacing": "-0.04em", "fontWeight": "700"}],
+                        "body-lg": ["18px", {"lineHeight": "1.5", "letterSpacing": "0em", "fontWeight": "400"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            background-color: #000000;
+            color: #FFFFFF;
+            -webkit-font-smoothing: antialiased;
+            overflow-x: hidden;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+        }
+        .ghost-border {
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .pulse-red {
+            animation: pulse-red 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        @keyframes pulse-red {
+            0%, 100% { opacity: 0.8; transform: scale(1); }
+            50% { opacity: 0.3; transform: scale(1.5); }
+        }
+        .glow-white {
+            filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.6));
+        }
+        .safe-pb {
+            padding-bottom: env(safe-area-inset-bottom);
+        }
+    </style>
+</head>
+<body class="font-body-md text-body-md min-h-screen flex flex-col">
+<!-- TopAppBar -->
+<header class="fixed top-0 w-full z-50 flex justify-between items-center px-margin-mobile h-16 bg-surface/80 dark:bg-surface/80 backdrop-blur-xl border-b border-ghost-border">
+<div class="flex items-center gap-2"><img src="https://lh3.googleusercontent.com/aida/AP1WRLtc4IbyjqRAV8DxOeqGL1gY1ftJXAXP_1mJ7LRrcTFIYAgURbcXWNtlwVIGYt8ZmwXj4upu9ZLs7VKiGV-KLCk8gj-rX55jk0VQphyyMYJjGOkWN_sbsqwjXglvlWZjSvMOBxks0-MsTPeVGoAan0-Q6lAY24mN9UbIKBMDym0VZ1Rv1aq5LXlnZtaQf-SIxaqjgrFQ0vVyBtWGGgnO6iccj-ZZH7C_JqI4fTZnoP-VHDiXOTPtRQRn6w" alt="Progressive Overload Logo" class="h-6 w-auto object-contain brightness-0 invert mr-1" style="opacity: 0;">
+<span class="font-telemetry-lg text-telemetry-lg tracking-tighter text-surgical-white">FORGE</span>
+</div>
+<div class="flex items-center gap-4">
+</div>
+</header>
+<main class="flex-1 mt-16 mb-20 px-margin-mobile overflow-y-auto pt-4 flex flex-col gap-6">
+<!-- Anatomical Viewport -->
+<section class="relative aspect-[3/4] w-full glass-panel rounded-xl overflow-hidden flex items-center justify-center p-4">
+<img alt="The Blueprint Anterior View" class="h-full w-auto object-contain" src="https://lh3.googleusercontent.com/aida/ADBb0uixuI8HDXv2Xcve__R0GfNeuOv1HSJSZ1QYQKOqu_I6W17madbYPmcn14fzRWuLFVwZSpLrBVBBINk0f3mJqFjA-SSpZofrby_uu-MaeU9r-rRI6QIjA-yjpYCpjs3D6kOuyp1M-bQN1PuQRmRWBJFVg6fHsNz-v_UNRNL9Fxd9XkVZPXcIU8N0fElUYYAk1cCHl_9HaoTgxMvwtOcIbZ3ontmdsK627q5sFIR5J3Nv0BuI7RXHOre4WrA">
+<!-- HUD Overlays (Interactive Regions) -->
+<div class="absolute inset-0 pointer-events-none">
+<!-- Chest Glow (Point Fort) -->
+<div class="absolute top-[20%] left-[25%] w-12 h-12 bg-white/20 rounded-full blur-xl glow-white"></div>
+<div class="absolute top-[20%] right-[25%] w-12 h-12 bg-white/20 rounded-full blur-xl glow-white"></div>
+<!-- Quads Glow (Point Fort) -->
+<div class="absolute bottom-[28%] left-[28%] w-16 h-24 bg-white/10 rounded-full blur-xl glow-white"></div>
+<div class="absolute bottom-[28%] right-[28%] w-16 h-24 bg-white/10 rounded-full blur-xl glow-white"></div>
+<!-- Abs Pulse (Point Faible) -->
+<div class="absolute top-[38%] left-1/2 -translate-x-1/2 w-10 h-10 bg-chirurgical-red/40 rounded-full blur-lg pulse-red"></div>
+<div class="absolute top-[42%] left-1/2 -translate-x-1/2 w-8 h-8 bg-chirurgical-red/30 rounded-full blur-lg pulse-red" style="animation-delay: 0.5s;"></div>
+</div>
+<!-- Coordinate Label -->
+</section>
+<!-- View Toggle -->
+<div class="grid grid-cols-2 p-1 bg-white/5 rounded-lg border border-ghost-border">
+<button class="py-2 rounded font-label-caps text-label-caps bg-white text-black transition-all">ANTERIOR</button>
+<button class="py-2 rounded font-label-caps text-label-caps text-zinc-400 hover:text-white transition-all">POSTERIOR</button>
+</div>
+<!-- Selection Summary Module -->
+<div class="glass-panel rounded-xl p-5 flex flex-col gap-4">
+<div class="flex justify-between items-center border-b border-ghost-border pb-2">
+<span class="font-label-caps text-label-caps text-zinc-400">BLUEPRINT_SUMMARY</span>
+<span class="font-telemetry-md text-surgical-white text-[10px]">ANALYSIS COMPLETE</span>
+</div>
+<div class="grid grid-cols-2 gap-4">
+<div class="flex flex-col gap-2">
+<span class="font-label-caps text-[10px] text-zinc-500">POINTS FORTS</span>
+<div class="flex flex-col gap-1">
+<div class="flex items-center gap-2">
+<div class="w-1.5 h-1.5 rounded-full bg-surgical-white"></div>
+<span class="font-telemetry-md text-telemetry-md text-surgical-white">QUADS</span>
+</div>
+<div class="flex items-center gap-2">
+<div class="w-1.5 h-1.5 rounded-full bg-surgical-white"></div>
+<span class="font-telemetry-md text-telemetry-md text-surgical-white">PECTORALS</span>
+</div>
+</div>
+</div>
+<div class="flex flex-col gap-2">
+<span class="font-label-caps text-[10px] text-zinc-500">POINTS FAIBLES</span>
+<div class="flex flex-col gap-1">
+<div class="flex items-center gap-2">
+<div class="w-1.5 h-1.5 rounded-full bg-chirurgical-red"></div>
+<span class="font-telemetry-md text-telemetry-md text-chirurgical-red">ABDOMINALS</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Primary Action -->
+<div class="mt-auto pb-8">
+<div class="relative w-full h-14 bg-glass-fill border border-glass-border rounded-full overflow-hidden select-none flex items-center px-1" id="slide-to-validate-container">
+<div class="absolute inset-0 flex items-center justify-center pointer-events-none">
+<span class="font-label-caps text-zinc-400 tracking-[0.4em] text-[10px] opacity-60">SLIDE TO COMMIT BLUEPRINT</span>
+</div>
+<div class="absolute inset-y-0 left-0 bg-surgical-white/5 w-0 pointer-events-none transition-all duration-75" id="slider-fill"></div>
+<!-- High-fidelity Glassmorphic Handle -->
+<div class="absolute left-1 w-12 h-12 glass-card bg-white/5 border border-[rgba(255,255,255,0.2)] rounded-full flex items-center justify-center cursor-grab active:cursor-grabbing transition-transform duration-75 micro-glow z-10" id="slider-handle">
+<div class="w-1.5 h-1.5 bg-surgical-white rounded-full"></div>
+</div>
+</div>
+<style>
+  #slide-to-validate-container {
+    touch-action: none;
+  }
+</style>
+<script>
+  (function() {
+    const container = document.getElementById('slide-to-validate-container');
+    const handle = document.getElementById('slider-handle');
+    const fill = document.getElementById('slider-fill');
+    let isDragging = false;
+    let startX = 0;
+    const padding = 4; // Based on px-1 (4px)
+    
+    const updateMaxMove = () => {
+        return container.clientWidth - handle.clientWidth - (padding * 2);
+    };
+
+    const onStart = (e) => {
+      isDragging = true;
+      startX = (e.pageX || e.touches[0].pageX) - (parseFloat(handle.style.transform.replace('translateX(', '')) || 0);
+      handle.classList.remove('transition-transform');
+      fill.classList.remove('transition-all');
+    };
+
+    const onMove = (e) => {
+      if (!isDragging) return;
+      const currentX = e.pageX || e.touches[0].pageX;
+      let move = currentX - startX;
+      const maxMove = updateMaxMove();
+      move = Math.max(0, Math.min(move, maxMove));
+      handle.style.transform = `translateX(${move}px)`;
+      fill.style.width = `${move + (handle.clientWidth / 2) + padding}px`;
+      
+      if (move >= maxMove) {
+        isDragging = false;
+        handle.style.transform = `translateX(${maxMove}px)`;
+        container.classList.add('bg-surgical-white/10');
+        container.querySelector('span').classList.replace('text-zinc-400', 'text-surgical-white');
+        container.querySelector('span').classList.replace('opacity-60', 'opacity-100');
+        handle.style.opacity = '0.5';
+        handle.style.pointerEvents = 'none';
+      }
+    };
+
+    const onEnd = () => {
+      if (!isDragging) return;
+      isDragging = false;
+      const move = parseFloat(handle.style.transform.replace('translateX(', '')) || 0;
+      const maxMove = updateMaxMove();
+      if (move < maxMove) {
+        handle.classList.add('transition-transform');
+        fill.classList.add('transition-all');
+        handle.style.transform = 'translateX(0px)';
+        fill.style.width = '0px';
+      }
+    };
+
+    handle.addEventListener('mousedown', onStart);
+    handle.addEventListener('touchstart', onStart);
+    window.addEventListener('mousemove', onMove);
+    window.addEventListener('touchmove', onMove);
+    window.addEventListener('mouseup', onEnd);
+    window.addEventListener('touchend', onEnd);
+  })();
+</script>
+</div>
+</main>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 w-full z-50 bg-surface/90 backdrop-blur-2xl border-t border-ghost-border pb-safe">
+</nav>
+<script>
+        // Micro-interaction for toggling views
+        const toggleButtons = document.querySelectorAll('button.font-label-caps');
+        toggleButtons.forEach(btn => {
+            btn.addEventListener('click', function() {
+                toggleButtons.forEach(b => {
+                    b.classList.remove('bg-white', 'text-black');
+                    b.classList.add('text-zinc-400');
+                });
+                this.classList.remove('text-zinc-400');
+                this.classList.add('bg-white', 'text-black');
+                
+                // Haptic feedback simulation
+                if (window.navigator.vibrate) {
+                    window.navigator.vibrate(10);
+                }
+            });
+        });
+
+        // Simulating coordinate tracking on anatomical view
+        const viewport = document.querySelector('.relative.aspect-\\[3\\/4\\]');
+        const coordLabel = viewport.querySelector('.font-telemetry-md');
+        
+        viewport.addEventListener('mousemove', (e) => {
+            const rect = viewport.getBoundingClientRect();
+            const x = (e.clientX - rect.left).toFixed(1);
+            const y = (e.clientY - rect.top).toFixed(1);
+            coordLabel.innerHTML = `LOC_X: ${x}<br>LOC_Y: ${y}`;
+        });
+    </script>
+
+
+</body></html>

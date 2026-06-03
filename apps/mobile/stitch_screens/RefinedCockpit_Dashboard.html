@@ -1,0 +1,308 @@
+<!DOCTYPE html><html class="dark" lang="fr" style=""><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0, viewport-fit=cover" name="viewport">
+<title>VESSL_OS_v1.0 | BIOMECH DASHBOARD</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&amp;family=Geist+Sans:wght@400;600;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<style>
+        body {
+            background-color: #000000;
+            color: #FFFFFF;
+            -webkit-font-smoothing: antialiased;
+            overflow-x: hidden;
+        }
+
+        .glass-container {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border-radius: 24px;
+        }
+
+        .ghost-border-subtle {
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .pulse-red {
+            animation: pulse-red-glow 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+
+        @keyframes pulse-red-glow {
+            0%, 100% { filter: drop-shadow(0 0 2px rgba(239, 68, 68, 0.4)); opacity: 0.8; }
+            50% { filter: drop-shadow(0 0 12px rgba(239, 68, 68, 0.9)); opacity: 1; }
+        }
+
+        .pulse-primary {
+            animation: pulse-primary-glow 3s infinite;
+        }
+
+        @keyframes pulse-primary-glow {
+            0% { box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.2); }
+            70% { box-shadow: 0 0 0 15px rgba(255, 255, 255, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(255, 255, 255, 0); }
+        }
+
+        .scanline {
+            width: 100%;
+            height: 2px;
+            background: rgba(255, 255, 255, 0.1);
+            position: absolute;
+            top: 0;
+            animation: scan 4s linear infinite;
+        }
+
+        @keyframes scan {
+            0% { top: 0; }
+            100% { top: 100%; }
+        }
+
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "surface-dim": "#131313",
+                      "surface-container-low": "#1b1b1b",
+                      "tertiary-container": "#ffdad7",
+                      "surface-container": "#1f1f1f",
+                      "on-secondary-container": "#b4b4bd",
+                      "surface-container-lowest": "#0e0e0e",
+                      "on-surface-variant": "#c4c7c8",
+                      "on-tertiary-fixed-variant": "#930013",
+                      "primary-container": "#e2e2e2",
+                      "on-secondary-fixed-variant": "#45464e",
+                      "secondary-fixed-dim": "#c6c6cf",
+                      "outline": "#8e9192",
+                      "ghost-border": "rgba(255, 255, 255, 0.1)",
+                      "zinc-400": "#A1A1AA",
+                      "surgical-white": "#FFFFFF",
+                      "secondary-fixed": "#e2e1eb",
+                      "on-tertiary": "#68000a",
+                      "inverse-on-surface": "#303030",
+                      "on-background": "#e2e2e2",
+                      "on-surface": "#e2e2e2",
+                      "on-primary-fixed-variant": "#454747",
+                      "on-primary": "#2f3131",
+                      "tertiary": "#ffffff",
+                      "primary-fixed": "#e2e2e2",
+                      "error-container": "#93000a",
+                      "on-tertiary-container": "#c22229",
+                      "surface-variant": "#353535",
+                      "primary": "#ffffff",
+                      "on-tertiary-fixed": "#410004",
+                      "inverse-surface": "#e2e2e2",
+                      "on-primary-fixed": "#1a1c1c",
+                      "surface-container-highest": "#353535",
+                      "secondary": "#c6c6cf",
+                      "on-error-container": "#ffdad6",
+                      "glass-border": "rgba(255, 255, 255, 0.08)",
+                      "surface": "#131313",
+                      "primary-fixed-dim": "#c6c6c7",
+                      "surface-tint": "#c6c6c7",
+                      "surface-bright": "#393939",
+                      "on-secondary-fixed": "#1a1b22",
+                      "on-primary-container": "#636565",
+                      "outline-variant": "#444748",
+                      "error": "#ffb4ab",
+                      "glass-fill": "rgba(255, 255, 255, 0.03)",
+                      "chirurgical-red": "#EF4444",
+                      "secondary-container": "#45464e",
+                      "tertiary-fixed-dim": "#ffb3ad",
+                      "inverse-primary": "#5d5f5f",
+                      "tertiary-fixed": "#ffdad7",
+                      "background": "#131313",
+                      "surface-container-high": "#2a2a2a",
+                      "on-secondary": "#2f3037",
+                      "on-error": "#690005"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "reach-zone-padding": "32px",
+                      "gutter": "12px",
+                      "margin-mobile": "20px",
+                      "unit": "4px"
+              },
+              "fontFamily": {
+                      "telemetry-lg": ["JetBrains Mono"],
+                      "headline-lg": ["Geist Sans"],
+                      "label-caps": ["JetBrains Mono"],
+                      "headline-md": ["Geist Sans"],
+                      "body-md": ["Geist Sans"],
+                      "body-lg": ["Geist Sans"],
+                      "telemetry-md": ["JetBrains Mono"]
+              },
+              "fontSize": {
+                      "telemetry-lg": ["20px", {"lineHeight": "1", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                      "headline-lg": ["32px", {"lineHeight": "1.1", "letterSpacing": "-0.04em", "fontWeight": "700"}],
+                      "label-caps": ["12px", {"lineHeight": "1", "letterSpacing": "0.1em", "fontWeight": "700"}],
+                      "headline-md": ["24px", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+                      "body-md": ["16px", {"lineHeight": "1.5", "letterSpacing": "0em", "fontWeight": "400"}],
+                      "body-lg": ["18px", {"lineHeight": "1.5", "letterSpacing": "0em", "fontWeight": "400"}],
+                      "telemetry-md": ["14px", {"lineHeight": "1.2", "letterSpacing": "0em", "fontWeight": "500"}]
+              }
+            },
+          },
+        }
+    </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+</head>
+<body class="bg-black min-h-screen pb-32">
+<!-- TopAppBar -->
+<header class="fixed top-0 w-full bg-surface border-b border-glass-border z-50 flex justify-between items-center h-16 px-margin-mobile">
+<div class="flex items-center gap-2">
+
+
+</div>
+<div class="flex items-center gap-4">
+<div class="flex flex-col items-end">
+<span class="font-label-caps text-[10px] text-zinc-400">STATUS: OPTIMAL</span>
+<span class="font-telemetry-md text-primary">NAV BARRR</span>
+</div>
+
+</div>
+</header>
+<main class="pt-24 px-margin-mobile flex flex-col gap-8"><!-- Split-View Cockpit Row -->
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
+<!-- Left: CNS Readiness Gauge -->
+<section class="flex flex-col gap-3 mb-4"><div class="grid grid-cols-2 gap-4"><div class="flex flex-col gap-1.5"><label class="font-label-caps text-[8px] text-zinc-500 tracking-widest px-1">SELECT_BLUEPRINT</label><div class="relative group"><select class="w-full bg-surface-container-low border border-glass-border text-surgical-white font-telemetry-md text-xs py-3 px-4 rounded-lg appearance-none focus:outline-none focus:border-primary transition-colors cursor-pointer"><option>HYPERTROPHY_ALPHA</option><option>STRENGTH_V1</option><option>RECOVERY_PHASE</option></select><span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-zinc-500 group-hover:text-primary transition-colors text-sm">expand_more</span></div></div><div class="flex flex-col gap-1.5"><label class="font-label-caps text-[8px] text-zinc-500 tracking-widest px-1">SELECT_SESSION</label><div class="relative group"><select class="w-full bg-surface-container-low border border-glass-border text-surgical-white font-telemetry-md text-xs py-3 px-4 rounded-lg appearance-none focus:outline-none focus:border-primary transition-colors cursor-pointer"><option>LEGS_PULL_04</option><option>CHEST_PUSH_02</option><option>FULL_BODY_FLOW</option></select><span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-zinc-500 group-hover:text-primary transition-colors text-sm">expand_more</span></div></div></div></section><section class="relative w-full aspect-square mx-auto flex items-center justify-center glass-container max-w-[220px]">
+<div class="absolute inset-4 rounded-full border border-glass-border opacity-30"></div>
+<svg class="absolute inset-0 w-full h-full -rotate-90 p-8" viewBox="0 0 100 100"><circle class="text-glass-fill" cx="50" cy="50" fill="none" r="46" stroke="currentColor" stroke-width="4"></circle>
+<circle class="text-primary" cx="50" cy="50" fill="none" r="46" stroke="currentColor" stroke-dasharray="289" stroke-dashoffset="45" stroke-linecap="butt" stroke-width="4"></circle></svg>
+<div class="text-center z-10">
+<h2 class="font-label-caps text-zinc-400 mb-1 text-[10px]">CNS READINESS</h2>
+<div class="font-telemetry-lg text-surgical-white flex items-baseline justify-center text-2xl">
+                84.2<span class="text-xl ml-1 text-zinc-400">%</span>
+</div>
+<div class="mt-2 font-label-caps text-[8px] text-primary bg-glass-fill px-2 py-0.5 rounded-full border border-glass-border uppercase">READY</div>
+</div>
+</section>
+<!-- Right: Biometric Map + Metrics Stack -->
+<section class="glass-container p-4 flex flex-col gap-4">
+<div class="flex justify-between items-center border-b border-glass-border pb-2">
+<div>
+<h3 class="font-label-caps text-zinc-400 text-[10px]">BIOMETRIC_MAP</h3>
+<p class="font-telemetry-md text-surgical-white">FATIGUE_ANALYSIS</p>
+</div>
+<div class="flex gap-1">
+<span class="font-label-caps text-[8px] bg-surgical-white text-black px-1.5 py-0.5 rounded">ANT</span>
+<span class="font-label-caps text-[8px] border border-glass-border text-zinc-400 px-1.5 py-0.5 rounded">POST</span>
+</div>
+</div>
+<div class="grid grid-cols-5 gap-4 items-center">
+<!-- Map Area -->
+<div class="col-span-3 relative h-48 flex justify-center">
+<img alt="Muscle Map" class="h-full opacity-60 grayscale brightness-150 mix-blend-screen" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDB-WYGZFUCYO5pqtyqLk9Q-U3MUJm2Y7uw-dZBAnI0IZIrFckpRdTbMTvdJO7ONAOuqu9HzgRVwF4D1oUYOG5aZONGAe6CxV-Fp7MALmd5epcMc0oXtyiv_5AsvF-ifd7i4T96ZFYjgWh6UJTWcJIRYOAfzS-QPAUDzGRMbrb9DPdPhqS54OrcBOPjmYYNi_zT7RhHvZMYpOfRHmjHAdZa0QnSqKiSwq4xMyYJ5HzBz2YEiyB6uHDdw3ZHVU6-tdg2PapiVsHEkUk">
+<div class="absolute bottom-8 left-1/2 -translate-x-full w-3 h-6 bg-chirurgical-red/40 blur-md pulse-red rounded-full"></div>
+<div class="absolute bottom-8 left-1/2 w-3 h-6 bg-chirurgical-red/40 blur-md pulse-red rounded-full"></div>
+</div>
+<!-- High Density Technical Metrics Stack -->
+<div class="col-span-2 flex flex-col gap-2">
+<div class="ghost-border-subtle p-2 rounded bg-surface-container-lowest">
+<h4 class="font-label-caps text-[8px] text-zinc-500">ACWR</h4>
+<div class="flex justify-between items-baseline">
+<span class="font-telemetry-md text-primary">1.14</span>
+<span class="material-symbols-outlined text-[10px] text-primary">trending_up</span>
+</div>
+</div>
+<div class="ghost-border-subtle p-2 rounded bg-surface-container-lowest">
+<h4 class="font-label-caps text-[8px] text-zinc-500">ST_MON</h4>
+<div class="flex justify-between items-baseline">
+<span class="font-telemetry-md text-surgical-white">2.4</span>
+<span class="material-symbols-outlined text-[10px] text-zinc-500">horizontal_rule</span>
+</div>
+</div>
+<div class="ghost-border-subtle p-2 rounded bg-surface-container-lowest">
+<h4 class="font-label-caps text-[8px] text-zinc-500">HRV</h4>
+<div class="flex justify-between items-baseline">
+<span class="font-telemetry-md text-primary">88ms</span>
+<span class="material-symbols-outlined text-[10px] text-primary">check_circle</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+</div>
+<!-- Fatigue List Details (Compact) -->
+<section class="grid grid-cols-3 gap-3">
+<div class="ghost-border-subtle p-2 rounded-lg bg-surface-container-low">
+<span class="font-label-caps text-[8px] text-zinc-500">QUADS</span>
+<div class="text-chirurgical-red font-telemetry-md text-sm">92%</div>
+</div>
+<div class="ghost-border-subtle p-2 rounded-lg bg-surface-container-low">
+<span class="font-label-caps text-[8px] text-zinc-500">LUMBAR</span>
+<div class="text-surgical-white font-telemetry-md text-sm">74%</div>
+</div>
+<div class="ghost-border-subtle p-2 rounded-lg bg-surface-container-low">
+<span class="font-label-caps text-[8px] text-zinc-500">DELTOID</span>
+<div class="text-zinc-500 font-telemetry-md text-sm">12%</div>
+</div>
+</section>
+<!-- Primary Action Reach Zone -->
+<div class="flex flex-col gap-4">
+<button class="w-full h-16 glass-container bg-surgical-white text-black flex items-center justify-center gap-4 pulse-primary active:scale-95 transition-all">
+<span class="material-symbols-outlined font-bold" data-icon="bolt" style="font-variation-settings: 'FILL' 1;">bolt</span>
+<span class="font-telemetry-lg uppercase tracking-[0.2em] text-lg">LANCER SÉANCE</span>
+</button>
+<p class="text-center font-label-caps text-[9px] text-zinc-500 border-t border-glass-border pt-4 tracking-widest">
+        ESTIMATED_DURATION: 72M | INTENSITY: HIGH
+    </p>
+</div></main>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 py-3 bg-surface border-t border-glass-border pb-safe bg-surface-container-lowest"><div class="flex w-full justify-between items-center max-w-lg mx-auto">
+<a class="flex flex-col items-center justify-center text-primary border-t-2 border-primary pt-2 pb-1 px-4" href="#">
+<span class="material-symbols-outlined text-lg" data-icon="fitness_center" style="font-variation-settings: 'FILL' 1;">fitness_center</span>
+<span class="font-label-caps text-[8px] mt-1">EXTRACT</span>
+</a>
+<a class="flex flex-col items-center justify-center text-zinc-500 hover:text-surgical-white pt-2 pb-1 px-4 transition-colors" href="#">
+<span class="material-symbols-outlined text-lg" data-icon="person_pin_circle">person_pin_circle</span>
+<span class="font-label-caps text-[8px] mt-1">VESSEL</span>
+</a>
+<a class="flex flex-col items-center justify-center text-zinc-500 hover:text-surgical-white pt-2 pb-1 px-4 transition-colors" href="#">
+<span class="material-symbols-outlined text-lg" data-icon="query_stats">query_stats</span>
+<span class="font-label-caps text-[8px] mt-1">TELEMETRY</span>
+</a>
+<a class="flex flex-col items-center justify-center text-zinc-500 hover:text-surgical-white pt-2 pb-1 px-4 transition-colors" href="#">
+<span class="material-symbols-outlined text-lg" data-icon="biotech">biotech</span>
+<span class="font-label-caps text-[8px] mt-1">LAB</span>
+</a>
+</div></nav>
+<script>
+        // Simple micro-interaction for gauge percentage oscillation
+        const gaugeValue = document.querySelector('.font-telemetry-lg.text-6xl');
+        let baseVal = 84.21;
+        
+        setInterval(() => {
+            const drift = (Math.random() - 0.5) * 0.05;
+            baseVal += drift;
+            if (gaugeValue) {
+                const parts = baseVal.toFixed(1).split('.');
+                gaugeValue.innerHTML = `${parts[0]}<span class="text-2xl ml-1 text-zinc-400">.${parts[1]}%</span>`;
+            }
+        }, 2000);
+
+        // Haptic-like feedback simulation on button press
+        document.querySelector('.pulse-primary').addEventListener('touchstart', () => {
+            if (window.navigator.vibrate) {
+                window.navigator.vibrate(20);
+            }
+        });
+    </script>
+
+
+</body></html>

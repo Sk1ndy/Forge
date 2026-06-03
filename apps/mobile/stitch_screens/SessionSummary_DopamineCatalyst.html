@@ -1,0 +1,256 @@
+<!DOCTYPE html><html class="dark" lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&amp;family=Geist+Sans:wght@400;600;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "surface-container-low": "#1b1b1b",
+                    "primary": "#ffffff",
+                    "on-primary-fixed-variant": "#454747",
+                    "on-surface-variant": "#c4c7c8",
+                    "surface-variant": "#353535",
+                    "surface-bright": "#393939",
+                    "tertiary-container": "#ffdad7",
+                    "surface-dim": "#131313",
+                    "on-error": "#690005",
+                    "on-primary": "#2f3131",
+                    "surface-container-lowest": "#0e0e0e",
+                    "inverse-on-surface": "#303030",
+                    "on-primary-container": "#636565",
+                    "inverse-surface": "#e2e2e2",
+                    "on-tertiary": "#68000a",
+                    "zinc-400": "#A1A1AA",
+                    "outline": "#8e9192",
+                    "tertiary": "#ffffff",
+                    "on-secondary": "#2f3037",
+                    "ghost-border": "rgba(255, 255, 255, 0.1)",
+                    "tertiary-fixed": "#ffdad7",
+                    "surface": "#131313",
+                    "on-surface": "#e2e2e2",
+                    "secondary-container": "#45464e",
+                    "primary-fixed-dim": "#c6c6c7",
+                    "surface-container-highest": "#353535",
+                    "background": "#131313",
+                    "surgical-white": "#FFFFFF",
+                    "secondary-fixed-dim": "#c6c6cf",
+                    "on-secondary-container": "#b4b4bd",
+                    "surface-container-high": "#2a2a2a",
+                    "secondary-fixed": "#e2e1eb",
+                    "on-error-container": "#ffdad6",
+                    "on-secondary-fixed-variant": "#45464e",
+                    "glass-fill": "rgba(255, 255, 255, 0.03)",
+                    "on-tertiary-container": "#c22229",
+                    "glass-border": "rgba(255, 255, 255, 0.08)",
+                    "on-tertiary-fixed": "#410004",
+                    "on-secondary-fixed": "#1a1b22",
+                    "on-primary-fixed": "#1a1c1c",
+                    "surface-container": "#1f1f1f",
+                    "error": "#ffb4ab",
+                    "on-background": "#e2e2e2",
+                    "error-container": "#93000a",
+                    "primary-container": "#e2e2e2",
+                    "outline-variant": "#444748",
+                    "on-tertiary-fixed-variant": "#930013",
+                    "surface-tint": "#c6c6c7",
+                    "chirurgical-red": "#EF4444",
+                    "secondary": "#c6c6cf",
+                    "inverse-primary": "#5d5f5f",
+                    "tertiary-fixed-dim": "#ffb3ad",
+                    "primary-fixed": "#e2e2e2"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "margin-mobile": "20px",
+                    "unit": "4px",
+                    "reach-zone-padding": "32px",
+                    "gutter": "12px"
+            },
+            "fontFamily": {
+                    "headline-md": ["Geist Sans"],
+                    "telemetry-lg": ["JetBrains Mono"],
+                    "label-caps": ["JetBrains Mono"],
+                    "headline-lg": ["Geist Sans"],
+                    "body-lg": ["Geist Sans"],
+                    "telemetry-md": ["JetBrains Mono"],
+                    "body-md": ["Geist Sans"]
+            },
+            "fontSize": {
+                    "headline-md": ["24px", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+                    "telemetry-lg": ["20px", {"lineHeight": "1", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "label-caps": ["12px", {"lineHeight": "1", "letterSpacing": "0.1em", "fontWeight": "700"}],
+                    "headline-lg": ["32px", {"lineHeight": "1.1", "letterSpacing": "-0.04em", "fontWeight": "700"}],
+                    "body-lg": ["18px", {"lineHeight": "1.5", "letterSpacing": "0em", "fontWeight": "400"}],
+                    "telemetry-md": ["14px", {"lineHeight": "1.2", "letterSpacing": "0em", "fontWeight": "500"}],
+                    "body-md": ["16px", {"lineHeight": "1.5", "letterSpacing": "0em", "fontWeight": "400"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body {
+            background-color: #000000;
+            color: #FFFFFF;
+            -webkit-font-smoothing: antialiased;
+        }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(20px);
+        }
+        .ghost-edge {
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        /* Custom graph line animation */
+        @keyframes draw {
+            to { stroke-dashoffset: 0; }
+        }
+        .path-animate {
+            stroke-dasharray: 1000;
+            stroke-dashoffset: 1000;
+            animation: draw 2s ease-out forwards;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col font-body-md overflow-x-hidden">
+<!-- TopAppBar -->
+<header class="w-full top-0 sticky border-b border-ghost-border backdrop-blur-md bg-transparent text-primary flex justify-between items-center px-margin-mobile py-4 z-50">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary" data-icon="sensors">sensors</span>
+<span class="font-telemetry-lg text-telemetry-lg tracking-tighter text-primary">SESSION_COMPLETE</span>
+</div>
+<button class="font-label-caps text-label-caps hover:opacity-80 active:scale-95 transition-transform text-primary">DONE</button>
+</header>
+<main class="flex-grow flex flex-col px-margin-mobile pt-8 pb-32 max-w-lg mx-auto w-full">
+<!-- Total Volume Hero -->
+<section class="mb-12">
+<h2 class="font-label-caps text-label-caps text-zinc-400 mb-2">TOTAL_VOLUME_EXTRACTED</h2>
+<div class="flex items-baseline gap-2">
+<span class="font-telemetry-lg text-[64px] leading-none tracking-tighter text-surgical-white">14.2t</span>
+<div class="flex items-center gap-1 glass-panel px-3 py-1 rounded-full">
+<span class="material-symbols-outlined text-[14px]" data-icon="arrow_upward">arrow_upward</span>
+<span class="font-label-caps text-[10px]">+4.2% OVERLOAD</span>
+</div>
+</div>
+</section>
+<!-- Fatigue Projection Chart -->
+<section class="mb-12">
+<div class="flex justify-between items-end mb-4">
+<h2 class="font-label-caps text-label-caps text-zinc-400">FATIGUE_PROJECTION</h2>
+<div class="flex gap-4">
+<div class="flex items-center gap-2">
+<div class="w-2 h-2 bg-primary"></div>
+<span class="font-label-caps text-[10px] text-zinc-400">RECOVERY</span>
+</div>
+<div class="flex items-center gap-2">
+<div class="w-2 h-0.5 bg-chirurgical-red"></div>
+<span class="font-label-caps text-[10px] text-zinc-400">CNS_STRESS</span>
+</div>
+</div>
+</div>
+<div class="glass-panel w-full aspect-[16/9] relative p-4 rounded-lg flex flex-col justify-end">
+<!-- SVG Chart -->
+<svg class="absolute inset-0 w-full h-full p-4 overflow-visible" viewBox="0 0 400 150">
+<!-- Grid Lines -->
+<line stroke="rgba(255,255,255,0.05)" stroke-width="1" x1="0" x2="400" y1="0" y2="0"></line>
+<line stroke="rgba(255,255,255,0.05)" stroke-width="1" x1="0" x2="400" y1="50" y2="50"></line>
+<line stroke="rgba(255,255,255,0.05)" stroke-width="1" x1="0" x2="400" y1="100" y2="100"></line>
+<!-- Recovery Curve (White) -->
+<path class="path-animate" d="M 0,120 Q 100,130 200,80 T 400,20" fill="none" stroke="#FFFFFF" stroke-width="2"></path>
+<!-- CNS Fatigue (Red Dashed) -->
+<path class="path-animate" d="M 0,20 Q 50,140 150,100 T 400,130" fill="none" stroke="#EF4444" stroke-dasharray="4,4" stroke-width="1.5"></path>
+</svg>
+<!-- X-Axis Labels -->
+<div class="flex justify-between w-full font-label-caps text-[10px] text-zinc-400 mt-2 relative z-10">
+<span>NOW</span>
+<span>12H</span>
+<span>24H</span>
+<span>36H</span>
+<span>48H</span>
+</div>
+</div>
+</section>
+<!-- Technical Breakdown Grid -->
+<section class="grid grid-cols-2 gap-4 mb-12">
+<div class="glass-panel p-4 rounded-lg flex flex-col gap-1">
+<span class="font-label-caps text-[10px] text-zinc-400">TOTAL_SETS</span>
+<span class="font-telemetry-lg text-headline-md text-surgical-white">24</span>
+</div>
+<div class="glass-panel p-4 rounded-lg flex flex-col gap-1">
+<span class="font-label-caps text-[10px] text-zinc-400">TOTAL_REPS</span>
+<span class="font-telemetry-lg text-headline-md text-surgical-white">192</span>
+</div>
+<div class="glass-panel p-4 rounded-lg flex flex-col gap-1">
+<span class="font-label-caps text-[10px] text-zinc-400">AVG_RPE</span>
+<span class="font-telemetry-lg text-headline-md text-surgical-white">8.4</span>
+</div>
+<div class="glass-panel p-4 rounded-lg flex flex-col gap-1">
+<span class="font-label-caps text-[10px] text-zinc-400">INTENSITY</span>
+<span class="font-telemetry-lg text-headline-md text-surgical-white">ELITE</span>
+</div>
+</section>
+<!-- Muscle Engagement Meta -->
+<section class="mb-12">
+<h2 class="font-label-caps text-label-caps text-zinc-400 mb-4">ANATOMY_BLUEPRINT</h2>
+<div class="glass-panel rounded-lg p-6 flex items-center justify-between">
+<div class="space-y-4">
+<div class="flex flex-col">
+<span class="font-label-caps text-[10px] text-zinc-400">PRIMARY_FOCUS</span>
+<span class="font-body-md text-primary">POSTERIOR CHAIN</span>
+</div>
+<div class="flex flex-col">
+<span class="font-label-caps text-[10px] text-zinc-400">SECONDARY_LOAD</span>
+<span class="font-body-md text-primary">LUMBAR / CORE</span>
+</div>
+</div>
+<div class="w-24 h-32 opacity-60">
+<img alt="Anatomical wireframe" class="w-full h-full object-contain" data-alt="A highly detailed anatomical wireframe of a human body, rendered in a clinical brutalist style. The figure is shown from a rear-quarter view, highlighting the posterior chain in deep whites and sharp silver lines. Faint glowing red accents pulse on the glutes and lower back to indicate high fatigue levels. The background is deep OLED black with faint technical telemetry overlays, creating a medical laboratory diagnostic aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBy5VzN4aKX2srZMz8MMp2FtqO6uCoVuMNthgLspAIBy57m1UjW0gguq4GixQVh0AfwVeyOLpOQ1ca6sIkDzl8ZTje28BoYI_l7N27Fkh9G55V_5Pk4tb4aS2ATR0fnc0R-mRYMQxpRKrZTgX3zFaf3b5QqHhssmF_aHYfqHgdRd6_oJWqVCQiz8kLX-QPPK6IgR-qq5YaIhEwEpIp6EilS6DP4zt-yyiF6LIF41JfsPvhNGtUYBYDWMhI2GHq3wy8yO8joN0IBJZI">
+</div>
+</div>
+</section>
+</main>
+<!-- Reach-Zone Primary Action -->
+<footer class="fixed bottom-0 left-0 w-full px-margin-mobile pb-10 pt-4 bg-gradient-to-t from-black to-transparent">
+<button class="w-full h-20 glass-panel rounded-xl flex items-center justify-center gap-4 hover:bg-white/10 active:scale-95 transition-all group">
+<span class="material-symbols-outlined text-primary group-hover:translate-x-[-4px] transition-transform" data-icon="terminal">terminal</span>
+<span class="font-headline-md text-surgical-white uppercase tracking-widest">RETURN TO HUB</span>
+</button>
+</footer>
+<!-- Atmosphere Micro-interaction script -->
+<script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Subtle parallax for cards on tilt (simulated)
+            const panels = document.querySelectorAll('.glass-panel');
+            document.addEventListener('mousemove', (e) => {
+                const xAxis = (window.innerWidth / 2 - e.pageX) / 100;
+                const yAxis = (window.innerHeight / 2 - e.pageY) / 100;
+                panels.forEach(panel => {
+                    panel.style.transform = `rotateY(${xAxis}deg) rotateX(${yAxis}deg)`;
+                });
+            });
+
+            // Active state haptic simulation
+            const button = document.querySelector('footer button');
+            button.addEventListener('touchstart', () => {
+                if (window.navigator.vibrate) {
+                    window.navigator.vibrate(15);
+                }
+            });
+        });
+    </script>
+</body></html>

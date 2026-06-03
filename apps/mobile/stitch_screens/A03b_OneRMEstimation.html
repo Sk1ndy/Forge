@@ -1,0 +1,249 @@
+<!DOCTYPE html><html class="dark" lang="en" style=""><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>VESSEL_SYSTEM_v1.0 - CAPABILITY</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;600;700&amp;family=JetBrains+Mono:wght@400;500;700&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "on-secondary": "#2f3037",
+                      "primary-container": "#e2e2e2",
+                      "primary": "#ffffff",
+                      "on-secondary-fixed-variant": "#45464e",
+                      "secondary-container": "#45464e",
+                      "on-secondary-fixed": "#1a1b22",
+                      "chirurgical-red": "#EF4444",
+                      "inverse-on-surface": "#303030",
+                      "on-primary": "#2f3131",
+                      "error-container": "#93000a",
+                      "tertiary": "#ffffff",
+                      "surface-tint": "#c6c6c7",
+                      "on-background": "#e2e2e2",
+                      "on-tertiary-fixed": "#410004",
+                      "on-secondary-container": "#b4b4bd",
+                      "outline-variant": "#444748",
+                      "surface-dim": "#131313",
+                      "tertiary-fixed-dim": "#ffb3ad",
+                      "zinc-400": "#A1A1AA",
+                      "on-primary-container": "#636565",
+                      "background": "#131313",
+                      "on-tertiary-fixed-variant": "#930013",
+                      "surface-container-lowest": "#0e0e0e",
+                      "ghost-border": "rgba(255, 255, 255, 0.1)",
+                      "error": "#ffb4ab",
+                      "surface-bright": "#393939",
+                      "surface-container-highest": "#353535",
+                      "secondary": "#c6c6cf",
+                      "surface-container-low": "#1b1b1b",
+                      "secondary-fixed": "#e2e1eb",
+                      "on-surface-variant": "#c4c7c8",
+                      "surface-variant": "#353535",
+                      "glass-fill": "rgba(255, 255, 255, 0.03)",
+                      "surgical-white": "#FFFFFF",
+                      "surface-container": "#1f1f1f",
+                      "on-surface": "#e2e2e2",
+                      "inverse-primary": "#5d5f5f",
+                      "on-error-container": "#ffdad6",
+                      "on-primary-fixed-variant": "#454747",
+                      "glass-border": "rgba(255, 255, 255, 0.08)",
+                      "surface-container-high": "#2a2a2a",
+                      "surface": "#131313",
+                      "secondary-fixed-dim": "#c6c6cf",
+                      "on-tertiary": "#68000a",
+                      "on-error": "#690005",
+                      "tertiary-container": "#ffdad7",
+                      "on-tertiary-container": "#c22229",
+                      "tertiary-fixed": "#ffdad7",
+                      "inverse-surface": "#e2e2e2",
+                      "primary-fixed": "#e2e2e2",
+                      "primary-fixed-dim": "#c6c6c7",
+                      "outline": "#8e9192",
+                      "on-primary-fixed": "#1a1c1c"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "2xl": "1.5rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "unit": "4px",
+                      "margin-mobile": "20px",
+                      "gutter": "12px",
+                      "reach-zone-padding": "32px"
+              },
+              "fontFamily": {
+                      "headline-md": ["Geist", "sans-serif"],
+                      "telemetry-md": ["JetBrains Mono", "monospace"],
+                      "body-lg": ["Geist", "sans-serif"],
+                      "label-caps": ["JetBrains Mono", "monospace"],
+                      "body-md": ["Geist", "sans-serif"],
+                      "telemetry-lg": ["JetBrains Mono", "monospace"],
+                      "headline-lg": ["Geist", "sans-serif"]
+              },
+              "fontSize": {
+                      "headline-md": ["24px", { "lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "600" }],
+                      "telemetry-md": ["14px", { "lineHeight": "1.2", "letterSpacing": "0em", "fontWeight": "500" }],
+                      "body-lg": ["18px", { "lineHeight": "1.5", "letterSpacing": "0em", "fontWeight": "400" }],
+                      "label-caps": ["12px", { "lineHeight": "1", "letterSpacing": "0.1em", "fontWeight": "700" }],
+                      "body-md": ["16px", { "lineHeight": "1.5", "letterSpacing": "0em", "fontWeight": "400" }],
+                      "telemetry-lg": ["20px", { "lineHeight": "1", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                      "headline-lg": ["32px", { "lineHeight": "1.1", "letterSpacing": "-0.04em", "fontWeight": "700" }]
+              }
+            },
+          },
+        }
+    </script>
+<style>
+        body {
+            background-color: #000000;
+            color: #ffffff;
+            font-family: "Geist", sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        ::-webkit-scrollbar {
+            display: none;
+        }
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+</head>
+<body class="bg-black min-h-screen flex flex-col pb-[100px] selection:bg-chirurgical-red selection:text-white relative">
+<header class="bg-background dark:bg-background w-full top-0 sticky border-b border-ghost-border flex justify-between items-center px-margin-mobile h-16 max-w-none z-50">
+<button class="text-primary dark:text-primary hover:opacity-80 transition-opacity active:scale-95 duration-100 flex items-center justify-center"><img alt="Forge Logo" class="h-8 w-8 object-contain" src="https://lh3.googleusercontent.com/aida/AP1WRLtc4IbyjqRAV8DxOeqGL1gY1ftJXAXP_1mJ7LRrcTFIYAgURbcXWNtlwVIGYt8ZmwXj4upu9ZLs7VKiGV-KLCk8gj-rX55jk0VQphyyMYJjGOkWN_sbsqwjXglvlWZjSvMOBxks0-MsTPeVGoAan0-Q6lAY24mN9UbIKBMDym0VZ1Rv1aq5LXlnZtaQf-SIxaqjgrFQ0vVyBtWGGgnO6iccj-ZZH7C_JqI4fTZnoP-VHDiXOTPtRQRn6w"></button>
+<h1 class="font-headline-md text-headline-md tracking-tighter text-primary dark:text-primary truncate px-4"><code data-path-to-node="5,2,0" data-index-in-node="160">CAPABILITY</code></h1>
+<button class="w-8"></button>
+</header>
+<main class="flex-1 flex flex-col px-margin-mobile pt-6 gap-6">
+<!-- Experience Level -->
+<section class="flex flex-col gap-3">
+<h2 class="font-label-caps text-[10px] text-zinc-400">OPERATOR_EXPERIENCE</h2>
+<div class="grid grid-cols-3 gap-2">
+<button class="bg-glass-fill border border-glass-border rounded-xl py-3 flex flex-col items-center justify-center hover:bg-white/5 transition-colors active:scale-95 text-zinc-500">
+<span class="font-label-caps text-[10px]">0-1 years</span>
+</button>
+<button class="bg-white/10 border border-white/20 rounded-xl py-3 flex flex-col items-center justify-center transition-colors active:scale-95 text-surgical-white relative overflow-hidden">
+<div class="absolute inset-0 bg-gradient-to-b from-white/5 to-transparent"></div>
+<span class="font-label-caps text-[10px] relative z-10"><span class="" style="color: rgb(113, 113, 122); background-color: rgba(255, 255, 255, 0.03);">1-3 years</span></span>
+</button>
+<button class="bg-glass-fill border border-glass-border rounded-xl py-3 flex flex-col items-center justify-center hover:bg-white/5 transition-colors active:scale-95 text-zinc-500">
+<span class="font-label-caps text-[10px]"><span class="" style="background-color: rgba(255, 255, 255, 0.03);">+3 years</span></span>
+</button>
+</div>
+</section>
+<!-- Weekly Frequency -->
+<section class="flex flex-col gap-3">
+<h2 class="font-label-caps text-[10px] text-zinc-400">SESSION_FREQUENCY (PER/WEEK)</h2>
+<div class="flex gap-3 overflow-x-auto hide-scrollbar">
+<!-- 2 Sessions -->
+<button class="shrink-0 w-14 h-14 rounded-full bg-glass-fill border border-glass-border flex items-center justify-center text-zinc-400 font-telemetry-md text-telemetry-md hover:bg-white/5 active:scale-95 transition-all">
+                    2
+                </button>
+<!-- 3 Sessions -->
+<button class="shrink-0 w-14 h-14 rounded-full bg-glass-fill border border-glass-border flex items-center justify-center text-zinc-400 font-telemetry-md text-telemetry-md hover:bg-white/5 active:scale-95 transition-all">
+                    3
+                </button>
+<!-- 4 Sessions (Active) -->
+<button class="shrink-0 w-14 h-14 rounded-full bg-surgical-white text-black flex items-center justify-center font-telemetry-md text-telemetry-md active:scale-95 transition-all shadow-[0_0_10px_rgba(255,255,255,0.2)]">
+                    4
+                </button>
+<!-- 5 Sessions -->
+<button class="shrink-0 w-14 h-14 rounded-full bg-glass-fill border border-glass-border flex items-center justify-center text-zinc-400 font-telemetry-md text-telemetry-md hover:bg-white/5 active:scale-95 transition-all">
+                    5
+                </button>
+<!-- 6 Sessions -->
+<button class="shrink-0 w-14 h-14 rounded-full bg-glass-fill border border-glass-border flex items-center justify-center text-zinc-400 font-telemetry-md text-telemetry-md hover:bg-white/5 active:scale-95 transition-all">
+                    6
+                </button>
+</div>
+</section>
+<!-- Estimator Toggle (Refined & Discrete) -->
+<section class="flex items-center justify-between bg-glass-fill border border-ghost-border rounded-xl px-4 py-2 opacity-100">
+<div class="flex flex-col">
+<span class="font-label-caps text-[10px] text-zinc-400">REPS_TO_MAX MODE</span>
+<span class="font-label-caps text-[8px] text-zinc-500">I DON'T KNOW MY MAXES (CALCULATE VIA REPS)</span>
+</div>
+<button class="w-10 h-5 bg-white rounded-full relative border border-white flex items-center p-0.5 transition-colors shadow-[0_0_10px_rgba(255,255,255,0.4)]">
+<div class="w-3.5 h-3.5 bg-black rounded-full transition-transform transform translate-x-5"></div>
+</button>
+</section>
+<!-- Primary Lifts (High-Density Cockpit Grid) -->
+<section class="flex flex-col gap-3"><h2 class="font-label-caps text-[10px] text-zinc-400">PRIMARY_LIFTS (ESTIMATED MAX MODE)</h2>
+<!-- SQUAT -->
+<div class="bg-glass-fill border border-glass-border rounded-xl p-3 flex flex-col gap-2">
+<div class="flex justify-between items-center">
+<span class="font-label-caps text-[11px] text-surgical-white tracking-widest">SQUAT</span>
+</div>
+<div class="grid grid-cols-2 gap-2">
+<div class="flex items-center justify-between bg-surface-container-lowest/50 rounded-lg px-2 py-1 border border-ghost-border/50">
+<button class="text-zinc-500 hover:text-white"><span class="material-symbols-outlined text-[16px]">remove</span></button>
+<div class="font-telemetry-md text-surgical-white flex items-baseline gap-1">100.0 <span class="text-[10px] text-zinc-500">KG</span></div>
+<button class="text-zinc-500 hover:text-white"><span class="material-symbols-outlined text-[16px]">add</span></button>
+</div>
+<div class="flex items-center justify-between bg-surface-container-lowest/50 rounded-lg px-2 py-1 border border-ghost-border/50">
+<button class="text-zinc-500 hover:text-white"><span class="material-symbols-outlined text-[16px]">remove</span></button>
+<div class="font-telemetry-md text-surgical-white flex items-baseline gap-1">8 <span class="text-[10px] text-zinc-500 uppercase">reps</span></div>
+<button class="text-zinc-500 hover:text-white"><span class="material-symbols-outlined text-[16px]">add</span></button>
+</div>
+</div>
+</div>
+<!-- BENCH -->
+<div class="bg-glass-fill border border-glass-border rounded-xl p-3 flex flex-col gap-2">
+<div class="flex justify-between items-center">
+<span class="font-label-caps text-[11px] text-surgical-white tracking-widest">BENCH</span>
+</div>
+<div class="grid grid-cols-2 gap-2">
+<div class="flex items-center justify-between bg-surface-container-lowest/50 rounded-lg px-2 py-1 border border-ghost-border/50">
+<button class="text-zinc-500 hover:text-white"><span class="material-symbols-outlined text-[16px]">remove</span></button>
+<div class="font-telemetry-md text-surgical-white flex items-baseline gap-1">70.0 <span class="text-[10px] text-zinc-500">KG</span></div>
+<button class="text-zinc-500 hover:text-white"><span class="material-symbols-outlined text-[16px]">add</span></button>
+</div>
+<div class="flex items-center justify-between bg-surface-container-lowest/50 rounded-lg px-2 py-1 border border-ghost-border/50">
+<button class="text-zinc-500 hover:text-white"><span class="material-symbols-outlined text-[16px]">remove</span></button>
+<div class="font-telemetry-md text-surgical-white flex items-baseline gap-1">10 <span class="text-[10px] text-zinc-500 uppercase">reps</span></div>
+<button class="text-zinc-500 hover:text-white"><span class="material-symbols-outlined text-[16px]">add</span></button>
+</div>
+</div>
+</div>
+<!-- DEADLIFT -->
+<div class="bg-glass-fill border border-glass-border rounded-xl p-3 flex flex-col gap-2">
+<div class="flex justify-between items-center">
+<span class="font-label-caps text-[11px] text-surgical-white tracking-widest">DEADLIFT</span>
+</div>
+<div class="grid grid-cols-2 gap-2">
+<div class="flex items-center justify-between bg-surface-container-lowest/50 rounded-lg px-2 py-1 border border-ghost-border/50">
+<button class="text-zinc-500 hover:text-white"><span class="material-symbols-outlined text-[16px]">remove</span></button>
+<div class="font-telemetry-md text-surgical-white flex items-baseline gap-1">140.0 <span class="text-[10px] text-zinc-500">KG</span></div>
+<button class="text-zinc-500 hover:text-white"><span class="material-symbols-outlined text-[16px]">add</span></button>
+</div>
+<div class="flex items-center justify-between bg-surface-container-lowest/50 rounded-lg px-2 py-1 border border-ghost-border/50">
+<button class="text-zinc-500 hover:text-white"><span class="material-symbols-outlined text-[16px]">remove</span></button>
+<div class="font-telemetry-md text-surgical-white flex items-baseline gap-1">5 <span class="text-[10px] text-zinc-500 uppercase">reps</span></div>
+<button class="text-zinc-500 hover:text-white"><span class="material-symbols-outlined text-[16px]">add</span></button>
+</div>
+</div>
+</div></section>
+<!-- Slide to Initiate -->
+<section class="mt-6 mb-4">
+<div class="h-16 w-full rounded-full bg-surface-container-high border border-ghost-border relative flex items-center p-1 overflow-hidden group">
+<div class="absolute inset-0 flex items-center justify-center pointer-events-none z-0">
+<span class="font-label-caps text-[10px] text-zinc-500 tracking-widest group-hover:text-zinc-400 transition-colors">SLIDE TO INITIATE SIMULATION</span>
+</div>
+<div class="h-14 w-14 rounded-full bg-surgical-white text-black flex items-center justify-center z-10 cursor-grab active:cursor-grabbing shadow-[0_0_15px_rgba(255,255,255,0.3)]">
+<span class="material-symbols-outlined text-black">keyboard_double_arrow_right</span>
+</div>
+</div>
+</section>
+</main>
+
+
+</body></html>

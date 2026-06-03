@@ -1,0 +1,233 @@
+<!DOCTYPE html><html class="dark" lang="en" style=""><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<style>
+        @font-face {
+            font-family: 'Geist Sans';
+            src: url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap'); /* Fallback for demo */
+        }
+        body {
+            background-color: #131313;
+            color: #e2e2e2;
+            -webkit-font-smoothing: antialiased;
+            overflow-x: hidden;
+        }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(20px);
+        }
+        .ghost-border {
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .glow-white {
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.15);
+        }
+        @keyframes pulse-zinc {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.4; }
+        }
+        .animate-pulse-slow {
+            animation: pulse-zinc 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        @keyframes scanline {
+            0% { transform: translateY(-100%); }
+            100% { transform: translateY(1000%); }
+        }
+        .scanline {
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            animation: scanline 4s linear infinite;
+        }
+        .grid-bg {
+            background-image: 
+                linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "zinc-400": "#A1A1AA",
+                        "tertiary-fixed": "#ffdad7",
+                        "ghost-border": "rgba(255, 255, 255, 0.1)",
+                        "surface-tint": "#c6c6c7",
+                        "outline-variant": "#444748",
+                        "chirurgical-red": "#EF4444",
+                        "on-tertiary": "#68000a",
+                        "on-surface-variant": "#c4c7c8",
+                        "inverse-on-surface": "#303030",
+                        "on-background": "#e2e2e2",
+                        "surface-container": "#1f1f1f",
+                        "on-tertiary-container": "#c22229",
+                        "surface-variant": "#353535",
+                        "glass-border": "rgba(255, 255, 255, 0.08)",
+                        "on-secondary": "#2f3037",
+                        "on-secondary-fixed-variant": "#45464e",
+                        "on-primary": "#2f3131",
+                        "on-error": "#690005",
+                        "surgical-white": "#FFFFFF",
+                        "surface-bright": "#393939",
+                        "surface-container-high": "#2a2a2a",
+                        "error": "#ffb4ab",
+                        "secondary-container": "#45464e",
+                        "inverse-primary": "#5d5f5f",
+                        "on-tertiary-fixed-variant": "#930013",
+                        "tertiary-container": "#ffdad7",
+                        "on-tertiary-fixed": "#410004",
+                        "primary-fixed-dim": "#c6c6c7",
+                        "secondary-fixed": "#e2e1eb",
+                        "background": "#131313",
+                        "surface": "#131313",
+                        "primary-container": "#e2e2e2",
+                        "surface-container-highest": "#353535",
+                        "surface-container-low": "#1b1b1b",
+                        "on-surface": "#e2e2e2",
+                        "inverse-surface": "#e2e2e2",
+                        "glass-fill": "rgba(255, 255, 255, 0.03)",
+                        "tertiary-fixed-dim": "#ffb3ad",
+                        "tertiary": "#ffffff",
+                        "primary": "#ffffff",
+                        "primary-fixed": "#e2e2e2",
+                        "on-primary-fixed-variant": "#454747",
+                        "on-primary-fixed": "#1a1c1c",
+                        "on-primary-container": "#636565",
+                        "secondary": "#c6c6cf",
+                        "on-secondary-fixed": "#1a1b22",
+                        "surface-dim": "#131313",
+                        "error-container": "#93000a",
+                        "on-secondary-container": "#b4b4bd",
+                        "secondary-fixed-dim": "#c6c6cf",
+                        "outline": "#8e9192",
+                        "on-error-container": "#ffdad6",
+                        "surface-container-lowest": "#0e0e0e"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "4px",
+                        "lg": "8px",
+                        "xl": "12px",
+                        "2xl": "24px",
+                        "3xl": "28px",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "margin-mobile": "20px",
+                        "unit": "4px",
+                        "reach-zone-padding": "32px",
+                        "gutter": "12px"
+                    },
+                    "fontFamily": {
+                        "telemetry-lg": ["JetBrains Mono"],
+                        "label-caps": ["JetBrains Mono"],
+                        "headline-lg": ["Geist Sans"],
+                        "body-md": ["Geist Sans"],
+                        "body-lg": ["Geist Sans"],
+                        "telemetry-md": ["JetBrains Mono"],
+                        "headline-md": ["Geist Sans"]
+                    },
+                    "fontSize": {
+                        "telemetry-lg": ["20px", {"lineHeight": "1", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "label-caps": ["12px", {"lineHeight": "1", "letterSpacing": "0.1em", "fontWeight": "700"}],
+                        "headline-lg": ["32px", {"lineHeight": "1.1", "letterSpacing": "-0.04em", "fontWeight": "700"}],
+                        "body-md": ["16px", {"lineHeight": "1.5", "letterSpacing": "0em", "fontWeight": "400"}],
+                        "body-lg": ["18px", {"lineHeight": "1.5", "letterSpacing": "0em", "fontWeight": "400"}],
+                        "telemetry-md": ["14px", {"lineHeight": "1.2", "letterSpacing": "0em", "fontWeight": "500"}],
+                        "headline-md": ["24px", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "600"}]
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="min-h-screen flex flex-col font-body-md bg-background" style="--mouse-x: 72.56410256410255%; --mouse-y: 21.058688147295744%;">
+<!-- TopAppBar -->
+<nav class="w-full top-0 sticky z-[60] bg-background/80 backdrop-blur-md border-b border-ghost-border flex justify-between items-center px-margin-mobile h-16 max-w-none">
+<div class="flex items-center gap-3">
+
+
+</div>
+<div class="flex items-center gap-2">
+
+
+</div>
+</nav>
+<main class="flex-grow pb-reach-zone-padding">
+<!-- Hero: Technical Telemetry -->
+
+<!-- Sensor Modules Section -->
+<section class="px-margin-mobile pt-8 space-y-4">
+<h2 class="font-label-caps text-label-caps text-zinc-400 uppercase">External Sensors</h2>
+<div class="grid grid-cols-1 gap-4">
+<!-- APPLE_HEALTH -->
+<div class="glass-panel p-5 rounded-3xl flex items-center justify-between group transition-all hover:border-white/20">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 rounded-xl bg-white flex items-center justify-center">
+<span class="material-symbols-outlined text-background text-2xl" style="font-variation-settings: 'FILL' 1;">favorite</span>
+</div>
+<div>
+<div class="font-label-caps text-label-caps text-surgical-white">APPLE_HEALTH</div>
+
+</div>
+</div>
+<div class="flex items-center gap-2 px-3 py-1 bg-white/10 rounded-full glow-white">
+<span class="w-1.5 h-1.5 rounded-full bg-surgical-white"></span>
+<span class="font-label-caps text-[10px] text-surgical-white">CONNECTED</span>
+</div>
+</div>
+<!-- WHOOP -->
+
+<!-- GARMIN -->
+
+</div>
+</section>
+<!-- Data Summary Block -->
+<section class="px-margin-mobile pt-10">
+
+</section>
+</main>
+<!-- Reach-Zone Actions -->
+<footer class="sticky bottom-0 w-full p-margin-mobile bg-gradient-to-t from-background via-background to-transparent z-50">
+<div class="flex flex-col gap-4 max-w-lg mx-auto">
+<button class="w-full bg-surgical-white text-background py-5 rounded-2xl font-headline-md text-headline-md font-bold uppercase transition-transform active:scale-[0.98] flex items-center justify-center gap-2">
+                INITIALIZE NEURAL HUB
+                <span class="material-symbols-outlined">arrow_forward</span>
+</button>
+<button class="w-full py-2 text-center transition-opacity hover:opacity-60 active:scale-95">
+<span class="font-label-caps text-label-caps text-zinc-400 tracking-widest">SKIP_FOR_NOW</span>
+</button>
+</div>
+</footer>
+<!-- BottomNavBar (Suppressed as per Transactional Rule, but if it were top-level destination, it would be here) -->
+<!-- The user is in a focused journey (linking sensors), so we suppress the main navigation to prioritize the primary action. -->
+<script>
+        // Atmospheric Micro-interactions
+        document.addEventListener('mousemove', (e) => {
+            const x = (e.clientX / window.innerWidth) * 100;
+            const y = (e.clientY / window.innerHeight) * 100;
+            document.body.style.setProperty('--mouse-x', `${x}%`);
+            document.body.style.setProperty('--mouse-y', `${y}%`);
+        });
+
+        // Simple button haptic simulation for browsers
+        const buttons = document.querySelectorAll('button');
+        buttons.forEach(btn => {
+            btn.addEventListener('touchstart', () => {
+                if (window.navigator.vibrate) {
+                    window.navigator.vibrate(10);
+                }
+            });
+        });
+    </script>
+
+
+
+
+</body></html>

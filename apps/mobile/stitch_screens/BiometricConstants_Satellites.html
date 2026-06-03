@@ -1,0 +1,265 @@
+<!DOCTYPE html><html class="dark" lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>FORGE // SATELLITE_F1</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;600;700&amp;family=JetBrains+Mono:wght@500;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-tertiary-container": "#c22229",
+                        "inverse-on-surface": "#303030",
+                        "tertiary-fixed-dim": "#ffb3ad",
+                        "on-secondary": "#2f3037",
+                        "surface-container-lowest": "#0e0e0e",
+                        "error-container": "#93000a",
+                        "outline": "#8e9192",
+                        "chirurgical-red": "#EF4444",
+                        "error": "#ffb4ab",
+                        "primary-container": "#e2e2e2",
+                        "on-primary-container": "#636565",
+                        "on-error": "#690005",
+                        "surface-container-low": "#1b1b1b",
+                        "primary-fixed": "#e2e2e2",
+                        "on-secondary-container": "#b4b4bd",
+                        "on-surface": "#e2e2e2",
+                        "on-secondary-fixed": "#1a1b22",
+                        "inverse-surface": "#e2e2e2",
+                        "on-primary-fixed": "#1a1c1c",
+                        "surface": "#131313",
+                        "primary-fixed-dim": "#c6c6c7",
+                        "surface-dim": "#131313",
+                        "glass-border": "rgba(255, 255, 255, 0.08)",
+                        "surgical-white": "#FFFFFF",
+                        "secondary-fixed": "#e2e1eb",
+                        "tertiary-container": "#ffdad7",
+                        "surface-tint": "#c6c6c7",
+                        "surface-container-high": "#2a2a2a",
+                        "on-tertiary": "#68000a",
+                        "inverse-primary": "#5d5f5f",
+                        "ghost-border": "rgba(255, 255, 255, 0.1)",
+                        "tertiary-fixed": "#ffdad7",
+                        "on-secondary-fixed-variant": "#45464e",
+                        "on-background": "#e2e2e2",
+                        "on-primary": "#2f3131",
+                        "surface-container-highest": "#353535",
+                        "on-tertiary-fixed-variant": "#930013",
+                        "glass-fill": "rgba(255, 255, 255, 0.03)",
+                        "surface-bright": "#393939",
+                        "background": "#131313",
+                        "primary": "#ffffff",
+                        "on-error-container": "#ffdad6",
+                        "surface-container": "#1f1f1f",
+                        "zinc-400": "#A1A1AA",
+                        "surface-variant": "#353535",
+                        "on-surface-variant": "#c4c7c8",
+                        "secondary-fixed-dim": "#c6c6cf",
+                        "secondary-container": "#45464e",
+                        "on-primary-fixed-variant": "#454747",
+                        "secondary": "#c6c6cf",
+                        "on-tertiary-fixed": "#410004",
+                        "tertiary": "#ffffff",
+                        "outline-variant": "#444748"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "gutter": "12px",
+                        "unit": "4px",
+                        "reach-zone-padding": "32px",
+                        "margin-mobile": "20px"
+                    },
+                    "fontFamily": {
+                        "telemetry-lg": ["JetBrains Mono"],
+                        "telemetry-md": ["JetBrains Mono"],
+                        "body-lg": ["Geist Sans"],
+                        "headline-md": ["Geist Sans"],
+                        "body-md": ["Geist Sans"],
+                        "label-caps": ["JetBrains Mono"],
+                        "headline-lg": ["Geist Sans"]
+                    },
+                    "fontSize": {
+                        "telemetry-lg": ["20px", { "lineHeight": "1", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "telemetry-md": ["14px", { "lineHeight": "1.2", "letterSpacing": "0em", "fontWeight": "500" }],
+                        "body-lg": ["18px", { "lineHeight": "1.5", "letterSpacing": "0em", "fontWeight": "400" }],
+                        "headline-md": ["24px", { "lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "600" }],
+                        "body-md": ["16px", { "lineHeight": "1.5", "letterSpacing": "0em", "fontWeight": "400" }],
+                        "label-caps": ["12px", { "lineHeight": "1", "letterSpacing": "0.1em", "fontWeight": "700" }],
+                        "headline-lg": ["32px", { "lineHeight": "1.1", "letterSpacing": "-0.04em", "fontWeight": "700" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body { background-color: #000000; color: #FFFFFF; }
+        .ghost-border { border: 1px solid rgba(255, 255, 255, 0.1); }
+        .glass-panel { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.1); }
+        .reach-zone { margin-top: auto; padding-bottom: 80px; } /* Space for BottomNavBar */
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="min-h-screen flex flex-col font-body-md overflow-x-hidden selection:bg-chirurgical-red selection:text-white">
+<!-- TopAppBar -->
+<header class="w-full top-0 sticky z-40 bg-background dark:bg-background border-b border-ghost-border flex justify-between items-center px-margin-mobile py-4 w-full bg-background transition-transform duration-150">
+<button aria-label="Clinical Notes" class="w-10 h-10 flex items-center justify-center text-primary dark:text-primary hover:opacity-80 transition-opacity active:scale-95">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">clinical_notes</span>
+</button>
+<h1 class="font-headline-md text-headline-md font-bold tracking-tighter text-primary uppercase text-center flex-1">FORGE // SATELLITE_F1</h1>
+<button aria-label="Sensors" class="w-10 h-10 flex items-center justify-center text-primary dark:text-primary hover:opacity-80 transition-opacity active:scale-95">
+<span class="material-symbols-outlined">sensors</span>
+</button>
+</header>
+<!-- Main Content Canvas -->
+<main class="flex-1 flex flex-col px-margin-mobile py-6 gap-8 pb-32">
+<!-- Header Title -->
+<section class="text-center">
+<h2 class="font-headline-lg text-headline-lg text-primary tracking-tighter uppercase mb-2">BIOMETRIC CONSTANTS</h2>
+<p class="font-telemetry-md text-telemetry-md text-zinc-400">SYSTEMIC VARIABLE MODULATION</p>
+</section>
+<!-- Theoretical Impact HUD -->
+<section class="glass-panel p-6 rounded-lg flex flex-col gap-4 relative overflow-hidden">
+<div class="absolute top-0 left-0 w-1 h-full bg-chirurgical-red"></div>
+<div class="flex justify-between items-start">
+<div>
+<h3 class="font-label-caps text-label-caps text-zinc-400 mb-1">THEORETICAL IMPACT</h3>
+<div class="font-telemetry-lg text-telemetry-lg text-primary">FATIGUE DAMPING</div>
+</div>
+<div class="text-right">
+<span class="material-symbols-outlined text-chirurgical-red">trending_up</span>
+</div>
+</div>
+<div class="flex items-baseline gap-2">
+<div class="font-headline-lg text-headline-lg text-primary" id="hud-value">-12.4</div>
+<div class="font-telemetry-md text-telemetry-md text-zinc-400">% RECOVERY BOOST</div>
+</div>
+<div class="w-full bg-surface-container-high h-1 rounded-full overflow-hidden">
+<div class="bg-chirurgical-red h-full w-[68%]" id="hud-bar"></div>
+</div>
+</section>
+<!-- Reach Zone Inputs -->
+<section class="reach-zone flex flex-col gap-6">
+<!-- Sleep Stepper -->
+<div class="flex flex-col gap-3">
+<label class="font-label-caps text-label-caps text-zinc-400">SLEEP DURATION (HOURS)</label>
+<div class="flex items-center justify-between glass-panel rounded-full p-2">
+<button aria-label="Decrease Sleep" class="w-16 h-16 rounded-full flex items-center justify-center ghost-border text-primary hover:bg-glass-fill active:bg-surface-variant transition-colors" onclick="updateSleep(-0.5)">
+<span class="material-symbols-outlined">remove</span>
+</button>
+<div class="font-telemetry-lg text-telemetry-lg text-primary w-24 text-center" id="sleep-val">7.5</div>
+<button aria-label="Increase Sleep" class="w-16 h-16 rounded-full flex items-center justify-center ghost-border text-primary hover:bg-glass-fill active:bg-surface-variant transition-colors" onclick="updateSleep(0.5)">
+<span class="material-symbols-outlined">add</span>
+</button>
+</div>
+</div>
+<!-- Caloric Status Selector -->
+<div class="flex flex-col gap-3">
+<label class="font-label-caps text-label-caps text-zinc-400">CALORIC STATUS</label>
+<div class="grid grid-cols-3 gap-2">
+<button class="py-4 glass-panel rounded-lg font-telemetry-md text-telemetry-md text-zinc-400 text-center uppercase active-state-selector" onclick="selectCaloric(this, 'deficit')">DEFICIT</button>
+<button class="py-4 glass-panel rounded-lg font-telemetry-md text-telemetry-md text-primary text-center uppercase active-state-selector border-primary bg-glass-fill" onclick="selectCaloric(this, 'maintenance')">MAINTENANCE</button>
+<button class="py-4 glass-panel rounded-lg font-telemetry-md text-telemetry-md text-zinc-400 text-center uppercase active-state-selector" onclick="selectCaloric(this, 'surplus')">SURPLUS</button>
+</div>
+</div>
+<!-- Systemic Stress Selector -->
+<div class="flex flex-col gap-3">
+<label class="font-label-caps text-label-caps text-zinc-400">SYSTEMIC STRESS LEVEL</label>
+<div class="grid grid-cols-3 gap-2">
+<button class="py-4 glass-panel rounded-lg font-telemetry-md text-telemetry-md text-zinc-400 text-center uppercase active-stress-selector" onclick="selectStress(this, 'low')">LOW</button>
+<button class="py-4 glass-panel rounded-lg font-telemetry-md text-telemetry-md text-primary text-center uppercase active-stress-selector border-primary bg-glass-fill" onclick="selectStress(this, 'med')">MED</button>
+<button class="py-4 glass-panel rounded-lg font-telemetry-md text-telemetry-md text-zinc-400 text-center uppercase active-stress-selector" onclick="selectStress(this, 'high')">HIGH</button>
+</div>
+</div>
+<!-- Action Button -->
+<button class="w-full bg-primary text-black font-headline-md text-headline-md py-4 rounded-lg mt-4 active:scale-[0.98] transition-transform flex items-center justify-center gap-2">
+<span class="material-symbols-outlined">sync</span>
+                CALIBRATE SYSTEM
+            </button>
+</section>
+</main>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 left-0 w-full flex justify-around items-center px-margin-mobile pt-4 pb-8 z-50 bg-background/95 backdrop-blur-md border-t border-ghost-border md:hidden pb-reach-zone-padding">
+<button class="flex flex-col items-center justify-center text-zinc-400 hover:text-primary transition-colors active:bg-glass-fill rounded-lg transition-all p-2 w-full">
+<span class="material-symbols-outlined mb-1">precision_manufacturing</span>
+<span class="font-label-caps text-label-caps">EXTRACT</span>
+</button>
+<button class="flex flex-col items-center justify-center text-primary font-bold hover:text-primary transition-colors active:bg-glass-fill rounded-lg transition-all p-2 w-full">
+<span class="material-symbols-outlined mb-1" style="font-variation-settings: 'FILL' 1;">body_system</span>
+<span class="font-label-caps text-label-caps text-primary">VESSEL</span>
+</button>
+<button class="flex flex-col items-center justify-center text-zinc-400 hover:text-primary transition-colors active:bg-glass-fill rounded-lg transition-all p-2 w-full">
+<span class="material-symbols-outlined mb-1">analytics</span>
+<span class="font-label-caps text-label-caps">TELEMETRY</span>
+</button>
+<button class="flex flex-col items-center justify-center text-zinc-400 hover:text-primary transition-colors active:bg-glass-fill rounded-lg transition-all p-2 w-full">
+<span class="material-symbols-outlined mb-1">biotech</span>
+<span class="font-label-caps text-label-caps">LAB</span>
+</button>
+</nav>
+<script>
+        // Simple Interaction Logic
+        let currentSleep = 7.5;
+        
+        function updateSleep(delta) {
+            currentSleep += delta;
+            if(currentSleep < 0) currentSleep = 0;
+            if(currentSleep > 24) currentSleep = 24;
+            document.getElementById('sleep-val').innerText = currentSleep.toFixed(1);
+            simulateCalculation();
+        }
+
+        function selectCaloric(btn, value) {
+            document.querySelectorAll('.active-state-selector').forEach(el => {
+                el.classList.remove('text-primary', 'border-primary', 'bg-glass-fill');
+                el.classList.add('text-zinc-400');
+            });
+            btn.classList.remove('text-zinc-400');
+            btn.classList.add('text-primary', 'border-primary', 'bg-glass-fill');
+            simulateCalculation();
+        }
+
+        function selectStress(btn, value) {
+            document.querySelectorAll('.active-stress-selector').forEach(el => {
+                el.classList.remove('text-primary', 'border-primary', 'bg-glass-fill', 'text-chirurgical-red');
+                el.classList.add('text-zinc-400');
+            });
+            btn.classList.remove('text-zinc-400');
+            if(value === 'high') {
+                btn.classList.add('text-chirurgical-red', 'border-chirurgical-red', 'bg-glass-fill');
+            } else {
+                btn.classList.add('text-primary', 'border-primary', 'bg-glass-fill');
+            }
+            simulateCalculation();
+        }
+
+        function simulateCalculation() {
+            // Fake recalculation effect
+            const hud = document.getElementById('hud-value');
+            const bar = document.getElementById('hud-bar');
+            hud.style.opacity = '0.5';
+            
+            setTimeout(() => {
+                const randomVal = (Math.random() * -20).toFixed(1);
+                hud.innerText = randomVal;
+                hud.style.opacity = '1';
+                bar.style.width = `${Math.abs(randomVal) * 4}%`;
+            }, 300);
+            
+            // Haptic feedback placeholder
+            if (navigator.vibrate) navigator.vibrate(10);
+        }
+    </script>
+</body></html>

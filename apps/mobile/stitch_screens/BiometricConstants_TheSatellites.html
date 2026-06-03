@@ -1,0 +1,288 @@
+<!DOCTYPE html><html class="dark" lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<!-- Geist Sans placeholder via standard sans fallback since it's a specific brand font, assuming system sans-serif for UI -->
+<style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
+        
+        :root {
+            --geist-sans: 'Inter', sans-serif;
+            --jetbrains-mono: 'JetBrains Mono', monospace;
+        }
+
+        body {
+            background-color: #000000;
+            color: #ffffff;
+            font-family: var(--geist-sans);
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+        }
+
+        .font-headline-md { font-family: var(--geist-sans); }
+        .font-label-caps { font-family: var(--jetbrains-mono); text-transform: uppercase; }
+        .font-body-md { font-family: var(--geist-sans); }
+        .font-telemetry-lg { font-family: var(--jetbrains-mono); }
+        
+        .glass-fill { background-color: rgba(255, 255, 255, 0.03); }
+        .ghost-border { border: 1px solid rgba(255, 255, 255, 0.1); }
+        
+        /* Haptic feedback simulation */
+        .active-press:active {
+            transform: scale(0.98);
+            transition: transform 0.1s ease-out;
+        }
+
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "background": "#000000",
+                    "secondary-fixed-dim": "#c6c6cf",
+                    "error-container": "#93000a",
+                    "surface-variant": "#353535",
+                    "inverse-surface": "#e2e2e2",
+                    "surface-container-highest": "#353535",
+                    "on-surface-variant": "#c4c7c8",
+                    "error": "#ffb4ab",
+                    "on-tertiary-fixed": "#410004",
+                    "surface-dim": "#131313",
+                    "tertiary-fixed-dim": "#ffb3ad",
+                    "on-secondary-container": "#b4b4bd",
+                    "tertiary-container": "#ffdad7",
+                    "primary-fixed": "#e2e2e2",
+                    "glass-border": "rgba(255, 255, 255, 0.08)",
+                    "on-tertiary-fixed-variant": "#930013",
+                    "secondary-fixed": "#e2e1eb",
+                    "surface-container": "#1f1f1f",
+                    "outline": "#8e9192",
+                    "on-background": "#e2e2e2",
+                    "secondary": "#c6c6cf",
+                    "outline-variant": "#444748",
+                    "surface-container-low": "#1b1b1b",
+                    "ghost-border": "rgba(255, 255, 255, 0.1)",
+                    "on-secondary-fixed": "#1a1b22",
+                    "inverse-primary": "#5d5f5f",
+                    "inverse-on-surface": "#303030",
+                    "tertiary": "#ffffff",
+                    "tertiary-fixed": "#ffdad7",
+                    "primary-container": "#e2e2e2",
+                    "on-secondary": "#2f3037",
+                    "glass-fill": "rgba(255, 255, 255, 0.03)",
+                    "secondary-container": "#45464e",
+                    "surface-container-high": "#2a2a2a",
+                    "on-primary-fixed": "#1a1c1c",
+                    "zinc-400": "#A1A1AA",
+                    "surface": "#131313",
+                    "primary-fixed-dim": "#c6c6c7",
+                    "on-primary-fixed-variant": "#454747",
+                    "on-error-container": "#ffdad6",
+                    "on-tertiary-container": "#c22229",
+                    "surface-bright": "#393939",
+                    "on-primary": "#2f3131",
+                    "surface-container-lowest": "#0e0e0e",
+                    "on-primary-container": "#636565",
+                    "on-error": "#690005",
+                    "surface-tint": "#c6c6c7",
+                    "on-secondary-fixed-variant": "#45464e",
+                    "on-tertiary": "#68000a",
+                    "surgical-white": "#FFFFFF",
+                    "primary": "#ffffff",
+                    "on-surface": "#e2e2e2",
+                    "chirurgical-red": "#EF4444"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0px",
+                    "lg": "2px",
+                    "xl": "4px",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "gutter": "12px",
+                    "reach-zone-padding": "32px",
+                    "margin-mobile": "20px",
+                    "unit": "4px"
+            },
+            "fontFamily": {
+                    "label-caps": ["JetBrains Mono"],
+                    "body-md": ["Inter"],
+                    "body-lg": ["Inter"],
+                    "telemetry-md": ["JetBrains Mono"],
+                    "telemetry-lg": ["JetBrains Mono"],
+                    "headline-lg": ["Inter"],
+                    "headline-md": ["Inter"]
+            }
+          },
+        },
+      }
+    </script>
+</head>
+<body class="bg-background text-primary selection:bg-chirurgical-red selection:text-white">
+<!-- TopAppBar -->
+<header class="fixed top-0 w-full z-50 bg-background border-b border-ghost-border flex items-center justify-between px-margin-mobile h-16">
+<div class="flex flex-col">
+<h1 class="font-headline-md text-headline-md font-bold tracking-tighter text-primary">SATELLITES</h1>
+<p class="font-label-caps text-[10px] tracking-widest text-zinc-400">SYSTEMIC VARIABLE MODULATION</p>
+</div>
+<div class="flex gap-4">
+<span class="material-symbols-outlined text-primary hover:opacity-80 transition-opacity cursor-pointer">analytics</span>
+<span class="material-symbols-outlined text-primary hover:opacity-80 transition-opacity cursor-pointer">settings_input_component</span>
+</div>
+</header>
+<main class="pt-24 pb-32 px-margin-mobile max-w-md mx-auto space-y-8">
+<!-- Theoretical Impact Card -->
+<section class="relative">
+<div class="glass-fill border border-glass-border p-6 backdrop-blur-xl">
+<header class="flex justify-between items-start mb-4">
+<span class="font-label-caps text-label-caps text-zinc-400">THEORETICAL IMPACT</span>
+<span class="font-label-caps text-[10px] text-chirurgical-red animate-pulse">LIVE CALCULATION</span>
+</header>
+<div class="flex flex-col gap-1">
+<h2 class="font-label-caps text-zinc-400 text-xs">FATIGUE DAMPING</h2>
+<div class="flex items-center gap-3">
+<span class="font-telemetry-lg text-4xl text-surgical-white">-12.4%</span>
+<div class="flex flex-col">
+<span class="material-symbols-outlined text-chirurgical-red" style="font-variation-settings: 'FILL' 1;">trending_down</span>
+<span class="font-label-caps text-[10px] text-surgical-white">RECOVERY BOOST</span>
+</div>
+</div>
+</div>
+<div class="mt-6 pt-4 border-t border-ghost-border">
+<p class="font-body-md text-xs text-zinc-400 leading-relaxed italic">
+                        "Optimization of systemic variables correlates to increased neuro-muscular efficiency."
+                    </p>
+</div>
+</div>
+<!-- Decorative scanline element -->
+<div class="absolute top-0 left-0 w-1 h-full bg-chirurgical-red/20"></div>
+</section>
+<!-- Input Modules -->
+<div class="space-y-10">
+<!-- SLEEP DURATION -->
+<div class="space-y-4">
+<label class="font-label-caps text-label-caps text-zinc-400 block px-1">SLEEP DURATION</label>
+<div class="flex items-center justify-between glass-fill ghost-border h-20 overflow-hidden">
+<button class="w-20 h-full flex items-center justify-center bg-white/5 active:bg-white/10 active-press transition-colors border-r border-ghost-border" id="sleep-minus">
+<span class="material-symbols-outlined text-2xl">remove</span>
+</button>
+<div class="flex-1 flex flex-col items-center justify-center">
+<span class="font-telemetry-lg text-2xl" id="sleep-value">7.5</span>
+<span class="font-label-caps text-[10px] text-zinc-400">HOURS</span>
+</div>
+<button class="w-20 h-full flex items-center justify-center bg-white/5 active:bg-white/10 active-press transition-colors border-l border-ghost-border" id="sleep-plus">
+<span class="material-symbols-outlined text-2xl">add</span>
+</button>
+</div>
+</div>
+<!-- CALORIC STATUS -->
+<div class="space-y-4">
+<label class="font-label-caps text-label-caps text-zinc-400 block px-1">CALORIC STATUS</label>
+<div class="grid grid-cols-3 gap-1 h-14">
+<button class="ghost-border glass-fill flex items-center justify-center font-label-caps text-xs text-zinc-400 hover:text-white transition-all active-press" onclick="setActive(this)">DEFICIT</button>
+<button class="border border-white glass-fill flex items-center justify-center font-label-caps text-xs text-white transition-all active-press" onclick="setActive(this)">MAINTENANCE</button>
+<button class="ghost-border glass-fill flex items-center justify-center font-label-caps text-xs text-zinc-400 hover:text-white transition-all active-press" onclick="setActive(this)">SURPLUS</button>
+</div>
+</div>
+<!-- SYSTEMIC STRESS LEVEL -->
+<div class="space-y-4">
+<label class="font-label-caps text-label-caps text-zinc-400 block px-1">SYSTEMIC STRESS LEVEL</label>
+<div class="grid grid-cols-3 gap-1 h-14">
+<button class="ghost-border glass-fill flex items-center justify-center font-label-caps text-xs text-zinc-400 hover:text-white transition-all active-press" onclick="setStress(this)">LOW</button>
+<button class="border border-white glass-fill flex items-center justify-center font-label-caps text-xs text-white transition-all active-press" onclick="setStress(this)">MED</button>
+<button class="ghost-border glass-fill flex items-center justify-center font-label-caps text-xs text-zinc-400 hover:text-white transition-all active-press" onclick="setStress(this)">HIGH</button>
+</div>
+</div>
+</div>
+<!-- Primary Action -->
+<div class="pt-8 pb-reach-zone-padding">
+<button class="w-full h-16 bg-white text-black font-headline-md font-bold text-lg flex items-center justify-center gap-3 active:scale-95 transition-transform">
+<span>CALIBRATE SYSTEM</span>
+<span class="material-symbols-outlined">sync</span>
+</button>
+</div>
+</main>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 w-full z-50 border-t border-ghost-border bg-background/95 backdrop-blur-xl flex justify-around items-center pt-2 pb-reach-zone-padding px-margin-mobile">
+<div class="flex flex-col items-center gap-1 text-zinc-400 opacity-50 hover:text-primary transition-colors cursor-pointer group">
+<span class="material-symbols-outlined">bolt</span>
+<span class="font-label-caps text-[10px]">EXTRACT</span>
+</div>
+<div class="flex flex-col items-center gap-1 text-primary cursor-pointer group scale-90">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">monitoring</span>
+<span class="font-label-caps text-[10px]">VITAL</span>
+</div>
+<div class="flex flex-col items-center gap-1 text-zinc-400 opacity-50 hover:text-primary transition-colors cursor-pointer group">
+<span class="material-symbols-outlined">biotech</span>
+<span class="font-label-caps text-[10px]">LAB</span>
+</div>
+<div class="flex flex-col items-center gap-1 text-zinc-400 opacity-50 hover:text-primary transition-colors cursor-pointer group">
+<span class="material-symbols-outlined">person</span>
+<span class="font-label-caps text-[10px]">PROFILE</span>
+</div>
+</nav>
+<script>
+        // Micro-interactions for the sleep stepper
+        let sleepValue = 7.5;
+        const sleepDisplay = document.getElementById('sleep-value');
+        const sleepPlus = document.getElementById('sleep-plus');
+        const sleepMinus = document.getElementById('sleep-minus');
+
+        sleepPlus.addEventListener('click', () => {
+            sleepValue = Math.min(12, sleepValue + 0.5);
+            sleepDisplay.textContent = sleepValue.toFixed(1);
+            hapticPulse();
+        });
+
+        sleepMinus.addEventListener('click', () => {
+            sleepValue = Math.max(0, sleepValue - 0.5);
+            sleepDisplay.textContent = sleepValue.toFixed(1);
+            hapticPulse();
+        });
+
+        function setActive(btn) {
+            const row = btn.parentElement;
+            Array.from(row.children).forEach(child => {
+                child.classList.remove('border-white', 'text-white');
+                child.classList.add('ghost-border', 'text-zinc-400');
+            });
+            btn.classList.add('border-white', 'text-white');
+            btn.classList.remove('ghost-border', 'text-zinc-400');
+            hapticPulse();
+        }
+
+        function setStress(btn) {
+            const row = btn.parentElement;
+            Array.from(row.children).forEach(child => {
+                child.classList.remove('border-white', 'text-white');
+                child.classList.add('ghost-border', 'text-zinc-400');
+            });
+            btn.classList.add('border-white', 'text-white');
+            btn.classList.remove('ghost-border', 'text-zinc-400');
+            hapticPulse();
+        }
+
+        function hapticPulse() {
+            // Placeholder for native haptic feedback logic
+            console.log("Haptic Pulse: 15ms");
+        }
+
+        // Add visual atmospheric glitch effect on button hover
+        document.querySelectorAll('button').forEach(btn => {
+            btn.addEventListener('mouseenter', () => {
+                // Future tech aesthetic flair
+            });
+        });
+    </script>
+</body></html>

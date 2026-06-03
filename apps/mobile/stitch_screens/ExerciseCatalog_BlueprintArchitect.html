@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
+<title>VESSEL_OS - Exercise Catalog</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Geist+Sans:wght@100..900&amp;family=JetBrains+Mono:wght@100..900&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "ghost-border": "rgba(255, 255, 255, 0.1)",
+                        "error": "#ffb4ab",
+                        "on-secondary-container": "#b4b4bd",
+                        "tertiary-container": "#ffdad7",
+                        "surface-tint": "#c6c6c7",
+                        "primary-container": "#e2e2e2",
+                        "outline-variant": "#444748",
+                        "on-surface-variant": "#c4c7c8",
+                        "on-tertiary-fixed": "#410004",
+                        "on-primary-fixed-variant": "#454747",
+                        "surface-bright": "#393939",
+                        "on-secondary-fixed": "#1a1b22",
+                        "surface-container-high": "#2a2a2a",
+                        "primary": "#ffffff",
+                        "on-primary-container": "#636565",
+                        "tertiary-fixed-dim": "#ffb3ad",
+                        "on-tertiary-fixed-variant": "#930013",
+                        "secondary": "#c6c6cf",
+                        "on-error-container": "#ffdad6",
+                        "surgical-white": "#FFFFFF",
+                        "on-tertiary": "#68000a",
+                        "inverse-primary": "#5d5f5f",
+                        "secondary-fixed-dim": "#c6c6cf",
+                        "surface-variant": "#353535",
+                        "on-tertiary-container": "#c22229",
+                        "glass-fill": "rgba(255, 255, 255, 0.03)",
+                        "tertiary": "#ffffff",
+                        "secondary-container": "#45464e",
+                        "surface-container-low": "#1b1b1b",
+                        "primary-fixed": "#e2e2e2",
+                        "inverse-on-surface": "#303030",
+                        "chirurgical-red": "#EF4444",
+                        "on-secondary": "#2f3037",
+                        "surface-container-lowest": "#0e0e0e",
+                        "background": "#131313",
+                        "surface": "#131313",
+                        "secondary-fixed": "#e2e1eb",
+                        "on-background": "#e2e2e2",
+                        "glass-border": "rgba(255, 255, 255, 0.08)",
+                        "surface-container-highest": "#353535",
+                        "tertiary-fixed": "#ffdad7",
+                        "on-secondary-fixed-variant": "#45464e",
+                        "on-primary-fixed": "#1a1c1c",
+                        "inverse-surface": "#e2e2e2",
+                        "primary-fixed-dim": "#c6c6c7",
+                        "zinc-400": "#A1A1AA",
+                        "outline": "#8e9192",
+                        "surface-container": "#1f1f1f",
+                        "error-container": "#93000a",
+                        "surface-dim": "#131313",
+                        "on-surface": "#e2e2e2",
+                        "on-error": "#690005",
+                        "on-primary": "#2f3131"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "reach-zone-padding": "32px",
+                        "margin-mobile": "20px",
+                        "gutter": "12px",
+                        "unit": "4px"
+                    },
+                    "fontFamily": {
+                        "body-md": ["Geist Sans"],
+                        "body-lg": ["Geist Sans"],
+                        "telemetry-lg": ["JetBrains Mono"],
+                        "label-caps": ["JetBrains Mono"],
+                        "headline-md": ["Geist Sans"],
+                        "telemetry-md": ["JetBrains Mono"],
+                        "headline-lg": ["Geist Sans"]
+                    },
+                    "fontSize": {
+                        "body-md": ["16px", { "lineHeight": "1.5", "letterSpacing": "0em", "fontWeight": "400" }],
+                        "body-lg": ["18px", { "lineHeight": "1.5", "letterSpacing": "0em", "fontWeight": "400" }],
+                        "telemetry-lg": ["20px", { "lineHeight": "1", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "label-caps": ["12px", { "lineHeight": "1", "letterSpacing": "0.1em", "fontWeight": "700" }],
+                        "headline-md": ["24px", { "lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "600" }],
+                        "telemetry-md": ["14px", { "lineHeight": "1.2", "letterSpacing": "0em", "fontWeight": "500" }],
+                        "headline-lg": ["32px", { "lineHeight": "1.1", "letterSpacing": "-0.04em", "fontWeight": "700" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body {
+            background-color: #000000; /* Deep Void OLED */
+            color: #FFFFFF;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        .glass-input:focus {
+            outline: none;
+            border-color: rgba(255, 255, 255, 0.4);
+            box-shadow: none;
+        }
+
+        .haptic-active:active {
+            transform: scale(0.96);
+            transition: transform 0.1s cubic-bezier(0.4, 0, 0.2, 1);
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+        
+        .haptic-add:active {
+            background-color: #FFFFFF;
+            color: #000000;
+        }
+
+        /* Material Symbols Fill Configuration */
+        .material-symbols-outlined[data-weight="fill"] {
+            font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background dark:bg-background text-primary dark:text-primary font-body-md text-body-md antialiased overflow-hidden flex flex-col h-screen">
+<!-- TopAppBar (Semantic Shell) -->
+<header class="flex justify-between items-center h-14 px-margin-mobile w-full z-50 fixed top-0 border-b border-ghost-border bg-background dark:bg-background flat no shadows">
+<button class="text-zinc-400 hover:opacity-80 transition-opacity duration-200 haptic-active p-2 -ml-2 rounded-full">
+<span class="material-symbols-outlined" data-icon="sensors">sensors</span>
+</button>
+<div class="font-label-caps text-label-caps tracking-widest text-surgical-white text-center">
+            VESSEL_OS<br/><span class="text-zinc-400 text-[10px] tracking-[0.2em] opacity-80">DATABASE QUERY</span>
+</div>
+<button class="text-zinc-400 hover:opacity-80 transition-opacity duration-200 haptic-active p-2 -mr-2 rounded-full">
+<span class="material-symbols-outlined" data-icon="settings_input_component">settings_input_component</span>
+</button>
+</header>
+<!-- Main Content Canvas -->
+<main class="flex-1 flex flex-col mt-14 mb-20 overflow-hidden pt-4 px-margin-mobile pb-reach-zone-padding">
+<!-- Search Module -->
+<div class="relative w-full mb-6 shrink-0 z-20">
+<div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+<span class="material-symbols-outlined text-zinc-400 text-lg" data-icon="search">search</span>
+</div>
+<input autocomplete="off" class="glass-input w-full bg-glass-fill border border-ghost-border rounded-lg py-4 pl-12 pr-4 font-telemetry-md text-telemetry-md text-surgical-white placeholder-zinc-400 transition-colors duration-200" placeholder="QUERY DATABASE..." spellcheck="false" type="text"/>
+</div>
+<!-- Filter Ribbons (Horizontal Scroll) -->
+<div class="flex space-x-3 mb-6 overflow-x-auto hide-scrollbar shrink-0 pb-2 border-b border-ghost-border/50">
+<button class="haptic-active shrink-0 px-4 py-2 rounded-full border border-ghost-border bg-glass-fill font-label-caps text-label-caps text-surgical-white whitespace-nowrap">ALL</button>
+<button class="haptic-active shrink-0 px-4 py-2 rounded-full border border-ghost-border font-label-caps text-label-caps text-zinc-400 whitespace-nowrap">LOWER BODY</button>
+<button class="haptic-active shrink-0 px-4 py-2 rounded-full border border-ghost-border font-label-caps text-label-caps text-zinc-400 whitespace-nowrap">UPPER BODY</button>
+<button class="haptic-active shrink-0 px-4 py-2 rounded-full border border-ghost-border font-label-caps text-label-caps text-zinc-400 whitespace-nowrap">CORE</button>
+<button class="haptic-active shrink-0 px-4 py-2 rounded-full border border-ghost-border font-label-caps text-label-caps text-zinc-400 whitespace-nowrap">ISOLATION</button>
+</div>
+<!-- Exercise List (High Density) -->
+<div class="flex-1 overflow-y-auto hide-scrollbar pb-10 space-y-0">
+<!-- Row 1 -->
+<div class="flex items-center justify-between py-4 border-b border-ghost-border group">
+<div class="flex flex-col">
+<span class="font-headline-md text-body-lg text-surgical-white tracking-tight">BARBELL SQUAT</span>
+<div class="flex space-x-2 mt-1">
+<span class="font-label-caps text-[10px] text-zinc-400 border border-ghost-border px-1.5 py-0.5 rounded-sm">[QUADS]</span>
+<span class="font-label-caps text-[10px] text-zinc-400 border border-ghost-border px-1.5 py-0.5 rounded-sm">[GLUTES]</span>
+<span class="font-label-caps text-[10px] text-zinc-400 border border-ghost-border px-1.5 py-0.5 rounded-sm">[COMPOUND]</span>
+</div>
+</div>
+<button class="haptic-add w-12 h-12 flex items-center justify-center border border-ghost-border rounded-lg text-surgical-white transition-colors duration-150">
+<span class="material-symbols-outlined" data-icon="add">add</span>
+</button>
+</div>
+<!-- Row 2 -->
+<div class="flex items-center justify-between py-4 border-b border-ghost-border group">
+<div class="flex flex-col">
+<span class="font-headline-md text-body-lg text-surgical-white tracking-tight">BULGARIAN SPLIT SQUAT</span>
+<div class="flex space-x-2 mt-1">
+<span class="font-label-caps text-[10px] text-zinc-400 border border-ghost-border px-1.5 py-0.5 rounded-sm">[QUADS]</span>
+<span class="font-label-caps text-[10px] text-zinc-400 border border-ghost-border px-1.5 py-0.5 rounded-sm">[GLUTES]</span>
+<span class="font-label-caps text-[10px] text-zinc-400 border border-ghost-border px-1.5 py-0.5 rounded-sm">[UNILATERAL]</span>
+</div>
+</div>
+<button class="haptic-add w-12 h-12 flex items-center justify-center border border-ghost-border rounded-lg text-surgical-white transition-colors duration-150">
+<span class="material-symbols-outlined" data-icon="add">add</span>
+</button>
+</div>
+<!-- Row 3 -->
+<div class="flex items-center justify-between py-4 border-b border-ghost-border group">
+<div class="flex flex-col">
+<span class="font-headline-md text-body-lg text-surgical-white tracking-tight">ROMANIAN DEADLIFT</span>
+<div class="flex space-x-2 mt-1">
+<span class="font-label-caps text-[10px] text-zinc-400 border border-ghost-border px-1.5 py-0.5 rounded-sm">[HAMSTRINGS]</span>
+<span class="font-label-caps text-[10px] text-zinc-400 border border-ghost-border px-1.5 py-0.5 rounded-sm">[LOWER BACK]</span>
+</div>
+</div>
+<button class="haptic-add w-12 h-12 flex items-center justify-center border border-ghost-border rounded-lg text-surgical-white transition-colors duration-150 bg-glass-fill">
+<span class="material-symbols-outlined" data-icon="check">check</span>
+</button>
+</div>
+<!-- Row 4 -->
+<div class="flex items-center justify-between py-4 border-b border-ghost-border group">
+<div class="flex flex-col">
+<span class="font-headline-md text-body-lg text-surgical-white tracking-tight">LEG EXTENSION</span>
+<div class="flex space-x-2 mt-1">
+<span class="font-label-caps text-[10px] text-zinc-400 border border-ghost-border px-1.5 py-0.5 rounded-sm">[QUADS]</span>
+<span class="font-label-caps text-[10px] text-zinc-400 border border-ghost-border px-1.5 py-0.5 rounded-sm">[ISOLATION]</span>
+</div>
+</div>
+<button class="haptic-add w-12 h-12 flex items-center justify-center border border-ghost-border rounded-lg text-surgical-white transition-colors duration-150">
+<span class="material-symbols-outlined" data-icon="add">add</span>
+</button>
+</div>
+<!-- Row 5 -->
+<div class="flex items-center justify-between py-4 border-b border-ghost-border group">
+<div class="flex flex-col">
+<span class="font-headline-md text-body-lg text-surgical-white tracking-tight">LEG PRESS</span>
+<div class="flex space-x-2 mt-1">
+<span class="font-label-caps text-[10px] text-zinc-400 border border-ghost-border px-1.5 py-0.5 rounded-sm">[QUADS]</span>
+<span class="font-label-caps text-[10px] text-zinc-400 border border-ghost-border px-1.5 py-0.5 rounded-sm">[COMPOUND]</span>
+<span class="font-label-caps text-[10px] text-zinc-400 border border-ghost-border px-1.5 py-0.5 rounded-sm">[MACHINE]</span>
+</div>
+</div>
+<button class="haptic-add w-12 h-12 flex items-center justify-center border border-ghost-border rounded-lg text-surgical-white transition-colors duration-150">
+<span class="material-symbols-outlined" data-icon="add">add</span>
+</button>
+</div>
+<!-- Row 6 -->
+<div class="flex items-center justify-between py-4 border-b border-ghost-border group">
+<div class="flex flex-col">
+<span class="font-headline-md text-body-lg text-surgical-white tracking-tight">CALF RAISE SEATED</span>
+<div class="flex space-x-2 mt-1">
+<span class="font-label-caps text-[10px] text-zinc-400 border border-ghost-border px-1.5 py-0.5 rounded-sm">[CALVES]</span>
+<span class="font-label-caps text-[10px] text-zinc-400 border border-ghost-border px-1.5 py-0.5 rounded-sm">[ISOLATION]</span>
+</div>
+</div>
+<button class="haptic-add w-12 h-12 flex items-center justify-center border border-ghost-border rounded-lg text-surgical-white transition-colors duration-150">
+<span class="material-symbols-outlined" data-icon="add">add</span>
+</button>
+</div>
+</div>
+</main>
+<!-- BottomNavBar (Semantic Shell) - Kept for navigation context though technically this is a sub-view, assuming it acts as a primary catalog destination for the demo -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center h-20 px-margin-mobile border-t border-ghost-border bg-background/80 backdrop-blur-xl pb-safe">
+<button class="flex flex-col items-center justify-center text-zinc-400 hover:text-surgical-white Active: scale-95 transition-transform duration-150 group">
+<span class="material-symbols-outlined mb-1 group-hover:opacity-100 opacity-60 transition-opacity" data-icon="fitness_center">fitness_center</span>
+<span class="font-label-caps text-[10px]">EXTRACTION</span>
+</button>
+<button class="flex flex-col items-center justify-center text-surgical-white font-bold scale-110 group">
+<span class="material-symbols-outlined mb-1" data-icon="query_stats" data-weight="fill">query_stats</span>
+<span class="font-label-caps text-[10px]">ANATOMY</span>
+</button>
+<button class="flex flex-col items-center justify-center text-zinc-400 hover:text-surgical-white Active: scale-95 transition-transform duration-150 group">
+<span class="material-symbols-outlined mb-1 group-hover:opacity-100 opacity-60 transition-opacity" data-icon="biotech">biotech</span>
+<span class="font-label-caps text-[10px]">TELEMETRY</span>
+</button>
+<button class="flex flex-col items-center justify-center text-zinc-400 hover:text-surgical-white Active: scale-95 transition-transform duration-150 group">
+<span class="material-symbols-outlined mb-1 group-hover:opacity-100 opacity-60 transition-opacity" data-icon="history">history</span>
+<span class="font-label-caps text-[10px]">LOG</span>
+</button>
+</nav>
+</body></html>

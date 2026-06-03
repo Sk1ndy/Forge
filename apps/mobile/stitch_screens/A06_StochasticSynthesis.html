@@ -1,0 +1,405 @@
+<!DOCTYPE html><html class="dark" lang="en" style=""><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0, viewport-fit=cover" name="viewport">
+<title>THE CRUCIBLE | FORGE</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&amp;family=Geist:wght@400;600;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+  tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        "colors": {
+                "on-tertiary-container": "#c22229",
+                "on-tertiary-fixed": "#410004",
+                "on-tertiary": "#68000a",
+                "on-secondary-container": "#b4b4bd",
+                "outline-variant": "#444748",
+                "on-surface": "#e2e2e2",
+                "on-primary": "#2f3131",
+                "secondary-fixed": "#e2e1eb",
+                "on-surface-variant": "#c4c7c8",
+                "tertiary-container": "#ffdad7",
+                "surface-variant": "#353535",
+                "surface-container-low": "#1b1b1b",
+                "on-secondary-fixed-variant": "#45464e",
+                "tertiary-fixed": "#ffdad7",
+                "surface-container": "#1f1f1f",
+                "zinc-400": "#A1A1AA",
+                "surface-container-high": "#2a2a2a",
+                "on-secondary": "#2f3037",
+                "surface-dim": "#131313",
+                "secondary": "#c6c6cf",
+                "on-error": "#690005",
+                "on-primary-fixed": "#1a1c1c",
+                "surgical-white": "#FFFFFF",
+                "on-primary-fixed-variant": "#454747",
+                "primary-fixed-dim": "#c6c6c7",
+                "inverse-on-surface": "#303030",
+                "surface": "#131313",
+                "primary": "#ffffff",
+                "primary-container": "#e2e2e2",
+                "background": "#131313",
+                "glass-border": "rgba(255, 255, 255, 0.08)",
+                "tertiary": "#ffffff",
+                "on-background": "#e2e2e2",
+                "error-container": "#93000a",
+                "chirurgical-red": "#EF4444",
+                "on-error-container": "#ffdad6",
+                "secondary-container": "#45464e",
+                "inverse-primary": "#5d5f5f",
+                "surface-container-lowest": "#0e0e0e",
+                "glass-fill": "rgba(255, 255, 255, 0.03)",
+                "primary-fixed": "#e2e2e2",
+                "error": "#ffb4ab",
+                "on-primary-container": "#636565",
+                "outline": "#8e9192",
+                "ghost-border": "rgba(255, 255, 255, 0.1)",
+                "surface-bright": "#393939",
+                "on-tertiary-fixed-variant": "#930013",
+                "surface-container-highest": "#353535",
+                "inverse-surface": "#e2e2e2",
+                "on-secondary-fixed": "#1a1b22",
+                "tertiary-fixed-dim": "#ffb3ad",
+                "surface-tint": "#c6c6c7",
+                "secondary-fixed-dim": "#c6c6cf"
+        },
+        "borderRadius": {
+                "DEFAULT": "0.25rem",
+                "lg": "0.5rem",
+                "xl": "0.75rem",
+                "full": "9999px"
+        },
+        "spacing": {
+                "reach-zone-padding": "32px",
+                "margin-mobile": "20px",
+                "gutter": "12px",
+                "unit": "4px"
+        },
+        "fontFamily": {
+                "body-lg": [
+                        "Geist Sans"
+                ],
+                "headline-md": [
+                        "Geist Sans"
+                ],
+                "telemetry-md": [
+                        "JetBrains Mono"
+                ],
+                "headline-lg": [
+                        "Geist Sans"
+                ],
+                "body-md": [
+                        "Geist Sans"
+                ],
+                "telemetry-lg": [
+                        "JetBrains Mono"
+                ],
+                "label-caps": [
+                        "JetBrains Mono"
+                ]
+        },
+        "fontSize": {
+                "body-lg": [
+                        "18px",
+                        {
+                                "lineHeight": "1.5",
+                                "letterSpacing": "0em",
+                                "fontWeight": "400"
+                        }
+                ],
+                "headline-md": [
+                        "24px",
+                        {
+                                "lineHeight": "1.2",
+                                "letterSpacing": "-0.02em",
+                                "fontWeight": "600"
+                        }
+                ],
+                "telemetry-md": [
+                        "14px",
+                        {
+                                "lineHeight": "1.2",
+                                "letterSpacing": "0em",
+                                "fontWeight": "500"
+                        }
+                ],
+                "headline-lg": [
+                        "32px",
+                        {
+                                "lineHeight": "1.1",
+                                "letterSpacing": "-0.04em",
+                                "fontWeight": "700"
+                        }
+                ],
+                "body-md": [
+                        "16px",
+                        {
+                                "lineHeight": "1.5",
+                                "letterSpacing": "0em",
+                                "fontWeight": "400"
+                        }
+                ],
+                "telemetry-lg": [
+                        "20px",
+                        {
+                                "lineHeight": "1",
+                                "letterSpacing": "-0.02em",
+                                "fontWeight": "700"
+                        }
+                ],
+                "label-caps": [
+                        "12px",
+                        {
+                                "lineHeight": "1",
+                                "letterSpacing": "0.1em",
+                                "fontWeight": "700"
+                        }
+                ]
+        }
+},
+    },
+  }
+</script>
+<style>
+        @keyframes scanline {
+            0% { transform: translateY(-100%); }
+            100% { transform: translateY(100%); }
+        }
+        @keyframes rotate-slow {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        @keyframes scroll-up {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(-100%); }
+        }
+        .crucible-gradient {
+            background: #000;
+        }
+        .scanline-overlay {
+            position: absolute;
+            width: 100%;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.05);
+            animation: scanline 4s linear infinite;
+            pointer-events: none;
+            z-index: 50;
+        }
+        /* Curved Text Path SVG Support */
+        .curved-text {
+            fill: #FFFFFF;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 10px;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+        }
+        .curved-text-dim {
+            fill: #A1A1AA;
+        }
+        /* Specular Reflection */
+        .specular-highlight {
+            background: linear-gradient(180deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 100%);
+        }
+    </style>
+</head>
+<body class="bg-black text-surgical-white overflow-hidden selection:bg-surgical-white selection:text-black" style="transform: scale(1);">
+<!-- Main Crucible Content -->
+<main class="relative h-screen w-full flex flex-col items-center justify-center crucible-gradient">
+<div class="scanline-overlay"></div>
+<!-- HUD Diagnostics (Corners) -->
+<div class="absolute top-8 left-4 max-w-[200px] z-40 overflow-hidden h-[120px] mask-image-[linear-gradient(to_bottom,rgba(0,0,0,1),rgba(0,0,0,0))]">
+<div class="flex flex-col space-y-[4px] opacity-70 transition-transform" id="log-container-tl" style="transform: translateY(-2198px);"><p class="font-telemetry-md text-zinc-400 text-[9px] transition-colors duration-300 leading-tight whitespace-nowrap truncate text-surgical-white">&gt; ADJUSTING TORQUE FOR FEMUR RATIO: LONG...</p></div>
+</div>
+<div class="absolute bottom-8 right-4 max-w-[200px] text-right z-40 overflow-hidden h-[120px] mask-image-[linear-gradient(to_top,rgba(0,0,0,1),rgba(0,0,0,0))]">
+<div class="flex flex-col items-end space-y-[4px] opacity-70 transition-transform" id="log-container-br"></div>
+</div>
+<!-- Central Neural Sphere Cockpit -->
+<div class="relative flex flex-col items-center justify-center group w-[340px] h-[340px]">
+<!-- Outer Curved Telemetry -->
+<svg class="absolute w-[360px] h-[360px] animate-[rotate-slow_60s_linear_infinite]" viewBox="0 0 360 360">
+<defs>
+<path d="M 180, 180 m -160, 0 a 160,160 0 1,1 320,0 a 160,160 0 1,1 -320,0" id="circlePath1"></path>
+<path d="M 180, 180 m -170, 0 a 170,170 0 1,0 340,0 a 170,170 0 1,0 -340,0" id="circlePath2"></path>
+</defs>
+<text>
+<textPath class="curved-text curved-text-dim" href="#circlePath1" startOffset="5%">
+                DATA THROUGHPUT
+            </textPath>
+<textPath class="curved-text" href="#circlePath1" startOffset="25%">
+                1.2 GB/S
+            </textPath>
+</text>
+<text>
+<textPath class="curved-text curved-text-dim" href="#circlePath2" startOffset="5%">
+                ESTIMATED COMPLETION
+            </textPath>
+<textPath class="curved-text" href="#circlePath2" startOffset="30%">
+                00:04.22
+            </textPath>
+</text>
+</svg>
+<!-- Concentric Technical Rings -->
+<div class="absolute w-[300px] h-[300px] border border-white/10 rounded-full border-dashed animate-[rotate-slow_30s_linear_infinite_reverse]"></div>
+<div class="absolute w-[280px] h-[280px] border border-chirurgical-red/20 rounded-full animate-[rotate-slow_40s_linear_infinite]"></div>
+<!-- Central Image Payload -->
+<div class="relative w-[240px] h-[240px] rounded-full overflow-hidden border-2 border-white/20 shadow-[0_0_50px_rgba(255,255,255,0.05)] z-20 flex items-center justify-center bg-black">
+<div class="absolute inset-x-0 top-0 h-1/2 specular-highlight rounded-t-full pointer-events-none z-30"></div>
+<img alt="Forge Logo" class="w-3/4 h-3/4 object-contain opacity-80 z-10 relative" src="https://lh3.googleusercontent.com/aida/AP1WRLtc4IbyjqRAV8DxOeqGL1gY1ftJXAXP_1mJ7LRrcTFIYAgURbcXWNtlwVIGYt8ZmwXj4upu9ZLs7VKiGV-KLCk8gj-rX55jk0VQphyyMYJjGOkWN_sbsqwjXglvlWZjSvMOBxks0-MsTPeVGoAan0-Q6lAY24mN9UbIKBMDym0VZ1Rv1aq5LXlnZtaQf-SIxaqjgrFQ0vVyBtWGGgnO6iccj-ZZH7C_JqI4fTZnoP-VHDiXOTPtRQRn6w">
+<!-- Progress Overlay on Image -->
+<div class="absolute inset-0 bg-black/40 flex flex-col items-center justify-center z-20">
+<div class="font-telemetry-lg text-4xl text-surgical-white drop-shadow-[0_0_10px_rgba(255,255,255,0.8)] tabular-nums overflow-hidden h-[40px] relative" id="progress-container">
+<span class="block transition-transform duration-100 ease-out" id="progress-text">0%</span>
+</div>
+</div>
+</div>
+<!-- Circular Progress Ring -->
+<svg class="absolute w-[260px] h-[260px] transform -rotate-90 z-30" viewBox="0 0 260 260">
+<circle cx="130" cy="130" fill="none" r="126" stroke="rgba(255,255,255,0.1)" stroke-width="4"></circle>
+<circle class="transition-all duration-300 ease-out" cx="130" cy="130" fill="none" id="progress-ring" r="126" stroke="#EF4444" stroke-dasharray="791.68" stroke-dashoffset="791.68" stroke-width="4"></circle>
+</svg>
+</div>
+<!-- Core Branding (Moved Below Sphere) -->
+<div class="relative z-10 flex flex-col items-center mt-12 text-center">
+<h1 class="font-telemetry-lg text-headline-lg tracking-[0.2em] text-surgical-white uppercase">THE CRUCIBLE</h1>
+<p class="font-label-caps text-label-caps text-zinc-400 tracking-[0.5em] mt-3 uppercase">Extraction in Progress</p>
+<div class="mt-6 font-label-caps text-xs text-zinc-400 tracking-[0.2em]">COMPILING TELEMETRY</div>
+</div>
+</main>
+<script>
+        // Progress Circular Logic - Stochastic
+        let progress = 0;
+        const progressRing = document.getElementById('progress-ring');
+        const progressText = document.getElementById('progress-text');
+        
+        // Circumference of r=126 circle is ~791.68
+        const circumference = 2 * Math.PI * 126;
+
+        let isWaitingForPayload = false;
+
+        function updateProgress() {
+            if (isWaitingForPayload) return;
+
+            if (progress < 99) {
+                // Stochastic burst logic
+                let increment = 0;
+                const r = Math.random();
+                if (r > 0.9) {
+                    increment = Math.random() * 8 + 4; // Burst
+                } else if (r > 0.6) {
+                    increment = Math.random() * 2 + 1; // Normal
+                } else {
+                    increment = 0; // Pause
+                }
+
+                // Pause briefly on critical nodes
+                if (progress > 20 && progress < 25 && Math.random() > 0.8) increment = 0;
+                if (progress > 50 && progress < 55 && Math.random() > 0.8) increment = 0;
+                if (progress > 80 && progress < 85 && Math.random() > 0.8) increment = 0;
+
+
+                progress += increment;
+                if (progress > 99) progress = 99;
+                
+                const offset = circumference - (progress / 100) * circumference;
+                progressRing.style.strokeDashoffset = offset;
+                
+                // Roll counter effect (simple implementation for DOM)
+                progressText.innerText = `${Math.floor(progress)}%`;
+
+                if (progress === 99) {
+                    isWaitingForPayload = true;
+                    setTimeout(() => {
+                        // Simulate promise resolution
+                        progress = 100;
+                        const finalOffset = circumference - (progress / 100) * circumference;
+                        progressRing.style.strokeDashoffset = finalOffset;
+                        progressText.innerText = `100%`;
+                        
+                        // Flash on completion
+                        progressRing.setAttribute('stroke', '#FFFFFF');
+                        setTimeout(() => {
+                            // Reset or transition
+                            progressRing.setAttribute('stroke', '#EF4444');
+                        }, 1000);
+
+                    }, 2500 + Math.random() * 1500); // Wait 2.5-4s at 99%
+                }
+
+            }
+            setTimeout(updateProgress, 100 + Math.random() * 200); // Stochastic intervals
+        }
+
+        setTimeout(updateProgress, 500);
+
+        // Dynamic Log Stream (Split into corners) - Hyper-Personalized
+        const logs = [
+            "> ANALYZING 140.0KG SQUAT OVERLOAD MATRIX...",
+            "> COMPUTING ADAPTIVE DELOAD FOR 4 SESSIONS/WEEK...",
+            "> ADJUSTING TORQUE FOR FEMUR RATIO: LONG...",
+            "> MAPPING ANATOMICAL POINTS FAIBLES...",
+            "> SYNCHRONIZING CNS RECOVERY CONSTANTS...",
+            "> CALIBRATING HYPERTROPHY THRESHOLDS...",
+            "> MITOCHONDRIAL DENSITY PROJECTION...",
+            "> KINETIC LOAD PROFILES COMPILING..."
+        ];
+
+        const logContainerTL = document.getElementById('log-container-tl');
+        const logContainerBR = document.getElementById('log-container-br');
+        
+        let tlOffset = 0;
+        let brOffset = 0;
+
+        function addLog() {
+            const logEntry = document.createElement('p');
+            logEntry.className = "font-telemetry-md text-zinc-400 text-[9px] transition-colors duration-300 leading-tight whitespace-nowrap truncate text-surgical-white";
+            logEntry.innerText = logs[Math.floor(Math.random() * logs.length)];
+            
+            // Randomly assign to top-left or bottom-right
+            const isTL = Math.random() > 0.5;
+            const targetContainer = isTL ? logContainerTL : logContainerBR;
+            
+            if (isTL) {
+                targetContainer.appendChild(logEntry);
+                tlOffset -= 14; // Approx height + spacing
+                targetContainer.style.transform = `translateY(${tlOffset}px)`;
+            } else {
+                targetContainer.insertBefore(logEntry, targetContainer.firstChild);
+                brOffset += 14;
+                targetContainer.style.transform = `translateY(${brOffset}px)`;
+            }
+
+            if (targetContainer.children.length > 15) {
+                if (isTL) targetContainer.removeChild(targetContainer.firstChild);
+                else targetContainer.removeChild(targetContainer.lastChild);
+            }
+        }
+
+        // Pre-fill some logs
+        for(let i=0; i<6; i++) {
+            const log1 = document.createElement('p');
+            log1.className = "font-telemetry-md text-[9px] leading-tight whitespace-nowrap truncate text-surgical-white";
+            log1.innerText = logs[Math.floor(Math.random() * logs.length)];
+            logContainerTL.appendChild(log1);
+
+            const log2 = document.createElement('p');
+            log2.className = "font-telemetry-md text-[9px] leading-tight whitespace-nowrap truncate text-surgical-white";
+            log2.innerText = logs[Math.floor(Math.random() * logs.length)];
+            logContainerBR.appendChild(log2);
+        }
+
+        // Variable speed logging
+        function triggerLog() {
+            addLog();
+            setTimeout(triggerLog, 200 + Math.random() * 800);
+        }
+        triggerLog();
+
+        // Haptic Logic Emulation
+        document.body.addEventListener('click', () => {
+            document.body.style.transform = 'scale(0.995)';
+            setTimeout(() => document.body.style.transform = 'scale(1)', 50);
+        });
+    </script>
+</body></html>
