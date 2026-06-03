@@ -1,0 +1,364 @@
+<!DOCTYPE html><html class="dark" lang="en" style=""><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>FORGE // THE VESSEL</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&amp;family=Geist:wght@400;600;700;800&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "tertiary": "#ffffff",
+                    "glass-fill": "rgba(255, 255, 255, 0.03)",
+                    "tertiary-fixed-dim": "#ffb3ad",
+                    "on-surface": "#e2e2e2",
+                    "inverse-surface": "#e2e2e2",
+                    "surface-container-low": "#1b1b1b",
+                    "surface-container-highest": "#353535",
+                    "primary-container": "#e2e2e2",
+                    "surface": "#131313",
+                    "secondary-fixed": "#e2e1eb",
+                    "background": "#000000",
+                    "primary-fixed-dim": "#c6c6c7",
+                    "tertiary-container": "#ffdad7",
+                    "on-tertiary-fixed": "#410004",
+                    "secondary-fixed-dim": "#c6c6cf",
+                    "outline": "#8e9192",
+                    "on-error-container": "#ffdad6",
+                    "surface-container-lowest": "#0e0e0e",
+                    "on-secondary-container": "#b4b4bd",
+                    "error-container": "#93000a",
+                    "surface-dim": "#131313",
+                    "on-secondary-fixed": "#1a1b22",
+                    "secondary": "#c6c6cf",
+                    "on-primary-container": "#636565",
+                    "primary-fixed": "#e2e2e2",
+                    "on-primary-fixed-variant": "#454747",
+                    "on-primary-fixed": "#1a1c1c",
+                    "primary": "#ffffff",
+                    "on-tertiary-container": "#c22229",
+                    "surface-container": "#1f1f1f",
+                    "on-background": "#e2e2e2",
+                    "chirurgical-red": "#EF4444",
+                    "on-tertiary": "#68000a",
+                    "on-surface-variant": "#c4c7c8",
+                    "inverse-on-surface": "#303030",
+                    "outline-variant": "#444748",
+                    "surface-tint": "#c6c6c7",
+                    "zinc-400": "#A1A1AA",
+                    "tertiary-fixed": "#ffdad7",
+                    "ghost-border": "rgba(255, 255, 255, 0.1)",
+                    "on-tertiary-fixed-variant": "#930013",
+                    "inverse-primary": "#5d5f5f",
+                    "secondary-container": "#45464e",
+                    "error": "#ffb4ab",
+                    "surface-container-high": "#2a2a2a",
+                    "surface-bright": "#393939",
+                    "surgical-white": "#FFFFFF",
+                    "on-error": "#690005",
+                    "on-primary": "#2f3131",
+                    "on-secondary": "#2f3037",
+                    "on-secondary-fixed-variant": "#45464e",
+                    "glass-border": "rgba(255, 255, 255, 0.08)",
+                    "surface-variant": "#353535"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "gutter": "12px",
+                    "margin-mobile": "20px",
+                    "unit": "4px",
+                    "reach-zone-padding": "32px"
+            },
+            "fontFamily": {
+                    "label-caps": ["JetBrains Mono"],
+                    "headline-lg": ["Geist Sans"],
+                    "body-md": ["Geist Sans"],
+                    "body-lg": ["Geist Sans"],
+                    "telemetry-lg": ["JetBrains Mono"],
+                    "telemetry-md": ["JetBrains Mono"],
+                    "headline-md": ["Geist Sans"]
+            },
+            "fontSize": {
+                    "label-caps": ["12px", {"lineHeight": "1", "letterSpacing": "0.1em", "fontWeight": "700"}],
+                    "headline-lg": ["32px", {"lineHeight": "1.1", "letterSpacing": "-0.04em", "fontWeight": "700"}],
+                    "body-md": ["16px", {"lineHeight": "1.5", "letterSpacing": "0em", "fontWeight": "400"}],
+                    "body-lg": ["18px", {"lineHeight": "1.5", "letterSpacing": "0em", "fontWeight": "400"}],
+                    "telemetry-lg": ["20px", {"lineHeight": "1", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "telemetry-md": ["14px", {"lineHeight": "1.2", "letterSpacing": "0em", "fontWeight": "500"}],
+                    "headline-md": ["24px", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "600"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body {
+            background-color: #000000;
+            color: #ffffff;
+            -webkit-font-smoothing: antialiased;
+            overflow-x: hidden;
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(20px);
+            border-radius: 12px;
+        }
+
+        .squarcle {
+            border-radius: 24px;
+        }
+
+        .haptic-feedback:active {
+            transform: scale(0.98);
+            transition: transform 0.1s ease;
+        }
+
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        .scan-overlay {
+            background: linear-gradient(0deg, rgba(239, 68, 68, 0.05) 0%, rgba(255, 255, 255, 0) 100%);
+        }
+
+        input[type="range"] {
+            -webkit-appearance: none;
+            width: 100%;
+            background: transparent;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 24px;
+            width: 2px;
+            background: #ffffff;
+            cursor: pointer;
+            margin-top: -10px;
+        }
+
+        input[type="range"]::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 1px;
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .micro-glow {
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.15);
+        }
+    </style>
+</head>
+<body class="font-body-md text-on-background selection:bg-chirurgical-red/30 pb-32">
+<!-- TopAppBar -->
+<header class="fixed top-0 w-full bg-background dark:bg-background text-primary dark:text-primary border-b border-ghost-border z-50 flex justify-between items-center px-margin-mobile h-16">
+<div class="flex items-center gap-2">
+<h1 class="font-headline-lg text-headline-lg tracking-tighter text-surgical-white">FORGE</h1>
+</div>
+<div class="flex items-center gap-4">
+</div>
+</header>
+<main class="pt-20 px-margin-mobile max-w-lg mx-auto">
+<!-- Header Section -->
+<section class="mb-8">
+<h3 class="font-headline-lg text-headline-lg text-surgical-white">ANTHROPOMETRIC EVALUATION</h3>
+</section>
+<!-- Anthropometric Form -->
+<div class="space-y-6 mb-12">
+<!-- Biological Origin -->
+<div class="space-y-3 mb-8"><label class="font-label-caps text-zinc-400">MEASUREMENT SYSTEM</label><div class="grid grid-cols-2 gap-1 bg-glass-fill p-1 border border-ghost-border rounded-xl h-12"><button class="flex items-center justify-center font-label-caps text-surgical-white bg-white/10 rounded-lg border border-white/20 transition-all text-[10px] tracking-widest">METRIC<span class="ml-2 text-[8px] opacity-40">[KG/CM]</span></button><button class="flex items-center justify-center font-label-caps text-zinc-400 hover:text-white transition-all text-[10px] tracking-widest">IMPERIAL<span class="ml-2 text-[8px] opacity-40">[LB/FT]</span></button></div></div><div class="space-y-3">
+<label class="font-label-caps text-zinc-400">BIOLOGICAL ORIGIN</label>
+<div class="grid grid-cols-3 gap-2 bg-glass-fill p-1 border border-ghost-border rounded-xl">
+<button class="py-3 px-4 font-label-caps text-surgical-white bg-white/10 rounded-lg border border-white/20 transition-all">MAN</button>
+<button class="py-3 px-4 font-label-caps text-zinc-400 hover:text-white transition-all">WOMEN</button>
+<button class="py-3 px-4 font-label-caps text-zinc-400 hover:text-white transition-all">OTHER</button>
+</div>
+</div>
+<!-- Age Stepper -->
+<div class="space-y-3">
+<label class="font-label-caps text-zinc-400">CHRONOLOGICAL AGE</label>
+<div class="glass-card flex items-center justify-between p-4 h-20">
+<button class="w-14 h-14 flex items-center justify-center bg-white/5 border border-ghost-border rounded-full active:scale-90 transition-transform" onclick="this.nextElementSibling.innerText = Math.max(18, parseInt(this.nextElementSibling.innerText) - 1)">
+<span class="material-symbols-outlined text-surgical-white">remove</span>
+</button>
+<div class="text-center">
+<span class="font-telemetry-lg text-4xl text-surgical-white leading-none">28</span>
+<span class="block font-label-caps text-[10px] text-zinc-400 mt-1 uppercase tracking-widest">Years</span>
+</div>
+<button class="w-14 h-14 flex items-center justify-center bg-white/5 border border-ghost-border rounded-full active:scale-90 transition-transform" onclick="this.previousElementSibling.firstElementChild.innerText = parseInt(this.previousElementSibling.firstElementChild.innerText) + 1">
+<span class="material-symbols-outlined text-surgical-white">add</span>
+</button>
+</div>
+</div>
+<!-- Stature (cm) -->
+<div class="space-y-3">
+<div class="flex justify-between items-end">
+<label class="font-label-caps text-zinc-400">STATURE</label>
+<div class="font-telemetry-md text-surgical-white">185<span class="text-zinc-500 ml-1">cm</span></div>
+</div>
+<div class="glass-card p-6 h-20 flex items-center relative">
+<input class="w-full" max="220" min="140" placeholder="185" type="range" value="182.5">
+<div class="absolute left-6 right-6 bottom-3 flex justify-between">
+<span class="font-label-caps text-[8px] text-zinc-500">140</span>
+<span class="font-label-caps text-[8px] text-zinc-500">180</span>
+<span class="font-label-caps text-[8px] text-zinc-500">220</span>
+</div>
+</div>
+</div>
+<!-- Body Mass (kg) -->
+<div class="space-y-3">
+<div class="flex justify-between items-end">
+<label class="font-label-caps text-zinc-400">BODY MASS</label>
+<div class="font-telemetry-md text-surgical-white">84.2<span class="text-zinc-500 ml-1">kg</span></div>
+</div>
+<div class="glass-card p-6 h-20 flex items-center relative">
+<input class="w-full" max="150" min="40" type="range" value="84.2">
+<div class="absolute left-6 right-6 bottom-3 flex justify-between">
+<span class="font-label-caps text-[8px] text-zinc-500">40</span>
+<span class="font-label-caps text-[8px] text-zinc-500">95</span>
+<span class="font-label-caps text-[8px] text-zinc-500">150</span>
+</div>
+</div>
+</div>
+<!-- Ratios -->
+<!-- Anatomical Visualization -->
+<div class="mb-8 space-y-3">
+<label class="font-label-caps text-zinc-400">ANATOMICAL REFERENCE</label>
+<div class="glass-card overflow-hidden bg-white/[0.03] backdrop-blur-xl border border-ghost-border flex flex-col items-center">
+<img alt="Biomechanical human body silhouette" class="w-full max-w-[280px] h-auto object-contain" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDm--oH5ix-ymo8gWvqmOcdugvAOVLiliW92oz-7Ug1Uoy6ONhOASBuxmNNA0Oeo6hEW8vElmE1Y_BItyML025oiXe5WLxThtBjRvznk84wzszRwneu0kO4IajqYqklK7nFn2148gsmuvYjwbjcUYIYVph6o-kQ6OTXklsgDZxz5o_gfrC9qSSj1HMiuwoQwPTKpCZRJuUEMF3xSSOmTD1kAc3DbjwzvMDG85-n1l8-S605EDm8Q3usUWMsyXCPFoKPdPnKvN8bHcw">
+<div class="w-full py-2 bg-black/40 border-t border-ghost-border">
+<p class="text-center font-label-caps text-[10px] text-zinc-400 tracking-widest">REAL-TIME KINETIC MODELING</p>
+</div>
+</div>
+</div><div class="grid grid-cols-2 gap-4">
+<div class="space-y-3">
+<label class="font-label-caps text-zinc-400 text-[10px]">FEMUR RATIO</label>
+<div class="flex flex-col bg-glass-fill border border-ghost-border rounded-xl p-1">
+<button class="py-2 font-label-caps text-[10px] text-zinc-400">SHORT</button>
+<button class="py-2 font-label-caps text-[10px] text-surgical-white bg-white/10 rounded-lg border border-white/20">MED</button>
+<button class="py-2 font-label-caps text-[10px] text-zinc-400">LONG</button>
+</div>
+</div><!-- Surgical Alert -->
+<div class="mt-3 py-2 px-3 bg-red-950/20 border border-red-500/30 rounded-lg flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-[14px] text-chirurgical-red">warning</span>
+<span class="font-telemetry-md font-bold text-chirurgical-red text-[10px] tracking-tighter">WARN: HIGH LUMBAR SHEAR DETECTED</span>
+</div>
+<div class="space-y-3">
+<label class="font-label-caps text-zinc-400 text-[10px]">HUMERUS RATIO</label>
+<div class="flex flex-col bg-glass-fill border border-ghost-border rounded-xl p-1">
+<button class="py-2 font-label-caps text-[10px] text-zinc-400">SHORT</button>
+<button class="py-2 font-label-caps text-[10px] text-zinc-400">MED</button>
+<button class="py-2 font-label-caps text-[10px] text-surgical-white bg-white/10 rounded-lg border border-white/20">LONG</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Primary Action -->
+<div class="reach-zone mt-12 pb-8">
+<div class="relative w-full h-14 bg-glass-fill border border-[rgba(255,255,255,0.1)] rounded-full overflow-hidden select-none flex items-center px-1" id="slide-to-validate-container">
+<div class="absolute inset-0 flex items-center justify-center pointer-events-none">
+<span class="font-label-caps text-zinc-400 tracking-[0.4em] text-[10px] opacity-60">SLIDE TO VALIDATE</span>
+</div>
+<div class="absolute inset-y-0 left-0 bg-surgical-white/5 w-0 pointer-events-none transition-all duration-75" id="slider-fill"></div>
+<!-- High-fidelity Glassmorphic Handle -->
+<div class="absolute left-1 w-12 h-12 glass-card bg-white/5 border border-[rgba(255,255,255,0.2)] rounded-full flex items-center justify-center cursor-grab active:cursor-grabbing transition-transform duration-75 micro-glow z-10" id="slider-handle">
+<div class="w-1.5 h-1.5 bg-surgical-white rounded-full"></div>
+</div>
+</div>
+<style>
+  #slide-to-validate-container {
+    touch-action: none;
+  }
+</style>
+<script>
+  (function() {
+    const container = document.getElementById('slide-to-validate-container');
+    const handle = document.getElementById('slider-handle');
+    const fill = document.getElementById('slider-fill');
+    let isDragging = false;
+    let startX = 0;
+    const padding = 4; // Based on px-1 (4px)
+    
+    const updateMaxMove = () => {
+        return container.clientWidth - handle.clientWidth - (padding * 2);
+    };
+
+    const onStart = (e) => {
+      isDragging = true;
+      startX = (e.pageX || e.touches[0].pageX) - (parseFloat(handle.style.transform.replace('translateX(', '')) || 0);
+      handle.classList.remove('transition-transform');
+      fill.classList.remove('transition-all');
+    };
+
+    const onMove = (e) => {
+      if (!isDragging) return;
+      const currentX = e.pageX || e.touches[0].pageX;
+      let move = currentX - startX;
+      const maxMove = updateMaxMove();
+      move = Math.max(0, Math.min(move, maxMove));
+      handle.style.transform = `translateX(${move}px)`;
+      fill.style.width = `${move + (handle.clientWidth / 2) + padding}px`;
+      
+      if (move >= maxMove) {
+        isDragging = false;
+        handle.style.transform = `translateX(${maxMove}px)`;
+        container.classList.add('bg-surgical-white/10');
+        container.querySelector('span').classList.replace('text-zinc-400', 'text-surgical-white');
+        container.querySelector('span').classList.replace('opacity-60', 'opacity-100');
+        handle.style.opacity = '0.5';
+        handle.style.pointerEvents = 'none';
+      }
+    };
+
+    const onEnd = () => {
+      if (!isDragging) return;
+      isDragging = false;
+      const move = parseFloat(handle.style.transform.replace('translateX(', '')) || 0;
+      const maxMove = updateMaxMove();
+      if (move < maxMove) {
+        handle.classList.add('transition-transform');
+        fill.classList.add('transition-all');
+        handle.style.transform = 'translateX(0px)';
+        fill.style.width = '0px';
+      }
+    };
+
+    handle.addEventListener('mousedown', onStart);
+    handle.addEventListener('touchstart', onStart);
+    window.addEventListener('mousemove', onMove);
+    window.addEventListener('touchmove', onMove);
+    window.addEventListener('mouseup', onEnd);
+    window.addEventListener('touchend', onEnd);
+  })();
+</script>
+</div>
+</main>
+<script>
+    // Micro-interactions for sliders
+    document.querySelectorAll('input[type="range"]').forEach(slider => {
+        slider.addEventListener('input', (e) => {
+            const val = e.target.value;
+            const display = e.target.closest('.space-y-3').querySelector('.font-telemetry-md');
+            if(display) {
+                const unit = display.querySelector('span').innerText;
+                display.innerHTML = `${val}<span class="text-zinc-500 ml-1">${unit}</span>`;
+            }
+        });
+    });
+</script>
+
+
+</body></html>
