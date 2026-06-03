@@ -93,7 +93,7 @@ export default function VesselScreen() {
 
       {/* TopAppBar - Recreated exactly from the mockup header */}
       <View style={tw`w-full h-16 border-b border-white/8 flex-row items-center px-5 bg-black z-50`}>
-        <Text style={[tw`text-white text-xl font-bold tracking-tighter`, { fontFamily: 'Geist' }]}>
+        <Text style={[tw`text-white text-[32px] tracking-tighter`, { fontFamily: 'Geist-Bold' }]}>
           FORGE
         </Text>
       </View>
@@ -101,7 +101,7 @@ export default function VesselScreen() {
       <ScrollView contentContainerStyle={tw`px-5 pt-6 pb-24`} showsVerticalScrollIndicator={false}>
         {/* Header Section */}
         <View style={tw`items-start mb-8`}>
-          <Text style={[tw`text-[28px] font-bold text-white tracking-tighter uppercase`, { fontFamily: 'Geist' }]}>
+          <Text style={[tw`text-[32px] text-white tracking-tighter uppercase leading-none`, { fontFamily: 'Geist-Bold' }]}>
             ANTHROPOMETRIC EVALUATION
           </Text>
         </View>
@@ -109,7 +109,7 @@ export default function VesselScreen() {
         <View style={tw`flex flex-col gap-6`}>
           {/* MEASUREMENT SYSTEM SWITCHER */}
           <View style={tw`flex flex-col gap-3`}>
-            <Text style={[tw`text-[11px] text-zinc-400 tracking-[0.1em] font-bold`, { fontFamily: 'JetBrainsMono' }]}>MEASUREMENT SYSTEM</Text>
+            <Text style={[tw`text-[11px] text-zinc-400 tracking-[0.1em]`, { fontFamily: 'JetBrainsMono-Bold' }]}>MEASUREMENT SYSTEM</Text>
             <View style={tw`flex-row gap-1 bg-white/3 p-1 border border-white/8 rounded-xl h-12`}>
               <TouchableOpacity
                 activeOpacity={0.8}
@@ -124,8 +124,8 @@ export default function VesselScreen() {
               >
                 <Text
                   style={[
-                    tw`text-[10px] font-bold tracking-widest`,
-                    { fontFamily: 'JetBrainsMono' },
+                    tw`text-[10px] tracking-widest`,
+                    { fontFamily: 'JetBrainsMono-Bold' },
                     unitSystem === 'metric' ? tw`text-white` : tw`text-zinc-400`,
                   ]}
                 >
@@ -146,8 +146,8 @@ export default function VesselScreen() {
               >
                 <Text
                   style={[
-                    tw`text-[10px] font-bold tracking-widest`,
-                    { fontFamily: 'JetBrainsMono' },
+                    tw`text-[10px] tracking-widest`,
+                    { fontFamily: 'JetBrainsMono-Bold' },
                     unitSystem === 'imperial' ? tw`text-white` : tw`text-zinc-400`,
                   ]}
                 >
@@ -159,7 +159,7 @@ export default function VesselScreen() {
 
           {/* BIOLOGICAL ORIGIN */}
           <View style={tw`flex flex-col gap-3`}>
-            <Text style={[tw`text-[11px] text-zinc-400 tracking-[0.1em] font-bold`, { fontFamily: 'JetBrainsMono' }]}>BIOLOGICAL ORIGIN</Text>
+            <Text style={[tw`text-[11px] text-zinc-400 tracking-[0.1em]`, { fontFamily: 'JetBrainsMono-Bold' }]}>BIOLOGICAL ORIGIN</Text>
             <View style={tw`flex-row gap-2 bg-white/3 p-1 border border-white/8 rounded-xl`}>
               {(['man', 'women', 'other'] as const).map((g) => (
                 <TouchableOpacity
@@ -176,8 +176,8 @@ export default function VesselScreen() {
                 >
                   <Text
                     style={[
-                      tw`text-[10px] font-bold tracking-widest uppercase`,
-                      { fontFamily: 'JetBrainsMono' },
+                      tw`text-[10px] tracking-widest uppercase`,
+                      { fontFamily: 'JetBrainsMono-Bold' },
                       genderState === g ? tw`text-white` : tw`text-zinc-400`,
                     ]}
                   >
@@ -190,7 +190,7 @@ export default function VesselScreen() {
 
           {/* CHRONOLOGICAL AGE */}
           <View style={tw`flex flex-col gap-3`}>
-            <Text style={[tw`text-[11px] text-zinc-400 tracking-[0.1em] font-bold`, { fontFamily: 'JetBrainsMono' }]}>CHRONOLOGICAL AGE</Text>
+            <Text style={[tw`text-[11px] text-zinc-400 tracking-[0.1em]`, { fontFamily: 'JetBrainsMono-Bold' }]}>CHRONOLOGICAL AGE</Text>
             <GlassCard style={tw`flex-row items-center justify-between p-4 h-20 bg-white/3 border border-white/8 rounded-xl`}>
               <TouchableOpacity
                 activeOpacity={0.7}
@@ -204,8 +204,8 @@ export default function VesselScreen() {
               </TouchableOpacity>
               
               <View style={tw`items-center justify-center`}>
-                <Text style={[tw`text-4xl text-white font-bold leading-none`, { fontFamily: 'JetBrainsMono' }]}>{age}</Text>
-                <Text style={[tw`text-[9px] text-zinc-400 mt-1 uppercase tracking-widest`, { fontFamily: 'JetBrainsMono' }]}>YEARS</Text>
+                <Text style={[tw`text-4xl text-white leading-none`, { fontFamily: 'JetBrainsMono-Bold' }]}>{age}</Text>
+                <Text style={[tw`text-[9px] text-zinc-400 mt-1 uppercase tracking-widest`, { fontFamily: 'JetBrainsMono-Bold' }]}>YEARS</Text>
               </View>
 
               <TouchableOpacity
@@ -224,8 +224,8 @@ export default function VesselScreen() {
           {/* STATURE */}
           <View style={tw`flex flex-col gap-3`}>
             <View style={tw`flex-row justify-between items-end`}>
-              <Text style={[tw`text-[11px] text-zinc-400 tracking-[0.1em] font-bold`, { fontFamily: 'JetBrainsMono' }]}>STATURE</Text>
-              <Text style={[tw`text-[14px] text-white font-bold`, { fontFamily: 'JetBrainsMono' }]}>
+              <Text style={[tw`text-[11px] text-zinc-400 tracking-[0.1em]`, { fontFamily: 'JetBrainsMono-Bold' }]}>STATURE</Text>
+              <Text style={[tw`text-[14px] text-white`, { fontFamily: 'JetBrainsMono-Bold' }]}>
                 {displayHeight}
                 <Text style={tw`text-zinc-500 text-[11px] ml-1`}> {unitSystem === 'metric' ? 'cm' : 'in'}</Text>
               </Text>
@@ -244,8 +244,8 @@ export default function VesselScreen() {
           {/* BODY MASS */}
           <View style={tw`flex flex-col gap-3`}>
             <View style={tw`flex-row justify-between items-end`}>
-              <Text style={[tw`text-[11px] text-zinc-400 tracking-[0.1em] font-bold`, { fontFamily: 'JetBrainsMono' }]}>BODY MASS</Text>
-              <Text style={[tw`text-[14px] text-white font-bold`, { fontFamily: 'JetBrainsMono' }]}>
+              <Text style={[tw`text-[11px] text-zinc-400 tracking-[0.1em]`, { fontFamily: 'JetBrainsMono-Bold' }]}>BODY MASS</Text>
+              <Text style={[tw`text-[14px] text-white`, { fontFamily: 'JetBrainsMono-Bold' }]}>
                 {displayWeight}
                 <Text style={tw`text-zinc-500 text-[11px] ml-1`}> {unitSystem === 'metric' ? 'kg' : 'lbs'}</Text>
               </Text>
@@ -263,7 +263,7 @@ export default function VesselScreen() {
 
           {/* ANATOMICAL REFERENCE (V4 image mockup layout) */}
           <View style={tw`flex flex-col gap-3`}>
-            <Text style={[tw`text-[11px] text-zinc-400 tracking-[0.1em] font-bold`, { fontFamily: 'JetBrainsMono' }]}>ANATOMICAL REFERENCE</Text>
+            <Text style={[tw`text-[11px] text-zinc-400 tracking-[0.1em]`, { fontFamily: 'JetBrainsMono-Bold' }]}>ANATOMICAL REFERENCE</Text>
             <GlassCard style={tw`overflow-hidden bg-white/3 border border-white/8 rounded-xl items-center`}>
               <Image
                 source={require('../assets/images/anatomical_reference_v4.png')}
@@ -271,60 +271,99 @@ export default function VesselScreen() {
                 resizeMode="contain"
               />
               <View style={tw`w-full py-2 bg-black/40 border-t border-white/8`}>
-                <Text style={[tw`text-center text-[10px] text-zinc-400 tracking-widest uppercase`, { fontFamily: 'JetBrainsMono' }]}>
+                <Text style={[tw`text-center text-[10px] text-zinc-400 tracking-widest uppercase`, { fontFamily: 'JetBrainsMono-Bold' }]}>
                   REAL-TIME KINETIC MODELING
                 </Text>
               </View>
             </GlassCard>
           </View>
 
-          {/* RATIOS & SURGICAL ALERT (Recreated exactly from CSS Grid structure) */}
-          <View style={tw`flex-row flex-wrap gap-4`}>
-            {/* Femur Ratio column (takes 47% width of parent) */}
-            <View style={[tw`flex-col gap-3`, { width: '47%' }]}>
-              <Text style={[tw`text-[10px] text-zinc-400 tracking-[0.1em] font-bold`, { fontFamily: 'JetBrainsMono' }]}>FEMUR RATIO</Text>
-              <View style={tw`flex flex-col bg-white/3 border border-white/8 rounded-xl p-1`}>
-                {(['short', 'average', 'long'] as const).map((r) => (
-                  <TouchableOpacity
-                    key={r}
-                    activeOpacity={0.8}
-                    onPress={async () => {
-                      await HapticService.select();
-                      setFemurRatio(r);
-                    }}
-                    style={[
-                      tw`py-2 items-center justify-center rounded-lg mb-1`,
-                      femurRatio === r && tw`bg-white/10 border border-white/20`,
-                    ]}
-                  >
-                    <Text
+          {/* RATIOS & SURGICAL ALERT (Refactored dynamically into a clean 2x2 Grid) */}
+          <View style={tw`flex-col gap-4 w-full`}>
+            {/* Row 1 */}
+            <View style={tw`flex-row gap-4 w-full`}>
+              {/* Femur Ratio column (Left side) */}
+              <View style={tw`flex-1 gap-3`}>
+                <Text style={[tw`text-[10px] text-zinc-400 tracking-[0.1em]`, { fontFamily: 'JetBrainsMono-Bold' }]}>FEMUR RATIO</Text>
+                <View style={tw`flex flex-col bg-white/3 border border-white/8 rounded-xl p-1`}>
+                  {(['short', 'average', 'long'] as const).map((r) => (
+                    <TouchableOpacity
+                      key={r}
+                      activeOpacity={0.8}
+                      onPress={async () => {
+                        await HapticService.select();
+                        setFemurRatio(r);
+                      }}
                       style={[
-                        tw`text-[10px] font-bold`,
-                        { fontFamily: 'JetBrainsMono' },
-                        femurRatio === r ? tw`text-white` : tw`text-zinc-400`,
+                        tw`py-2 items-center justify-center rounded-lg mb-1`,
+                        femurRatio === r && tw`bg-white/10 border border-white/20`,
                       ]}
                     >
-                      {r === 'average' ? 'MED' : r.toUpperCase()}
-                    </Text>
-                  </TouchableOpacity>
-                ))}
+                      <Text
+                        style={[
+                          tw`text-[10px]`,
+                          { fontFamily: 'JetBrainsMono-Bold' },
+                          femurRatio === r ? tw`text-white` : tw`text-zinc-400`,
+                        ]}
+                      >
+                        {r === 'average' ? 'MED' : r.toUpperCase()}
+                      </Text>
+                    </TouchableOpacity>
+                  ))}
+                </View>
+              </View>
+
+              {/* Right column: either Surgical Alert (if femur is long) or Humerus Ratio (if femur is short/med) */}
+              <View style={tw`flex-1 gap-3`}>
+                {femurRatio === 'long' ? (
+                  <View style={tw`flex-1`}>
+                    <Text style={[tw`text-[10px] text-transparent tracking-[0.1em]`, { fontFamily: 'JetBrainsMono-Bold' }]}>ALERT</Text>
+                    <View style={tw`flex-1 justify-center items-center bg-red-950/20 border border-chirurgical-red/30 rounded-xl p-3 gap-2`}>
+                      <Ionicons name="warning" size={16} color="#ef4444" style={tw`self-center`} />
+                      <Text style={[tw`text-chirurgical-red text-[9px] tracking-tighter uppercase text-center`, { fontFamily: 'JetBrainsMono-Bold' }]}>
+                        WARN: HIGH LUMBAR SHEAR DETECTED
+                      </Text>
+                    </View>
+                  </View>
+                ) : (
+                  <View style={tw`flex-1 gap-3`}>
+                    <Text style={[tw`text-[10px] text-zinc-400 tracking-[0.1em]`, { fontFamily: 'JetBrainsMono-Bold' }]}>HUMERUS RATIO</Text>
+                    <View style={tw`flex flex-col bg-white/3 border border-white/8 rounded-xl p-1`}>
+                      {(['short', 'average', 'long'] as const).map((r) => (
+                        <TouchableOpacity
+                          key={r}
+                          activeOpacity={0.8}
+                          onPress={async () => {
+                            await HapticService.select();
+                            setArmRatio(r);
+                          }}
+                          style={[
+                            tw`py-2 items-center justify-center rounded-lg mb-1`,
+                            armRatio === r && tw`bg-white/10 border border-white/20`,
+                          ]}
+                        >
+                          <Text
+                            style={[
+                              tw`text-[10px]`,
+                              { fontFamily: 'JetBrainsMono-Bold' },
+                              armRatio === r ? tw`text-white` : tw`text-zinc-400`,
+                            ]}
+                          >
+                            {r === 'average' ? 'MED' : r.toUpperCase()}
+                          </Text>
+                        </TouchableOpacity>
+                      ))}
+                    </View>
+                  </View>
+                )}
               </View>
             </View>
 
-            {/* Right side: Alert (if femur is long) or Humerus Ratio */}
-            {femurRatio === 'long' ? (
-              <>
-                {/* Alert takes the second column slot in row 1 */}
-                <View style={[tw`justify-center bg-red-950/20 border border-chirurgical-red/30 rounded-xl p-4 gap-2`, { width: '47%', height: 110 }]}>
-                  <Ionicons name="warning" size={14} color="#ef4444" style={tw`self-center`} />
-                  <Text style={[tw`font-bold text-chirurgical-red text-[8px] tracking-tighter uppercase text-center`, { fontFamily: 'JetBrainsMono' }]}>
-                    WARN: HIGH LUMBAR SHEAR DETECTED
-                  </Text>
-                </View>
-
-                {/* Humerus ratio wraps to row 2 column 1 */}
-                <View style={[tw`flex-col gap-3 mt-4`, { width: '47%' }]}>
-                  <Text style={[tw`text-[10px] text-zinc-400 tracking-[0.1em] font-bold`, { fontFamily: 'JetBrainsMono' }]}>HUMERUS RATIO</Text>
+            {/* Row 2 (Only rendered when femur ratio is long to wrap Humerus Ratio underneath) */}
+            {femurRatio === 'long' && (
+              <View style={tw`flex-row gap-4 w-full`}>
+                <View style={tw`flex-1 gap-3`}>
+                  <Text style={[tw`text-[10px] text-zinc-400 tracking-[0.1em]`, { fontFamily: 'JetBrainsMono-Bold' }]}>HUMERUS RATIO</Text>
                   <View style={tw`flex flex-col bg-white/3 border border-white/8 rounded-xl p-1`}>
                     {(['short', 'average', 'long'] as const).map((r) => (
                       <TouchableOpacity
@@ -341,8 +380,8 @@ export default function VesselScreen() {
                       >
                         <Text
                           style={[
-                            tw`text-[10px] font-bold`,
-                            { fontFamily: 'JetBrainsMono' },
+                            tw`text-[10px]`,
+                            { fontFamily: 'JetBrainsMono-Bold' },
                             armRatio === r ? tw`text-white` : tw`text-zinc-400`,
                           ]}
                         >
@@ -352,45 +391,13 @@ export default function VesselScreen() {
                     ))}
                   </View>
                 </View>
-              </>
-            ) : (
-              <>
-                {/* Humerus ratio takes the second column slot in row 1 */}
-                <View style={[tw`flex-col gap-3`, { width: '47%' }]}>
-                  <Text style={[tw`text-[10px] text-zinc-400 tracking-[0.1em] font-bold`, { fontFamily: 'JetBrainsMono' }]}>HUMERUS RATIO</Text>
-                  <View style={tw`flex flex-col bg-white/3 border border-white/8 rounded-xl p-1`}>
-                    {(['short', 'average', 'long'] as const).map((r) => (
-                      <TouchableOpacity
-                        key={r}
-                        activeOpacity={0.8}
-                        onPress={async () => {
-                          await HapticService.select();
-                          setArmRatio(r);
-                        }}
-                        style={[
-                          tw`py-2 items-center justify-center rounded-lg mb-1`,
-                          armRatio === r && tw`bg-white/10 border border-white/20`,
-                        ]}
-                      >
-                        <Text
-                          style={[
-                            tw`text-[10px] font-bold`,
-                            { fontFamily: 'JetBrainsMono' },
-                            armRatio === r ? tw`text-white` : tw`text-zinc-400`,
-                          ]}
-                        >
-                          {r === 'average' ? 'MED' : r.toUpperCase()}
-                        </Text>
-                      </TouchableOpacity>
-                    ))}
-                  </View>
-                </View>
-              </>
+                <View style={tw`flex-1`} /> {/* Placeholder to balance Row 2 */}
+              </View>
             )}
           </View>
 
           {validationError && (
-            <Text style={[tw`text-red-500 text-[11px] mt-2`, { fontFamily: 'JetBrainsMono' }]}>
+            <Text style={[tw`text-red-500 text-[11px] mt-2`, { fontFamily: 'JetBrainsMono-Bold' }]}>
               {validationError}
             </Text>
           )}

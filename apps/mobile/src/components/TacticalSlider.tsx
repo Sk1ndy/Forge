@@ -114,6 +114,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     width: 2,
     height: 24,
+    top: 12, // Parfaitement centré verticalement dans la zone tactile de 48px (48/2 - 24/2 = 12)
     backgroundColor: '#ffffff',
     // Halo lumineux blanc premium
     shadowColor: '#ffffff',
@@ -130,9 +131,9 @@ const styles = StyleSheet.create({
     marginTop: -4,
   },
   tickText: {
-    fontSize: 9,
-    fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'monospace',
-    color: 'rgba(255, 255, 255, 0.3)',
+    fontSize: 8,
+    fontFamily: 'JetBrainsMono',
+    color: '#71717a', // zinc-500
     fontWeight: '700',
     flex: 1,
   },

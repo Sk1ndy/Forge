@@ -103,16 +103,16 @@ export default function OnboardingScreen() {
 
         {/* Central Branding */}
         <View style={tw`flex-1 justify-center items-center z-20 px-5 pb-24`}>
-          <View style={tw`items-center w-full`}>
-            <Text style={[tw`text-white text-[48px] font-bold tracking-[0.4em] mb-2 text-center`, { fontFamily: 'Geist' }]}>FORGE</Text>
-            <View style={tw`w-48 h-[1px] bg-white/30 mb-6`} />
-            <Text style={[tw`text-white/60 text-[10px] tracking-[0.3em] text-center uppercase`, { fontFamily: 'JetBrainsMono' }]}>BIOMECHANICAL SIMULATION ENGINE</Text>
+          <View style={[tw`items-center`, { alignSelf: 'center' }]}>
+            <Text style={[tw`text-white text-[48px] tracking-[0.4em] mb-2 text-center leading-none`, { fontFamily: 'Geist-Bold' }]}>FORGE</Text>
+            <View style={tw`w-full h-[1px] bg-white/30 mb-6`} />
+            <Text style={[tw`text-white/60 text-[10px] tracking-[0.3em] text-center uppercase`, { fontFamily: 'JetBrainsMono-Bold' }]}>BIOMECHANICAL SIMULATION ENGINE</Text>
           </View>
         </View>
 
         {/* Bottom Left Telemetry (HUD Uplink status) */}
         <View style={tw`absolute bottom-28 left-6 z-40`} pointerEvents="none">
-          <Text style={[tw`text-zinc-400/60 text-[9px] tracking-[0.2em] uppercase`, { fontFamily: 'JetBrainsMono' }]}>UPLINK: SECURE</Text>
+          <Text style={[tw`text-zinc-400/60 text-[9px] tracking-[0.2em] uppercase`, { fontFamily: 'JetBrainsMono-Bold' }]}>UPLINK: SECURE</Text>
         </View>
 
         {/* Fixed Glass Footer */}
@@ -133,7 +133,7 @@ export default function OnboardingScreen() {
                 }
               ]}
             >
-              <Text style={[tw`text-black font-bold text-sm tracking-[0.2em]`, { fontFamily: 'Geist' }]}>INITIATE EVALUATION</Text>
+              <Text style={[tw`text-black text-sm tracking-[0.2em]`, { fontFamily: 'Geist-Bold' }]}>INITIATE EVALUATION</Text>
             </TouchableOpacity>
             
             <TouchableOpacity
@@ -144,7 +144,7 @@ export default function OnboardingScreen() {
               }}
               style={tw`py-2`}
             >
-              <Text style={[tw`text-white/60 text-[10px] tracking-[0.2em] uppercase`, { fontFamily: 'JetBrainsMono' }]}>Existing Member / Login</Text>
+              <Text style={[tw`text-white/60 text-[10px] tracking-[0.2em] uppercase`, { fontFamily: 'JetBrainsMono-Bold' }]}>Existing Member / Login</Text>
             </TouchableOpacity>
           </View>
         </View>

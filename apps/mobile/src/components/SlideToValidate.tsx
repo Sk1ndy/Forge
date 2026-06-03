@@ -28,7 +28,8 @@ export const SlideToValidate: React.FC<SlideToValidateProps> = ({ onValidate }) 
     setContainerWidth(e.nativeEvent.layout.width);
   };
 
-  const maxMove = containerWidth > 0 ? containerWidth - 48 - 8 : 0; // w-12 is 48px, padding px-1 is 4px * 2
+  // w-12 is 48px, padding horizontal is 4px * 2 (8px)
+  const maxMove = containerWidth > 0 ? containerWidth - 48 - 8 : 0;
 
   const panResponder = useRef(
     PanResponder.create({
@@ -75,7 +76,7 @@ export const SlideToValidate: React.FC<SlideToValidateProps> = ({ onValidate }) 
   const textOpacity = maxMove > 0
     ? panX.interpolate({
         inputRange: [0, maxMove * 0.6],
-        outputRange: [0.6, 0],
+        outputRange: [0.6, 0.15],
         extrapolate: 'clamp',
       })
     : 0.6;
@@ -101,6 +102,27 @@ export const SlideToValidate: React.FC<SlideToValidateProps> = ({ onValidate }) 
           { backgroundColor: bgOpacity }
         ]}
       >
+        {/* Real-time slider fill sliding in from the left (using GPU translation) */}
+        {containerWidth > 0 && (
+          <Animated.View
+            style={[
+              styles.fill,
+              {
+                width: containerWidth,
+                transform: [
+                  {
+                    translateX: panX.interpolate({
+                      inputRange: [0, maxMove || 1],
+                      outputRange: [-containerWidth + 48, 0],
+                      extrapolate: 'clamp',
+                    }),
+                  },
+                ],
+              },
+            ]}
+          />
+        )}
+
         {/* Texte flottant au centre */}
         <Animated.View style={[styles.textWrapper, { opacity: textOpacity }]} pointerEvents="none">
           <Text style={styles.text}>SLIDE TO VALIDATE</Text>
@@ -140,16 +162,26 @@ const styles = StyleSheet.create({
     position: 'relative',
     overflow: 'hidden',
   },
+  fill: {
+    position: 'absolute',
+    top: 0,
+    bottom: 0,
+    left: 4,
+    height: '100%',
+    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+    borderRadius: 28,
+    pointerEvents: 'none',
+  },
   textWrapper: {
     ...StyleSheet.absoluteFill,
     justifyContent: 'center',
     alignItems: 'center',
+    zIndex: 2,
   },
   text: {
-    color: '#a1a1aa',
+    color: '#ffffff',
     fontSize: 10,
-    fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'monospace',
-    fontWeight: '700',
+    fontFamily: 'JetBrainsMono-Bold',
     letterSpacing: 4,
   },
   handle: {
@@ -161,6 +193,7 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(255, 255, 255, 0.2)',
     justifyContent: 'center',
     alignItems: 'center',
+    zIndex: 3,
     // Micro-glow
     shadowColor: '#ffffff',
     shadowOffset: { width: 0, height: 0 },
