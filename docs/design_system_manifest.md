@@ -32,11 +32,13 @@ La palette de couleurs est ultra-restreinte, hautement fonctionnelle et optimis�
 | **`bg-glass-fill`** | `rgba(255, 255, 255, 0.03)` | Fond des conteneurs vitrés translucides. |
 | **`border-glass-border`** | `rgba(255, 255, 255, 0.08)` | Bordures fines (1px) délimitant les cartes. |
 | **`border-ghost-border`** | `rgba(255, 255, 255, 0.1)` | Bordures interactives (boutons inactifs, curseurs). |
-| **`text-chirurgical-red`** | `#EF4444` | **L'Exception**. Unique couleur autorisée. Dédiée exclusivement aux alertes de fatigue critique, au cisaillement lombaire et aux zones musculaires saturées. |
+| **`text-chirurgical-red`** | `#EF4444` | **Couleur d'état critique**. Alertes de fatigue critique, surcharge, cisaillement lombaire ou zones musculaires saturées. |
+| **`text-clinical-orange`** | `#F97316` | **Couleur d'état intermédiaire**. Tension modérée, seuils de précaution ou avertissements. |
+| **`text-clinical-green`** | `#10B981` | **Couleur d'état optimal**. Capteurs connectés, synchronisation réussie ou niveau optimal. |
 
 > [!NOTE]
 > **USAGE DES COULEURS D'ÉTAT (ROUGE, ORANGE, VERT)** :
-> L'utilisation tactique du rouge chirurgical (`#EF4444`), de l'orange clinique (`#F97316`) ou d'un vert clinique subtil est autorisée pour exprimer un état système ou physiologique (ex: statut optimal/connecté de capteurs, surcharge ou tension intermédiaire sur les graphiques de progression). Ces touches de couleur doivent rester extrêmement locales et subtiles pour préserver la dominance clinique monochrome de l'interface.
+> L'utilisation tactique de ces trois couleurs est autorisée pour exprimer un état système ou physiologique (ex: statut de capteurs, surcharge ou tension sur les graphiques de progression). Ces touches de couleur doivent rester extrêmement locales et subtiles pour préserver la dominance clinique monochrome de l'interface.
 
 ---
 
