@@ -45,10 +45,6 @@ export function CyberGrid() {
           <Text style={[styles.hudText, { fontFamily: monoFont }]}>HUD_SYS // v4.0</Text>
           <Text style={[styles.hudText, { fontFamily: monoFont }]}>CALIBRATION: ACTIVE</Text>
         </View>
-        <View style={[styles.hudRow, styles.hudRowBottom]}>
-          <Text style={[styles.hudText, { fontFamily: monoFont }]}>STOCHASTIC_PREDICT</Text>
-          <Text style={[styles.hudText, { fontFamily: monoFont }]}>CNS_FAILURE_GUARD</Text>
-        </View>
       </View>
     </View>
   );

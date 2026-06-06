@@ -1,12 +1,12 @@
-import React, { useState, useRef } from 'react';
-import {
-  StyleSheet,
-  View,
-  Text,
-  PanResponder,
-  LayoutChangeEvent,
-  Platform,
-} from 'react-native';
+import React, { useState, useRef, useEffect } from 'react';
+import { StyleSheet, View, Text, LayoutChangeEvent } from 'react-native';
+import { GestureDetector, Gesture } from 'react-native-gesture-handler';
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  runOnJS,
+} from 'react-native-reanimated';
+import * as Haptics from 'expo-haptics';
 
 interface TacticalSliderProps {
   min: number;
@@ -16,11 +16,6 @@ interface TacticalSliderProps {
   unit: string;
 }
 
-/**
- * TacticalSlider - Un curseur de visée tactile haute-fidélité.
- * Utilise PanResponder pour une réactivité gestuelle à 120Hz sans dépendances complexes.
- * Affiche une aiguille verticale blanche ultra-fine de 2px sur une piste millimétrique.
- */
 export const TacticalSlider: React.FC<TacticalSliderProps> = ({
   min,
   max,
@@ -29,112 +24,149 @@ export const TacticalSlider: React.FC<TacticalSliderProps> = ({
   unit,
 }) => {
   const [width, setWidth] = useState(0);
-  const startVal = useRef(0);
+  const translateX = useSharedValue(0);
+  const startX = useSharedValue(0);
+
+  // Synchronize transition value when value changes externally
+  useEffect(() => {
+    if (width > 0) {
+      const percent = (value - min) / (max - min);
+      translateX.value = percent * width;
+    }
+  }, [value, min, max, width]);
 
   const onLayout = (e: LayoutChangeEvent) => {
-    setWidth(e.nativeEvent.layout.width);
+    const layoutWidth = e.nativeEvent.layout.width;
+    const activeWidth = layoutWidth - 40; // account for paddingHorizontal: 20
+    setWidth(activeWidth);
+    
+    // Initial position setup
+    const percent = (value - min) / (max - min);
+    translateX.value = percent * activeWidth;
   };
 
-  const panResponder = useRef(
-    PanResponder.create({
-      onStartShouldSetPanResponder: () => true,
-      onMoveShouldSetPanResponder: () => true,
-      onPanResponderGrant: () => {
-        startVal.current = value;
-      },
-      onPanResponderMove: (_, gestureState) => {
-        if (width <= 0) return;
-        const deltaX = gestureState.dx;
-        const deltaValue = (deltaX / width) * (max - min);
-        const newValue = startVal.current + deltaValue;
-        const clampedValue = Math.max(min, Math.min(newValue, max));
-        // Arrondir à 1 décimale pour le poids (kg) ou à l'entier pour la taille
-        const roundedValue = unit.toLowerCase() === 'kg' || unit.toLowerCase() === 'lbs'
-          ? Math.round(clampedValue * 10) / 10
-          : Math.round(clampedValue);
-        onChange(roundedValue);
-      },
+  const lastActiveVal = useRef(value);
+
+  const handleValueChange = (val: number) => {
+    if (val !== lastActiveVal.current) {
+      lastActiveVal.current = val;
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => {});
+      onChange(val);
+    }
+  };
+
+  const panGesture = Gesture.Pan()
+    .onStart(() => {
+      startX.value = translateX.value;
     })
-  ).current;
+    .onUpdate((event) => {
+      if (width <= 0) return;
+      const nextX = startX.value + event.translationX;
+      const clampedX = Math.max(0, Math.min(nextX, width));
+      translateX.value = clampedX;
 
-  // Calcul du pourcentage de progression pour positionner l'aiguille
-  const percent = max > min ? (value - min) / (max - min) : 0;
-  const clampedPercent = Math.max(0, Math.min(percent, 1));
-  const handleLeft = clampedPercent * width;
+      // Calculate step values
+      const percent = clampedX / width;
+      const rawValue = min + percent * (max - min);
+      const roundedValue = unit.toLowerCase() === 'kg' || unit.toLowerCase() === 'lbs'
+        ? Math.round(rawValue * 10) / 10
+        : Math.round(rawValue);
 
-  const midValue = (min + max) / 2;
+      runOnJS(handleValueChange)(roundedValue);
+    });
+
+  const thumbStyle = useAnimatedStyle(() => {
+    return {
+      transform: [{ translateX: translateX.value }],
+    };
+  });
+
+  const midValue = Math.round((min + max) / 2);
 
   return (
-    <View style={styles.sliderWrapper}>
-      {/* Zone active du geste */}
-      <View
-        style={styles.touchArea}
+    <GestureDetector gesture={panGesture}>
+      <View 
+        style={styles.sliderContainer}
         onLayout={onLayout}
-        {...panResponder.panHandlers}
       >
-        {/* Rail Horizontal */}
-        <View style={styles.track} />
+        {/* Interactive Slider Area */}
+        <View style={styles.trackContainer} pointerEvents="none">
+          {/* Horizontal Track Line */}
+          <View style={styles.track} />
 
-        {/* Aiguille de Visée (Needle Handle) */}
-        <View
-          style={[
-            styles.needle,
-            { left: handleLeft - 1 }, // Décale de la moitié de la largeur (2px) pour centrer
-          ]}
-        />
-      </View>
+          {/* Micro-Precision Tick Indicator */}
+          <Animated.View
+            style={[
+              styles.tick,
+              thumbStyle,
+            ]}
+          />
+        </View>
 
-      {/* Graduation HUD / Ticks */}
-      <View style={styles.ticksContainer}>
-        <Text style={[styles.tickText, { textAlign: 'left' }]}>{Math.round(min)}</Text>
-        <Text style={[styles.tickText, { textAlign: 'center' }]}>{Math.round(midValue)}</Text>
-        <Text style={[styles.tickText, { textAlign: 'right' }]}>{Math.round(max)}</Text>
+        {/* Bounds Labels Underneath */}
+        <View style={styles.boundsRow} pointerEvents="none">
+          <Text style={styles.limitText}>{Math.round(min)}</Text>
+          <Text style={[styles.limitText, { textAlign: 'center' }]}>{midValue}</Text>
+          <Text style={[styles.limitText, { textAlign: 'right' }]}>{Math.round(max)}</Text>
+        </View>
       </View>
-    </View>
+    </GestureDetector>
   );
 };
 
 const styles = StyleSheet.create({
-  sliderWrapper: {
+  sliderContainer: {
+    backgroundColor: 'rgba(255, 255, 255, 0.01)',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.18)',
+    borderRadius: 16,
+    paddingHorizontal: 20,
+    height: 60,
+    justifyContent: 'center',
     width: '100%',
-    paddingVertical: 8,
+    // Subtle border glow
+    shadowColor: '#ffffff',
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.08,
+    shadowRadius: 8,
   },
-  touchArea: {
-    width: '100%',
-    height: 48,
+  trackContainer: {
+    height: 16,
     justifyContent: 'center',
     position: 'relative',
+    width: '100%',
   },
   track: {
     height: 1,
-    backgroundColor: 'rgba(255, 255, 255, 0.15)',
+    backgroundColor: 'rgba(255, 255, 255, 0.22)',
     width: '100%',
   },
-  needle: {
+  tick: {
     position: 'absolute',
     width: 2,
-    height: 24,
-    top: 12, // Parfaitement centré verticalement dans la zone tactile de 48px (48/2 - 24/2 = 12)
+    height: 14,
+    borderRadius: 1,
     backgroundColor: '#ffffff',
-    // Halo lumineux blanc premium
+    left: 0, // Starts aligned at the inner track padding boundary
+    // Active needle glow
     shadowColor: '#ffffff',
     shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0.8,
-    shadowRadius: 6,
-    elevation: 4,
+    shadowOpacity: 0.6,
+    shadowRadius: 3,
   },
-  ticksContainer: {
+  boundsRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     width: '100%',
-    paddingHorizontal: 2,
-    marginTop: -4,
+    marginTop: 6,
   },
-  tickText: {
-    fontSize: 8,
+  limitText: {
     fontFamily: 'JetBrainsMono',
-    color: '#71717a', // zinc-500
-    fontWeight: '700',
+    fontSize: 9.5,
+    color: 'rgba(255, 255, 255, 0.38)',
+    fontWeight: '500',
     flex: 1,
   },
 });
+
+export default TacticalSlider;

@@ -102,7 +102,9 @@ export async function loadLatestBlueprint(): Promise<{ id: string; name: string;
 export async function createWorkoutSession(blueprintId?: string): Promise<string | null> {
   try {
     const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return null;
+    if (!user) {
+      return `guest_sess_${Date.now()}_${Math.random().toString(36).substring(7)}`;
+    }
 
     const { data, error } = await supabase
       .from('workout_sessions')
@@ -113,23 +115,98 @@ export async function createWorkoutSession(blueprintId?: string): Promise<string
     if (error) throw error;
     return data.id;
   } catch (e) {
-    console.error("Error creating workout session", e);
-    return null;
+    console.warn("Offline/Error creating workout session, generating local ID", e);
+    return `local_sess_${Date.now()}_${Math.random().toString(36).substring(7)}`;
   }
 }
 
-import { getUnsyncedLogs, markLogAsSynced, saveLogLocally } from './sqlite';
+import {
+  getUnsyncedLogs,
+  markLogAsSynced,
+  saveLogLocally,
+  saveProfileLocally,
+  getLocalProfile,
+  getUnsyncedProfiles,
+  markProfileAsSynced,
+  deleteLocalProfile,
+  LocalProfile
+} from './sqlite';
+
+export async function saveUserProfile(profile: Omit<LocalProfile, 'is_synced' | 'updated_at'>): Promise<boolean> {
+  try {
+    // 1. Save Locally (Offline First)
+    saveProfileLocally(profile);
+    
+    // 2. Try to sync immediately (fire and forget)
+    syncLocalProfileToSupabase().catch(console.error);
+
+    return true;
+  } catch (e) {
+    console.error("Error saving user profile locally", e);
+    return false;
+  }
+}
+
+export async function syncLocalProfileToSupabase() {
+  try {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+
+    // Check if there is a guest profile we need to adopt
+    const guestProfile = getLocalProfile('guest');
+    if (guestProfile) {
+      saveProfileLocally({
+        ...guestProfile,
+        id: user.id,
+        is_synced: 0
+      });
+      // Delete guest profile so we don't sync it again
+      deleteLocalProfile('guest');
+    }
+
+    const unsynced = getUnsyncedProfiles();
+    for (const profile of unsynced) {
+      const { error } = await supabase
+        .from('users')
+        .upsert({
+          id: profile.id,
+          pdc: profile.pdc,
+          gender: profile.gender,
+          age: profile.age,
+          is_beginner: profile.experience === 'beginner',
+          pr_squat: profile.pr_squat,
+          pr_bench: profile.pr_bench,
+          pr_deadlift: profile.pr_deadlift,
+          pr_ohp: profile.pr_ohp,
+          updated_at: new Date().toISOString()
+        });
+
+      if (!error) {
+        markProfileAsSynced(profile.id);
+      }
+    }
+  } catch (e) {
+    console.error("Failed to sync profile to Supabase", e);
+  }
+}
+
+export async function syncAll() {
+  await syncLocalProfileToSupabase();
+  await syncLocalLogsToSupabase();
+}
 
 export async function saveExerciseLog(log: Omit<ExerciseLog, 'id' | 'created_at'>): Promise<boolean> {
   try {
     const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return false;
+    const userId = user?.id || 'guest';
 
     // 1. Save Locally (Offline First)
-    saveLogLocally({ ...log, user_id: user.id } as any);
+    saveLogLocally({ ...log, user_id: userId } as any);
     
     // 2. Try to sync immediately (fire and forget)
-    syncLocalLogsToSupabase().catch(console.error);
+    if (user) {
+      syncLocalLogsToSupabase().catch(console.error);
+    }
 
     return true;
   } catch (e) {

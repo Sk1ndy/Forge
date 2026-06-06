@@ -1,19 +1,32 @@
-import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Platform } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import React, { useState } from 'react';
+import { View, Text, TouchableOpacity, StyleSheet, TextInput } from 'react-native';
+import { Feather } from '@expo/vector-icons';
 import { HapticService } from '../services/HapticService';
 
 interface TacticalStepperProps {
-  label: string;
   value: number;
   onIncrement: () => void;
   onDecrement: () => void;
   suffix?: string;
   min?: number;
   max?: number;
+  onChange?: (val: number) => void;
+  onEditStateChange?: (editing: boolean) => void;
 }
 
-export function TacticalStepper({ label, value, onIncrement, onDecrement, suffix = '', min = 0, max = 100 }: TacticalStepperProps) {
+export function TacticalStepper({
+  value,
+  onIncrement,
+  onDecrement,
+  suffix = '',
+  min = 0,
+  max = 100,
+  onChange,
+  onEditStateChange,
+}: TacticalStepperProps) {
+  const [isEditing, setIsEditing] = useState(false);
+  const [inputValue, setInputValue] = useState(value.toString());
+
   const handleDec = () => {
     if (value > min) {
       HapticService.step().catch(() => {});
@@ -32,86 +45,128 @@ export function TacticalStepper({ label, value, onIncrement, onDecrement, suffix
     }
   };
 
+  const handleSubmit = () => {
+    setIsEditing(false);
+    onEditStateChange?.(false);
+    const parsed = parseInt(inputValue.trim(), 10);
+    if (!isNaN(parsed) && onChange) {
+      const clamped = Math.max(min, Math.min(max, parsed));
+      onChange(clamped);
+      HapticService.select().catch(() => {});
+    }
+  };
+
   return (
     <View style={styles.container}>
-      <Text style={styles.label}>{label}</Text>
-      <View style={styles.stepperControls}>
-        <TouchableOpacity 
-          activeOpacity={0.7} 
-          onPress={handleDec} 
-          style={[styles.btn, value <= min && styles.btnDisabled]}
-        >
-          <Ionicons name="remove" size={24} color={value <= min ? 'rgba(255,255,255,0.2)' : '#ffffff'} />
-        </TouchableOpacity>
-        
-        <View style={styles.valueContainer}>
-          <Text style={styles.value}>{value}</Text>
-          {suffix ? <Text style={styles.suffix}>{suffix}</Text> : null}
-        </View>
-
-        <TouchableOpacity 
-          activeOpacity={0.7} 
-          onPress={handleInc} 
-          style={[styles.btn, value >= max && styles.btnDisabled]}
-        >
-          <Ionicons name="add" size={24} color={value >= max ? 'rgba(255,255,255,0.2)' : '#ffffff'} />
-        </TouchableOpacity>
+      <TouchableOpacity 
+        activeOpacity={0.7} 
+        onPress={handleDec} 
+        style={[styles.btn, value <= min && styles.btnDisabled]}
+      >
+        <Feather name="minus" size={18} color={value <= min ? 'rgba(255,255,255,0.15)' : '#ffffff'} />
+      </TouchableOpacity>
+      
+      <View style={styles.valueContainer}>
+        {isEditing ? (
+          <TextInput
+            style={[styles.input, { width: Math.max(40, inputValue.length * 14) }]}
+            value={inputValue}
+            onChangeText={setInputValue}
+            onBlur={handleSubmit}
+            onSubmitEditing={handleSubmit}
+            autoFocus
+            keyboardType="numeric"
+            returnKeyType="done"
+            selectTextOnFocus
+          />
+        ) : (
+          <TouchableOpacity
+            onPress={() => {
+              setInputValue(value.toString());
+              setIsEditing(true);
+              onEditStateChange?.(true);
+              HapticService.select().catch(() => {});
+            }}
+            activeOpacity={0.7}
+            style={styles.valueWrapper}
+          >
+            <Text style={styles.value}>{value}</Text>
+          </TouchableOpacity>
+        )}
+        {suffix ? <Text style={styles.suffix}>{suffix.toUpperCase()}</Text> : null}
       </View>
+
+      <TouchableOpacity 
+        activeOpacity={0.7} 
+        onPress={handleInc} 
+        style={[styles.btn, value >= max && styles.btnDisabled]}
+      >
+        <Feather name="plus" size={18} color={value >= max ? 'rgba(255,255,255,0.15)' : '#ffffff'} />
+      </TouchableOpacity>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: 'rgba(255, 255, 255, 0.02)',
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.1)',
-    borderRadius: 8,
-    padding: 16,
-    gap: 12,
-  },
-  label: {
-    fontSize: 9,
-    fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'monospace',
-    color: '#a1a1aa',
-    letterSpacing: 2,
-    textTransform: 'uppercase',
-  },
-  stepperControls: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    backgroundColor: '#000000',
+    backgroundColor: 'transparent',
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.05)',
-    borderRadius: 6,
-    padding: 4,
+    borderColor: 'rgba(255, 255, 255, 0.08)',
+    borderRadius: 16,
+    paddingHorizontal: 12,
+    height: 60,
+    width: '100%',
   },
   btn: {
-    width: 48,
-    height: 48,
+    width: 38,
+    height: 38,
+    borderRadius: 19,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: 'rgba(255, 255, 255, 0.05)',
-    borderRadius: 4,
+    backgroundColor: 'rgba(255, 255, 255, 0.02)',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.05)',
   },
   btnDisabled: {
-    backgroundColor: 'transparent',
+    opacity: 0.3,
   },
   valueContainer: {
-    flexDirection: 'row',
-    alignItems: 'baseline',
-    gap: 4,
+    alignItems: 'center',
+    justifyContent: 'center',
+    minWidth: 80,
+  },
+  valueWrapper: {
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(255, 255, 255, 0.3)',
+    paddingBottom: 2,
   },
   value: {
-    fontSize: 24,
-    fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'monospace',
+    fontSize: 22,
+    fontFamily: 'JetBrainsMono-Bold',
     fontWeight: '700',
     color: '#ffffff',
+    lineHeight: 26,
+  },
+  input: {
+    fontSize: 22,
+    fontFamily: 'JetBrainsMono-Bold',
+    fontWeight: '700',
+    color: '#ffffff',
+    textAlign: 'center',
+    padding: 0,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(255, 255, 255, 0.6)',
   },
   suffix: {
-    fontSize: 12,
-    fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'monospace',
-    color: '#a1a1aa',
+    fontSize: 7,
+    fontFamily: 'JetBrainsMono',
+    color: 'rgba(255, 255, 255, 0.25)',
+    letterSpacing: 1,
+    marginTop: 1,
   },
 });
+
+export default TacticalStepper;

@@ -4,6 +4,9 @@ import { StatusBar } from 'expo-status-bar';
 import { View } from 'react-native';
 import { useFonts } from 'expo-font';
 import * as SplashScreen from 'expo-splash-screen';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
+
+import { syncAll } from '../src/lib/supabase';
 
 // Prevent the splash screen from auto-hiding before our custom fonts are loaded
 SplashScreen.preventAutoHideAsync().catch(() => {});
@@ -27,24 +30,31 @@ export default function RootLayout() {
     }
   }, [fontsLoaded, fontError]);
 
+  useEffect(() => {
+    // Initial sync of offline logs and user profile on app launch
+    syncAll().catch((err) => {
+      console.warn('RootLayout: Failed to perform initial sync', err);
+    });
+  }, []);
+
   if (!fontsLoaded && !fontError) {
     return null;
   }
 
   return (
-    <View style={{ flex: 1, backgroundColor: '#000000' }}>
-      <StatusBar style="light" />
-      <Stack
-        screenOptions={{
-          headerShown: false,
-          contentStyle: { backgroundColor: '#000000' },
-        }}
-      >
-        <Stack.Screen name="index" options={{ animation: 'fade' }} />
-        <Stack.Screen name="onboarding" options={{ animation: 'slide_from_right' }} />
-        <Stack.Screen name="vessel" options={{ animation: 'slide_from_right' }} />
-        <Stack.Screen name="login" options={{ animation: 'fade' }} />
-      </Stack>
-    </View>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <View style={{ flex: 1, backgroundColor: '#000000' }}>
+        <StatusBar style="light" />
+        <Stack
+          screenOptions={{
+            headerShown: false,
+            contentStyle: { backgroundColor: '#000000' },
+          }}
+        >
+          <Stack.Screen name="index" options={{ animation: 'fade' }} />
+          <Stack.Screen name="vessel" options={{ animation: 'slide_from_right' }} />
+        </Stack>
+      </View>
+    </GestureHandlerRootView>
   );
 }

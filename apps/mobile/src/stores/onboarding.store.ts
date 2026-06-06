@@ -23,8 +23,6 @@ const initialAnthropometry: AnthropometricData = {
   age: 25,
   heightCm: 175,
   weightKg: 75,
-  femurRatio: 'average',
-  armRatio: 'average',
 };
 
 const initialMuscleMapping: MuscleMappingData = {

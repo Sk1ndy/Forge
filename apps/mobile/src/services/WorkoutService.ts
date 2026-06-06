@@ -1,4 +1,4 @@
-import { loadLatestBlueprint, createWorkoutSession, loadExercises, syncLocalLogsToSupabase } from '../lib/supabase';
+import { loadLatestBlueprint, createWorkoutSession, loadExercises, syncAll } from '../lib/supabase';
 import { useWorkoutStore } from '../stores/workout.store';
 import { WeeklyBlueprint, Exercise, PlannedExercise } from '@forge/shared';
 
@@ -57,9 +57,9 @@ export const WorkoutService = {
       // 1. Vide le store d'entraînement actif
       useWorkoutStore.getState().endSession();
 
-      // 2. Force une tentative de synchronisation des logs d'exercices stockés en local SQLite
+      // 2. Force une tentative de synchronisation complète stockée en local SQLite
       // vers Supabase de manière non bloquante.
-      syncLocalLogsToSupabase().catch((err) => {
+      syncAll().catch((err) => {
         console.warn('WorkoutService: Passive background sync failed', err);
       });
     } catch (e) {
@@ -85,7 +85,7 @@ export const WorkoutService = {
    */
   syncLogs: async (): Promise<void> => {
     try {
-      await syncLocalLogsToSupabase();
+      await syncAll();
     } catch (e) {
       console.error('WorkoutService: Sync failed', e);
     }

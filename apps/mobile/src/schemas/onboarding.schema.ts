@@ -5,8 +5,6 @@ export const AnthropometricSchema = z.object({
   age: z.number().min(14, "Âge minimum 14 ans").max(100, "Âge maximum 100 ans"),
   heightCm: z.number().min(100, "Taille minimum 100 cm").max(250, "Taille maximum 250 cm"),
   weightKg: z.number().min(30, "Poids minimum 30 kg").max(300, "Poids maximum 300 kg"),
-  femurRatio: z.enum(['short', 'average', 'long']).default('average'),
-  armRatio: z.enum(['short', 'average', 'long']).default('average'),
 });
 
 export const MuscleMappingSchema = z.object({

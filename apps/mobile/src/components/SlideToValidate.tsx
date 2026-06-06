@@ -1,210 +1,232 @@
-import React, { useState, useRef } from 'react';
-import {
-  StyleSheet,
-  View,
-  Text,
-  Animated,
-  PanResponder,
-  LayoutChangeEvent,
-  Platform,
-} from 'react-native';
-import { HapticService } from '../services/HapticService';
+import React, { useState } from 'react';
+import { StyleSheet, View, LayoutChangeEvent } from 'react-native';
+import { GestureDetector, Gesture } from 'react-native-gesture-handler';
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withSpring,
+  withTiming,
+  interpolate,
+  runOnJS,
+} from 'react-native-reanimated';
+import { Feather } from '@expo/vector-icons';
+import * as Haptics from 'expo-haptics';
 
 interface SlideToValidateProps {
   onValidate: () => void;
 }
 
-/**
- * SlideToValidate - Bouton glissant haut de gamme de validation (Cupertino style).
- * Utilise PanResponder et Animated.spring sur le GPU pour une fluidité absolue.
- * S'assombrit/s'éclaire et dispose d'un retour haptique physique à l'activation.
- */
 export const SlideToValidate: React.FC<SlideToValidateProps> = ({ onValidate }) => {
-  const [containerWidth, setContainerWidth] = useState(0);
-  const [validated, setValidated] = useState(false);
-  const panX = useRef(new Animated.Value(0)).current;
+  const translateX = useSharedValue(0);
+  const isSliding = useSharedValue(false);
+  const isSuccess = useSharedValue(false);
+  const maxTranslate = useSharedValue(0);
+  const [isFinished, setIsFinished] = useState(false);
 
   const onLayout = (e: LayoutChangeEvent) => {
-    setContainerWidth(e.nativeEvent.layout.width);
+    const width = e.nativeEvent.layout.width;
+    maxTranslate.value = width - 38 - 8; // handle is 38px, padding is 4px on each side
   };
 
-  // w-12 is 48px, padding horizontal is 4px * 2 (8px)
-  const maxMove = containerWidth > 0 ? containerWidth - 48 - 8 : 0;
+  const triggerLightHaptic = () => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => {});
+  };
 
-  const panResponder = useRef(
-    PanResponder.create({
-      onStartShouldSetPanResponder: () => true,
-      onMoveShouldSetPanResponder: () => true,
-      onPanResponderGrant: () => {
-        if (validated) return;
-        HapticService.select().catch(() => {});
-      },
-      onPanResponderMove: (_, gestureState) => {
-        if (validated || maxMove <= 0) return;
-        const moveX = Math.max(0, Math.min(gestureState.dx, maxMove));
-        panX.setValue(moveX);
-      },
-      onPanResponderRelease: (_, gestureState) => {
-        if (validated || maxMove <= 0) return;
-        
-        // Seuil de validation : 90% du chemin parcouru
-        if (gestureState.dx >= maxMove * 0.9) {
-          setValidated(true);
-          // Animer jusqu'au bout
-          Animated.timing(panX, {
-            toValue: maxMove,
-            duration: 100,
-            useNativeDriver: true,
-          }).start(async () => {
-            await HapticService.success();
-            onValidate();
-          });
-        } else {
-          // Effet de ressort Cupertino (Spring Back)
-          Animated.spring(panX, {
-            toValue: 0,
-            friction: 6,
-            tension: 60,
-            useNativeDriver: true,
-          }).start();
-        }
-      },
+  const triggerHeavyHaptic = () => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy).catch(() => {});
+  };
+
+  const triggerSuccessCallback = () => {
+    setIsFinished(true);
+    onValidate();
+  };
+
+  // Modern Gesture API: Gesture.Pan()
+  const panGesture = Gesture.Pan()
+    .onStart(() => {
+      if (isSuccess.value) return;
+      isSliding.value = true;
+      runOnJS(triggerLightHaptic)();
     })
-  ).current;
+    .onUpdate((event) => {
+      if (isSuccess.value) return;
+      translateX.value = Math.max(0, Math.min(event.translationX, maxTranslate.value));
+    })
+    .onEnd(() => {
+      if (isSuccess.value) return;
+      isSliding.value = false;
 
-  // Interpolation de l'opacité du texte en fonction du glissement
-  const textOpacity = maxMove > 0
-    ? panX.interpolate({
-        inputRange: [0, maxMove * 0.6],
-        outputRange: [0.6, 0.15],
-        extrapolate: 'clamp',
-      })
-    : 0.6;
+      // Threshold: 90%
+      if (translateX.value >= maxTranslate.value * 0.90) {
+        isSuccess.value = true;
+        translateX.value = withTiming(maxTranslate.value, { duration: 80 }, () => {
+          runOnJS(triggerHeavyHaptic)();
+          runOnJS(triggerSuccessCallback)();
+        });
+      } else {
+        translateX.value = withSpring(0, { damping: 12 });
+      }
+    });
 
-  // Interpolation de la couleur du fond du slider à l'activation
-  const bgOpacity = maxMove > 0
-    ? panX.interpolate({
-        inputRange: [0, maxMove],
-        outputRange: ['rgba(255, 255, 255, 0.03)', 'rgba(255, 255, 255, 0.1)'],
-        extrapolate: 'clamp',
-      })
-    : 'rgba(255, 255, 255, 0.03)';
+  const thumbStyle = useAnimatedStyle(() => {
+    const scale = withSpring(isSliding.value ? 1.05 : 1.0, { damping: 15 });
+    // Halo glow opacity during sliding
+    const shadowOpacity = interpolate(
+      translateX.value,
+      [0, maxTranslate.value || 100],
+      [0.15, 0.45],
+      'clamp'
+    );
+    // Expand shadow radius during sliding
+    const shadowRadius = interpolate(
+      translateX.value,
+      [0, maxTranslate.value || 100],
+      [4, 12],
+      'clamp'
+    );
+
+    return {
+      transform: [
+        { translateX: translateX.value },
+        { scale },
+      ],
+      shadowOpacity: isSliding.value ? shadowOpacity : 0.15,
+      shadowRadius: isSliding.value ? shadowRadius : 4,
+    };
+  });
+
+  const textStyle = useAnimatedStyle(() => {
+    const opacity = interpolate(
+      translateX.value,
+      [0, maxTranslate.value * 0.6 || 50],
+      [0.6, 0], // Starts at 0.6 (Zinc-400), fades completely to 0
+      'clamp'
+    );
+    return {
+      opacity,
+    };
+  });
+
+  const trackStyle = useAnimatedStyle(() => {
+    const opacity = withTiming(isSuccess.value ? 0 : 1, { duration: 150 });
+    return {
+      opacity,
+    };
+  });
+
+  const successCheckStyle = useAnimatedStyle(() => {
+    const opacity = withTiming(isSuccess.value ? 1 : 0, { duration: 200 });
+    const scale = withSpring(isSuccess.value ? 1.0 : 0.5);
+    return {
+      opacity,
+      transform: [{ scale }],
+    };
+  });
 
   return (
-    <View
-      style={styles.container}
-      onLayout={onLayout}
-    >
-      {/* Fond interactif */}
-      <Animated.View
-        style={[
-          styles.track,
-          { backgroundColor: bgOpacity }
-        ]}
+    <View style={styles.outerContainer}>
+      {/* Success Check Icon (Fade In / Scale Up) */}
+      <Animated.View style={[styles.successContainer, successCheckStyle]} pointerEvents="none">
+        <View style={styles.successCircle}>
+          <Feather name="check" size={20} color="#ffffff" />
+        </View>
+      </Animated.View>
+
+      {/* Slider Track (Fade Out on Success) */}
+      <Animated.View 
+        style={[styles.track, trackStyle]} 
+        onLayout={onLayout}
+        pointerEvents={isFinished ? 'none' : 'auto'}
       >
-        {/* Real-time slider fill sliding in from the left (using GPU translation) */}
-        {containerWidth > 0 && (
-          <Animated.View
-            style={[
-              styles.fill,
-              {
-                width: containerWidth,
-                transform: [
-                  {
-                    translateX: panX.interpolate({
-                      inputRange: [0, maxMove || 1],
-                      outputRange: [-containerWidth + 48, 0],
-                      extrapolate: 'clamp',
-                    }),
-                  },
-                ],
-              },
-            ]}
-          />
-        )}
+        <View style={styles.textContainer} pointerEvents="none">
+          <Animated.Text style={[styles.instructionText, textStyle]}>
+            SLIDE TO COMMIT
+          </Animated.Text>
+        </View>
 
-        {/* Texte flottant au centre */}
-        <Animated.View style={[styles.textWrapper, { opacity: textOpacity }]} pointerEvents="none">
-          <Text style={styles.text}>SLIDE TO VALIDATE</Text>
-        </Animated.View>
-
-        {/* Poignée en verre dépoli (Handle) */}
-        <Animated.View
-          style={[
-            styles.handle,
-            { transform: [{ translateX: panX }] }
-          ]}
-          {...panResponder.panHandlers}
-        >
-          <View style={styles.dot} />
-        </Animated.View>
+        <GestureDetector gesture={panGesture}>
+          <Animated.View style={[styles.thumb, thumbStyle]}>
+            <View style={styles.thumbCenterMarker} />
+          </Animated.View>
+        </GestureDetector>
       </Animated.View>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
+  outerContainer: {
     width: '100%',
-    height: 56,
+    height: 48,
     position: 'relative',
     justifyContent: 'center',
   },
   track: {
     width: '100%',
-    height: 56,
-    borderRadius: 28,
+    height: 48,
+    borderRadius: 24,
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.08)',
-    flexDirection: 'row',
-    alignItems: 'center',
+    borderColor: '#27272a', // Zinc-800
+    backgroundColor: '#18181b', // Zinc-900
     paddingHorizontal: 4,
-    position: 'relative',
+    justifyContent: 'center',
     overflow: 'hidden',
   },
-  fill: {
+  thumb: {
+    width: 38,
+    height: 38,
+    borderRadius: 19,
+    backgroundColor: '#fafafa', // Zinc-50
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 10,
+    // Specular Halo Glow
+    shadowColor: '#ffffff',
+    shadowOffset: { width: 0, height: 0 },
+    elevation: 3,
+  },
+  thumbCenterMarker: {
+    width: 4,
+    height: 4,
+    borderRadius: 2,
+    backgroundColor: '#000000',
+    opacity: 0.15,
+  },
+  textContainer: {
     position: 'absolute',
     top: 0,
     bottom: 0,
-    left: 4,
-    height: '100%',
-    backgroundColor: 'rgba(255, 255, 255, 0.05)',
-    borderRadius: 28,
-    pointerEvents: 'none',
-  },
-  textWrapper: {
-    ...StyleSheet.absoluteFill,
+    left: 0,
+    right: 0,
     justifyContent: 'center',
     alignItems: 'center',
-    zIndex: 2,
   },
-  text: {
-    color: '#ffffff',
+  instructionText: {
+    fontFamily: 'JetBrainsMono',
     fontSize: 10,
-    fontFamily: 'JetBrainsMono-Bold',
-    letterSpacing: 4,
+    color: '#a1a1aa', // Zinc-400
+    letterSpacing: 1.5,
   },
-  handle: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
+  successContainer: {
+    position: 'absolute',
+    top: 0,
+    bottom: 0,
+    left: 0,
+    right: 0,
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 20,
+  },
+  successCircle: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
     backgroundColor: 'rgba(255, 255, 255, 0.05)',
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.2)',
+    borderColor: 'rgba(255, 255, 255, 0.1)',
     justifyContent: 'center',
     alignItems: 'center',
-    zIndex: 3,
-    // Micro-glow
-    shadowColor: '#ffffff',
-    shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0.25,
-    shadowRadius: 10,
-    elevation: 4,
-  },
-  dot: {
-    width: 6,
-    height: 6,
-    borderRadius: 3,
-    backgroundColor: '#ffffff',
   },
 });
+
+export default SlideToValidate;

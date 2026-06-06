@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { Animated, StyleSheet, TextStyle, Platform } from 'react-native';
 
 interface TacticalFlickerProps {
@@ -17,7 +17,7 @@ export const TacticalFlicker: React.FC<TacticalFlickerProps> = ({
   style,
   fontType = 'mono',
 }) => {
-  const opacityAnim = useRef(new Animated.Value(1)).current;
+  const [opacityAnim] = useState(() => new Animated.Value(1));
 
   useEffect(() => {
     // Séquence de micro-flicker tactique (cockpit militaire) au montage
